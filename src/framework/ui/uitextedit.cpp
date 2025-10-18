@@ -97,14 +97,14 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     }
 
     if (hasSelection()) {
-        const int textLength = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
+        const int textLengthSel = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
 
         int a = std::clamp(m_selectionStart, 0, static_cast<int>(m_text.length()));
         int b = std::clamp(m_selectionEnd, 0, static_cast<int>(m_text.length()));
         if (a > b) std::swap(a, b);
 
-        const int visStart = m_srcToVis.empty() ? a : std::clamp(m_srcToVis[a], 0, textLength);
-        const int visEnd = m_srcToVis.empty() ? b : std::clamp(m_srcToVis[b], 0, textLength);
+        const int visStart = m_srcToVis.empty() ? a : std::clamp(m_srcToVis[a], 0, textLengthSel);
+        const int visEnd = m_srcToVis.empty() ? b : std::clamp(m_srcToVis[b], 0, textLengthSel);
 
         if (glyphsMustRecache) {
             m_glyphsSelectRectCache.clear();
@@ -132,20 +132,99 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         if (elapsed <= delay) {
             Rect cursorRect;
 
-            if (cursorVis < textLength && m_glyphsCoords[cursorVis].first.isValid()) {
-                const Rect& cur = m_glyphsCoords[cursorVis].first;
-                const bool hasPrev = cursorVis > 0 && m_glyphsCoords[cursorVis - 1].first.isValid();
-                const bool sameLineAsPrev = hasPrev && (m_glyphsCoords[cursorVis - 1].first.top() == cur.top());
+            struct LineInfo
+            {
+                int visStart = 0;
+                int visEnd = 0;
+                int top = std::numeric_limits<int>::min();
+                int bottom = std::numeric_limits<int>::min();
+                int left = std::numeric_limits<int>::max();
+                int right = std::numeric_limits<int>::min();
+                bool hasGlyphs = false;
+            };
 
-                if (!hasPrev || !sameLineAsPrev)
-                    cursorRect = Rect(cur.left(), cur.top(), 1, m_font->getGlyphHeight());
-                else
-                    cursorRect = Rect(m_glyphsCoords[cursorVis - 1].first.right(), m_glyphsCoords[cursorVis - 1].first.top(), 1, m_font->getGlyphHeight());
-            } else if (cursorVis > 0 && m_glyphsCoords[cursorVis - 1].first.isValid()) {
-                cursorRect = Rect(m_glyphsCoords[cursorVis - 1].first.right(), m_glyphsCoords[cursorVis - 1].first.top(), 1, m_font->getGlyphHeight());
-            } else {
-                cursorRect = Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
+            std::vector<LineInfo> lines;
+            {
+                int start = 0;
+                const int n = static_cast<int>(m_displayedText.size());
+                for (int i = 0; i <= n; ++i) {
+                    const bool br = (i == n) || (m_displayedText[i] == '\n');
+                    if (!br) continue;
+                    lines.push_back(LineInfo{ start, i });
+                    start = i + 1;
+                }
+                if (lines.empty()) lines.push_back(LineInfo{ 0, n });
             }
+
+            const int visLen = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
+            for (auto& li : lines) {
+                for (int v = li.visStart; v < li.visEnd && v < visLen; ++v) {
+                    const Rect& r = m_glyphsCoords[v].first;
+                    if (!r.isValid()) continue;
+                    li.hasGlyphs = true;
+                    li.top = (li.top == std::numeric_limits<int>::min()) ? r.top() : std::min(li.top, r.top());
+                    li.bottom = (li.bottom == std::numeric_limits<int>::min()) ? r.bottom() : std::max(li.bottom, r.bottom());
+                    li.left = std::min(li.left, r.left());
+                    li.right = std::max(li.right, r.right());
+                }
+            }
+
+            const int lineH = m_font->getGlyphHeight();
+            const int lineDy = m_font->getGlyphSpacing().height();
+            int yCursor = m_drawArea.top();
+            for (size_t i = 0; i < lines.size(); ++i) {
+                auto& li = lines[i];
+                if (li.hasGlyphs) {
+                    if (li.top == std::numeric_limits<int>::min() || li.bottom == std::numeric_limits<int>::min()) {
+                        li.top = yCursor;
+                        li.bottom = li.top + lineH;
+                    }
+                    yCursor = li.bottom;
+                } else {
+                    if (i > 0) {
+                        const auto& prev = lines[i - 1];
+                        const int base = (prev.top != std::numeric_limits<int>::min()) ? prev.bottom : yCursor;
+                        li.top = base + lineDy;
+                        li.bottom = li.top + lineH;
+                    } else {
+                        int nextTop = std::numeric_limits<int>::min();
+                        for (size_t k = i + 1; k < lines.size(); ++k) {
+                            if (lines[k].hasGlyphs) { nextTop = lines[k].top; break; }
+                        }
+                        if (nextTop != std::numeric_limits<int>::min()) {
+                            li.bottom = nextTop - lineDy;
+                            li.top = li.bottom - lineH;
+                        } else {
+                            li.top = yCursor;
+                            li.bottom = li.top + lineH;
+                        }
+                    }
+                }
+                if (li.left == std::numeric_limits<int>::max())
+                    li.left = m_rect.left() + m_padding.left;
+                if (li.right == std::numeric_limits<int>::min())
+                    li.right = li.left;
+            }
+
+            int lineIdx = (int)lines.size() - 1;
+            for (int i = 0; i < (int)lines.size(); ++i) {
+                const auto& li = lines[i];
+                if (cursorVis >= li.visStart && cursorVis <= li.visEnd) { lineIdx = i; break; }
+            }
+            const auto& L = lines[lineIdx];
+
+            int caretX = L.left;
+            if (L.hasGlyphs) {
+                if (cursorVis < visLen && m_glyphsCoords[cursorVis].first.isValid()) {
+                    caretX = m_glyphsCoords[cursorVis].first.left();
+                } else if (cursorVis > 0 && cursorVis - 1 < visLen && m_glyphsCoords[cursorVis - 1].first.isValid()) {
+                    caretX = m_glyphsCoords[cursorVis - 1].first.right();
+                } else {
+                    caretX = L.left;
+                }
+            }
+
+            cursorRect = Rect(caretX, L.top, 1, m_font->getGlyphHeight());
 
             const bool useSelectionColor = hasSelection() && m_cursorPos >= m_selectionStart && m_cursorPos <= m_selectionEnd;
             const auto& color = useSelectionColor ? m_selectionColor : m_color;
@@ -708,81 +787,113 @@ void UITextEdit::moveCursorVertically(bool up)
 
 int UITextEdit::getTextPos(const Point& pos)
 {
-    const int visLen = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
+    const int srcLen = static_cast<int>(m_text.length());
+    const int visLen = static_cast<int>(m_displayedText.length());
     if (visLen <= 0)
-        return -1;
+        return 0;
 
-    Rect firstGlyphRect, lastGlyphRect;
-    for (int i = 0; i < visLen; ++i) {
-        const Rect r = m_glyphsCoords[i].first;
-        if (!r.isValid()) continue;
-        if (!firstGlyphRect.isValid()) firstGlyphRect = r;
-        lastGlyphRect = r;
+    struct VLine
+    {
+        int visStart;
+        int visEnd;
+        int top, bottom;
+        int left, right;
+        bool hasGlyphs;
+    };
+    std::vector<VLine> lines;
+    lines.reserve(64);
+
+    int lineStart = 0;
+    for (int j = 0; j <= visLen; ++j) {
+        const bool isBreak = (j == visLen) || (m_displayedText[j] == '\n');
+        if (!isBreak) continue;
+        const int visStart = lineStart;
+        const int visEnd = j;
+        lineStart = j + 1;
+        lines.push_back({ visStart, visEnd, 0, 0, 0, 0, false });
     }
 
-    if (visLen > 0) {
-        if (pos.y < firstGlyphRect.top())
-            return 0;
-        if (pos.y > lastGlyphRect.bottom())
-            return static_cast<int>(m_text.length());
+    const int glyphH = m_font->getGlyphHeight();
+    const int areaTop = m_drawArea.top();
+    const int areaLeft = m_drawArea.left();
+
+    std::vector<int> visToLine(visLen + 1, 0);
+    for (size_t k = 0; k < lines.size(); ++k)
+        for (int v = lines[k].visStart; v <= lines[k].visEnd; ++v)
+            visToLine[v] = static_cast<int>(k);
+
+    for (size_t k = 0; k < lines.size(); ++k) {
+        auto& L = lines[k];
+        int top = std::numeric_limits<int>::max();
+        int bottom = std::numeric_limits<int>::min();
+        int left = std::numeric_limits<int>::max();
+        int right = std::numeric_limits<int>::min();
+
+        for (int i = 0; i < std::min<int>(visLen, (int)m_glyphsCoords.size()); ++i) {
+            const Rect& r = m_glyphsCoords[i].first;
+            if (!r.isValid()) continue;
+            const int lineIdx = visToLine[std::clamp(i, 0, visLen)];
+            if (lineIdx != (int)k) continue;
+            L.hasGlyphs = true;
+            top = std::min(top, r.top());
+            bottom = std::max(bottom, r.bottom());
+            left = std::min(left, r.left());
+            right = std::max(right, r.right());
+        }
+
+        if (!L.hasGlyphs) {
+            const int t = areaTop + static_cast<int>(k) * glyphH;
+            L.top = t;
+            L.bottom = t + glyphH;
+            L.left = areaLeft;
+            L.right = areaLeft;
+        } else {
+            L.top = (top == std::numeric_limits<int>::max()) ? (areaTop + (int)k * glyphH) : top;
+            L.bottom = (bottom == std::numeric_limits<int>::min()) ? (L.top + glyphH) : bottom;
+            L.left = (left == std::numeric_limits<int>::max()) ? areaLeft : left;
+            L.right = (right == std::numeric_limits<int>::min()) ? areaLeft : right;
+        }
     }
 
-    int candidateVis = -1;
+    if (pos.y < lines.front().top)
+        return 0;
+    if (pos.y > lines.back().bottom)
+        return srcLen;
 
-    for (int i = 0; i < visLen; ++i) {
-        const Rect g = m_glyphsCoords[i].first;
-        if (!g.isValid()) continue;
-
-        const int lineTop = g.top();
-
-        int lineStart = i;
-        int lineEnd = i;
-        while (lineEnd + 1 < visLen) {
-            const Rect& next = m_glyphsCoords[lineEnd + 1].first;
-            if (!next.isValid() || next.top() != lineTop)
-                break;
-            ++lineEnd;
-        }
-
-        const int lineLeft = m_glyphsCoords[lineStart].first.left();
-        int lineRight = lineLeft;
-        for (int j = lineStart; j <= lineEnd; ++j) {
-            const Rect& r = m_glyphsCoords[j].first;
-            if (r.isValid())
-                lineRight = std::max(lineRight, r.right());
-        }
-
-        if (pos.y >= m_glyphsCoords[lineStart].first.top() &&
-            pos.y <= m_glyphsCoords[lineStart].first.bottom()) {
-            if (pos.x < lineLeft) {
-                candidateVis = lineStart;
-            } else if (pos.x > lineRight) {
-                candidateVis = lineEnd; // Fica no fim da linha atual
-            } else {
-                for (int j = lineStart; j <= lineEnd; ++j) {
-                    const Rect& r = m_glyphsCoords[j].first;
-                    if (pos.x < r.right()) {
-                        candidateVis = j;
-                        break;
-                    }
-                }
-                if (candidateVis < 0)
-                    candidateVis = lineEnd;
-            }
+    int clickedLine = -1;
+    for (size_t k = 0; k < lines.size(); ++k) {
+        if (pos.y >= lines[k].top && pos.y <= lines[k].bottom) {
+            clickedLine = static_cast<int>(k);
             break;
         }
+        if (k + 1 < lines.size() && pos.y > lines[k].bottom && pos.y < lines[k + 1].top) {
+            clickedLine = (pos.y - lines[k].bottom <= lines[k + 1].top - pos.y) ? (int)k : (int)k + 1;
+            break;
+        }
+    }
+    if (clickedLine < 0) clickedLine = (int)lines.size() - 1;
 
-        i = lineEnd;
+    const auto& L = lines[clickedLine];
+
+    int targetVis = -1;
+    if (!L.hasGlyphs) {
+        targetVis = L.visStart;
+    } else if (pos.x <= L.left) {
+        targetVis = L.visStart;
+    } else if (pos.x >= L.right) {
+        targetVis = L.visEnd;
+    } else {
+        targetVis = L.visEnd;
+        for (int j = L.visStart; j < L.visEnd; ++j) {
+            const Rect& r = m_glyphsCoords[j].first;
+            if (!r.isValid()) continue;
+            if (pos.x < r.right()) { targetVis = j; break; }
+        }
     }
 
-    if (candidateVis < 0)
-        return -1;
-
-    const int visIdx = std::clamp(candidateVis, 0, static_cast<int>(m_visToSrc.size()) - 1);
-    return std::clamp(
-        m_visToSrc.empty() ? candidateVis : m_visToSrc[visIdx],
-        0,
-        static_cast<int>(m_text.length()));
+    targetVis = std::clamp(targetVis, 0, visLen);
+    const int visIdx = std::clamp(targetVis, 0, (int)m_visToSrc.size() - 1);
+    return std::clamp(m_visToSrc.empty() ? targetVis : m_visToSrc[visIdx], 0, srcLen);
 }
 
 void UITextEdit::updateDisplayedText()
