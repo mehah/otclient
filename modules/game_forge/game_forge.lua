@@ -14,6 +14,8 @@ local function resetInfo()
     ForgeController.formattedPrice = "???"
     ForgeController.transfer.canTransfer = false
     ForgeController.transfer.isConvergence = false
+    ForgeController.transfer.title = "Transfer Requirements"
+    ForgeController.fusion.title = "Further Items Needed For Fusion"
     ForgeController.fusion.selected = cloneValue(ForgeController.baseSelected)
     ForgeController.fusion.selectedTarget = cloneValue(ForgeController.baseSelected)
     ForgeController.fusion.isConvergence = false
@@ -91,7 +93,7 @@ function ForgeController:hide()
 end
 
 function ForgeController:toggle()
-    ForgeController:toggleTransferMenu()
+    ForgeController:toggleFusionMenu()
     resetInfo()
     if ForgeController.rawData then
         forgeData(ForgeController.rawData)
@@ -256,8 +258,47 @@ ForgeController.fusion = {
     chanceImproved = 15,
     chanceBase = 50,
     hasConvergence = false,
-    clip = { x = 0, y = 0, width = 116, height = 34 }
+    isConvergence = false,
+    title = "Further Items Needed For Fusion",
+    clip = { x = 0, y = 0, width = 116, height = 34 },
+    items = {},
+    selected = cloneValue(ForgeController.baseSelected),
+    selectedTarget = cloneValue(ForgeController.baseSelected),
+    canTransfer = false,
+    currentList = {},
 }
+function ForgeController:toggleFusionMenu()
+    self:resetTabsClip()
+    self.currentTab = 'fusion'
+    self.fusion.clip = { x = 0, y = 34, width = 116, height = 34 }
+end
+
+local function handleFusionItems(data)
+    local currentList = {}
+
+    for i, item in pairs(data) do
+        item.key = ("%d_%d"):format(item.id, item.tier)
+        if item.tier > 0 then
+            item.clip = ItemsDatabase.getTierClip(item.tier)
+        end
+
+        local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(item.id)
+        if imagePath then
+            item.imagePath = imagePath
+            item.rarityClipObject = rarityClipObject
+        end
+    end
+
+    table.sort(currentList, function(a, b)
+        if a.tier == b.tier then
+            return a.id < b.id
+        end
+        return a.tier > b.tier
+    end)
+
+
+    return currentList
+end
 -- FUSION MENU
 
 -- TRANSFER MENU
@@ -268,6 +309,7 @@ ForgeController.transfer = {
     dust = 100,
     convergenceDust = 160,
     hasConvergence = false,
+    title = "Transfer Requirements",
     dustLabel = 100,
     exaltedCoresLabel = "???",
     necessaryExaltedCores = 0,
@@ -367,8 +409,10 @@ function ForgeController.transfer:toggleConvergence()
     ForgeController.transfer.canTransfer = false
     if not ForgeController.transfer.isConvergence then
         ForgeController.transfer.currentList = cloneValue(ForgeController.transfer.items)
+        ForgeController.transfer.title = "Transfer Requirements"
     else
         ForgeController.transfer.currentList = cloneValue(ForgeController.transfer.convergenceItems)
+        ForgeController.transfer.title = "Convergence Transfer Requirements"
     end
 end
 
@@ -409,8 +453,41 @@ local function handleTransferItems(data)
     return currentList
 end
 
+local function handleParseConvergenceFusionItems(data)
+    local parsedItemsBySlot = {}
+    for slot, sloItems in pairs(data) do
+        for _, item in pairs(sloItems) do
+            item.key = ("%d_%d"):format(item.id, item.tier)
+            item.slot = slot
+            if item.tier > 0 then
+                item.clip = ItemsDatabase.getTierClip(item.tier)
+            end
+
+            local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(item.id)
+            if imagePath then
+                item.imagePath = imagePath
+                item.rarityClipObject = rarityClipObject
+            end
+
+            table.insert(parsedItemsBySlot, item)
+        end
+    end
+
+    return data, parsedItemsBySlot
+end
+
 function onOpenForge(data)
     ForgeController.conversion.dustMax = data.dustLevel or ForgeController.conversion.dustMax or 100
+
+    -- FUSION ITEMS
+    local items = cloneValue(data.fusionItems or {})
+    local fusionItems = handleFusionItems(items)
+    ForgeController.fusion.items = fusionItems
+    ForgeController.fusion.currentList = cloneValue(fusionItems)
+    local convergenceFusion = cloneValue(data.convergenceFusion or {})
+    local _, convergenceItemsBySlot = handleParseConvergenceFusionItems(convergenceFusion)
+    ForgeController.fusion.convergenceItems = convergenceItemsBySlot
+    -- FUSION ITEMS
 
     -- TRANSFER ITEMS
     local transfers = cloneValue(data.transfers or {})
@@ -436,7 +513,7 @@ function onOpenForge(data)
     local shouldShow = not ForgeController.ui or ForgeController.ui:isDestroyed() or not ForgeController.ui:isVisible()
     if shouldShow then
         ForgeController:show(true)
-        ForgeController:toggleTransferMenu()
+        ForgeController:toggleFusionMenu()
     end
 end
 
@@ -453,6 +530,11 @@ function forgeData(data)
     if next(convergenceFusion) then
         ForgeController.fusion.convergencePrices = convergenceFusion
     end
+
+    for k, v in pairs(convergenceFusion) do
+        g_logger.info("Convergence Fusion Price - Tier " .. tostring(k) .. ": " .. tostring(v))
+    end
+
     ForgeController.fusion.grades = data.fusionGrades or {}
     ForgeController.fusion.convergenceDust = data.convergenceFusionDust or 130
     ForgeController.fusion.dust = data.normalDustFusion or 100
