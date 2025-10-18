@@ -1382,10 +1382,10 @@ void UIWidget::updateSize() {
         return;
 
     if (m_htmlNode && (m_htmlNode->getType() == NodeType::Text || m_htmlNode->getStyle("inherit-text") == "true")) {
-        setSize(m_realTextSize);
         setProp(PropTextVerticalAutoResize, true);
         if (m_parent->m_width.unit == Unit::FitContent) {
             setProp(PropTextHorizontalAutoResize, true);
+            setWidth_px(m_realTextSize.width());
         } else {
             setProp(PropTextHorizontalAutoResize, false);
             setWidth_px(m_parent->getSize().width());
