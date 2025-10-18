@@ -5,16 +5,7 @@ local helpers = require('modules.game_forge.game_forge_helpers')
 local cloneValue = helpers.cloneValue
 local normalizeClassPriceEntries = helpers.normalizeClassPriceEntries
 local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
-local baseSelectedFusionItem = {
-    id = -1,
-    tier = -1,
-    clip = {},
-    imagePath = nil,
-    rarityClipObject = nil,
-    count = 0,
-    countLabel = "0 / 1",
-    slot = -1
-}
+
 local function resetInfo()
     ForgeController.transfer.exaltedCoresLabel = "???"
     ForgeController.transfer.selected = cloneValue(ForgeController.baseSelected)
@@ -22,6 +13,11 @@ local function resetInfo()
     ForgeController.rawPrice = 0
     ForgeController.formattedPrice = "???"
     ForgeController.transfer.canTransfer = false
+    ForgeController.transfer.isConvergence = false
+    ForgeController.fusion.selected = cloneValue(ForgeController.baseSelected)
+    ForgeController.fusion.selectedTarget = cloneValue(ForgeController.baseSelected)
+    ForgeController.fusion.isConvergence = false
+    ForgeController.fusion.canTransfer = false
 end
 
 local TAB_ORDER = { 'fusion', 'transfer', 'conversion', 'history' }
@@ -308,7 +304,9 @@ function ForgeController.transfer:handleSelect(item)
         return
     end
 
-    local targetTier = ForgeController.transfer.isConvergence and item.tier or (item.tier - 1)
+    local isConvergence = ForgeController.transfer.isConvergence
+
+    local targetTier = isConvergence and item.tier or (item.tier - 1)
     for _, values in pairs(ForgeController.transfer.grades) do
         if values.tier == targetTier then
             ForgeController.transfer.exaltedCoresLabel = values.exaltedCores
@@ -318,8 +316,10 @@ function ForgeController.transfer:handleSelect(item)
     end
 
     ForgeController.transfer.selected = item
+    local list = isConvergence and ForgeController.transfer.convergenceItems or
+        ForgeController.transfer.items
     local receivers = {}
-    for _, _item in pairs(ForgeController.transfer.items.receivers) do
+    for _, _item in pairs(list.receivers) do
         if item.id ~= _item.id then
             table.insert(receivers, _item)
         end
@@ -327,7 +327,8 @@ function ForgeController.transfer:handleSelect(item)
 
     ForgeController.transfer.currentList.receivers = receivers
     local transfer = ForgeController.transfer
-    ForgeController:getPrice(transfer.prices, item.id, transfer.selected.tier, transfer.isConvergence, true)
+    local prices = isConvergence and transfer.convergencePrices or transfer.prices
+    ForgeController:getPrice(prices, item.id, transfer.selected.tier, isConvergence, true)
 end
 
 function ForgeController.transfer:handleSelectTarget(item)
@@ -359,8 +360,16 @@ function ForgeController.transfer:handleSelectTarget(item)
     end
 end
 
-function ForgeContrller.transfer:toggleConvergence()
-
+function ForgeController.transfer:toggleConvergence()
+    ForgeController.transfer.isConvergence = not ForgeController.transfer.isConvergence
+    ForgeController.transfer.selected = cloneValue(ForgeController.baseSelected)
+    ForgeController.transfer.selectedTarget = cloneValue(ForgeController.baseSelected)
+    ForgeController.transfer.canTransfer = false
+    if not ForgeController.transfer.isConvergence then
+        ForgeController.transfer.currentList = cloneValue(ForgeController.transfer.items)
+    else
+        ForgeController.transfer.currentList = cloneValue(ForgeController.transfer.convergenceItems)
+    end
 end
 
 -- TRANSFER MENU
