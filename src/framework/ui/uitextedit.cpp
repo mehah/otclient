@@ -1380,11 +1380,22 @@ bool UITextEdit::onMousePress(const Point& mousePos, const Fw::MouseButton butto
     if (button == Fw::MouseLeftButton) {
         const int pos = getTextPos(mousePos);
         if (pos >= 0) {
-            setCursorPos(pos);
+            const int mods = g_window.getKeyboardModifiers();
 
             if (getProp(PropSelectable)) {
-                m_selectionReference = pos;
-                setSelection(pos, pos);
+                if (mods & Fw::KeyboardShiftModifier) {
+                    if (!hasSelection())
+                        m_selectionReference = m_cursorPos;
+
+                    setCursorPos(pos);
+                    setSelection(m_selectionReference, pos);
+                } else {
+                    setCursorPos(pos);
+                    m_selectionReference = pos;
+                    setSelection(pos, pos);
+                }
+            } else {
+                setCursorPos(pos);
             }
         }
 #ifdef __EMSCRIPTEN__
@@ -1462,9 +1473,19 @@ bool UITextEdit::onDoubleClick(const Point& mousePos)
         }
     }
 
-    setSelection(start, end);
-    setCursorPos(end);
-    m_selectionReference = start;
+    const int mods = g_window.getKeyboardModifiers();
+    if (mods & Fw::KeyboardShiftModifier) {
+        int anchor = hasSelection() ? m_selectionReference : m_cursorPos;
+
+        const int target = (pos >= anchor) ? end : start;
+
+        setSelection(anchor, target);
+        setCursorPos(target);
+    } else {
+        setSelection(start, end);
+        setCursorPos(end);
+        m_selectionReference = start;
+    }
 
     return true;
 }
