@@ -1210,9 +1210,11 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
             appendCharacter('\n');
             return true;
         } else if (keyCode == Fw::KeyUp && !getProp(PropShiftNavigation) && getProp(PropMultiline)) {
+            clearSelection();
             moveCursorVertically(true);
             return true;
         } else if (keyCode == Fw::KeyDown && !getProp(PropShiftNavigation) && getProp(PropMultiline)) {
+            clearSelection();
             moveCursorVertically(false);
             return true;
         }
@@ -1276,6 +1278,22 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
             }
             return true;
         }
+        if (keyCode == Fw::KeyUp && getProp(PropMultiline)) {
+            const int oldPos = m_cursorPos;
+            moveCursorVertically(true);
+            if (!hasSelection())
+                m_selectionReference = oldPos;
+            setSelection(m_selectionReference, m_cursorPos);
+            return true;
+        }
+        if (keyCode == Fw::KeyDown && getProp(PropMultiline)) {
+            const int oldPos = m_cursorPos;
+            moveCursorVertically(false);
+            if (!hasSelection())
+                m_selectionReference = oldPos;
+            setSelection(m_selectionReference, m_cursorPos);
+            return true;
+        }
         if (keyCode == Fw::KeyHome) {
             const int srcLen = static_cast<int>(m_text.length());
             const int visLen = static_cast<int>(m_displayedText.length());
@@ -1288,7 +1306,14 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
             const int srcTarget = m_visToSrc.empty()
                 ? std::clamp(lineStart, 0, srcLen)
                 : std::clamp(m_visToSrc[std::clamp(lineStart, 0, visLen)], 0, srcLen);
-            setSelection(m_cursorPos, srcTarget);
+
+            if (getProp(PropShiftNavigation)) {
+                clearSelection();
+            } else {
+                if (!hasSelection())
+                    m_selectionReference = m_cursorPos;
+                setSelection(m_selectionReference, srcTarget);
+            }
             setCursorPos(srcTarget);
             return true;
         } else if (keyCode == Fw::KeyEnd) {
@@ -1318,7 +1343,13 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
                 bestSrc = std::clamp(le, 0, srcLen);
             }
 
-            setSelection(m_cursorPos, bestSrc);
+            if (getProp(PropShiftNavigation)) {
+                clearSelection();
+            } else {
+                if (!hasSelection())
+                    m_selectionReference = m_cursorPos;
+                setSelection(m_selectionReference, bestSrc);
+            }
             setCursorPos(bestSrc);
             return true;
         }
@@ -1401,21 +1432,15 @@ bool UITextEdit::onDoubleClick(const Point& mousePos)
         return false;
 
     int pos = getTextPos(mousePos);
-    if (pos < 0)
-        return false;
+    if (pos < 0) return false;
     if (pos >= static_cast<int>(m_text.size()))
         pos = static_cast<int>(m_text.size()) - 1;
 
-    auto isSpace = [](unsigned char c) -> bool {
-        return std::isspace(c) != 0;
-    };
-    auto isWord = [](unsigned char c) -> bool {
-        return std::isalnum(c) != 0 || c == '_' || c >= 128;
-    };
+    auto isSpace = [](unsigned char c) -> bool { return std::isspace(c) != 0; };
+    auto isWord = [](unsigned char c) -> bool { return std::isalnum(c) != 0 || c == '_' || c >= 128; };
 
     int start = pos;
     int end = pos + 1;
-
     const auto ch = static_cast<unsigned char>(m_text[pos]);
 
     if (isSpace(ch)) {
@@ -1439,6 +1464,8 @@ bool UITextEdit::onDoubleClick(const Point& mousePos)
 
     setSelection(start, end);
     setCursorPos(end);
+    m_selectionReference = start;
+
     return true;
 }
 
