@@ -101,7 +101,9 @@ namespace {
         /*"visibility",*/
         "white-space",
         "word-spacing",
-        "writing-mode"
+        "writing-mode",
+        "hyphens",
+        "text-lang"
     };
 
     static inline bool isInheritable(std::string_view prop) noexcept {

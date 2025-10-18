@@ -117,7 +117,7 @@ void UIWidget::updateText()
 {
     if (isTextWrap() && m_rect.isValid()) {
         m_drawTextColors = m_textColors;
-        m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x, m_textWrapOptions);
+        m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x, getTextWrapOptions());
     } else {
         m_drawText = m_text;
         m_drawTextColors = m_textColors;
@@ -325,6 +325,12 @@ void UIWidget::computeHtmlTextIntrinsicSize() {
 
     static std::vector<Point> glyphsPositions;
     m_font->calculateGlyphsPositions(m_text, Fw::AlignTopLeft, glyphsPositions, &m_realTextSize);
+}
+
+const WrapOptions& UIWidget::getTextWrapOptions() {
+    if (m_parent && m_htmlNode && m_htmlNode->getType() == NodeType::Text)
+        return m_parent->m_textWrapOptions;
+    return m_textWrapOptions;
 }
 
 void UIWidget::applyWhiteSpace() {

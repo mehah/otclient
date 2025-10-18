@@ -941,6 +941,8 @@ protected:
     virtual void onTextChange(std::string_view text, std::string_view oldText);
     virtual void onFontChange(std::string_view font);
 
+    const WrapOptions& getTextWrapOptions();
+
     WrapOptions m_textWrapOptions;
     std::vector<Point> m_glyphsPositionsCache;
 
