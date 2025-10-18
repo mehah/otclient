@@ -1,78 +1,403 @@
-﻿<link href="game_forge.css" />
+﻿<!--
 <link href="tab/conversion/conversion.css" />
 <link href="tab/fusion/fusion.css" />
 <link href="tab/history/history.css" />
-<link href="tab/transfer/transfer.css" />
+<link href="tab/transfer/transfer.css" /> -->
+<link href="game_forge.css" />
 <html>
-  <window class="forge-window" title="Exaltation Forge" onescape="self:close()">
-    <!-- Navigation buttons -->
-    <div
-      id="buttonPanel"
-      class="button-panel"
-      layout="type: horizontalBox;spacing:0"
-    >
-      <button
-        id="fusionBtn"
-        class="forge-btn btn-fusion"
-        onclick="self:loadMenu('fusionMenu')"
-      ></button>
-
-      <button
-        id="transferBtn"
-        class="forge-btn btn-transfer"
-        onclick="self:loadMenu('transferMenu')"
-      ></button>
-
-      <button
-        id="conversionBtn"
-        class="forge-btn btn-conversion"
-        onclick="self:loadMenu('conversionMenu')"
-      ></button>
-
-      <button
-        id="historyBtn"
-        class="forge-btn btn-history"
-        onclick="self:loadMenu('historyMenu')"
-      ></button>
+  <window class="forge-window" title="Exaltation Forge" onescape="self:hide()">
+    <div class="tabs">
+      <img class="tabs-img" src="/modules/game_forge/images/fusionButton.png" />
+      <img
+        class="tabs-img"
+        src="/modules/game_forge/images/transferButton.png"
+        *image-clip="self.transfer.clip"
+        onclick="self:toggleTransferMenu()"
+      />
+      <img
+        class="tabs-img"
+        src="/modules/game_forge/images/conversionButton.png"
+        *image-clip="self.conversion.clip"
+        onclick="self:toggleConversionMenu()"
+      />
+      <img
+        class="tabs-img-history"
+        src="/modules/game_forge/images/historyButton.png"
+        *image-clip="self.history.clip"
+        onclick="self:toggleHistoryMenu()"
+      />
     </div>
 
-    <!-- Main content area -->
-    <div id="content" class="content-area"></div>
+    <div class="content">
+      <div *if="self.currentTab == 'transfer'" class="transfer-container">
+        <div class="transfer-select-container">
+          <span class="transfer-header">Select Items for the Transfer</span>
+          <div class="transfer-select-wrapper">
+            <div
+              class="transfer-select-donnor-container"
+              layout="type: grid; cell-size: 34 34;cell-spacing:2;num-columns:4"
+            >
+              <div
+                *for="local item in (self.transfer.currentList.donors or {})"
+                onclick="self.transfer:handleSelect(item)"
+                *border="self.transfer.selected and self.transfer.selected.id == item.id and 1 or 0"
+                *border-color="self.transfer.selected and self.transfer.selected.id == item.id and 'white' or 'transparent'"
+              >
+                <div class="item-to-select">
+                  <img
+                    *if="item.imagePath"
+                    *image-source="item.imagePath"
+                    *image-clip="item.rarityClipObject"
+                    *border-width="1"
+                    *border-color="self.selectedFusionItem and self.selectedFusionItem.key == item.key and 'white' or 'transparent'"
+                    class="item-rarity"
+                  />
+                  <UIItem
+                    *item-id="item.id"
+                    style="height: 32px; width: 32px; align-items: center"
+                  />
+                  <img
+                    *if="item.tier>0"
+                    class="item-tier-strip"
+                    src="/images/inventory/tiers-strip.png"
+                    *image-clip="item.clip"
+                  />
+                  <label class="item-count">{{item.count}}</label>
+                </div>
+              </div>
+            </div>
+            <div class="transfer-select-donnor-center">
+              <div class="transfer-select-arrows-container">
+                <img
+                  src="/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+                  width="14"
+                  height="25"
+                />
+                <img
+                  src="/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+                  width="14"
+                  height="25"
+                  style="margin-left: 8px"
+                />
+                <img
+                  src="/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+                  width="14"
+                  height="25"
+                  style="margin-left: 8px"
+                />
+              </div>
+              <div class="transfer-select-convergence">
+                <input id="transfer_convergence" type="checkbox" /><label
+                  style="margin-left: 2px"
+                  for="transfer_convergence"
+                  >Convergence</label
+                >
+              </div>
+            </div>
+            <div class="transfer-select-donnor-container"></div>
+          </div>
+        </div>
+
+        <div class="transfer-select-container" style="margin-top: 8px">
+          <span class="transfer-header">Transfer Requirements</span>
+          <div class="transfer-requirements-wrapper">
+            <div class="transfer-requirement-item-container">
+              <div class="transfer-requirement">
+                <img
+                  style="margin-top: 22px; margin-left: 30px"
+                  src="/images/ui/icon-questionmark.png"
+                  width="8"
+                  height="21"
+                />
+              </div>
+              <div class="transfer-requirement-item-cost">0/1</div>
+            </div>
+            <div
+              class="transfer-requirement-item-container"
+              style="margin-left: 8px"
+            >
+              <div class="transfer-requirement">
+                <UIItem style="item-id: 37160" />
+              </div>
+              <div class="transfer-requirement-item-cost">
+                {{self.transfer.dustLabel}}
+                <img
+                  style="margin-left: 2px"
+                  src="/modules/game_forge/images/icon-currency-dust.png"
+                  width="9"
+                  height="6"
+                />
+              </div>
+            </div>
+            <div
+              class="transfer-requirement-item-container"
+              style="margin-left: 8px"
+            >
+              <div class="transfer-requirement">
+                <UIItem style="item-id: 37110" />
+              </div>
+              <div class="transfer-requirement-item-cost">
+                {{self.transfer.exaltedCoresLabel }}
+                <img
+                  style="margin-left: 2px"
+                  src="/modules/game_forge/images/icon-currency-exaltedcore.png"
+                  width="9"
+                  height="9"
+                />
+              </div>
+            </div>
+            <div class="transfer-requirement-arrow">
+              <img
+                src="/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+                width="14"
+                height="25"
+              />
+            </div>
+            <div class="transfer-button-container">
+              <div class="transfer-button">
+                <div class="transfer-button-items">
+                  <span style="margin-left: 30px">
+                    <img
+                      src="/images/ui/icon-questionmark.png"
+                      width="8"
+                      height="21"
+                    />
+                  </span>
+                  <span style="padding-top: 8px; margin-left: 20px">
+                    <img
+                      src="/modules/game_forge/images/arrows/icon-arrows.png"
+                      width="15"
+                      height="7"
+                    />
+                  </span>
+                  <span style="margin-left: 20px">
+                    <img
+                      src="/images/ui/icon-questionmark.png"
+                      width="8"
+                      height="21"
+                    />
+                  </span>
+                </div>
+              </div>
+              <div class="base-gold-bg" style="margin-top: 2px; width: 128px">
+                <p>{{self.currentGold}}</p>
+                <img
+                  src="/images/game/prey/prey_gold.png"
+                  width="10"
+                  height="10"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="transfer-description">{{self.description}}</div>
+      </div>
+
+      <div *if="self.currentTab == 'conversion'" class="conversion-container">
+        <div class="conversion-wrapper">
+          <div class="conversion-column">
+            <div class="conversion-column-header"><p>Convert Dust</p></div>
+            <div class="conversion-column-img">
+              <div class="conversion-column-item-container">
+                <UIItem style="item-id: 37160" />
+              </div>
+              <div class="conversion-column-item-cost">
+                <p *color="self:getColor('dustToSilver')">
+                  {{self.conversion.necessaryDustToSliver}}
+                </p>
+                <img
+                  src="/modules/game_forge/images/icon-currency-dust.png"
+                  width="9"
+                  height="6"
+                  style="margin-left: 3px"
+                />
+              </div>
+              <div>
+                <img
+                  style="margin-top: 8px"
+                  src="/modules/game_forge/images/arrows/icon-arrow-downlarge.png"
+                  width="25"
+                  height="14"
+                />
+              </div>
+              <div
+                class="conversion-column-item-conversion-button"
+                *disabled="self.conversion.disableDustConversion"
+                onclick="self.conversion:toggle(2)"
+              >
+                <UIItem style="item-id: 37109" />
+              </div>
+              <div style="margin-top: 8px">
+                <p>{{self.conversion.dustToSilverLabel}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="conversion-column" style="margin-left: 6px">
+            <div class="conversion-column-header"><p>Convert Slivers</p></div>
+            <div class="conversion-column-img">
+              <div class="conversion-column-item-container">
+                <UIItem style="item-id: 37109" />
+              </div>
+              <div class="conversion-column-item-cost">
+                <p *color="self:getColor('sliverToCore')">
+                  {{self.conversion.sliverToCore}}
+                </p>
+                <img
+                  style="margin-left: 3px"
+                  src="/modules/game_forge/images/icon-currency-sliver.png"
+                  width="9"
+                  height="9"
+                />
+              </div>
+              <div>
+                <img
+                  style="margin-top: 8px"
+                  src="/modules/game_forge/images/arrows/icon-arrow-downlarge.png"
+                  width="25"
+                  height="14"
+                />
+              </div>
+              <div
+                class="conversion-column-item-conversion-button"
+                *disabled="self.conversion.disableSliverConversion"
+                onclick="self.conversion:toggle(3)"
+              >
+                <UIItem style="item-id: 37110" />
+              </div>
+              <div style="margin-top: 8px">
+                <p>{{self.conversion.sliverToCoreLabel}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="conversion-column" style="margin-left: 6px">
+            <div class="conversion-column-header">
+              <p>Increase Dust Limit</p>
+            </div>
+            <div class="conversion-column-img">
+              <div class="conversion-column-item-container">
+                <UIItem style="item-id: 37160" />
+              </div>
+              <div class="conversion-column-item-cost">
+                <p *color="self:getColor('increaseDustLimit')">
+                  {{self.conversion.dustMaxIncreaseCost}}
+                </p>
+                <img
+                  style="margin-left: 3px"
+                  src="/modules/game_forge/images/icon-currency-dust.png"
+                  width="9"
+                  height="6"
+                />
+              </div>
+              <div>
+                <img
+                  style="margin-top: 8px"
+                  src="/modules/game_forge/images/arrows/icon-arrow-downlarge.png"
+                  width="25"
+                  height="14"
+                />
+              </div>
+              <div
+                class="conversion-column-item-increase-button"
+                *disabled="self.conversion.disableIncreaseDustLimit"
+                onclick="self.conversion:toggle(4)"
+              >
+                <UIItem style="item-id: 37160" />
+              </div>
+              <div style="margin-top: 8px">
+                <p>{{self.conversion.dustMaxLabel}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="description">{{self.description}}</div>
+      </div>
+      <div *if="self.currentTab == 'history'">
+        <div class="history-container" id="history">
+          <div class="history-list">
+            <table class="history-table">
+              <thead style="background-color: #363636; width: 500px">
+                <tr>
+                  <th style="width: 145px">Date</th>
+                  <th style="width: 85px">Action</th>
+                  <th style="width: 235px">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  style="height: 30px"
+                  *for="local row in (self.history.list or {})"
+                >
+                  <td style="width: 145px">{{row.createdAt}}</td>
+                  <td style="width: 85px">{{row.actionType}}</td>
+                  <td style="width: 230px">{{row.description}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="history-footer">
+            <button
+              *visible="self.history.showPreviousButton"
+              *disabled="not self.history.showPreviousButton"
+              class="history-footer-previous"
+              onclick="self.history:onHistoryPreviousPage()"
+            >
+              Previous Page
+            </button>
+            <div class="history-page-label">
+              {{self.history.currentPage}}/{{self.history.lastPage}}
+            </div>
+            <button
+              *visible="self.history.showNextButton"
+              *disabled="not self.history.showNextButton"
+              class="history-footer-next"
+              onclick="self.history:onHistoryNextPage()"
+            >
+              Next Page
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Separator -->
     <hr class="separator HorizontalSeparator" />
 
-    <!-- Status bar with resources -->
-    <div class="status-bar">
-      <div class="status-item status-primary resource-bottom-container">
-        <div class="resource-bottom">
-          <img src="/images/game/prey/prey_gold" />
-          {{self.currentGold}}
+    <div class="footer">
+      <div class="footer-content">
+        <div class="base-gold-bg">
+          <p>{{self.currentGold}}</p>
+          <img src="/images/game/prey/prey_gold.png" width="10" height="10" />
+        </div>
+        <div
+          class="base-resource-bg base-dust-resource-bg"
+          style="margin-left: 8px"
+        >
+          <p>{{self.currentDustAndMaxLabel}}</p>
+          <img
+            src="/modules/game_forge/images/icon-currency-dust.png"
+            width="9"
+            height="6"
+          />
+        </div>
+        <div class="base-resource-bg" style="margin-left: 8px">
+          <p>{{self.currentSlivers}}</p>
+          <img
+            src="/modules/game_forge/images/icon-currency-sliver.png"
+            width="9"
+            height="9"
+          />
+        </div>
+        <div class="base-resource-bg" style="margin-left: 8px">
+          <p>{{self.currentExaltedCores}}</p>
+          <img
+            src="/modules/game_forge/images/icon-currency-exaltedcore.png"
+            width="9"
+            height="9"
+          />
         </div>
       </div>
-
-      <div class="status-item status-secondary resource-bottom-container">
-        <div class="resource-bottom">
-          <img src="images/icon-currency-dust" />
-          {{self.currentDustLevel}}
-        </div>
-      </div>
-
-      <div class="status-item status-tertiary resource-bottom-container">
-        <div class="resource-bottom">
-          <img src="images/icon-currency-sliver" />
-          {{self.currentSlivers}}
-        </div>
-      </div>
-
-      <div class="status-item status-tertiary resource-bottom-container">
-        <div class="resource-bottom">
-          <img src="images/icon-currency-exaltedcore" />
-          {{self.currentExaltedCores}}
-        </div>
-      </div>
-
-      <button class="close-btn" onclick="self:close()">Close</button>
+      <button class="close-btn" onclick="self:hide()">Close</button>
     </div>
   </window>
 </html>
