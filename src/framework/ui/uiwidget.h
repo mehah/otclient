@@ -199,11 +199,11 @@ enum class OverflowType : uint8_t
 
 struct SizeUnit
 {
-    [[nodiscard]] bool needsUpdate(Unit _unit) const {
+    bool needsUpdate(Unit _unit) const {
         return pendingUpdate && unit == _unit;
     }
 
-    [[nodiscard]] bool needsUpdate(Unit _unit, uint32_t _version) const {
+    bool needsUpdate(Unit _unit, uint32_t _version) const {
         return pendingUpdate && unit == _unit && version != _version;
     }
 
@@ -215,7 +215,7 @@ struct SizeUnit
 
     SizeUnit() = default;
     SizeUnit(Unit u) : unit(u) {}
-    SizeUnit(int16_t v) : value(v) {}
+    SizeUnit(int16_t v) : unit(Unit::Px), value(v) {}
     SizeUnit(Unit u, int16_t v, int16_t valueCalculed, uint32_t needUpdate)
         : unit(u), value(v), valueCalculed(valueCalculed), pendingUpdate(needUpdate) {}
 
@@ -663,9 +663,7 @@ public:
     bool isEffectivelyVisible() { return isVisible() || m_displayType != DisplayType::None; }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }
-    bool isLastChild() {
-        return m_parent && std::cmp_equal(m_childIndex, m_parent->m_children.size());
-    }
+    bool isLastChild() { return m_parent && m_childIndex == static_cast<int32_t>(m_parent->m_children.size()); }
     bool isMiddleChild() { return !isFirstChild() && !isLastChild(); }
 
     bool hasChildren() { return !m_children.empty(); }
@@ -940,11 +938,12 @@ protected:
     virtual bool isTextEdit() { return false; }
     void drawText(const Rect& screenCoords);
 
-    void updateHtmlTextSize();
+    void computeHtmlTextIntrinsicSize();
 
     virtual void onTextChange(std::string_view text, std::string_view oldText);
     virtual void onFontChange(std::string_view font);
 
+    WrapOptions m_textWrapOptions;
     std::vector<Point> m_glyphsPositionsCache;
 
     std::string m_text;

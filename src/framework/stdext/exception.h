@@ -40,7 +40,7 @@ namespace stdext
         exception(fmt::format_string<Args...> fmtStr, Args&&... args) : m_what(fmt::format(fmtStr, std::forward<Args>(args)...)) {}
 
         ~exception() noexcept override = default;
-        [[nodiscard]] const char* what() const noexcept override { return m_what.data(); }
+        const char* what() const noexcept override { return m_what.data(); }
     protected:
         std::string m_what;
     };

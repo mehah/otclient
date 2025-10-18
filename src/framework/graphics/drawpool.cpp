@@ -397,14 +397,12 @@ std::shared_ptr<CoordsBuffer> DrawPool::getCoordsBuffer() {
     } else
         coordsBuffer = new CoordsBuffer();
 
-    return {
-        coordsBuffer, [this](CoordsBuffer* ptr) {
+    return std::shared_ptr<CoordsBuffer>(coordsBuffer, [this](CoordsBuffer* ptr) {
         if (m_enabled) {
             ptr->clear();
             m_coordsCache.emplace_back(ptr);
         } else {
             delete ptr;
         }
-    }
-    };
+    });
 }

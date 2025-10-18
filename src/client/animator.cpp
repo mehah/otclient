@@ -50,7 +50,7 @@ void Animator::unserialize(const int animationPhases, const FileStreamPtr& fin)
     m_loopCount = fin->get32();
     m_startPhase = fin->get8();
 
-    for (int i = 0; std::cmp_less(i, m_animationPhases); ++i) {
+    for (int i = 0; i < m_animationPhases; ++i) {
         int minimum = fin->getU32();
         int maximum = fin->getU32();
         m_phaseDurations.emplace_back(minimum, maximum);
@@ -79,7 +79,7 @@ void Animator::serialize(const FileStreamPtr& fin) const
 
 void Animator::setPhase(const int phase)
 {
-    if (std::cmp_equal(m_phase, phase))
+    if (m_phase == phase)
         return;
 
     if (!m_async) {
@@ -91,7 +91,7 @@ void Animator::setPhase(const int phase)
         m_phase = 0;
     else if (phase == AnimPhaseRandom)
         m_phase = stdext::random_range(0, m_animationPhases);
-    else if (phase >= 0 && std::cmp_less(phase, m_animationPhases))
+    else if (phase >= 0 && phase < m_animationPhases)
         m_phase = phase;
     else
         m_phase = getStartPhase();
@@ -107,14 +107,14 @@ int Animator::getPhase()
     const ticks_t ticks = g_clock.millis();
     if (ticks != m_lastPhaseTicks && !m_isComplete) {
         const int elapsedTicks = static_cast<int>(ticks - m_lastPhaseTicks);
-        if (std::cmp_greater_equal(elapsedTicks, m_currentDuration)) {
+        if (elapsedTicks >= m_currentDuration) {
             int phase;
             if (m_loopCount < 0)
                 phase = getPingPongPhase();
             else
                 phase = getLoopPhase();
 
-            if (std::cmp_not_equal(m_phase, phase)) {
+            if (m_phase != phase) {
                 const int duration = getPhaseDuration(phase) - (elapsedTicks - m_currentDuration);
                 if (duration < 0 && !m_async) {
                     calculateSynchronous();
@@ -171,7 +171,7 @@ int Animator::getPingPongPhase()
 {
     int count = m_currentDirection == AnimDirForward ? 1 : -1;
     const int nextPhase = m_phase + count;
-    if (nextPhase < 0 || std::cmp_greater_equal(nextPhase, m_animationPhases)) {
+    if (nextPhase < 0 || nextPhase >= m_animationPhases) {
         m_currentDirection = m_currentDirection == AnimDirForward ? AnimDirBackward : AnimDirForward;
         count *= -1;
     }
@@ -181,7 +181,7 @@ int Animator::getPingPongPhase()
 int Animator::getLoopPhase()
 {
     const int nextPhase = m_phase + 1;
-    if (std::cmp_less(nextPhase, m_animationPhases))
+    if (nextPhase < m_animationPhases)
         return nextPhase;
 
     if (m_loopCount == 0)
@@ -208,13 +208,13 @@ int Animator::getPhaseDuration(const int phase) const
 void Animator::calculateSynchronous()
 {
     int totalDuration = 0;
-    for (int i = 0; std::cmp_less(i, m_animationPhases); ++i)
+    for (int i = 0; i < m_animationPhases; ++i)
         totalDuration += getPhaseDuration(i);
 
     const ticks_t ticks = g_clock.millis();
     const int elapsedTicks = static_cast<int>(ticks % totalDuration);
     int totalTime = 0;
-    for (int i = 0; std::cmp_less(i, m_animationPhases); ++i) {
+    for (int i = 0; i < m_animationPhases; ++i) {
         const int duration = getPhaseDuration(i);
         if (elapsedTicks >= totalTime && elapsedTicks < totalTime + duration) {
             m_phase = i;

@@ -24,9 +24,6 @@
 #include <framework/otml/otml.h>
 #include <framework/ui/uiwidget.h>
 #include <framework/html/queryselector.h>
-
-#include <algorithm>
-
 #include "htmlparser.h"
 
 std::string HtmlNode::getAttr(const std::string& name) const {
@@ -363,8 +360,8 @@ void HtmlNode::destroy() {
 
 void HtmlNode::remove(const HtmlNodePtr& child) {
     if (!child) return;
-    auto it = std::ranges::find_if(children,
-                                   [&](const HtmlNodePtr& c) { return c.get() == child.get(); });
+    auto it = std::find_if(children.begin(), children.end(),
+        [&](const HtmlNodePtr& c) { return c.get() == child.get(); });
     if (it == children.end()) return;
 
     child->unregisterSubtreeFromIndexes(child);
@@ -565,8 +562,7 @@ void HtmlNode::setOuterHTML(const std::string& html) {
     auto rootEl = container ? container->querySelector("div") : nullptr;
 
     size_t idx = indexInParent();
-    if (std::cmp_equal(idx, -1))
-        return;
+    if (idx == size_t(-1)) return;
 
     p->remove(shared_from_this());
 

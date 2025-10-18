@@ -45,26 +45,26 @@ public:
     void setUpsideDown(bool upsideDown);
     void setTime(const ticks_t time) { m_time = time; }
 
-    [[nodiscard]] const Size& getSize() const { return m_size; }
-    [[nodiscard]] auto getTransformMatrixId() const { return m_transformMatrixId; }
+    const Size& getSize() const { return m_size; }
+    auto getTransformMatrixId() const { return m_transformMatrixId; }
 
-    [[nodiscard]] const auto getAtlasRegion(Fw::TextureAtlasType type) const { return m_atlas[type]; }
-    [[nodiscard]] const AtlasRegion* getAtlasRegion() const;
+    const auto getAtlasRegion(Fw::TextureAtlasType type) const { return m_atlas[type]; }
+    const AtlasRegion* getAtlasRegion() const;
 
-    [[nodiscard]] ticks_t getTime() const { return m_time; }
-    [[nodiscard]] uint32_t getId() const { return m_id; }
-    [[nodiscard]] uint32_t getUniqueId() const { return m_uniqueId; }
-    [[nodiscard]] size_t hash() const { return m_hash; }
+    ticks_t getTime() const { return m_time; }
+    uint32_t getId() const { return m_id; }
+    uint32_t getUniqueId() const { return m_uniqueId; }
+    size_t hash() const { return m_hash; }
 
-    [[nodiscard]] int getWidth() const { return m_size.width(); }
-    [[nodiscard]] int getHeight() const { return m_size.height(); }
+    int getWidth() const { return m_size.width(); }
+    int getHeight() const { return m_size.height(); }
 
-    [[nodiscard]] virtual bool isAnimatedTexture() const { return false; }
-    [[nodiscard]] bool isEmpty() const { return m_id == 0; }
-    [[nodiscard]] bool hasRepeat() const { return getProp(repeat); }
-    [[nodiscard]] bool hasMipmaps() const { return getProp(hasMipMaps); }
-    [[nodiscard]] bool isSmooth() const { return getProp(smooth); }
-    [[nodiscard]] bool canCacheInAtlas() const { return getProp(Prop::_allowAtlasCache); }
+    virtual bool isAnimatedTexture() const { return false; }
+    bool isEmpty() const { return m_id == 0; }
+    bool hasRepeat() const { return getProp(repeat); }
+    bool hasMipmaps() const { return getProp(hasMipMaps); }
+    bool isSmooth() const { return getProp(smooth); }
+    bool canCacheInAtlas() const { return getProp(Prop::_allowAtlasCache); }
     bool setupSize(const Size& size);
 
     virtual void allowAtlasCache();
@@ -106,7 +106,7 @@ protected:
 
     uint16_t m_props{ 0 };
     void setProp(const Prop prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
-    [[nodiscard]] bool getProp(const Prop prop) const { return m_props & prop; };
+    bool getProp(const Prop prop) const { return m_props & prop; };
 
     friend class GarbageCollection;
     friend class TextureManager;

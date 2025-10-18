@@ -1,7 +1,5 @@
 #include "uilayoutflexbox.h"
 
-#include <algorithm>
-
 namespace {
     enum class Axis { Horizontal, Vertical };
 
@@ -330,7 +328,7 @@ void layoutFlex(UIWidget& container)
         return;
     }
 
-    std::ranges::stable_sort(items, [](const FlexItemData& a, const FlexItemData& b) {
+    std::stable_sort(items.begin(), items.end(), [](const FlexItemData& a, const FlexItemData& b) {
         if (a.order != b.order)
             return a.order < b.order;
         return a.sourceIndex < b.sourceIndex;
@@ -540,7 +538,7 @@ void layoutFlex(UIWidget& container)
     for (size_t i = 0; i < lineCount; ++i)
         lineOrder[i] = i;
     if (wrapReverse)
-        std::ranges::reverse(lineOrder);
+        std::reverse(lineOrder.begin(), lineOrder.end());
 
     std::vector<double> lineOffsets(lineCount, 0.0);
     double crossCursor = crossLeading;

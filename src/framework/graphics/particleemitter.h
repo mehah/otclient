@@ -34,7 +34,7 @@ public:
 
     void update(float elapsedTime, const ParticleSystemPtr& system);
 
-    [[nodiscard]] bool hasFinished() const { return m_finished; }
+    bool hasFinished() const { return m_finished; }
 
 private:
     // self related

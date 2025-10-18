@@ -85,7 +85,7 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightView
             return;
 
         const int animation = getCurrentAnimationPhase();
-        if (m_loop > -1 && std::cmp_not_equal(animation, m_lastAnimation)) {
+        if (m_loop > -1 && animation != m_lastAnimation) {
             m_lastAnimation = animation;
             if (animation == 0 && --m_loop == 0)
                 return;

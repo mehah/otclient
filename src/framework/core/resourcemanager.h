@@ -57,8 +57,8 @@ public:
 
     // String_view Support
     FileStreamPtr openFile(const std::string& fileName);
-    [[nodiscard]] FileStreamPtr appendFile(const std::string& fileName) const;
-    [[nodiscard]] FileStreamPtr createFile(const std::string& fileName) const;
+    FileStreamPtr appendFile(const std::string& fileName) const;
+    FileStreamPtr createFile(const std::string& fileName) const;
     bool deleteFile(const std::string& fileName);
 
     bool makeDir(const std::string& directory);

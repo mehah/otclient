@@ -118,7 +118,7 @@ bool Effect::waitFor(const EffectPtr& effect)
     uint16_t minDuration = getIdleAnimator() ? getIdleAnimator()->getMinDuration() : g_gameConfig.getEffectTicksPerFrame();
     minDuration = minDuration * std::max<uint8_t>(getAnimationPhases() / 3, 1);
 
-    if (std::cmp_less_equal(ticksElapsed, minDuration))
+    if (ticksElapsed <= minDuration)
         return false;
 
     const int duration = effect->m_duration / (g_app.mustOptimize() || g_app.isForcedEffectOptimization() ? 1.5 : 3);

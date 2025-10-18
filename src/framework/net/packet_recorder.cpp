@@ -40,7 +40,9 @@ PacketRecorder::PacketRecorder(const std::string_view& file)
 }
 
 PacketRecorder::~PacketRecorder()
-= default;
+{
+
+}
 
 void PacketRecorder::addInputPacket(const InputMessagePtr& packet)
 {

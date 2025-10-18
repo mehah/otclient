@@ -279,7 +279,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 if (widget->isOnHtml()) {
                     if (parentWidget != hookedWidget) {
                         if (isInlineish(hookedWidget.get())) {
-                            margin += hookedWidget->getPaddingLeft() + hookedWidget->getPaddingRight();
+                            margin += hookedWidget->getMarginRight();
                         }
                     }
 

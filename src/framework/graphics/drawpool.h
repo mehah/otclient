@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "declarations.h"
 #include "framebuffer.h"
 #include "framework/core/timer.h"
@@ -66,7 +68,7 @@ struct DrawHashController
         return false;
     }
 
-    [[nodiscard]] bool isLast(const size_t hash) const {
+    bool isLast(const size_t hash) const {
         return m_lastObjectHash == hash;
     }
 
@@ -74,7 +76,7 @@ struct DrawHashController
         m_currentHash = 1;
     }
 
-    [[nodiscard]] bool wasModified() const {
+    bool wasModified() const {
         return m_currentHash != m_lastHash;
     }
 

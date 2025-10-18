@@ -38,7 +38,7 @@ public:
 
     void seek(uint32_t pos);
     void skip(uint32_t len);
-    [[nodiscard]] uint32_t tell() const { return m_pos; }
+    uint32_t tell() const { return m_pos; }
     uint32_t size() { unserialize(); return m_buffer.size(); }
 
     uint8_t getU8();

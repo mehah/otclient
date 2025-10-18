@@ -803,7 +803,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     int16_t num = stdext::to_number(std::string(numericPart(sv)));
     applyDimension(isWidth, unit, num);
     if (m_htmlNode)
-        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { .value = valueStr , .inheritedFromId = "" };
+        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { valueStr , "" };
 }
 
 void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
@@ -1027,13 +1027,13 @@ void UIWidget::updateTableLayout()
             const int outerHeight = std::max<int>(0, cellHeight) + cell->m_padding.top + cell->m_padding.bottom;
 
             rowCellInfo[rowIndex].push_back(TableCellInfo{
-                .widget = cell,
-                .column = columnIndex,
-                .columnSpan = colSpan,
-                .rowSpan = effectiveRowSpan,
-                .requiredOuterWidth = candidate,
-                .widthFixed = fixedWidth,
-                .outerHeight = outerHeight,
+                cell,
+                columnIndex,
+                colSpan,
+                effectiveRowSpan,
+                candidate,
+                fixedWidth,
+                outerHeight,
             });
 
             const std::size_t occupancyValue = effectiveRowSpan;
@@ -1055,8 +1055,8 @@ void UIWidget::updateTableLayout()
     std::vector<int> columnWidths(columnCount, 0);
     std::vector<bool> columnFixed(columnCount, false);
 
-    for (auto& rowIndex : rowCellInfo) {
-        for (const auto& info : rowIndex) {
+    for (std::size_t rowIndex = 0; rowIndex < rowCellInfo.size(); ++rowIndex) {
+        for (const auto& info : rowCellInfo[rowIndex]) {
             const std::size_t span = std::min<std::size_t>(info.columnSpan, columnCount - info.column);
             if (span == 0)
                 continue;
@@ -1387,7 +1387,7 @@ void UIWidget::updateSize() {
         auto height = m_textSizeNowrap.height();
         if (parentSize.width() < m_textSizeNowrap.width()) {
             if (isTextWrap() && m_rect.isValid()) {
-                const auto& text = m_font->wrapText(m_text, parentSize.width() - m_textOffset.x);
+                const auto& text = m_font->wrapText(m_text, parentSize.width() - m_textOffset.x, m_textWrapOptions);
                 height *= std::count(text.begin(), text.end(), '\n') + 1;
             }
         }

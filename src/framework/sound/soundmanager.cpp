@@ -443,14 +443,14 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
 
             uint32_t effectId = protobufSoundEffect.id();
             m_clientSoundEffects.emplace(effectId, ClientSoundEffect{
-                                             .clientId = effectId,
-                                             .type = static_cast<ClientSoundType>(protobufSoundEffect.numeric_sound_type()),
-                                             .pitchMin = pitch.min_value(),
-                                             .pitchMax = pitch.max_value(),
-                                             .volumeMin = volume.max_value(),
-                                             .volumeMax = volume.max_value(),
-                                             .soundId = protobufSoundEffect.has_simple_sound_effect() ? protobufSoundEffect.simple_sound_effect().sound_id() : 0,
-                                             .randomSoundId = std::move(randomSounds)
+                effectId,
+                static_cast<ClientSoundType>(protobufSoundEffect.numeric_sound_type()),
+                pitch.min_value(),
+                pitch.max_value(),
+                volume.max_value(),
+                volume.max_value(),
+                protobufSoundEffect.has_simple_sound_effect() ? protobufSoundEffect.simple_sound_effect().sound_id() : 0,
+                std::move(randomSounds)
             });
         }
 
@@ -459,13 +459,13 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
             uint32_t effectId = protobufLocationAmbient.id();
             DelayedSoundEffects effects = {};
             for (const auto& delayedEffect : protobufLocationAmbient.delayed_effects()) {
-                effects.emplace_back(delayedEffect.numeric_sound_effect_id(), delayedEffect.delay_seconds());
+                effects.push_back({ delayedEffect.numeric_sound_effect_id(), delayedEffect.delay_seconds() });
             }
 
             m_clientAmbientEffects.emplace(effectId, ClientLocationAmbient{
-                                               .clientId = effectId,
-                                               .loopedAudioFileId = protobufLocationAmbient.looping_sound_id(),
-                                               .delayedSoundEffects = std::move(effects)
+                effectId,
+                protobufLocationAmbient.looping_sound_id(),
+                std::move(effects)
             });
         }
 
@@ -478,14 +478,14 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
 
             ItemCountSoundEffects soundEffects = {};
             for (const auto& soundEffect : protobufItemAmbient.sound_effects()) {
-                soundEffects.emplace_back(soundEffect.looping_sound_id(), soundEffect.count());
+                soundEffects.push_back({ soundEffect.looping_sound_id(), soundEffect.count() });
             }
 
             uint32_t effectId = protobufItemAmbient.id();
             m_clientItemAmbientEffects.emplace(effectId, ClientItemAmbient{
-                                                   .id = effectId,
-                                                   .clientIds = std::move(itemClientIds),
-                                                   .itemCountSoundEffects = std::move(soundEffects)
+                effectId,
+                std::move(itemClientIds),
+                std::move(soundEffects)
             });
         }
 
@@ -493,9 +493,9 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
         for (const auto& protobufMusicTemplate : protobufSounds.music_template()) {
             uint32_t effectId = protobufMusicTemplate.id();
             m_clientMusic.emplace(effectId, ClientMusic{
-                                      .id = effectId,
-                                      .audioFileId = protobufMusicTemplate.sound_id(),
-                                      .musicType = static_cast<ClientMusicType>(protobufMusicTemplate.music_type())
+                effectId,
+                protobufMusicTemplate.sound_id(),
+                static_cast<ClientMusicType>(protobufMusicTemplate.music_type())
             });
         }
 

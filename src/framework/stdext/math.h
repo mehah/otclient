@@ -51,4 +51,5 @@ namespace stdext
     int32_t normal_random(int32_t minNumber, int32_t maxNumber);
     bool random_bool(double probability = 0.5);
     std::mt19937& random_gen();
+
 }
