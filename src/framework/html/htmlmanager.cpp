@@ -299,6 +299,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     if (node->getType() == NodeType::Text) {
         textNodes.emplace_back(node);
+        widget->setTextAlign(Fw::AlignTopLeft);
         widget->setFocusable(false);
         widget->setPhantom(true);
     }

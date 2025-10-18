@@ -46,6 +46,14 @@ namespace {
         return HyphenationMode::Manual;
     }
 
+    void stripPreStartNewline(std::string& s) {
+        if (s.size() >= 2 && s[0] == '\r' && s[1] == '\n') {
+            s.erase(0, 2);
+        } else if (!s.empty() && s[0] == '\n') {
+            s.erase(0, 1);
+        }
+    }
+
     void normalizeWhiteSpace(std::string& s, bool collapseSpaces, bool keepNewlines) {
         std::string out;
         out.reserve(s.size());
@@ -305,10 +313,18 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
+    computeHtmlTextIntrinsicSize();
     updateText();
     onFontChange(fontName);
     scheduleHtmlTask(PropUpdateSize);
     refreshHtml(true);
+}
+
+void UIWidget::computeHtmlTextIntrinsicSize() {
+    if (!isOnHtml())return;
+
+    static std::vector<Point> glyphsPositions;
+    m_font->calculateGlyphsPositions(m_text, Fw::AlignTopLeft, glyphsPositions, &m_realTextSize);
 }
 
 void UIWidget::applyWhiteSpace() {
@@ -328,16 +344,20 @@ void UIWidget::applyWhiteSpace() {
         setProp(PropTextVerticalAutoResize, true);
         normalizeWhiteSpace(m_text, true, false);
     } else if (whiteSpace == "pre") {
+        stripPreStartNewline(m_text);
         setProp(PropTextWrap, false);
         setProp(PropTextHorizontalAutoResize, true);
         setProp(PropTextVerticalAutoResize, true);
     } else if (whiteSpace == "pre-wrap") {
+        stripPreStartNewline(m_text);
         setProp(PropTextWrap, true);
     } else if (whiteSpace == "pre-line") {
+        stripPreStartNewline(m_text);
         setProp(PropTextWrap, true);
         normalizeWhiteSpace(m_text, true, true);
     } else {
         setProp(PropTextWrap, true);
         normalizeWhiteSpace(m_text, true, false);
     }
+    computeHtmlTextIntrinsicSize();
 }

@@ -1382,20 +1382,15 @@ void UIWidget::updateSize() {
         return;
 
     if (m_htmlNode && (m_htmlNode->getType() == NodeType::Text || m_htmlNode->getStyle("inherit-text") == "true")) {
-        const auto& parentSize = m_parent->m_width.unit == Unit::FitContent ? m_textSize : m_parent->getSize();
-
-        auto height = m_textSize.height();
-        if (parentSize.width() < m_textSize.width()) {
-            if (isTextWrap() && m_rect.isValid()) {
-                const auto& text = m_font->wrapText(m_text, parentSize.width() - m_textOffset.x, m_textWrapOptions);
-                height *= std::count(text.begin(), text.end(), '\n') + 1;
-            }
+        setSize(m_realTextSize);
+        setProp(PropTextVerticalAutoResize, true);
+        if (m_parent->m_width.unit == Unit::FitContent) {
+            setProp(PropTextHorizontalAutoResize, true);
+        } else {
+            setProp(PropTextHorizontalAutoResize, false);
+            setWidth_px(m_parent->getSize().width());
         }
 
-        setSize({
-            std::min<int>(parentSize.width() , m_textSize.width()) + getPaddingLeft() + getPaddingRight() + m_textOffset.x,
-            height + getPaddingTop() + getPaddingBottom() + m_textOffset.y
-        });
         updateText();
         return;
     }
