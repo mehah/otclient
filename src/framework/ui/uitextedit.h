@@ -36,7 +36,7 @@ private:
     void update(bool focusCursor = false, bool disableAreaUpdate = false);
 
 public:
-    void setCursorPos(int pos);
+    void setCursorPos(int pos, bool focusCursor = true);
     void setSelection(int start, int end);
     void setCursorVisible(const bool enable) { setProp(PropCursorVisible, enable); }
     void setChangeCursorImage(const bool enable) { setProp(PropChangeCursorImage, enable); }
@@ -130,7 +130,7 @@ private:
     void disableUpdates() { setProp(PropUpdatesEnabled, false); }
     void enableUpdates() { setProp(PropUpdatesEnabled, true); }
     void recacheGlyphs() { setProp(PropGlyphsMustRecache, true); }
-    void setCursorPosEx(int pos, bool preservePreferredX);
+    void setCursorPosEx(int pos, bool preservePreferredX, bool focusCursor);
 
     std::string m_validCharacters;
     uint32_t m_maxLength{ 0 };

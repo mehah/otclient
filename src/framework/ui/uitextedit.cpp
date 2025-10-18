@@ -526,12 +526,12 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     repaint();
 }
 
-void UITextEdit::setCursorPos(int pos)
+void UITextEdit::setCursorPos(int pos, bool focusCursor)
 {
-    setCursorPosEx(pos, false);
+    setCursorPosEx(pos, false, focusCursor);
 }
 
-void UITextEdit::setCursorPosEx(int pos, bool preservePreferredX)
+void UITextEdit::setCursorPosEx(int pos, bool preservePreferredX, bool focusCursor)
 {
     if (pos < 0)
         pos = m_text.length();
@@ -549,7 +549,7 @@ void UITextEdit::setCursorPosEx(int pos, bool preservePreferredX)
     if (!preservePreferredX)
         m_cursorPreferredX = -1;
 
-    update(true);
+    update(focusCursor);
 }
 
 void UITextEdit::setSelection(int start, int end)
@@ -823,8 +823,8 @@ void UITextEdit::moveCursorVertically(bool up)
     }
 
     const int targetLine = up ? curLine - 1 : curLine + 1;
-    if (targetLine < 0) { setCursorPosEx(0, true); return; }
-    if (targetLine >= (int)lines.size()) { setCursorPosEx(srcLen, true); return; }
+    if (targetLine < 0) { setCursorPosEx(0, true, true); return; }
+    if (targetLine >= (int)lines.size()) { setCursorPosEx(srcLen, true, true); return; }
 
     const auto& L = lines[targetLine];
 
@@ -862,7 +862,7 @@ void UITextEdit::moveCursorVertically(bool up)
     const int visIdx = std::clamp(targetVis, 0, (int)m_visToSrc.size() - 1);
     const int targetSrc = m_visToSrc.empty() ? std::clamp(targetVis, 0, srcLen) : std::clamp(m_visToSrc[visIdx], 0, srcLen);
 
-    setCursorPosEx(targetSrc, true);
+    setCursorPosEx(targetSrc, true, true);
 }
 
 int UITextEdit::getTextPos(const Point& pos)
@@ -1387,15 +1387,15 @@ bool UITextEdit::onMousePress(const Point& mousePos, const Fw::MouseButton butto
                     if (!hasSelection())
                         m_selectionReference = m_cursorPos;
 
-                    setCursorPos(pos);
+                    setCursorPos(pos, false);
                     setSelection(m_selectionReference, pos);
                 } else {
-                    setCursorPos(pos);
+                    setCursorPos(pos, false);
                     m_selectionReference = pos;
                     setSelection(pos, pos);
                 }
             } else {
-                setCursorPos(pos);
+                setCursorPos(pos, false);
             }
         }
 #ifdef __EMSCRIPTEN__
@@ -1427,7 +1427,7 @@ bool UITextEdit::onMouseMove(const Point& mousePos, const Point& mouseMoved)
         const int pos = getTextPos(mousePos);
         if (pos >= 0) {
             setSelection(m_selectionReference, pos);
-            setCursorPos(pos);
+            setCursorPos(pos, false);
         }
         return true;
     }
@@ -1476,14 +1476,12 @@ bool UITextEdit::onDoubleClick(const Point& mousePos)
     const int mods = g_window.getKeyboardModifiers();
     if (mods & Fw::KeyboardShiftModifier) {
         int anchor = hasSelection() ? m_selectionReference : m_cursorPos;
-
         const int target = (pos >= anchor) ? end : start;
-
         setSelection(anchor, target);
-        setCursorPos(target);
+        setCursorPos(target, false);
     } else {
         setSelection(start, end);
-        setCursorPos(end);
+        setCursorPos(end, false);
         m_selectionReference = start;
     }
 
