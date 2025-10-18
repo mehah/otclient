@@ -919,7 +919,7 @@ int UITextEdit::getTextPos(const Point& pos)
     } else if (pos.x <= L.left) {
         targetVis = L.visStart;
     } else if (pos.x >= L.right) {
-        targetVis = L.visEnd;
+        targetVis = std::max(L.visEnd - 1, L.visStart);
     } else {
         targetVis = L.visEnd;
         for (int j = L.visStart; j < L.visEnd; ++j) {
