@@ -1393,6 +1393,31 @@ void UIWidget::updateSize() {
         return;
     }
 
+    const bool widthNeedsUpdate = m_width.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) || m_width.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER);
+    const bool heightNeedsUpdate = m_height.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER);
+
+    if (widthNeedsUpdate || heightNeedsUpdate) {
+        auto width = -1;
+        auto height = -1;
+        auto parent = m_parent;
+        while (m_positionType == PositionType::Absolute && parent->m_positionType == PositionType::Static) {
+            parent = parent->m_parent;
+        }
+        if (widthNeedsUpdate) {
+            width = parent->getWidth();
+            if (width > -1 && m_positionType != PositionType::Absolute)
+                width -= parent->getPaddingLeft() + parent->getPaddingRight();
+        }
+        if (heightNeedsUpdate) {
+            height = parent->getHeight();
+            if (height > -1 && m_positionType != PositionType::Absolute)
+                height -= parent->getPaddingTop() + parent->getPaddingBottom();
+        }
+        if (width > -1 || height > -1) {
+            updateDimension(this, width, height);
+        }
+    }
+
     if (m_positionType == PositionType::Absolute) {
         UIWidgetPtr cb = getVirtualParent();
         if (!cb) return;
@@ -1571,31 +1596,6 @@ void UIWidget::updateSize() {
             setMarginTop(std::max(0, (top == INT_MIN ? 0 : top)));
         } else if (hasB) {
             setMarginBottom(std::max(0, (bottom == INT_MIN ? 0 : bottom)));
-        }
-    }
-
-    const bool widthNeedsUpdate = m_width.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) || m_width.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER);
-    const bool heightNeedsUpdate = m_height.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER);
-
-    if (widthNeedsUpdate || heightNeedsUpdate) {
-        auto width = -1;
-        auto height = -1;
-        auto parent = m_parent;
-        while (m_positionType == PositionType::Absolute && parent->m_positionType == PositionType::Static) {
-            parent = parent->m_parent;
-        }
-        if (widthNeedsUpdate) {
-            width = parent->getWidth();
-            if (width > -1 && m_positionType != PositionType::Absolute)
-                width -= parent->getPaddingLeft() + parent->getPaddingRight();
-        }
-        if (heightNeedsUpdate) {
-            height = parent->getHeight();
-            if (height > -1 && m_positionType != PositionType::Absolute)
-                height -= parent->getPaddingTop() + parent->getPaddingBottom();
-        }
-        if (width > -1 || height > -1) {
-            updateDimension(this, width, height);
         }
     }
 
