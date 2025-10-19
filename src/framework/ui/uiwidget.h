@@ -327,7 +327,7 @@ protected:
     OverflowType m_overflowType = OverflowType::Hidden;
     PositionType m_positionType = PositionType::Static;
     uint32_t m_flexLayoutVersion = 0;
-
+    Fw::AlignmentFlag m_placement = Fw::AlignNone;
     SizeUnit m_width;
     SizeUnit m_height;
     SizeUnit m_lineHeight;
@@ -440,6 +440,9 @@ public:
     void setFlexShrink(float shrink);
     void setFlexBasis(const FlexBasis& basis);
     void setAlignSelf(AlignSelf align);
+    void setPlacement(const std::string& placement);
+
+    auto getPlacement() const { return m_placement; }
     FlexDirection getFlexDirection() const { return m_flexContainer.direction; }
     FlexWrap getFlexWrap() const { return m_flexContainer.wrap; }
     JustifyContent getJustifyContent() const { return m_flexContainer.justify; }
@@ -731,10 +734,10 @@ public:
     void setX(const int x) { move(x, getY()); }
     void setY(const int y) { move(getX(), y); }
 
-    void setTop(int v) { m_positions.top.unit = Unit::Px; m_positions.top.value = v;  scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
-    void setBottom(int v) { m_positions.top.unit = Unit::Px; m_positions.bottom.value = v;  scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
-    void setLeft(int v) { m_positions.top.unit = Unit::Px; m_positions.left.value = v;  scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
-    void setRight(int v) { m_positions.top.unit = Unit::Px; m_positions.right.value = v;  scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setTop(int v) { m_positions.top.unit = Unit::Px; m_positions.top.value = v; scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setBottom(int v) { m_positions.top.unit = Unit::Px; m_positions.bottom.value = v; scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setLeft(int v) { m_positions.top.unit = Unit::Px; m_positions.left.value = v;  scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setRight(int v) { m_positions.top.unit = Unit::Px; m_positions.right.value = v;  scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
 
     void setHeight(std::string heightStr) { applyDimension(false, std::move(heightStr)); }
     void setWidth(std::string widthStr) { applyDimension(true, std::move(widthStr)); }

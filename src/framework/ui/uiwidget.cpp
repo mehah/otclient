@@ -2357,3 +2357,8 @@ void UIWidget::setAlignSelf(AlignSelf align)
     m_flexItem.alignSelf = align;
     updateParentLayout();
 }
+
+void UIWidget::setPlacement(const std::string& placement) {
+    m_placement = Fw::translatePlacement(placement);
+    scheduleHtmlTask(PropApplyAnchorAlignment);
+}

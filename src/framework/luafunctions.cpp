@@ -681,6 +681,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("setBottom", &UIWidget::setBottom);
     g_lua.bindClassMemberFunction<UIWidget>("setRight", &UIWidget::setRight);
     g_lua.bindClassMemberFunction<UIWidget>("setLeft", &UIWidget::setLeft);
+    g_lua.bindClassMemberFunction<UIWidget>("setPlacement", &UIWidget::setPlacement);
 
     g_lua.bindClassMemberFunction<UIWidget>("getX", &UIWidget::getX);
     g_lua.bindClassMemberFunction<UIWidget>("getY", &UIWidget::getY);
