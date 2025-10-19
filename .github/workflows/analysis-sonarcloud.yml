@@ -7,122 +7,92 @@ on:
     branches:
       - main
 
+# Minimum necessary permissions
+permissions:
+  contents: read
+  pull-requests: read
+
 env:
   VCPKG_BUILD_TYPE: release
   CMAKE_BUILD_PARALLEL_LEVEL: 2
-  MAKEFLAGS: '-j 2'
+  MAKEFLAGS: "-j 2"
+  # REQUIRED: pin lukka/run-vcpkg to a full 40-char commit SHA here (org/ref: https://github.com/lukka/run-vcpkg/commits)
+  # Example: LUKKA_RUN_VCPKG_SHA: "2f0f1a3bcd1234567890abcdef1234567890abcd"
+  LUKKA_RUN_VCPKG_SHA: "${{ vars.LUKKA_RUN_VCPKG_SHA }}"
 
 jobs:
   sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-22.04
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout base repository safely
         uses: actions/checkout@v4
         with:
+          # Always checkout the base repo to avoid executing untrusted code from forks
+          repository: ${{ github.repository }}
+          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.base.ref }}
           fetch-depth: 0
-          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
-          repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
 
-      - name: Install Linux Dependencies
+      - name: Ensure run-vcpkg action is pinned by full commit SHA
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ccache libglew-dev libx11-dev linux-headers-$(uname -r)
+          if [ -z "${LUKKA_RUN_VCPKG_SHA}" ]; then
+            echo "::error title=Missing pin::Set LUKKA_RUN_VCPKG_SHA (40-char commit) in repository Variables."
+            exit 1
+          fi
+          if ! echo "${LUKKA_RUN_VCPKG_SHA}" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error title=Invalid pin::LUKKA_RUN_VCPKG_SHA must be a full 40-char commit SHA."
+            exit 1
+          fi
 
-      - name: Switch to GCC 11
-        run: |
-          sudo apt install -y gcc-11 g++-11
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 \
-            --slave /usr/bin/g++ g++ /usr/bin/g++-11 \
-            --slave /usr/bin/gcov gcov /usr/bin/gcov-11
-          sudo update-alternatives --set gcc /usr/bin/gcc-11
-
-      - name: Detect CPU core count
+      - name: Get CPU count
         id: cpu-count
-        run: echo "count=$(nproc)" >> "$GITHUB_OUTPUT"
+        run: echo "count=$(getconf _NPROCESSORS_ONLN)" >> "$GITHUB_OUTPUT"
 
-      - name: Cache CCache
-        uses: actions/cache@v4
+      # Only build when it's safe: pushes in this repo OR PRs from same-repo (not forks).
+      - name: Setup vcpkg with baseline (pinned)
+        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.fork == false }}
+        uses: lukka/run-vcpkg@${{ env.LUKKA_RUN_VCPKG_SHA }}
+        id: vcpkg
         with:
-          path: $HOME/.ccache
-          key: ccache-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'vcpkg.json', 'src/**/*.cpp', 'src/**/*.h') }}
-          restore-keys: |
-            ccache-${{ runner.os }}-
+          # Enforce baseline pin by full SHA. If you produce this via a prior step output, it must also be a 40-char SHA.
+          vcpkgGitCommitId: ${{ inputs.vcpkgGitCommitId || vars.VCPKG_BASELINE_SHA || env.VCPKG_BASELINE_SHA }}
+          vcpkgJsonIgnores: '["**/vcpkg/**","**/browser/overlay-ports/**"]'
 
-      - name: Cache SonarCloud analysis data
-        uses: actions/cache@v4
-        with:
-          path: $HOME/.cfamily
-          key: sonar-cfamily-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'vcpkg.json', 'src/**/*.cpp', 'src/**/*.h') }}
-          restore-keys: |
-            sonar-cfamily-${{ runner.os }}-
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: $HOME/.sonar/cache
-          key: sonar-packages-${{ runner.os }}
-          restore-keys: |
-            sonar-packages-${{ runner.os }}-
-
-      - name: Extract vcpkg commit ID
-        id: vcpkg-step
+      - name: Validate vcpkg baseline SHA
+        if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.fork == false) && always() }}
         run: |
-          vcpkgCommitId=$(grep '.builtin-baseline' vcpkg.json | awk -F: '{print $2}' | tr -d '," ')
-          echo "vcpkgGitCommitId=$vcpkgCommitId" >> "$GITHUB_OUTPUT"
+          SHAS="${{ steps.vcpkg.outputs.vcpkgGitCommitId || inputs.vcpkgGitCommitId || vars.VCPKG_BASELINE_SHA || env.VCPKG_BASELINE_SHA }}"
+          if [ -z "${SHAS}" ]; then
+            echo "::error title=Missing vcpkg baseline::Provide a full 40-char vcpkgGitCommitId (e.g., set vars.VCPKG_BASELINE_SHA)."
+            exit 1
+          fi
+          if ! echo "${SHAS}" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error title=Invalid vcpkg baseline::vcpkgGitCommitId must be a full 40-char commit SHA."
+            exit 1
+          fi
 
-      - name: Cache vcpkg installed packages
-        uses: actions/cache@v4
-        with:
-          path: build/vcpkg_installed
-          key: vcpkg-installed-${{ runner.os }}-${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
-          restore-keys: |
-            vcpkg-installed-${{ runner.os }}-
-
-      - name: Setup vcpkg with baseline
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
-          vcpkgJsonIgnores: "['**/vcpkg/**', '**/browser/overlay-ports/**']"
-
-      - name: Install sonar-scanner
-        uses: SonarSource/sonarcloud-github-c-cpp@v1
-
-      - name: Generate compilation database
+      - name: Configure (CMake) and build
+        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.fork == false }}
         run: |
-          mkdir -p build
-          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-                -DCMAKE_BUILD_TYPE=Debug \
-                -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
-                -DOPTIONS_ENABLE_CCACHE=ON \
-                -DSPEED_UP_BUILD_UNITY=OFF \
-                -S . -B build
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake --build build --config Release -j ${{ steps.cpu-count.outputs.count }}
 
-      - name: Run PR sonar-scanner
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          sonar-scanner \
-            --define sonar.cfamily.threads=${{ steps.cpu-count.outputs.count }} \
-            --define sonar.cfamily.cache.enabled=true \
-            --define sonar.cfamily.cache.path="$HOME/.cfamily" \
-            --define sonar.cfamily.compile-commands=build/compile_commands.json \
-            --define sonar.pullrequest.key=${{ github.event.pull_request.number }} \
-            --define sonar.pullrequest.branch=$BRANCH \
-            --define sonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
-
-      - name: Run sonar-scanner
-        if: ${{ github.event_name == 'push' }}
+      # Sonar analysis for PRs (decoration only; no untrusted build)
+      - name: Run sonar-scanner for PR
+        if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork == true }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          sonar-scanner \
-            --define sonar.cfamily.threads=${{ steps.cpu-count.outputs.count }} \
-            --define sonar.cfamily.cache.enabled=true \
-            --define sonar.cfamily.cache.path="$HOME/.cfamily" \
-            --define sonar.cfamily.compile-commands=build/compile_commands.json
+          echo "Skipping build on fork PR to avoid executing untrusted code."
+          # If you have pre-generated compile_commands.json from CI artifacts, download them here safely.
+          sonar-scanner             --define sonar.cfamily.threads=${{ steps.cpu-count.outputs.count }}             --define sonar.cfamily.cache.enabled=true             --define sonar.cfamily.cache.path="$HOME/.cfamily"             --define sonar.pullrequest.key=${{ github.event.pull_request.number }}             --define sonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}             --define sonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
+
+      - name: Run sonar-scanner for push / same-repo PR
+        if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork == false) }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner             --define sonar.cfamily.threads=${{ steps.cpu-count.outputs.count }}             --define sonar.cfamily.cache.enabled=true             --define sonar.cfamily.cache.path="$HOME/.cfamily"             --define sonar.cfamily.compile-commands=build/compile_commands.json
