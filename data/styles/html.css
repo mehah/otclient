@@ -21,6 +21,7 @@
 }
 
 button {
+  display: inline-block;
   text-align: center !important;
   padding: 5 10 5 10;
 }
