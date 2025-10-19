@@ -5,5 +5,5 @@ Module
   website: game_forge
   scripts: [ game_forge.lua, callbackHtml.lua   ]
   sandboxed: true
-  @onLoad: forgeController:init()
-  @onUnload: forgeController:terminate()
+  @onLoad: ForgeController:init()
+  @onUnload: ForgeController:terminate()

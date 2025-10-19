@@ -12,11 +12,8 @@
 .tabs-img {
   width: 116px;
   height: 34px;
-  --image-clip: 0 0 116 34;
 }
-.tabs-img:pressed {
-  --image-clip: 0 34 116 34;
-}
+
 .tabs-img-history {
   width: 118px;
   height: 34px;

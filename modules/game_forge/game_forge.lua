@@ -5,6 +5,7 @@ local helpers = require('modules.game_forge.game_forge_helpers')
 local cloneValue = helpers.cloneValue
 local normalizeClassPriceEntries = helpers.normalizeClassPriceEntries
 local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
+local formatHistoryDate = helpers.formatHistoryDate
 
 local function resetInfo()
     ForgeController.transfer.exaltedCoresLabel = "???"
@@ -47,21 +48,6 @@ function ForgeController:show(skipRequest)
         g_game.openPortableForgeRequest()
     end
 
-    self.modeFusion, self.modeTransfer = false, false
-
-    -- for _, tabName in ipairs(TAB_ORDER) do
-    --     self:loadTab(tabName)
-    -- end
-
-    local buttonPanel = self.ui.buttonPanel
-    -- for tabName, config in pairs(TAB_CONFIG) do
-    --     windowTypes[tabName .. 'Menu'] = {
-    --         obj = buttonPanel and buttonPanel[tabName .. 'Btn'],
-    --         panel = tabName,
-    --         modeProperty = config.modeProperty
-    --     }
-    -- end
-
     self.ui:centerIn('parent')
     self.ui:show()
     self.ui:raise()
@@ -71,7 +57,6 @@ function ForgeController:show(skipRequest)
         ForgeButton:setOn(true)
     end
 
-    -- SelectWindow('fusionMenu')
     self:updateResourceBalances()
 
     self:scheduleEvent(function()
@@ -93,7 +78,7 @@ function ForgeController:hide()
 end
 
 function ForgeController:toggle()
-    ForgeController:toggleFusionMenu()
+    ForgeController:toggleConversionMenu()
     resetInfo()
     if ForgeController.rawData then
         forgeData(ForgeController.rawData)
@@ -116,24 +101,18 @@ ForgeController.currentExaltedCores = 0
 ForgeController.rawCurrentGold = 0
 ForgeController.currentGold = 0
 
-ForgeController.currentTab = 'transfer'
+ForgeController.currentTab = 'conversion'
 function ForgeController:updateResourceBalances()
     if not self.ui then
         return
     end
 
     local player = g_game.getLocalPlayer()
-
     self.currentDust = player:getResourceBalance(ResourceTypes.FORGE_DUST or 70)
-    g_logger.info("Current Dust: " .. tostring(self.currentDust))
     self.currentSlivers = player:getResourceBalance(ResourceTypes.FORGE_SLIVER)
-    g_logger.info("Current Slivers: " .. tostring(self.currentSlivers))
     self.currentExaltedCores = player:getResourceBalance(ResourceTypes.FORGE_CORES)
-    g_logger.info("Current Exalted Cores: " .. tostring(self.currentExaltedCores))
     self.rawCurrentGold = player:getTotalMoney() or 0
-    g_logger.info("Current Gold: " .. tostring(self.rawCurrentGold))
     self.currentGold = comma_value(self.rawCurrentGold)
-    g_logger.info("Current Gold format: " .. tostring(self.currentGold))
 end
 
 ForgeController.baseSelected = {
@@ -287,7 +266,6 @@ local function handleFusionItems(data)
 
     for i, item in pairs(data) do
         item.key = ("%d_%d"):format(item.id, item.tier)
-        g_logger.info(">>>>" .. tostring(item.key))
         if item.tier > 0 then
             item.clip = ItemsDatabase.getTierClip(item.tier)
         end
@@ -480,6 +458,8 @@ function ForgeController:toggleConvergence(isTransfer)
     data.isConvergence = not data.isConvergence
     data.selected = cloneValue(ForgeController.baseSelected)
     data.selectedTarget = cloneValue(ForgeController.baseSelected)
+    ForgeController.formattedPrice = "???"
+    ForgeController.price = 0
 
     if isTransfer then
         data.canTransfer = false
@@ -491,7 +471,6 @@ function ForgeController:toggleConvergence(isTransfer)
             data.currentList = cloneValue(data.convergenceItems)
             data.title = "Convergence Transfer Requirements"
             data.dustLabel = data.convergenceDust
-            g_logger.info("Convergence dustLabel: " .. tostring(#data.currentList.donors))
         end
     else
         data.canFusion = false
@@ -575,7 +554,6 @@ function onOpenForge(data)
     local fusionItems = handleFusionItems(items)
     ForgeController.fusion.items = fusionItems
     ForgeController.fusion.currentList = cloneValue(fusionItems)
-    g_logger.info("Fusion Items Count: " .. tostring(#fusionItems))
     local convergenceFusion = cloneValue(data.convergenceFusion or {})
     local _, convergenceItemsBySlot = handleParseConvergenceFusionItems(convergenceFusion)
     ForgeController.fusion.convergenceItems = convergenceItemsBySlot
@@ -591,16 +569,6 @@ function onOpenForge(data)
     local convergenceTransferItems = handleTransferItems(convergenceTransfers)
     ForgeController.transfer.convergenceItems = convergenceTransferItems
     -- TRANSFER ITEMS
-
-    for k, v in pairs(data) do
-        if k == "fusionGrades" then
-            for kk, vv in pairs(v) do
-                g_logger.info("Fusion Grade - " .. tostring(kk) .. ": " .. tostring(vv))
-            end
-        else
-            g_logger.info("Forge Data - " .. tostring(k) .. ": " .. tostring(v))
-        end
-    end
 
     local shouldShow = not ForgeController.ui or ForgeController.ui:isDestroyed() or not ForgeController.ui:isVisible()
     if shouldShow then
@@ -658,16 +626,6 @@ function forgeData(data)
     ForgeController.conversion.dustMaxIncreaseCost = dustMax - 75
     ForgeController.conversion:handleButtons()
     -- CONVERSION
-
-    for k, v in pairs(data) do
-        if k == "fusionGrades" then
-            for kk, vv in pairs(v) do
-                g_logger.info("Fusion Grade - " .. tostring(kk) .. ": " .. tostring(vv))
-            end
-        else
-            g_logger.info("Forge Data - " .. tostring(k) .. ": " .. tostring(v))
-        end
-    end
 end
 
 function ForgeController:getColor(currentType)
@@ -864,11 +822,10 @@ function ForgeController.conversion:toggle(conversionType)
 end
 
 function ForgeController:resetTabsClip()
-    self.fusion.clip = { x = 0, y = 0, width = 118, height = 34 }
-    self.transfer.clip = { x = 0, y = 0, width = 118, height = 34 }
+    self.fusion.clip = { x = 0, y = 0, width = 116, height = 34 }
+    self.transfer.clip = { x = 0, y = 0, width = 116, height = 34 }
     self.conversion.clip = { x = 0, y = 0, width = 116, height = 34 }
     self.history.clip = { x = 0, y = 0, width = 118, height = 34 }
-
     resetInfo()
 end
 
@@ -903,7 +860,7 @@ local historyActionLabels = {
     [3] = 'Conversion',
     [4] = 'Conversion'
 }
-local formatHistoryDate = helpers.formatHistoryDate
+
 function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     page = math.max(tonumber(page) or 0, 1)
     lastPage = math.max(tonumber(lastPage) or page, 1)
