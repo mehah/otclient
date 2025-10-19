@@ -1398,8 +1398,15 @@ void UIWidget::updateSize() {
         if (!cb) return;
         cb->updateSize();
 
-        const int cbw = std::max(0, cb->getWidth());
-        const int cbh = std::max(0, cb->getHeight());
+        const int pl = cb->getPaddingLeft();
+        const int pr = cb->getPaddingRight();
+        const int pt = cb->getPaddingTop();
+        const int pb = cb->getPaddingBottom();
+
+        const int cbw_content = std::max(0, cb->getWidth());
+        const int cbh_content = std::max(0, cb->getHeight());
+        const int cbw_padding = std::max(0, cbw_content + pl + pr);
+        const int cbh_padding = std::max(0, cbh_content + pt + pb);
 
         auto toPx = [&](const SizeUnit& u, int base) -> int {
             switch (u.unit) {
@@ -1414,10 +1421,13 @@ void UIWidget::updateSize() {
         const bool hasT = m_positions.top.unit != Unit::Auto;
         const bool hasB = m_positions.bottom.unit != Unit::Auto;
 
-        int left = hasL ? toPx(m_positions.left, cbw) : INT_MIN;
-        int right = hasR ? toPx(m_positions.right, cbw) : INT_MIN;
-        int top = hasT ? toPx(m_positions.top, cbh) : INT_MIN;
-        int bottom = hasB ? toPx(m_positions.bottom, cbh) : INT_MIN;
+        const int baseW_for_offsets = (hasL || hasR) ? cbw_content : cbw_padding;
+        const int baseH_for_offsets = (hasT || hasB) ? cbh_content : cbh_padding;
+
+        int left = hasL ? toPx(m_positions.left, baseW_for_offsets) : pl;
+        int right = hasR ? toPx(m_positions.right, baseW_for_offsets) : pr;
+        int top = hasT ? toPx(m_positions.top, baseH_for_offsets) : pt;
+        int bottom = hasB ? toPx(m_positions.bottom, baseH_for_offsets) : pb;
 
         const int ml = getMarginLeft();
         const int mr = getMarginRight();
@@ -1438,19 +1448,21 @@ void UIWidget::updateSize() {
             return std::max(0, w);
         };
 
+        const int cbw_for_size = (hasL || hasR) ? cbw_content : cbw_padding;
+
         if (hasL && hasR && widthAutoLike) {
-            int w = cbw - left - right - ml - mr;
+            int w = cbw_for_size - left - right - ml - mr;
             if (w < 0) w = 0;
             setWidth_px(w);
             m_width.applyUpdate(getWidth(), SIZE_VERSION_COUNTER);
             resolvedW = getWidth();
         } else if ((hasL && !hasR && !widthAutoLike) || (hasR && !hasL && !widthAutoLike)) {
             int w = std::max(0, resolvedW);
-            int other = cbw - (hasL ? left : right) - w - ml - mr;
+            int other = cbw_for_size - (hasL ? left : right) - w - ml - mr;
             if (hasL) right = other; else left = other;
         } else if (hasL && hasR && !widthAutoLike) {
             int w = std::max(0, resolvedW);
-            right = cbw - left - w - ml - mr;
+            right = cbw_for_size - left - w - ml - mr;
         } else {
             if (widthAutoLike) {
                 int w = shrinkToFitWidth();
@@ -1459,12 +1471,12 @@ void UIWidget::updateSize() {
                 resolvedW = getWidth();
             }
             if (!hasL && !hasR) {
-                left = 0;
-                right = cbw - left - std::max(0, resolvedW) - ml - mr;
+                left = pl;
+                right = cbw_for_size - left - std::max(0, resolvedW) - ml - mr;
             } else if (!hasL) {
-                left = cbw - right - std::max(0, resolvedW) - ml - mr;
+                left = cbw_for_size - right - std::max(0, resolvedW) - ml - mr;
             } else {
-                right = cbw - left - std::max(0, resolvedW) - ml - mr;
+                right = cbw_for_size - left - std::max(0, resolvedW) - ml - mr;
             }
         }
 
@@ -1475,8 +1487,8 @@ void UIWidget::updateSize() {
                 setWidth_px(clamped);
                 m_width.applyUpdate(getWidth(), SIZE_VERSION_COUNTER);
                 resolvedW = clamped;
-                if (hasL) right = cbw - left - resolvedW - ml - mr;
-                else left = cbw - right - resolvedW - ml - mr;
+                if (hasL) right = cbw_for_size - left - resolvedW - ml - mr;
+                else left = cbw_for_size - right - resolvedW - ml - mr;
             }
         }
 
@@ -1494,19 +1506,21 @@ void UIWidget::updateSize() {
             return std::max(0, h);
         };
 
+        const int cbh_for_size = (hasT || hasB) ? cbh_content : cbh_padding;
+
         if (hasT && hasB && heightAutoLike) {
-            int h = cbh - top - bottom - mt - mb;
+            int h = cbh_for_size - top - bottom - mt - mb;
             if (h < 0) h = 0;
             setHeight_px(h);
             m_height.applyUpdate(getHeight(), SIZE_VERSION_COUNTER);
             resolvedH = getHeight();
         } else if ((hasT && !hasB && !heightAutoLike) || (hasB && !hasT && !heightAutoLike)) {
             int h = std::max(0, resolvedH);
-            int other = cbh - (hasT ? top : bottom) - h - mt - mb;
+            int other = cbh_for_size - (hasT ? top : bottom) - h - mt - mb;
             if (hasT) bottom = other; else top = other;
         } else if (hasT && hasB && !heightAutoLike) {
             int h = std::max(0, resolvedH);
-            bottom = cbh - top - h - mt - mb;
+            bottom = cbh_for_size - top - h - mt - mb;
         } else {
             if (heightAutoLike) {
                 int h = shrinkToFitHeight();
@@ -1515,12 +1529,12 @@ void UIWidget::updateSize() {
                 resolvedH = getHeight();
             }
             if (!hasT && !hasB) {
-                top = 0;
-                bottom = cbh - top - std::max(0, resolvedH) - mt - mb;
+                top = pt;
+                bottom = cbh_for_size - top - std::max(0, resolvedH) - mt - mb;
             } else if (!hasT) {
-                top = cbh - bottom - std::max(0, resolvedH) - mt - mb;
+                top = cbh_for_size - bottom - std::max(0, resolvedH) - mt - mb;
             } else {
-                bottom = cbh - top - std::max(0, resolvedH) - mt - mb;
+                bottom = cbh_for_size - top - std::max(0, resolvedH) - mt - mb;
             }
         }
 
@@ -1531,8 +1545,8 @@ void UIWidget::updateSize() {
                 setHeight_px(clamped);
                 m_height.applyUpdate(getHeight(), SIZE_VERSION_COUNTER);
                 resolvedH = clamped;
-                if (hasT) bottom = cbh - top - resolvedH - mt - mb;
-                else top = cbh - bottom - resolvedH - mt - mb;
+                if (hasT) bottom = cbh_for_size - top - resolvedH - mt - mb;
+                else top = cbh_for_size - bottom - resolvedH - mt - mb;
             }
         }
 
