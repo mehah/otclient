@@ -7,7 +7,12 @@
 <html>
   <window class="forge-window" title="Exaltation Forge" onescape="self:hide()">
     <div class="tabs">
-      <img class="tabs-img" src="/modules/game_forge/images/fusionButton.png" />
+      <img
+        class="tabs-img"
+        src="/modules/game_forge/images/fusionButton.png"
+        *image-clip="self.fusion.clip"
+        onclick="self:toggleFusionMenu()"
+      />
       <img
         class="tabs-img"
         src="/modules/game_forge/images/transferButton.png"
@@ -29,6 +34,378 @@
     </div>
 
     <div class="content">
+      <div *if="self.currentTab == 'fusion'" class="transfer-container">
+        <div class="transfer-select-container">
+          <span class="transfer-header">Select Item For Fusion</span>
+          <div class="transfer-select-wrapper">
+            <div
+              class="transfer-select-donnor-container"
+              layout="type: grid; cell-size: 34 34;cell-spacing:2;num-columns:4"
+            >
+              <div
+                *for="local item in (self.fusion.currentList or {})"
+                onclick="self.fusion:handleSelect(item)"
+              >
+                <div class="item-to-select">
+                  <img
+                    *image-source="item.imagePath"
+                    *image-clip="item.rarityClipObject"
+                    *border-width="1"
+                    *border-color="self.fusion.selected.key == item.key and 'white' or 'transparent'"
+                    class="item-rarity"
+                  />
+                  <UIItem
+                    *item-id="item.id"
+                    style="
+                      height: 32px;
+                      width: 32px;
+                      align-items: center;
+                      padding-left: 2px;
+                    "
+                  />
+                  <img
+                    *if="item.tier>0"
+                    class="item-tier-strip"
+                    src="/images/inventory/tiers-strip.png"
+                    *image-clip="item.clip"
+                  />
+                  <label class="item-count">{{item.count}}</label>
+                </div>
+              </div>
+            </div>
+            <div class="transfer-select-donnor-center" style="width: 183px">
+              <div class="transfer-select-arrows-container">
+                <img
+                  src="/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+                  width="14"
+                  height="25"
+                />
+                <img
+                  src="/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+                  width="14"
+                  height="25"
+                  style="margin-left: 8px"
+                />
+                <img
+                  src="/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+                  width="14"
+                  height="25"
+                  style="margin-left: 8px"
+                />
+              </div>
+              <div class="transfer-select-convergence">
+                <input
+                  id="fusion_convergence"
+                  type="checkbox"
+                  *checked="self.fusion.isConvergence"
+                  onchange="self:toggleConvergence()"
+                /><label style="margin-left: 2px" for="fusion_convergence"
+                  >Convergence</label
+                >
+              </div>
+            </div>
+            <div style="width: 66px; position: relative">
+              <img
+                *if="self.fusion.selected.id == -1"
+                style="margin-top: 22px; margin-left: 30px"
+                src="/images/ui/icon-questionmark.png"
+                width="8"
+                height="21"
+              />
+              <UIItem
+                *item-id="self.fusion.selected.id"
+                style="
+                  height: 64px;
+                  width: 64px;
+                  align-items: center;
+                  padding-left: 2px;
+                "
+                shader="Outfit - cyclopedia-black"
+              />
+              <img
+                *if="self.fusion.selected.targetTier > 0"
+                class="item-tier-strip"
+                src="/images/inventory/tiers-strip.png"
+                *image-clip="self.fusion.selected.targetClip"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="transfer-select-container" style="margin-top: 8px">
+          <span
+            class="transfer-header"
+            *left="self.fusion.isConvergence and 100 or 130"
+            >{{self.fusion.title}}</span
+          >
+          <div class="transfer-requirements-wrapper">
+            <div
+              *if="self.fusion.isConvergence"
+              background-color="lightblue"
+              height="85"
+              image-size="155 90"
+              class="transfer-select-donnor-container"
+              layout="type: grid; cell-size: 34 34;cell-spacing:2;num-columns:4"
+            >
+              <div
+                *for="local item in (self.fusion.convergenceItems or {})"
+                *if="item.key ~= self.fusion.selected.key and item.tier == self.fusion.selected.tier and self.fusion.selected.id ~= -1"
+                onclick="self:handleSelectTarget(item, false)"
+              >
+                <div class="item-to-select">
+                  <img
+                    *image-source="item.imagePath"
+                    *image-clip="item.rarityClipObject"
+                    *border-width="1"
+                    *border-color="self.fusion.selectedTarget.key == item.key and 'white' or 'transparent'"
+                    class="item-rarity"
+                  />
+                  <UIItem
+                    *item-id="item.id"
+                    style="
+                      height: 32px;
+                      width: 32px;
+                      align-items: center;
+                      padding-left: 2px;
+                    "
+                  />
+                  <img
+                    *if="item.tier>0"
+                    class="item-tier-strip"
+                    src="/images/inventory/tiers-strip.png"
+                    *image-clip="item.clip"
+                  />
+                  <label class="item-count">{{item.count}}</label>
+                </div>
+              </div>
+            </div>
+            <div
+              class="transfer-requirement-item-container"
+              *if="not self.fusion.isConvergence"
+            >
+              <div class="transfer-requirement">
+                <img
+                  *if="self.fusion.selected.id == -1"
+                  style="margin-top: 22px; margin-left: 30px"
+                  src="/images/ui/icon-questionmark.png"
+                  width="8"
+                  height="21"
+                />
+                <div *if="self.fusion.selected ~= -1" class="preview-item">
+                  <UIItem
+                    *item-id="self.fusion.selected.id"
+                    style="
+                      height: 64px;
+                      width: 64px;
+                      align-items: center;
+                      padding-left: 2px;
+                    "
+                  />
+                  <img
+                    *if="self.fusion.selected.tier>0"
+                    class="item-tier-strip"
+                    src="/images/inventory/tiers-strip.png"
+                    *image-clip="self.fusion.selected.clip"
+                  />
+                </div>
+              </div>
+              <div
+                class="transfer-requirement-item-cost"
+                *color="self:getColor('fusion-preview-count-label')"
+              >
+                {{self.fusion.selected.countLabel}}
+              </div>
+            </div>
+            <div
+              class="transfer-requirement-item-container"
+              style="margin-left: 8px"
+            >
+              <div class="transfer-requirement">
+                <UIItem style="item-id: 37160" />
+              </div>
+              <div class="transfer-requirement-item-cost">
+                <p *color="self:getColor('fusion-dust')">
+                  {{self.fusion.dustLabel}}
+                </p>
+                <img
+                  style="margin-left: 2px"
+                  src="/modules/game_forge/images/icon-currency-dust.png"
+                  width="9"
+                  height="6"
+                />
+              </div>
+            </div>
+            <div
+              class="fusion-buttons-container"
+              *width="self.fusion.isConvergence and 47 or 140"
+            >
+              <div style="height: 45px" *if="not self.fusion.isConvergence">
+                <div class="fusion-buttons-text-container">
+                  <span>Success Rate:</span>
+                  <span
+                    class="fusion-text-chance"
+                    *color="self:getColor('improve-chance')"
+                    >{{self.fusion.chanceImprovedLabel}}</span
+                  >
+                </div>
+                <div class="fusion-buttons-text-container">
+                  <button
+                    class="fusion-buttons-improve"
+                    *image-clip="self.fusion.chanceImprovedButtonClip"
+                    onclick="self.fusion:exaltedCoreImprovements('improve-chance')"
+                    *disabled="self.currentExaltedCores <= 0 or self.fusion.reduceTierLossChecked and self.currentExaltedCores == 1"
+                  >
+                    Improve to 65%
+                  </button>
+                  <div class="fusion-text-chance-cost">
+                    <p *color="self:getColor('improve-chance-cost')">1</p>
+                    <img
+                      style="margin-left: 2px"
+                      src="/modules/game_forge/images/icon-currency-exaltedcore.png"
+                      width="9"
+                      height="9"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div style="height: 45px" *if="not self.fusion.isConvergence">
+                <div class="fusion-buttons-text-container">
+                  <span>Tier Loss:</span>
+                  <span
+                    class="fusion-text-chance"
+                    style="margin-left: 50px"
+                    *color="self:getColor('reduce-loss')"
+                    >{{self.fusion.reduceTierLossLabel}}</span
+                  >
+                </div>
+                <div class="fusion-buttons-text-container">
+                  <button
+                    class="fusion-buttons-improve"
+                    *image-clip="self.fusion.reduceTierLossButtonClip"
+                    onclick="self.fusion:exaltedCoreImprovements('reduce-loss')"
+                    style="width: 98px"
+                    *disabled="self.currentExaltedCores <= 0 or self.fusion.chanceImprovedChecked and self.currentExaltedCores == 1"
+                  >
+                    Reduce to 50%
+                  </button>
+                  <div class="fusion-text-chance-cost">
+                    <p *color="self:getColor('reduce-loss-cost')">1</p>
+                    <img
+                      style="margin-left: 2px"
+                      src="/modules/game_forge/images/icon-currency-exaltedcore.png"
+                      width="9"
+                      height="9"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                text-align: center;
+                align-items: center;
+                width: 35px;
+                height: 90px;
+              "
+            >
+              <img
+                src="/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+                width="14"
+                height="25"
+              />
+            </div>
+            <div class="transfer-button-container">
+              <div
+                class="transfer-button"
+                *disabled="self.fusion.canFusion == false"
+                onclick="self:forgeAction(false)"
+              >
+                <div class="transfer-button-items">
+                  <span style="width: 50px; height: 66px">
+                    <img
+                      *if="self.fusion.selected.id == -1"
+                      src="/images/ui/icon-questionmark.png"
+                      style="margin-left: 28px; margin-top: 20px"
+                      width="8"
+                      height="21"
+                    />
+                    <div
+                      *if="self.fusion.selected.id ~= -1"
+                      class="item-to-select"
+                      style="margin-top: 15px; margin-left: 10px"
+                    >
+                      <UIItem
+                        *item-id="self.fusion.selected.id"
+                        style="height: 34px; width: 34px"
+                      />
+                      <img
+                        *if="self.fusion.selected.tier > 0"
+                        class="item-tier-strip"
+                        src="/images/inventory/tiers-strip.png"
+                        *image-clip="self.fusion.selected.clip"
+                        style="margin-left: 12px"
+                      />
+                    </div>
+                  </span>
+                  <span
+                    style="
+                      padding-top: 30px;
+                      padding-left: 5px;
+                      padding-right: 5px;
+                      height: 66px;
+                      width: 18px;
+                    "
+                  >
+                    <img
+                      src="/modules/game_forge/images/arrows/icon-arrows.png"
+                      width="15"
+                      height="7"
+                    />
+                  </span>
+                  <span style="width: 50px; height: 66px">
+                    <img
+                      *if="self.fusion.selected.id == -1"
+                      src="/images/ui/icon-questionmark.png"
+                      width="8"
+                      height="21"
+                      style="margin-left: 18px; margin-top: 20px"
+                    />
+                    <div
+                      *if="self.fusion.selected ~= -1"
+                      class="item-to-select"
+                      style="margin-top: 15px; margin-left: 8px"
+                    >
+                      <UIItem
+                        *item-id="self.fusion.selected.id"
+                        style="
+                          height: 34px;
+                          width: 34px;
+                          align-items: center;
+                          padding-left: 2px;
+                        "
+                      />
+                      <img
+                        *if="self.fusion.selected.targetTier > 0"
+                        class="item-tier-strip"
+                        src="/images/inventory/tiers-strip.png"
+                        *image-clip="self.fusion.selected.targetClip"
+                        style="margin-left: 12px"
+                      />
+                    </div>
+                  </span>
+                </div>
+              </div>
+              <div class="base-gold-bg" style="margin-top: 2px; width: 128px">
+                <p *color="self:getColor('price')">{{self.formattedPrice}}</p>
+                <img
+                  src="/images/game/prey/prey_gold.png"
+                  width="10"
+                  height="10"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div *if="self.currentTab == 'transfer'" class="transfer-container">
         <div class="transfer-select-container">
           <span class="transfer-header">Select Items for the Transfer</span>
@@ -98,7 +475,7 @@
                   id="transfer_convergence"
                   type="checkbox"
                   *checked="self.transfer.isConvergence"
-                  onchange="self.transfer:toggleConvergence()"
+                  onchange="self:toggleConvergence(true)"
                 /><label style="margin-left: 2px" for="transfer_convergence"
                   >Convergence</label
                 >
@@ -112,7 +489,7 @@
               <div
                 *for="local item in (self.transfer.currentList.receivers or {})"
                 *if="self.transfer.selected and self.transfer.selected.id ~= item.id and self.transfer.selected.slot == item.slot"
-                onclick="self.transfer:handleSelectTarget(item)"
+                onclick="self:handleSelectTarget(item, true)"
                 *border-width="1"
                 *border-color="self.transfer.selectedTarget.key == item.key and 'white' or 'transparent'"
               >
@@ -147,7 +524,7 @@
         </div>
 
         <div class="transfer-select-container" style="margin-top: 8px">
-          <span class="transfer-header">Transfer Requirements</span>
+          <span class="transfer-header">{{self.transfer.title}}</span>
           <div class="transfer-requirements-wrapper">
             <div class="transfer-requirement-item-container">
               <div class="transfer-requirement">
