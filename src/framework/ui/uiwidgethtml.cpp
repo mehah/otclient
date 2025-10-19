@@ -1398,13 +1398,8 @@ void UIWidget::updateSize() {
         if (!cb) return;
         cb->updateSize();
 
-        const int pl = cb->getPaddingLeft();
-        const int pr = cb->getPaddingRight();
-        const int pt = cb->getPaddingTop();
-        const int pb = cb->getPaddingBottom();
-
-        const int cbw = std::max(0, cb->getWidth() + pl + pr);
-        const int cbh = std::max(0, cb->getHeight() + pt + pb);
+        const int cbw = std::max(0, cb->getWidth());
+        const int cbh = std::max(0, cb->getHeight());
 
         auto toPx = [&](const SizeUnit& u, int base) -> int {
             switch (u.unit) {
@@ -1553,8 +1548,6 @@ void UIWidget::updateSize() {
             setMarginLeft(std::max(0, (left == INT_MIN ? 0 : left)));
         } else if (hasR) {
             setMarginRight(std::max(0, (right == INT_MIN ? 0 : right)));
-        } else {
-            setMarginLeft(pl);
         }
 
         if (hasT && hasB) {
@@ -1564,8 +1557,6 @@ void UIWidget::updateSize() {
             setMarginTop(std::max(0, (top == INT_MIN ? 0 : top)));
         } else if (hasB) {
             setMarginBottom(std::max(0, (bottom == INT_MIN ? 0 : bottom)));
-        } else {
-            setMarginTop(pt);
         }
     }
 
