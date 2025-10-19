@@ -56,17 +56,17 @@ function loadIcon(iconId)
     local spell, profile, spellName = Spells.getSpellByIcon(iconId)
     if not spellName then
         print('[WARNING] loadIcon: empty spellName for tfs spell id: ' .. iconId)
-        return
+        return nil, nil
     end
     if not profile then
         print('[WARNING] loadIcon: empty profile for tfs spell id: ' .. iconId)
-        return
+        return nil, nil
     end
 
     clientIconId = Spells.getClientId(spellName)
     if not clientIconId then
         print('[WARNING] loadIcon: empty clientIconId for tfs spell id: ' .. iconId)
-        return
+        return nil, nil
     end
 
     local icon = cooldownPanel:getChildById(iconId)
@@ -83,7 +83,7 @@ function loadIcon(iconId)
         print('[WARNING] loadIcon: empty spell icon for tfs spell id: ' .. iconId)
         icon = nil
     end
-    return icon
+    return icon, spellName
 end
 
 function onMiniWindowOpen()
@@ -188,7 +188,7 @@ function onSpellCooldown(iconId, duration)
     if not cooldownWindow:isVisible() then
         return
     end
-    local icon = loadIcon(iconId)
+    local icon, spellName = loadIcon(iconId)
     if not icon then
         print('[WARNING] Can not load cooldown icon on spell with id: ' .. iconId)
         return

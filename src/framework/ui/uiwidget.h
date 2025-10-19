@@ -657,7 +657,10 @@ public:
     bool isPhantom() { return hasProp(PropPhantom); }
     bool isDraggable() { return hasProp(PropDraggable); }
     bool isFixedSize() { return hasProp(PropFixedSize); }
-    bool isClipping() { return hasProp(PropClipping) || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll); }
+    bool isClipping() {
+        return hasProp(PropClipping) ||
+            (isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll));
+    }
     bool isDestroyed() { return hasProp(PropDestroyed); }
     bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
     bool isEffectivelyVisible() { return isVisible() || m_displayType != DisplayType::None; }
@@ -940,6 +943,8 @@ protected:
 
     virtual void onTextChange(std::string_view text, std::string_view oldText);
     virtual void onFontChange(std::string_view font);
+
+    const WrapOptions& getTextWrapOptions();
 
     WrapOptions m_textWrapOptions;
     std::vector<Point> m_glyphsPositionsCache;

@@ -52,7 +52,7 @@
 #include <span>
 #include <regex>
 #include <zlib.h>
-
+#include <limits>
 #include <parallel_hashmap/btree.h>
 #include <parallel_hashmap/phmap.h>
 #include <pugixml.hpp>

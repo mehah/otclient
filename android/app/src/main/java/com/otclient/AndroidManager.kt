@@ -36,4 +36,5 @@ class AndroidManager(
     fun getDisplayDensity(): Float = context.resources.displayMetrics.density
 
     external fun nativeInit()
+    external fun nativeSetAudioEnabled(enabled: Boolean)
 }
