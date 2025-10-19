@@ -116,8 +116,11 @@
 }
 .transfer-header {
   position: absolute;
-  top: -18;
-  left: 165px;
+  top: 2;
+  text-align: center;
+  left: 0;
+  right: 0;
+  width: 465px;
 }
 .transfer-select-wrapper {
   display: flex;

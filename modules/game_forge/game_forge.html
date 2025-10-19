@@ -132,11 +132,7 @@
           </div>
         </div>
         <div class="transfer-select-container" style="margin-top: 8px">
-          <span
-            class="transfer-header"
-            *left="self.fusion.isConvergence and 100 or 130"
-            >{{self.fusion.title}}</span
-          >
+          <span class="transfer-header">{{self.fusion.title}}</span>
           <div class="transfer-requirements-wrapper">
             <div
               *if="self.fusion.isConvergence"
@@ -405,6 +401,7 @@
             </div>
           </div>
         </div>
+        <div class="transfer-description">{{self.description}}</div>
       </div>
       <div *if="self.currentTab == 'transfer'" class="transfer-container">
         <div class="transfer-select-container">
