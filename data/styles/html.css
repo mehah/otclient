@@ -21,6 +21,7 @@
 }
 
 button {
+  display: inline-block;
   text-align: center !important;
   padding: 5 10 5 10;
 }
@@ -53,7 +54,6 @@ input[type="radio"] {
 }
 
 textarea {
-  white-space: pre;
   width: 128;
   height: 128;
 }

@@ -237,11 +237,13 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             continue;
 
         if (widget->getPositionType() == PositionType::Absolute) {
-            parentWidget = anchor->getAnchoredEdge() == Fw::AnchorTop && widget->getPositions().top.unit != Unit::Auto ||
-                anchor->getAnchoredEdge() == Fw::AnchorLeft && widget->getPositions().left.unit != Unit::Auto ||
-                anchor->getAnchoredEdge() == Fw::AnchorRight && widget->getPositions().right.unit != Unit::Auto ||
-                anchor->getAnchoredEdge() == Fw::AnchorBottom && widget->getPositions().bottom.unit != Unit::Auto ?
-                virtualParentWidget : getParentWidget();
+            parentWidget =
+                ((anchor->getAnchoredEdge() == Fw::AnchorTop && widget->getPositions().top.unit != Unit::Auto) ||
+                 (anchor->getAnchoredEdge() == Fw::AnchorLeft && widget->getPositions().left.unit != Unit::Auto) ||
+                 (anchor->getAnchoredEdge() == Fw::AnchorRight && widget->getPositions().right.unit != Unit::Auto) ||
+                 (anchor->getAnchoredEdge() == Fw::AnchorBottom && widget->getPositions().bottom.unit != Unit::Auto))
+                ? virtualParentWidget
+                : getParentWidget();
         }
 
         // determine hooked widget
@@ -279,7 +281,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 if (widget->isOnHtml()) {
                     if (parentWidget != hookedWidget) {
                         if (isInlineish(hookedWidget.get())) {
-                            margin += hookedWidget->getPaddingLeft() + hookedWidget->getPaddingRight();
+                            margin += hookedWidget->getMarginRight();
                         }
                     }
 

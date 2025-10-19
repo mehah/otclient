@@ -242,13 +242,22 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
 
     bar.health:setValue(player:getHealth(), player:getMaxHealth())
 
-    local manashield = player:getManaShield()
+    local manashield = 0
+    local maxManaShield = 0
+    
+    if player.getManaShield then
+        manashield = player:getManaShield()
+    end
+    
     if not bar.mana.defaultHeight then
         bar.mana.defaultHeight = bar.mana:getHeight()
     end
 
     bar.mana:setValue(mana, maxMana)
-    local maxManaShield = player:getMaxManaShield()
+    
+    if player.getMaxManaShield then
+        maxManaShield = player:getMaxManaShield()
+    end
     local shouldShowManaShield = manashield > 0 and maxManaShield > 0
     if shouldShowManaShield then
         local fullHeight = bar.mana.defaultHeight

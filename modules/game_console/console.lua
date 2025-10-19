@@ -526,7 +526,10 @@ function load()
         else
             consoleToggleChat:setText(tr('Chat On'))
         end
-        updateChatMode()
+        -- Only update chat mode if game is online to avoid binding issues during initialization
+        if g_game.isOnline() then
+            updateChatMode()
+        end
     end
     loadCommunicationSettings()
 end
@@ -2104,6 +2107,10 @@ function online()
           }
         }, gameRootPanel)
     end
+    
+    -- Update chat mode when game comes online to ensure proper key binding
+    updateChatMode()
+    
     -- open last channels
     local lastChannelsOpen = g_settings.getNode('lastChannelsOpen')
     if lastChannelsOpen then

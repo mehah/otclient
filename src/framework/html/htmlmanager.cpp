@@ -101,7 +101,9 @@ namespace {
         /*"visibility",*/
         "white-space",
         "word-spacing",
-        "writing-mode"
+        "writing-mode",
+        "hyphens",
+        "text-lang"
     };
 
     static inline bool isInheritable(std::string_view prop) noexcept {
@@ -299,6 +301,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     if (node->getType() == NodeType::Text) {
         textNodes.emplace_back(node);
+        widget->setTextAlign(Fw::AlignTopLeft);
         widget->setFocusable(false);
         widget->setPhantom(true);
     }

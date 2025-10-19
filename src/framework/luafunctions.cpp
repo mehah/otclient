@@ -226,6 +226,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_dispatcher", "addEvent", &EventDispatcher::addEvent, &g_dispatcher);
     g_lua.bindSingletonFunction("g_dispatcher", "scheduleEvent", &EventDispatcher::scheduleEvent, &g_dispatcher);
     g_lua.bindSingletonFunction("g_dispatcher", "cycleEvent", &EventDispatcher::cycleEvent, &g_dispatcher);
+    g_lua.bindSingletonFunction("g_dispatcher", "deferEvent", &EventDispatcher::deferEvent, &g_dispatcher);
 
     // ResourceManager
     g_lua.registerSingletonClass("g_resources");
