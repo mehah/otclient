@@ -752,6 +752,64 @@ namespace {
             w->getHeightHtml().applyUpdate(w->getHeight(), SIZE_VERSION_COUNTER);
         }
     }
+
+    void applyPlacementAnchors(UIWidget* widget)
+    {
+        if (!widget) return;
+
+        auto align = widget->getPlacement();
+        if (align == Fw::AlignNone) return;
+
+        switch (align) {
+            case Fw::AlignTopLeft:
+                widget->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                widget->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                break;
+
+            case Fw::AlignTopRight:
+                widget->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                widget->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                break;
+
+            case Fw::AlignBottomLeft:
+                widget->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                widget->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+                break;
+
+            case Fw::AlignBottomRight:
+                widget->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                widget->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+                break;
+
+            case Fw::AlignLeftCenter:
+                widget->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                widget->addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+                break;
+
+            case Fw::AlignRightCenter:
+                widget->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                widget->addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+                break;
+
+            case Fw::AlignTopCenter:
+                widget->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                widget->addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+                break;
+
+            case Fw::AlignBottomCenter:
+                widget->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+                widget->addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+                break;
+
+            case Fw::AlignCenter:
+                widget->addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+                widget->addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+                break;
+
+            default:
+                break;
+        }
+    }
 }
 
 void UIWidget::refreshHtml(bool siblingsTo) {
@@ -1643,9 +1701,8 @@ void UIWidget::applyAnchorAlignment() {
     if (!hasAnchoredLayout())
         return;
 
-    if (m_htmlNode->getAttr("anchor") == "parent") {
-        addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-        addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+    if (m_placement != Fw::AlignNone) {
+        applyPlacementAnchors(this);
         return;
     }
 

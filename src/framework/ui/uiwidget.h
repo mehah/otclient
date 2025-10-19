@@ -327,7 +327,7 @@ protected:
     OverflowType m_overflowType = OverflowType::Hidden;
     PositionType m_positionType = PositionType::Static;
     uint32_t m_flexLayoutVersion = 0;
-
+    Fw::AlignmentFlag m_placement = Fw::AlignNone;
     SizeUnit m_width;
     SizeUnit m_height;
     SizeUnit m_lineHeight;
@@ -440,6 +440,9 @@ public:
     void setFlexShrink(float shrink);
     void setFlexBasis(const FlexBasis& basis);
     void setAlignSelf(AlignSelf align);
+    void setPlacement(const std::string& placement);
+
+    auto getPlacement() const { return m_placement; }
     FlexDirection getFlexDirection() const { return m_flexContainer.direction; }
     FlexWrap getFlexWrap() const { return m_flexContainer.wrap; }
     JustifyContent getJustifyContent() const { return m_flexContainer.justify; }
