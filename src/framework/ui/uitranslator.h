@@ -28,6 +28,7 @@
 namespace Fw
 {
     AlignmentFlag translateAlignment(std::string aligment);
+    AlignmentFlag translatePlacement(std::string s);
     AnchorEdge translateAnchorEdge(std::string anchorEdge);
     WidgetState translateState(std::string state);
     AutoFocusPolicy translateAutoFocusPolicy(std::string policy);
