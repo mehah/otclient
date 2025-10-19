@@ -1,9 +1,4 @@
-﻿<!--
-<link href="tab/conversion/conversion.css" />
-<link href="tab/fusion/fusion.css" />
-<link href="tab/history/history.css" />
-<link href="tab/transfer/transfer.css" /> -->
-<link href="game_forge.css" />
+﻿<link href="game_forge.css" />
 <html>
   <window class="forge-window" title="Exaltation Forge" onescape="self:hide()">
     <div class="tabs">
@@ -144,7 +139,7 @@
             >
               <div
                 *for="local item in (self.fusion.convergenceItems or {})"
-                *if="item.key ~= self.fusion.selected.key and item.tier == self.fusion.selected.tier and self.fusion.selected.id ~= -1"
+                *if="item.tier == self.fusion.selected.tier and self.fusion.selected.id ~= -1"
                 onclick="self:handleSelectTarget(item, false)"
               >
                 <div class="item-to-select">
@@ -415,11 +410,7 @@
                 *for="local item in (self.transfer.currentList.donors or {})"
                 onclick="self.transfer:handleSelect(item)"
               >
-                <div
-                  class="item-to-select"
-                  *border-width="1"
-                  *border-color="red"
-                >
+                <div class="item-to-select">
                   <img
                     *if="item.imagePath"
                     *image-source="item.imagePath"

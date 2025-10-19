@@ -461,7 +461,7 @@ function ForgeController:toggleConvergence(isTransfer)
     data.selected = cloneValue(ForgeController.baseSelected)
     data.selectedTarget = cloneValue(ForgeController.baseSelected)
     ForgeController.formattedPrice = "???"
-    ForgeController.price = 0
+    ForgeController.rawPrice = 0
 
     if isTransfer then
         data.canTransfer = false
