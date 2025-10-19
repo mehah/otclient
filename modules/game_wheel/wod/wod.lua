@@ -261,31 +261,47 @@ local UIConfigurator = {
 -- ============================================================================
 
 -- Main function to show the Wheel of Destiny
-function WheelOfDestiny.show(container)
-    -- Validate access
-    local canAccess, errorMsg = AccessValidator.validateAccess()
-    if not canAccess then
-        displayErrorBox(tr('Info'), errorMsg)
-        return
-    end
+function WheelOfDestiny.show(container)    
+    -- Validate access    
+    local canAccess, errorMsg = AccessValidator.validateAccess()    
+    if not canAccess then    
+        displayErrorBox(tr('Info'), errorMsg)    
+        return    
+    end    
+        
+    -- Load UI    
+    local wodUI = g_ui.loadUI('wod', container)    
+    if not wodUI then return end    
     
-    -- Load UI
-    local wodUI = g_ui.loadUI('wod', container)
-    if not wodUI then return end
-
-    currentWodUI = wodUI    
-
-    wodUI:fill('parent')
+    currentWodUI = wodUI        
     
-    -- Get player vocation
-    local player = g_game.getLocalPlayer()
-    local basicVocation = VocationUtils.getBasicVocation(player:getVocation())
-    
-    -- Configure UI based on vocation
-    UIConfigurator.setupVocationOverlay(wodUI, basicVocation)  
-    UIConfigurator.setupBonusOverlays(wodUI, true)  
-    UIConfigurator.setupDataWindows(wodUI)  
-    UIConfigurator.setupVocationInformation(wodUI, basicVocation)
+    wodUI:fill('parent')    
+        
+    -- Get player vocation    
+    local player = g_game.getLocalPlayer()    
+    local basicVocation = VocationUtils.getBasicVocation(player:getVocation())    
+        
+    -- Configure UI based on vocation    
+    UIConfigurator.setupVocationOverlay(wodUI, basicVocation)      
+    UIConfigurator.setupBonusOverlays(wodUI, true)      
+    UIConfigurator.setupDataWindows(wodUI)      
+    UIConfigurator.setupVocationInformation(wodUI, basicVocation)    
+        
+    -- Conectar ambos os botões summary  
+    local summaryButton = wodUI:getChildById('summaryButton')    
+    local summaryButtonInside = wodUI:recursiveGetChildById('summaryButtonInside')  
+      
+    if summaryButton then    
+        connect(summaryButton, {    
+            onCheckChange = WheelOfDestiny.toggleSummaryPanel    
+        })    
+    end  
+      
+    if summaryButtonInside then  
+        connect(summaryButtonInside, {  
+            onCheckChange = WheelOfDestiny.toggleSummaryPanel  
+        })  
+    end  
 end
 
 -- Function to check if can access the wheel
@@ -307,42 +323,31 @@ function WheelOfDestiny.getPlayerBasicVocation()
     return VocationUtils.getBasicVocation(player:getVocation())
 end
 
-function WheelOfDestiny.toggleSummaryPanel()    
-    print("DEBUG: toggleSummaryPanel called")    
-        
-    if not currentWodUI then     
-        print("DEBUG: currentWodUI is nil")    
-        return     
-    end    
-        
-    local summaryButton = currentWodUI:recursiveGetChildById('summaryButton')    
-    local summaryPanel = currentWodUI:getChildById('summaryPanel')    
-        
-    print("DEBUG: summaryButton found:", summaryButton ~= nil)    
-    print("DEBUG: summaryPanel found:", summaryPanel ~= nil)    
-        
-    if not summaryButton or not summaryPanel then return end    
-        
-    -- Verificar estado atual do painel  
-    local isVisible = summaryPanel:isVisible()  
-    print("DEBUG: current panel visibility:", isVisible)  
+function WheelOfDestiny.toggleSummaryPanel(widget, checked)          
+    if not currentWodUI then           
+        return           
+    end          
+              
+    local summaryPanel = currentWodUI:getChildById('summaryPanel')  
+    local summaryButton = currentWodUI:getChildById('summaryButton')  
+    local summaryButtonInside = currentWodUI:recursiveGetChildById('summaryButtonInside')  
       
-    -- Toggle da visibilidade do painel    
-    summaryPanel:setVisible(not isVisible)    
-    print("DEBUG: panel visibility set to:", not isVisible)    
-        
-    -- Ocultar/mostrar outros painéis    
-    local panelsToToggle = {    
-        'dedicationPerksPanel',    
-        'convictionPerksPanel',    
-        'rightWindow3',    
-        'rightWindow4'    
-    }    
-        
-    for _, panelId in ipairs(panelsToToggle) do    
-        local panel = currentWodUI:getChildById(panelId)    
-        if panel then    
-            panel:setVisible(isVisible)  -- Se summary estava visível, mostra os outros  
-        end    
-    end    
+    if not summaryPanel then return end
+
+    -- Toggle da visibilidade do painel baseado no estado do checkbox
+    summaryPanel:setVisible(checked)
+
+    -- Traz o painel para frente quando visível
+    if checked then
+        summaryPanel:raise()
+        summaryPanel:setPhantom(false)
+    end
+
+    -- Sincroniza o estado de ambos os botões
+    if summaryButton then
+        summaryButton:setChecked(checked)
+    end
+    if summaryButtonInside then
+        summaryButtonInside:setChecked(checked)
+    end
 end

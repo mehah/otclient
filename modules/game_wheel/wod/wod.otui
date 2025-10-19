@@ -43,22 +43,6 @@ UIWidget
     text: Dedication Perks  
 
     UIWidget  
-      id: summaryButton  
-      size: 12 12  
-      anchors.top: parent.top  
-      anchors.right: parent.right  
-      margin-top: 6  
-      margin-right: 6  
-      image-source: /images/game/wheel/show-gui-help-grey  
-      visible: true  
-      enabled: true  
-      focusable: false  
-      @onClick: modules.game_wheel.WheelOfDestiny.toggleSummaryPanel()  
-        
-      $on:  
-        image-clip: 0 12 12 12
-
-    UIWidget  
       id: dedicationHitPoints  
       anchors.top: parent.top  
       anchors.left: parent.left  
@@ -174,7 +158,7 @@ UIWidget
         margin-right: 1  
         image-source: /images/game/wheel/show-gui-help-grey  
         visible: true
-      
+
   UIWidget
     id: convictionPerksPanel  
     anchors.left: backdropWheel.right
@@ -188,7 +172,7 @@ UIWidget
     text-offset: 0 3
     text-align: top
     text: Conviction Perks
-      
+
     UIWidget  
       id: infoConvictionPerks  
       size: 12 12  
@@ -283,30 +267,59 @@ UIWidget
     size: 522 522  
     visible: false
 
-  UIWidget  
-    id: summaryPanel  
-    anchors.left: backdropWheel.right  
-    anchors.top: backdropWheel.top  
-    size: 213 522  
-    margin-left: 10  
-    image-source: /images/ui/window  
-    image-border: 20  
-    color: #929292  
-    text-offset: 0 3  
-    text-align: top  
-    text: Summary  
-    visible: false  
+  UICheckBox  
+    id: summaryButton    
+    size: 14 14    
+    anchors.top: dedicationPerksPanel.top    
+    anchors.right: dedicationPerksPanel.right    
+    margin-top: 6    
+    margin-right: 6    
+    image-source: /images/game/wheel/summary.png    
+    image-clip: 0 0 14 14  
+    phantom: false  
       
-    Panel  
-      id: summaryContent  
-      anchors.top: parent.top  
-      anchors.left: parent.left  
-      anchors.right: parent.right  
-      anchors.bottom: parent.bottom  
-      margin-top: 25  
-      margin-left: 5  
-      margin-right: 5  
-      margin-bottom: 5  
-      layout:  
-        type: verticalBox  
+    $checked:    
+      image-clip: 0 14 14 14  
+  
+  UIWidget    
+    id: summaryPanel    
+    anchors.left: backdropWheel.right    
+    anchors.top: backdropWheel.top    
+    size: 213 522    
+    margin-left: 10    
+    image-source: /images/ui/window    
+    image-border: 20    
+    color: #929292    
+    text-offset: 0 3    
+    text-align: top    
+    text: Summary    
+    visible: false    
+    phantom: false    
+
+    UICheckBox  
+      id: summaryButtonInside    
+      size: 14 14    
+      anchors.top: parent.top    
+      anchors.right: parent.right    
+      margin-top: 6    
+      margin-right: 6    
+      image-source: /images/game/wheel/summary.png    
+      image-clip: 0 0 14 14  
+      phantom: false  
+        
+      $checked:    
+        image-clip: 0 14 14 14  
+
+    Panel    
+      id: summaryContent    
+      anchors.top: parent.top    
+      anchors.left: parent.left    
+      anchors.right: parent.right    
+      anchors.bottom: parent.bottom    
+      margin-top: 25    
+      margin-left: 5    
+      margin-right: 5    
+      margin-bottom: 5    
+      layout:    
+        type: verticalBox    
         spacing: 2
