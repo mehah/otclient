@@ -811,9 +811,8 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
 
     bool needUpdate = false;
 
-    if (m_positionType == PositionType::Absolute && (unit == Unit::Auto || unit == Unit::Percent)) {
-        if (isWidth && m_positions.right.unit == Unit::Auto || !isWidth && m_positions.bottom.unit == Unit::Auto)
-            unit = Unit::FitContent;
+    if (m_positionType == PositionType::Absolute && unit == Unit::Auto) {
+        unit = Unit::FitContent;
     }
 
     switch (unit) {
@@ -1408,14 +1407,13 @@ void UIWidget::updateSize() {
             auto parent = getVirtualParent();
             parent->updateSize();
 
-            const int pContentW = parent->getWidth() - parent->getPaddingLeft() - parent->getPaddingRight();
-            const int pContentH = parent->getHeight() - parent->getPaddingTop() - parent->getPaddingBottom();
-
             auto resolveH = [&](const SizeUnit& len, int base) -> int {
                 return (len.unit == Unit::Percent) ? (base * len.value) / 100 : len.value;
             };
 
             if (updateWidth) {
+                const int pContentW = parent->getWidth();
+
                 const int leftPx = resolveH(m_positions.left, pContentW);
                 const int rightPx = resolveH(m_positions.right, pContentW);
 
@@ -1430,6 +1428,7 @@ void UIWidget::updateSize() {
             }
 
             if (updateHeight) {
+                const int pContentH = parent->getHeight();
                 const int topPx = resolveH(m_positions.top, pContentH);
                 const int bottomPx = resolveH(m_positions.bottom, pContentH);
 
@@ -1459,13 +1458,13 @@ void UIWidget::updateSize() {
 
         if (widthNeedsUpdate) {
             width = parent->getWidth();
-            if (width > -1)
+            if (width > -1 && m_positionType != PositionType::Absolute)
                 width -= parent->getPaddingLeft() + parent->getPaddingRight();
         }
 
         if (heightNeedsUpdate) {
             height = parent->getHeight();
-            if (height > -1)
+            if (height > -1 && m_positionType != PositionType::Absolute)
                 height -= parent->getPaddingTop() + parent->getPaddingBottom();
         }
 
