@@ -79,20 +79,75 @@ jobs:
           cmake --build build --config Release -j ${{ steps.cpu-count.outputs.count }}
 
       # Sonar analysis for PRs (decoration only; no untrusted build)
-      - name: Run sonar-scanner for PR
-        if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork == true }}
+      - name: Run PR sonar-scanner
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PR_KEY_RAW: ${{ github.event.pull_request.number }}
+          SONAR_PR_BRANCH_RAW: ${{ github.event.pull_request.head.ref }}
+          SONAR_PR_BASE_RAW: ${{ github.event.pull_request.base.ref }}
+          CPU_THREADS_RAW: ${{ steps.cpu-count.outputs.count }}
         run: |
+          set -euo pipefail
+          sanitize_ref() {
+            # allow only safe chars: alnum, '.', '_', '/', '-'
+            printf '%s' "$1" | tr -cd '[:alnum:]._/-'
+          }
+          is_digits() {
+            case "$1" in
+              (''|*[!0-9]*) return 1;;
+              (*) return 0;;
+            esac
+          }
+      
+          SONAR_PR_KEY="$SONAR_PR_KEY_RAW"
+          SONAR_PR_BRANCH="$(sanitize_ref "$SONAR_PR_BRANCH_RAW")"
+          SONAR_PR_BASE="$(sanitize_ref "$SONAR_PR_BASE_RAW")"
+      
+          if ! is_digits "$CPU_THREADS_RAW"; then
+            echo "::warning title=Invalid threads::CPU thread count is not numeric. Falling back to 2."
+            CPU_THREADS=2
+          else
+            CPU_THREADS="$CPU_THREADS_RAW"
+          fi
+      
+          PROPS_FILE="$(mktemp)"
+          printf 'sonar.pullrequest.key=%s\n' "$SONAR_PR_KEY"       >> "$PROPS_FILE"
+          printf 'sonar.pullrequest.branch=%s\n' "$SONAR_PR_BRANCH" >> "$PROPS_FILE"
+          printf 'sonar.pullrequest.base=%s\n' "$SONAR_PR_BASE"     >> "$PROPS_FILE"
+      
           echo "Skipping build on fork PR to avoid executing untrusted code."
-          # If you have pre-generated compile_commands.json from CI artifacts, download them here safely.
-          sonar-scanner             --define sonar.cfamily.threads=${{ steps.cpu-count.outputs.count }}             --define sonar.cfamily.cache.enabled=true             --define sonar.cfamily.cache.path="$HOME/.cfamily"             --define sonar.pullrequest.key=${{ github.event.pull_request.number }}             --define sonar.pullrequest.branch=${{ github.event.pull_request.head.ref }}             --define sonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
-
-      - name: Run sonar-scanner for push / same-repo PR
-        if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork == false) }}
+      
+          sonar-scanner \
+            --define sonar.cfamily.threads="$CPU_THREADS" \
+            --define sonar.cfamily.cache.enabled=true \
+            --define sonar.cfamily.cache.path="$HOME/.cfamily" \
+            --define sonar.cfamily.compile-commands=build/compile_commands.json \
+            --property-file "$PROPS_FILE"
+      - name: Run sonar-scanner
+        if: ${{ github.event_name == 'push' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          CPU_THREADS_RAW: ${{ steps.cpu-count.outputs.count }}
         run: |
-          sonar-scanner             --define sonar.cfamily.threads=${{ steps.cpu-count.outputs.count }}             --define sonar.cfamily.cache.enabled=true             --define sonar.cfamily.cache.path="$HOME/.cfamily"             --define sonar.cfamily.compile-commands=build/compile_commands.json
+          set -euo pipefail
+          is_digits() {
+            case "$1" in
+              (''|*[!0-9]*) return 1;;
+              (*) return 0;;
+            esac
+          }
+          if ! is_digits "$CPU_THREADS_RAW"; then
+            echo "::warning title=Invalid threads::CPU thread count is not numeric. Falling back to 2."
+            CPU_THREADS=2
+          else
+            CPU_THREADS="$CPU_THREADS_RAW"
+          fi
+      
+          sonar-scanner \
+            --define sonar.cfamily.threads="$CPU_THREADS" \
+            --define sonar.cfamily.cache.enabled=true \
+            --define sonar.cfamily.cache.path="$HOME/.cfamily" \
+            --define sonar.cfamily.compile-commands=build/compile_commands.json
