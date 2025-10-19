@@ -128,6 +128,8 @@ ForgeController.baseSelected = {
 }
 
 function ForgeController:onInit()
+    if g_game.getFeature(GameForgeConvergence) then return end
+
     self:updateResourceBalances()
     self:registerEvents(g_game, {
         onBrowseForgeHistory = onBrowseForgeHistory,
