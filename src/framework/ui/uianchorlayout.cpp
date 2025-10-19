@@ -304,9 +304,10 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             case Fw::AnchorRight: {
                 auto margin = widget->getMarginRight();
                 if (widget->isOnHtml()) {
+                    if (widget->getPositionType() == PositionType::Absolute && widget->getPositions().right.unit != Unit::Auto)
+                        margin -= hookedWidget->getPaddingRight();
+
                     if (widget->getPositions().left.unit == Unit::Auto && (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)) {
-                        if (widget->getPositions().right.unit != Unit::Auto)
-                            margin -= hookedWidget->getPaddingRight();
                         margin += widget->getPositions().right.value;
                     }
                 }
@@ -385,11 +386,10 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                             margin += hookedWidget->getPositions().bottom.value;
                     }
 
-                    if (widget->getPositions().top.unit == Unit::Auto &&
-        (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)) {
-                        if (widget->getPositions().bottom.unit != Unit::Auto)
-                            margin -= hookedWidget->getPaddingBottom();
+                    if (widget->getPositionType() == PositionType::Absolute && widget->getPositions().bottom.unit != Unit::Auto)
+                        margin -= hookedWidget->getPaddingBottom();
 
+                    if (widget->getPositions().top.unit == Unit::Auto && (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)) {
                         margin += widget->getPositions().bottom.value;
                     }
                 }
