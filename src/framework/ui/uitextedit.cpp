@@ -141,6 +141,10 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
                 int left = std::numeric_limits<int>::max();
                 int right = std::numeric_limits<int>::min();
                 bool hasGlyphs = false;
+
+                LineInfo() = default;
+                LineInfo(int s, int e)
+                    : visStart(s), visEnd(e) {}
             };
 
             std::vector<LineInfo> lines;
@@ -150,10 +154,10 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
                 for (int i = 0; i <= n; ++i) {
                     const bool br = (i == n) || (m_displayedText[i] == '\n');
                     if (!br) continue;
-                    lines.push_back(LineInfo{ start, i });
+                    lines.emplace_back(start, i);
                     start = i + 1;
                 }
-                if (lines.empty()) lines.push_back(LineInfo{ 0, n });
+                if (lines.empty()) lines.emplace_back(0, n);
             }
 
             const int visLen = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
