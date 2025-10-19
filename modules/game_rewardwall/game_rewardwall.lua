@@ -396,7 +396,6 @@ function show()
     rewardWallController.ui:show()
     rewardWallController.ui:raise()
     rewardWallController.ui:focus()
-    rewardWallController.ui:centerIn('parent')
     connectOnServerError()
     premiumStatusWindwos(g_game.getLocalPlayer():isPremium())
 end
