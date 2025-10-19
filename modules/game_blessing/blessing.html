@@ -114,17 +114,17 @@
 </style>
 
 <html>
-<Window id="main" class="blessings-window" title="Blessings" onescape="self:close()">
+<Window id="main" placement="center" class="blessings-window" title="Blessings" onescape="self:close()">
 
   <!-- History Panel (initially hidden) -->
-  <div id="historyPanel" anchor="parent" class="history-panel minipanel" title="History"
+  <div id="historyPanel" placement="top-left" class="history-panel minipanel" title="History"
     *if="self.historyButtonText == 'Back'">
     <div id="historyScrollArea" class="history-scroll">
     </div>
   </div>
 
   <!-- Blessing Records Panel -->
-  <div id="blessingsRecordPanel" anchor="parent" class="record-panel minipanel" title="Record of Blessings"
+  <div id="blessingsRecordPanel" placement="top-left" class="record-panel minipanel" title="Record of Blessings"
     layout="type: horizontalBox">
   </div>
 
