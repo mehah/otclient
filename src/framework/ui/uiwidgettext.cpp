@@ -26,7 +26,85 @@
 #include <framework/graphics/fontmanager.h>
 #include <framework/graphics/textureatlas.h>
 #include <framework/html/htmlnode.h>
-#include <regex>
+
+namespace {
+    WordBreakMode parseWordBreakMode(const std::string& v) {
+        if (v == "break-all") return WordBreakMode::BreakAll;
+        if (v == "keep-all")  return WordBreakMode::KeepAll;
+        return WordBreakMode::Normal;
+    }
+
+    OverflowWrapMode parseOverflowWrapMode(const std::string& v) {
+        if (v == "anywhere")   return OverflowWrapMode::Anywhere;
+        if (v == "break-word") return OverflowWrapMode::BreakWord;
+        return OverflowWrapMode::Normal;
+    }
+
+    HyphenationMode parseHyphenationMode(const std::string& v) {
+        if (v == "none")   return HyphenationMode::None;
+        if (v == "auto")   return HyphenationMode::Auto;
+        return HyphenationMode::Manual;
+    }
+
+    void stripPreStartNewline(std::string& s) {
+        if (s.size() >= 2 && s[0] == '\r' && s[1] == '\n') {
+            s.erase(0, 2);
+        } else if (!s.empty() && s[0] == '\n') {
+            s.erase(0, 1);
+        }
+    }
+
+    void normalizeWhiteSpace(std::string& s, bool collapseSpaces, bool keepNewlines) {
+        std::string out;
+        out.reserve(s.size());
+        bool lastWasSpace = false;
+
+        auto flush_space = [&](bool asSpace) {
+            if (!collapseSpaces) {
+                if (asSpace) out.push_back(' ');
+                return;
+            }
+            if (asSpace) {
+                if (!lastWasSpace) {
+                    out.push_back(' ');
+                    lastWasSpace = true;
+                }
+            } else {
+                lastWasSpace = false;
+            }
+        };
+
+        for (char c : s) {
+            if (c == '\r' || c == '\t' || c == '\f' || c == '\v')
+                c = ' ';
+
+            if (c == '\n') {
+                if (keepNewlines) {
+                    lastWasSpace = false;
+                    out.push_back('\n');
+                } else {
+                    flush_space(true);
+                }
+                continue;
+            }
+
+            if (c == ' ') {
+                flush_space(true);
+            } else {
+                flush_space(false);
+                out.push_back(c);
+            }
+        }
+
+        auto l = out.find_first_not_of(keepNewlines ? " \t\r\f\v" : " \t\r\n\f\v");
+        auto r = out.find_last_not_of(keepNewlines ? " \t\r\f\v" : " \t\r\n\f\v");
+        if (l == std::string::npos) {
+            s.clear();
+        } else {
+            s.assign(out, l, r - l + 1);
+        }
+    }
+}
 
 void UIWidget::initText()
 {
@@ -39,7 +117,7 @@ void UIWidget::updateText()
 {
     if (isTextWrap() && m_rect.isValid()) {
         m_drawTextColors = m_textColors;
-        m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x, m_textWrapOptions);
+        m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x, getTextWrapOptions());
     } else {
         m_drawText = m_text;
         m_drawTextColors = m_textColors;
@@ -75,34 +153,6 @@ void UIWidget::resizeToText()
     setSize(textSize * std::max<float>(m_fontScale, 1.f));
 }
 
-namespace {
-    WordBreakMode parseWordBreakMode(const std::string& v) {
-        if (v == "break-all") return WordBreakMode::BreakAll;
-        if (v == "keep-all")  return WordBreakMode::KeepAll;
-        return WordBreakMode::Normal;
-    }
-
-    OverflowWrapMode parseOverflowWrapMode(const std::string& v) {
-        if (v == "anywhere")   return OverflowWrapMode::Anywhere;
-        if (v == "break-word") return OverflowWrapMode::BreakWord;
-        return OverflowWrapMode::Normal;
-    }
-
-    HyphenationMode parseHyphenationMode(const std::string& v) {
-        if (v == "none")   return HyphenationMode::None;
-        if (v == "auto")   return HyphenationMode::Auto;
-        return HyphenationMode::Manual;
-    }
-
-    void applyWhiteSpaceToOptions(const std::string& v, WrapOptions& opt, UIWidget* w) {
-        if (v == "nowrap") {
-            if (w) w->setTextWrap(false);
-        } else if (v == "normal" || v == "pre-wrap") {
-            if (w) w->setTextWrap(true);
-        }
-    }
-}
-
 void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
 {
     for (const auto& node : styleNode->children()) {
@@ -136,8 +186,6 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
             m_textWrapOptions.overflowWrapMode = parseOverflowWrapMode(node->value());
         else if (tag == "hyphens")
             m_textWrapOptions.hyphenationMode = parseHyphenationMode(node->value());
-        else if (tag == "white-space")
-            applyWhiteSpaceToOptions(node->value(), m_textWrapOptions, this);
         else if (tag == "text-lang")
             m_textWrapOptions.language = node->value();
     }
@@ -206,18 +254,17 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
     const std::string oldText = m_text;
     m_text = _text;
 
-    if (!isTextEdit()) {
-        computeHtmlTextIntrinsicSize();
+    if (isOnHtml() && !isTextEdit()) {
+        applyWhiteSpace();
+        scheduleHtmlTask(PropUpdateSize);
+        refreshHtml(true);
+    } else {
+        updateText();
     }
-
-    updateText();
 
     if (!dontFireLuaCall) {
         onTextChange(m_text, oldText);
     }
-
-    scheduleHtmlTask(PropUpdateSize);
-    refreshHtml(true);
 }
 
 void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireLuaCall)
@@ -263,26 +310,6 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     }
 }
 
-void UIWidget::computeHtmlTextIntrinsicSize() {
-    if (!isOnHtml())return;
-
-    bool hasTextWrap = isTextWrap();
-    auto text = m_text;
-    auto textAlign = m_textAlign;
-
-    { // discovery text size without wrap
-        m_textAlign = Fw::AlignTopLeft;
-        stdext::trimSpacesAndNewlines(m_text);
-        setProp(PropTextWrap, false);
-        updateText();
-        m_textSizeNowrap = m_textSize;
-    }
-
-    m_text = text;
-    m_textAlign = textAlign;
-    setProp(PropTextWrap, hasTextWrap);
-}
-
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
@@ -291,4 +318,52 @@ void UIWidget::setFont(const std::string_view fontName)
     onFontChange(fontName);
     scheduleHtmlTask(PropUpdateSize);
     refreshHtml(true);
+}
+
+void UIWidget::computeHtmlTextIntrinsicSize() {
+    if (!isOnHtml())return;
+
+    static std::vector<Point> glyphsPositions;
+    m_font->calculateGlyphsPositions(m_text, Fw::AlignTopLeft, glyphsPositions, &m_realTextSize);
+}
+
+const WrapOptions& UIWidget::getTextWrapOptions() {
+    if (m_parent && m_htmlNode && m_htmlNode->getType() == NodeType::Text)
+        return m_parent->m_textWrapOptions;
+    return m_textWrapOptions;
+}
+
+void UIWidget::applyWhiteSpace() {
+    auto whiteSpace = m_htmlNode->getStyle("white-space");
+    if (whiteSpace.empty())
+        whiteSpace = "normal";
+
+    setProp(PropTextHorizontalAutoResize, false);
+    setProp(PropTextVerticalAutoResize, false);
+
+    if (whiteSpace == "normal") {
+        setProp(PropTextWrap, true);
+        normalizeWhiteSpace(m_text, true, false);
+    } else if (whiteSpace == "nowrap") {
+        setProp(PropTextWrap, false);
+        setProp(PropTextHorizontalAutoResize, true);
+        setProp(PropTextVerticalAutoResize, true);
+        normalizeWhiteSpace(m_text, true, false);
+    } else if (whiteSpace == "pre") {
+        stripPreStartNewline(m_text);
+        setProp(PropTextWrap, false);
+        setProp(PropTextHorizontalAutoResize, true);
+        setProp(PropTextVerticalAutoResize, true);
+    } else if (whiteSpace == "pre-wrap") {
+        stripPreStartNewline(m_text);
+        setProp(PropTextWrap, true);
+    } else if (whiteSpace == "pre-line") {
+        stripPreStartNewline(m_text);
+        setProp(PropTextWrap, true);
+        normalizeWhiteSpace(m_text, true, true);
+    } else {
+        setProp(PropTextWrap, true);
+        normalizeWhiteSpace(m_text, true, false);
+    }
+    computeHtmlTextIntrinsicSize();
 }
