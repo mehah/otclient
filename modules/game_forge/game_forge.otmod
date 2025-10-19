@@ -3,7 +3,7 @@ Module
   description: game_forge
   author: game_forge
   website: game_forge
-  scripts: [ game_forge.lua, callbackHtml.lua   ]
+  scripts: [ game_forge.lua  ]
   sandboxed: true
   @onLoad: ForgeController:init()
   @onUnload: ForgeController:terminate()
