@@ -1,153 +1,54 @@
-name: Analysis - SonarCloud
+name: Code scanning / SonarCloud
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
   push:
     branches:
       - main
-
-# Minimum necessary permissions
-permissions:
-  contents: read
-  pull-requests: read
-
-env:
-  VCPKG_BUILD_TYPE: release
-  CMAKE_BUILD_PARALLEL_LEVEL: 2
-  MAKEFLAGS: "-j 2"
-  # REQUIRED: pin lukka/run-vcpkg to a full 40-char commit SHA here (org/ref: https://github.com/lukka/run-vcpkg/commits)
-  # Example: LUKKA_RUN_VCPKG_SHA: "2f0f1a3bcd1234567890abcdef1234567890abcd"
-  LUKKA_RUN_VCPKG_SHA: "${{ vars.LUKKA_RUN_VCPKG_SHA }}"
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
-  sonarcloud:
-    name: SonarCloud Analysis
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout base repository safely
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # Always checkout the base repo to avoid executing untrusted code from forks
-          repository: ${{ github.repository }}
-          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.base.ref }}
+          persist-credentials: false
           fetch-depth: 0
 
-      - name: Ensure run-vcpkg action is pinned by full commit SHA
-        run: |
-          if [ -z "${LUKKA_RUN_VCPKG_SHA}" ]; then
-            echo "::error title=Missing pin::Set LUKKA_RUN_VCPKG_SHA (40-char commit) in repository Variables."
-            exit 1
-          fi
-          if ! echo "${LUKKA_RUN_VCPKG_SHA}" | grep -Eq '^[0-9a-f]{40}$'; then
-            echo "::error title=Invalid pin::LUKKA_RUN_VCPKG_SHA must be a full 40-char commit SHA."
-            exit 1
-          fi
-
-      - name: Get CPU count
-        id: cpu-count
-        run: echo "count=$(getconf _NPROCESSORS_ONLN)" >> "$GITHUB_OUTPUT"
-
-      # Only build when it's safe: pushes in this repo OR PRs from same-repo (not forks).
-      - name: Setup vcpkg with baseline (pinned)
-        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.fork == false }}
-        uses: lukka/run-vcpkg@${{ env.LUKKA_RUN_VCPKG_SHA }}
-        id: vcpkg
+      - name: Setup vcpkg with baseline
+        uses: lukka/run-vcpkg@7dfc9355c4745bfe35f0c90894c0dbcb9b1e9116 # v11 (full commit SHA)
         with:
-          # Enforce baseline pin by full SHA. If you produce this via a prior step output, it must also be a 40-char SHA.
-          vcpkgGitCommitId: ${{ inputs.vcpkgGitCommitId || vars.VCPKG_BASELINE_SHA || env.VCPKG_BASELINE_SHA }}
-          vcpkgJsonIgnores: '["**/vcpkg/**","**/browser/overlay-ports/**"]'
+          vcpkgGitCommitId: 8d73531d42c57b8e9f02f4db3f671ca3696eaf7b
 
-      - name: Validate vcpkg baseline SHA
-        if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.fork == false) && always() }}
+      - name: Setup CMake
+        uses: lukka/get-cmake@v3.27.0
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential ninja-build
+
+      # Safe build only for trusted sources
+      - name: Build safely
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         run: |
-          SHAS="${{ steps.vcpkg.outputs.vcpkgGitCommitId || inputs.vcpkgGitCommitId || vars.VCPKG_BASELINE_SHA || env.VCPKG_BASELINE_SHA }}"
-          if [ -z "${SHAS}" ]; then
-            echo "::error title=Missing vcpkg baseline::Provide a full 40-char vcpkgGitCommitId (e.g., set vars.VCPKG_BASELINE_SHA)."
-            exit 1
-          fi
-          if ! echo "${SHAS}" | grep -Eq '^[0-9a-f]{40}$'; then
-            echo "::error title=Invalid vcpkg baseline::vcpkgGitCommitId must be a full 40-char commit SHA."
-            exit 1
-          fi
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel
 
-      - name: Configure (CMake) and build
-        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.fork == false }}
-        run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          cmake --build build --config Release -j ${{ steps.cpu-count.outputs.count }}
+      # Skip unsafe build on fork PRs
+      - name: Skip unsafe build on fork PR
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        run: echo "Skipping build on fork PR to avoid executing untrusted code."
 
-      # Sonar analysis for PRs (decoration only; no untrusted build)
-      - name: Run PR sonar-scanner
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
+      - name: SonarCloud Scan
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: SonarSource/sonarcloud-github-action@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PR_KEY_RAW: ${{ github.event.pull_request.number }}
-          SONAR_PR_BRANCH_RAW: ${{ github.event.pull_request.head.ref }}
-          SONAR_PR_BASE_RAW: ${{ github.event.pull_request.base.ref }}
-          CPU_THREADS_RAW: ${{ steps.cpu-count.outputs.count }}
-        run: |
-          set -euo pipefail
-          sanitize_ref() {
-            # allow only safe chars: alnum, '.', '_', '/', '-'
-            printf '%s' "$1" | tr -cd '[:alnum:]._/-'
-          }
-          is_digits() {
-            case "$1" in
-              (''|*[!0-9]*) return 1;;
-              (*) return 0;;
-            esac
-          }
-      
-          SONAR_PR_KEY="$SONAR_PR_KEY_RAW"
-          SONAR_PR_BRANCH="$(sanitize_ref "$SONAR_PR_BRANCH_RAW")"
-          SONAR_PR_BASE="$(sanitize_ref "$SONAR_PR_BASE_RAW")"
-      
-          if ! is_digits "$CPU_THREADS_RAW"; then
-            echo "::warning title=Invalid threads::CPU thread count is not numeric. Falling back to 2."
-            CPU_THREADS=2
-          else
-            CPU_THREADS="$CPU_THREADS_RAW"
-          fi
-      
-          PROPS_FILE="$(mktemp)"
-          printf 'sonar.pullrequest.key=%s\n' "$SONAR_PR_KEY"       >> "$PROPS_FILE"
-          printf 'sonar.pullrequest.branch=%s\n' "$SONAR_PR_BRANCH" >> "$PROPS_FILE"
-          printf 'sonar.pullrequest.base=%s\n' "$SONAR_PR_BASE"     >> "$PROPS_FILE"
-      
-          echo "Skipping build on fork PR to avoid executing untrusted code."
-      
-          sonar-scanner \
-            --define sonar.cfamily.threads="$CPU_THREADS" \
-            --define sonar.cfamily.cache.enabled=true \
-            --define sonar.cfamily.cache.path="$HOME/.cfamily" \
-            --define sonar.cfamily.compile-commands=build/compile_commands.json \
-            --property-file "$PROPS_FILE"
-      - name: Run sonar-scanner
-        if: ${{ github.event_name == 'push' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          CPU_THREADS_RAW: ${{ steps.cpu-count.outputs.count }}
-        run: |
-          set -euo pipefail
-          is_digits() {
-            case "$1" in
-              (''|*[!0-9]*) return 1;;
-              (*) return 0;;
-            esac
-          }
-          if ! is_digits "$CPU_THREADS_RAW"; then
-            echo "::warning title=Invalid threads::CPU thread count is not numeric. Falling back to 2."
-            CPU_THREADS=2
-          else
-            CPU_THREADS="$CPU_THREADS_RAW"
-          fi
-      
-          sonar-scanner \
-            --define sonar.cfamily.threads="$CPU_THREADS" \
-            --define sonar.cfamily.cache.enabled=true \
-            --define sonar.cfamily.cache.path="$HOME/.cfamily" \
-            --define sonar.cfamily.compile-commands=build/compile_commands.json
+        with:
+          args: >
+            -Dsonar.projectKey=myproject_key
+            -Dsonar.organization=myorganization
+            -Dsonar.cfamily.threads=${{ steps.cpu-count.outputs.count }}
