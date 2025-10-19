@@ -60,7 +60,7 @@ void Creature::onCreate() {
 
 void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr& /*lightView*/)
 {
-    if (!canBeSeen() || !canDraw())
+    if (!canBeSeen() || !canDraw() || isDead())
         return;
 
     if (drawThings) {
