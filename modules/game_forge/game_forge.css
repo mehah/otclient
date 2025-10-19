@@ -366,26 +366,24 @@
 }
 
 .history-footer {
-  height: 36px;
-  align-items: center;
-  position: relative;
+  height: 20px;
+  width: 465px;
+  display: flex;
 }
 
 .history-footer-previous {
-  position: absolute;
-  left: 0px;
-  top: 6px;
+  width: 80px;
 }
 
 .history-footer-next {
-  position: absolute;
-  right: 0px;
-  top: 6px;
+  width: 80px;
 }
 
 .history-page-label {
   text-align: center;
+  width: 265px;
   align-items: center;
+  height: 20px;
 }
 
 /* HISTORY MENU */

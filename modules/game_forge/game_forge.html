@@ -808,7 +808,7 @@
                 <UIItem style="item-id: 37160" />
               </div>
               <div style="margin-top: 8px">
-                <p>{{self.conversion.dustMaxLabel}}</p>
+                <p style="width: 100px">{{self.conversion.dustMaxLabel}}</p>
               </div>
             </div>
           </div>
@@ -849,7 +849,9 @@
               Previous Page
             </button>
             <div class="history-page-label">
-              {{self.history.currentPage}}/{{self.history.lastPage}}
+              <span
+                >{{self.history.currentPage}}/{{self.history.lastPage}}</span
+              >
             </div>
             <button
               *visible="self.history.showNextButton"
