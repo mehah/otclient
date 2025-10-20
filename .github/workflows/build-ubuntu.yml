@@ -38,6 +38,9 @@ jobs:
     if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
     name: ${{ matrix.os }}-${{ matrix.buildtype }}
     runs-on: ${{ matrix.os }}
+    env:
+      ACTIONS_RUNTIME_TOKEN: ${{ secrets.ACTIONS_RUNTIME_TOKEN }}
+      ACTIONS_CACHE_URL: ${{ secrets.ACTIONS_CACHE_URL }}
 
     concurrency:
       group: otclient-${{ github.workflow }}-${{ github.ref }}-${{ matrix.buildtype }}
@@ -115,9 +118,6 @@ jobs:
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
-        env:
-          ACTIONS_RUNTIME_TOKEN: ${{ secrets.ACTIONS_RUNTIME_TOKEN }}
-          ACTIONS_CACHE_URL: ${{ secrets.ACTIONS_CACHE_URL }}
         with:
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
@@ -145,9 +145,6 @@ jobs:
             cmake-dir-${{ matrix.buildtype }}
 
       - name: Configure and Build
-        env:
-          ACTIONS_RUNTIME_TOKEN: ${{ secrets.ACTIONS_RUNTIME_TOKEN }}
-          ACTIONS_CACHE_URL: ${{ secrets.ACTIONS_CACHE_URL }}
         run: |
           cmake -G Ninja -S . -B build-${{ matrix.buildtype }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
