@@ -145,6 +145,9 @@ jobs:
             cmake-dir-${{ matrix.buildtype }}
 
       - name: Configure and Build
+        env:
+          ACTIONS_RUNTIME_TOKEN: ${{ secrets.ACTIONS_RUNTIME_TOKEN }}
+          ACTIONS_CACHE_URL: ${{ secrets.ACTIONS_CACHE_URL }}
         run: |
           cmake -G Ninja -S . -B build-${{ matrix.buildtype }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
