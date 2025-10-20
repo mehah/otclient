@@ -209,9 +209,9 @@ function showWheelOfDestiny(container)
         [3] = { value = 75, total = 75 },
         [4] = { value = 80, total = 100 },
         [5] = { value = 100, total = 100 },
-        [6] = { value = 0, total = 100 },
+        [6] = { value = 15, total = 100 },
         [7] = { value = 80, total = 150 },
-        [8] = { value = 0, total = 150 },
+        [8] = { value = 120, total = 150 },
         [9] = { value = 200, total = 200 },
     })
 end  
