@@ -169,6 +169,26 @@ function showWheelOfDestiny(container)
     if WheelOfDestiny and WheelOfDestiny.show then  
         WheelOfDestiny.show(container)  
     end  
+
+    WheelOfDestiny.updateSlicesProgress("TopLeft", {
+        [1] = { value = 40, total = 50 },
+        [2] = { value = 0, total = 75 },
+        [3] = { value = 75, total = 75 },
+        [4] = { value = 80, total = 100 },
+        [5] = { value = 100, total = 100 },
+        [6] = { value = 0, total = 100 },
+        [7] = { value = 80, total = 150 },
+        [8] = { value = 0, total = 150 },
+        [9] = { value = 200, total = 200 },
+    })
+        [3] = { value = 75, total = 75 },
+        [4] = { value = 80, total = 100 },
+        [5] = { value = 10, total = 100 },
+        [6] = { value = 20, total = 100 },
+        [7] = { value = 80, total = 150 },
+        [8] = { value = 150, total = 150 },
+        [9] = { value = 200, total = 200 },
+    })
 end  
   
 function showGemAtelier(container)  

@@ -236,12 +236,128 @@ UIWidget
     anchors.centerIn: parent  
     size: 522 522  
     image-source: /images/game/wheel/backdrop_skillwheel
+
+    UIWidget
+    id: backdropWheel
+    anchors.centerIn: parent
+    size: 522 522
+    image-source: /images/game/wheel/backdrop_skillwheel
+
+    UIWidget
+      id: colorQuadrantTopLeft
+      anchors.fill: parent
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft1
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 52 52
+      margin-top: 209
+      margin-left: 209
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_1.png
+      image-clip: 209 209 52 52
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft2
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 67 73
+      margin-top: 188
+      margin-left: 157
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_2.png
+      image-clip: 157 188 67 73
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft3
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 73 67
+      margin-top: 157
+      margin-left: 188
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_3.png
+      image-clip: 188 157 73 67
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft4
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 65 77
+      margin-top: 184
+      margin-left: 105
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_4.png
+      image-clip: 105 184 65 77
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft5
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 81 81
+      margin-top: 127
+      margin-left: 127
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_5.png
+      image-clip: 127 127 81 81
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft6
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 77 65
+      margin-top: 105
+      margin-left: 184
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_6.png
+      image-clip: 184 105 77 65
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft7
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 90 107
+      margin-top: 115
+      margin-left: 60
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_7.png
+      image-clip: 60 115 90 107
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft8
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 107 90
+      margin-top: 60
+      margin-left: 115
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_8.png
+      image-clip: 115 60 107 90
+      phantom: true
+
+    UIWidget
+      id: colorTopLeft9
+      anchors.top: parent.top
+      anchors.left: parent.left
+      size: 196 196
+      margin-top: 12
+      margin-left: 12
+      image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_9.png
+      image-clip: 12 12 196 196
+      phantom: true
+
+    UIWidget
+      id: largeBonusTL
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png
       
     UIWidget  
       id: largeBonusTL  
       anchors.top: parent.top  
       anchors.left: parent.left  
-      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png
         
     UIWidget  
       id: largeBonusTR  
