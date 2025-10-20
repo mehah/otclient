@@ -995,7 +995,10 @@
               *image-clip="self.result.bonusItemClip ~= nil and self.result.bonusItemClip"
             />
           </UIItem>
-          <p style="display: block; text-align: center; width: 400px">
+          <p
+            *if="self.result and self.result.bonusLabel"
+            style="display: block; text-align: center; width: 400px"
+          >
             {{self.result.bonusLabel}}
           </p>
         </div>

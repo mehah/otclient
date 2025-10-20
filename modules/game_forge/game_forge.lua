@@ -234,8 +234,13 @@ function ForgeController:forgeAction(isTransfer)
         data.selectedTarget.id, chanceImproved, reduceTierLoss)
 end
 
-function ForgeController.resultSystemEvent(data)
+function ForgeController:resultSystemEvent()
     ForgeController.result.buttonLabel = "Close"
+
+    if not ForgeController.ui or ForgeController.ui:isDestroyed() then
+        return
+    end
+
     -- TODO: waiting mehah check this arrows animations
     if ForgeController.result.eventCount == 1 then
         -- ForgeController.result.arrows[1] = filledRightArrow
@@ -257,7 +262,7 @@ function ForgeController.resultSystemEvent(data)
         -- ForgeController.result.arrows[1] = filledRightArrow
         -- ForgeController.result.arrows[2] = filledRightArrow
         -- ForgeController.result.arrows[3] = filledRightArrow
-        if ForgeController.result.bonus > 0 then
+        if (ForgeController.result.bonus or 0) > 0 then
             ForgeController.result.buttonLabel = "Next"
         end
 
@@ -285,9 +290,9 @@ function ForgeController.resultSystemEvent(data)
         return
     end
 
-    ForgeController.result.eventCount = ForgeController.result.eventCount + 1
+    ForgeController.result.eventCount = (ForgeController.result.eventCount or 0) + 1
     scheduleEvent(function()
-        ForgeController.resultSystemEvent(ForgeController.result)
+        ForgeController:resultSystemEvent(ForgeController.result)
     end, 750)
 end
 
@@ -297,6 +302,9 @@ function forgeResultData(rawData)
     ForgeController.showBonus = false
     local data = cloneValue(rawData)
     ForgeController.result = data
+    -- for k, v in pairs(rawData) do
+    --     g_logger.info("result data: " .. k .. " = " .. tostring(v))
+    -- end
     if ForgeController.result.leftTier > 0 then
         ForgeController.result.leftClip = ItemsDatabase.getTierClip(ForgeController.result.leftTier)
     end
@@ -311,6 +319,8 @@ function forgeResultData(rawData)
         rightArrow,
     }
     ForgeController.result.buttonLabel = "Close"
+    ForgeController.result.bonusLabel = "-"
+
 
     ForgeController.result.label = ""
     if ForgeController.fusion.selected and ForgeController.fusion.selected.id ~= -1 then
@@ -371,7 +381,7 @@ function forgeResultData(rawData)
     ForgeController.result.rightShader = "Outfit - cyclopedia-black"
     ForgeController.result.eventCount = 1
     scheduleEvent(function()
-        ForgeController.resultSystemEvent(ForgeController.result)
+        ForgeController:resultSystemEvent()
     end, 750)
 end
 

@@ -76,6 +76,7 @@ Helpers.baseResult = {
     label = "",
     labelResult = "",
     bonusItem = -1,
+    bonus = 0,
     bonusTier = 0,
     bonusItemClip = nil,
     bonusLabel = "",
