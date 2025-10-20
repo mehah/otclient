@@ -96,16 +96,17 @@ jobs:
 
 
       - name: Validate vcpkg baseline SHA
+        shell: pwsh
         run: |
-          SHAS="${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}"
-          if [ -z "${SHAS}" ]; then
+          $SHAS = "${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}"
+          if ([string]::IsNullOrEmpty($SHAS)) {
             echo "::error title=Missing vcpkg baseline::Provide a full 40-char vcpkgGitCommitId."
             exit 1
-          fi
-          if ! echo "${SHAS}" | grep -Eq '^[0-9a-f]{40}$'; then
+          }
+          if ($SHAS -notmatch '^[0-9a-f]{40}$') {
             echo "::error title=Invalid vcpkg baseline::vcpkgGitCommitId must be a full 40-char commit SHA."
             exit 1
-          fi
+          }
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@v3.31.6
 
