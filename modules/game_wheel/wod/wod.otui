@@ -444,6 +444,214 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_right/TopRight_9.png
       image-clip: 314 12 196 196
       phantom: true
+    
+    UIWidget
+      id: colorQuadrantBottomLeft
+      anchors.fill: parent
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft1
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 52 52
+      margin-bottom: 209
+      margin-left: 209
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_1.png
+      image-clip: 209 261 52 52
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft2
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 67 73
+      margin-bottom: 188
+      margin-left: 157
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_2.png
+      image-clip: 157 261 67 73
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft3
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 73 67
+      margin-bottom: 157
+      margin-left: 188
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_3.png
+      image-clip: 188 298 73 67
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft4
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 65 77
+      margin-bottom: 184
+      margin-left: 105
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_4.png
+      image-clip: 105 261 65 77
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft5
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 81 81
+      margin-bottom: 127
+      margin-left: 127
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_5.png
+      image-clip: 127 314 81 81
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft6
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 77 65
+      margin-bottom: 105
+      margin-left: 184
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_6.png
+      image-clip: 184 352 77 65
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft7
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 90 107
+      margin-bottom: 115
+      margin-left: 60
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_7.png
+      image-clip: 60 300 90 107
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft8
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 107 90
+      margin-bottom: 60
+      margin-left: 115
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_8.png
+      image-clip: 115 372 107 90
+      phantom: true
+
+    UIWidget
+      id: colorBottomLeft9
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 196 196
+      margin-bottom: 12
+      margin-left: 12
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_9.png
+      image-clip: 12 314 196 196
+      phantom: true
+
+    UIWidget
+      id: colorQuadrantBottomRight
+      anchors.fill: parent
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight1
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 52 52
+      margin-bottom: 209
+      margin-right: 209
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_1.png
+      image-clip: 261 261 52 52
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight2
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 73 66
+      margin-bottom: 157
+      margin-right: 188
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_2.png
+      image-clip: 261 299 73 66
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight3
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 66 73
+      margin-bottom: 188
+      margin-right: 157
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_3.png
+      image-clip: 299 261 66 73
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight4
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 77 65
+      margin-bottom: 105
+      margin-right: 184
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_4.png
+      image-clip: 261 352 77 65
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight5
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 81 81
+      margin-bottom: 127
+      margin-right: 127
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_5.png
+      image-clip: 314 314 81 81
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight6
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 65 77
+      margin-bottom: 184
+      margin-right: 105
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_6.png
+      image-clip: 352 261 65 77
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight7
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 107 90
+      margin-bottom: 60
+      margin-right: 115
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_7.png
+      image-clip: 300 372 107 90
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight8
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 90 107
+      margin-bottom: 115
+      margin-right: 60
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_8.png
+      image-clip: 372 300 90 107
+      phantom: true
+
+    UIWidget
+      id: colorBottomRight9
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      size: 196 196
+      margin-bottom: 12
+      margin-right: 12
+      image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_9.png
+      image-clip: 314 314 196 196
+      phantom: true
 
     UIWidget
       id: largeBonusTL
