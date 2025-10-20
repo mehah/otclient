@@ -238,12 +238,6 @@ UIWidget
     image-source: /images/game/wheel/backdrop_skillwheel
 
     UIWidget
-    id: backdropWheel
-    anchors.centerIn: parent
-    size: 522 522
-    image-source: /images/game/wheel/backdrop_skillwheel
-
-    UIWidget
       id: colorQuadrantTopLeft
       anchors.fill: parent
       phantom: true
@@ -351,12 +345,6 @@ UIWidget
       id: largeBonusTL
       anchors.top: parent.top
       anchors.left: parent.left
-      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png
-      
-    UIWidget  
-      id: largeBonusTL  
-      anchors.top: parent.top  
-      anchors.left: parent.left  
       image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png
         
     UIWidget  

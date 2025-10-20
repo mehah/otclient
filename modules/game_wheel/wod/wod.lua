@@ -143,6 +143,21 @@ local QuadrantProgressConfig = {
         slicePrefix = 'colorTopLeft',
         totals = baseQuadrantValues,
         path = "top_left"
+    },
+    [BOTTOM_LEFT] = {
+        slicePrefix = 'colorBottomLeft',
+        totals = baseQuadrantValues,
+        path = "bottom_left"
+    },
+    [BOTTOM_RIGHT] = {
+        slicePrefix = 'colorBottomRight',
+        totals = baseQuadrantValues,
+        path = "bottom_right"
+    },
+    [TOP_RIGHT] = {
+        slicePrefix = 'colorTopRight',
+        totals = baseQuadrantValues,
+        path = "top_right"
     }
 }
 
