@@ -76,7 +76,11 @@ function assignSpell(button)
     end
     if button.cache.spellData and not button.cache.isRuneSpell then
         local spellData = button.cache.spellData
-        local spellId = spellData.icon.clientId
+        local spellId = spellData.clientId
+        if not spellId then
+            print("Warning Spell ID not found L81 modules/game_actionbar/logics/ActionAssignmentWindows.lua")
+            return
+        end
         local clip = Spells.getImageClip(spellId, 'Default')
         imageWidget:setImageSource(defaultIconsFolder)
         imageWidget:setImageClip(clip)

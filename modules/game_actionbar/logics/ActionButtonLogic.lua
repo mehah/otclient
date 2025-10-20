@@ -730,6 +730,10 @@ function updateButton(button)
         local spellData, param = Spells.getSpellDataByParamWords(sendText:lower())
         if spellData then
             local spellId = spellData.clientId
+            if not spellId then
+                print("Warning Spell ID not found L734 modules/game_actionbar/logics/ActionButtonLogic.lua")
+                return
+            end
             local source = SpelllistSettings['Default'].iconFile
             local clip = Spells.getImageClip(spellId, 'Default')
 
