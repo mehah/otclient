@@ -10,7 +10,7 @@ ForgeController.showResult = false
 ForgeController.showBonus = false
 local rightArrow = helpers.rightArrow
 local filledRightArrow = helpers.filledRightArrow
-ForgeController.result = {}
+ForgeController.result = cloneValue(helpers.baseResult)
 ForgeController.baseResult = helpers.baseResult
 
 local function resetInfo()
@@ -301,8 +301,12 @@ function forgeResultData(rawData)
     ForgeController.showResult = true
     ForgeController.showBonus = false
     local data = cloneValue(rawData)
-    ForgeController.result = data
-    -- for k, v in pairs(rawData) do
+    if type(data) == 'table' then
+        for key, value in pairs(data) do
+            ForgeController.result[key] = value
+        end
+    end
+    -- for k, v in pairs(ForgeController.result) do
     --     g_logger.info("result data: " .. k .. " = " .. tostring(v))
     -- end
     if ForgeController.result.leftTier > 0 then
@@ -348,9 +352,11 @@ function forgeResultData(rawData)
             local dust = isConvergence and ForgeController.fusion.convergenceDust or ForgeController.transfer.dust
             ForgeController.result.bonusLabel = string.format("Near! The used %s where not consumed.", dust)
         elseif ForgeController.result.bonus == 2 then
-            ForgeController.result.bonusItem = 37110
-            ForgeController.result.bonusLabel = string.format("Fantastic! The used %s where not consumed.",
-                ForgeController.result.coreCount)
+            if ForgeController.fusion.chanceImprovedChecked or ForgeController.fusion.reduceTierLossChecked then
+                ForgeController.result.bonusItem = 37110
+                ForgeController.result.bonusLabel = string.format("Fantastic! The used %s where not consumed.",
+                    ForgeController.result.coreCount)
+            end
         elseif ForgeController.result.bonus == 3 then
             ForgeController.result.bonusItem = 3031
             ForgeController.result.bonusLabel = string.format("Awesome! The used %s where not consumed.",
