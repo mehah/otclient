@@ -188,10 +188,6 @@ controller:registerEvents(g_game, {
             g_game.enableFeature(GamePrey)
         end
 
-        if version >= 1280 then
-            g_game.enableFeature(GameForgeConvergence)
-        end
-
         if version >= 1200 then
             g_game.enableFeature(GameColorizedLootValue)
             g_game.enableFeature(GameThingQuickLoot)

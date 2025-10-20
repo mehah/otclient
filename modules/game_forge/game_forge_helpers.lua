@@ -63,4 +63,33 @@ function Helpers.formatHistoryDate(timestamp)
     return os.date('%Y-%m-%d, %H:%M:%S', timestamp)
 end
 
+Helpers.rightArrow = "/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
+Helpers.filledRightArrow = "/modules/game_forge/images/arrows/icon-arrow-rightlarge-filled.png"
+
+Helpers.baseResult = {
+    leftItemId = -1,
+    leftTier = 0,
+    leftClip = nil,
+    rightItemId = -1,
+    rightTier = 0,
+    rightClip = nil,
+    label = "",
+    labelResult = "",
+    bonusItem = -1,
+    bonusTier = 0,
+    bonusItemClip = nil,
+    bonusLabel = "",
+    bonusAction = nil,
+    arrows = {
+        Helpers.rightArrow,
+        Helpers.rightArrow,
+        Helpers.rightArrow,
+    },
+    buttonLabel = "Close"
+}
+
+Helpers.green = "#44ad25"
+Helpers.red = "#d33c3c"
+Helpers.grey = "#c0c0c0"
+
 return Helpers

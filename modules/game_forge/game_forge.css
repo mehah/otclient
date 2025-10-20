@@ -428,3 +428,72 @@
 .close-btn:pressed {
   padding: 3px 10px !important;
 }
+
+.result-window {
+  width: 400px;
+  height: 130px;
+  position: relative;
+  display: block;
+}
+
+.result-dragon {
+  position: absolute;
+  --image-source: "/modules/game_store/images/dragon.png";
+  --image-size: 192 70;
+  top: -70px;
+  width: 192px;
+  height: 70px;
+}
+
+.result-title {
+  position: absolute;
+  top: 5;
+  width: 380px;
+  text-align: center;
+  color: #c0c0c0;
+  height: 20px;
+}
+
+.result-content {
+  top: 0;
+  display: flex;
+  width: 390px;
+  height: 90px;
+}
+
+.result-center {
+  height: 80px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 400px;
+  text-align: center;
+}
+
+.result-arrows {
+  text-align: center;
+  padding-top: 20px;
+}
+
+.result-arrows img:first-child {
+  margin-left: 0px;
+}
+
+.result-arrows img {
+  margin-left: 4px;
+}
+
+.result-text {
+  text-align: center;
+  width: 272px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30;
+  text-align: center;
+}
+
+.result-footer {
+  width: 390px;
+  height: 40px;
+}

@@ -6,6 +6,12 @@ local cloneValue = helpers.cloneValue
 local normalizeClassPriceEntries = helpers.normalizeClassPriceEntries
 local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
 local formatHistoryDate = helpers.formatHistoryDate
+ForgeController.showResult = false
+ForgeController.showBonus = false
+local rightArrow = helpers.rightArrow
+local filledRightArrow = helpers.filledRightArrow
+ForgeController.result = {}
+ForgeController.baseResult = helpers.baseResult
 
 local function resetInfo()
     ForgeController.transfer.exaltedCoresLabel = "???"
@@ -21,23 +27,22 @@ local function resetInfo()
     ForgeController.fusion.selectedTarget = cloneValue(ForgeController.baseSelected)
     ForgeController.fusion.isConvergence = false
     ForgeController.fusion.canTransfer = false
+    ForgeController.fusion.chanceImprovedChecked = false
+    ForgeController.fusion.reduceTierLossChecked = false
+    ForgeController.showResult = false
+    ForgeController.showBonus = false
+    ForgeController.result = cloneValue(helpers.baseResult)
 end
 
-local TAB_ORDER = { 'fusion', 'transfer', 'conversion', 'history' }
-function ForgeController:hideAllPanels()
-    for _, panel in pairs(self.ui.panels) do
-        if panel and panel.hide then
-            panel:hide()
-        end
-    end
-end
 
 function ForgeController:show(skipRequest)
+    if not g_game.getFeature(GameForgeConvergence) then
+        return ForgeController:hide()
+    end
     resetInfo()
     local needsReload = not self.ui or self.ui:isDestroyed()
     if needsReload then
         self:loadHtml('game_forge.html')
-        self.ui.panels = {}
     end
 
     if not self.ui then
@@ -58,10 +63,6 @@ function ForgeController:show(skipRequest)
     end
 
     self:updateResourceBalances()
-
-    self:scheduleEvent(function()
-        self.ui:centerIn('parent')
-    end, 1, "LazyHtml")
 end
 
 function ForgeController:hide()
@@ -128,14 +129,13 @@ ForgeController.baseSelected = {
 }
 
 function ForgeController:onInit()
-    if g_game.getFeature(GameForgeConvergence) then return end
-
     self:updateResourceBalances()
     self:registerEvents(g_game, {
         onBrowseForgeHistory = onBrowseForgeHistory,
         forgeData = forgeData,
         onOpenForge = onOpenForge,
         onResourcesBalanceChange = self:updateResourceBalances(),
+        forgeResultData = forgeResultData,
     })
 
     if not ForgeButton then
@@ -195,6 +195,16 @@ local forgeActions = {
     TRANSFER = 1
 }
 
+function ForgeController:closeResult()
+    ForgeController.showResult = false
+    ForgeController.showBonus = false
+
+    self:hide()
+    if ForgeController.rawOpenForgeData then
+        onOpenForge(ForgeController.rawOpenForgeData)
+    end
+end
+
 function ForgeController:forgeAction(isTransfer)
     local data = isTransfer and ForgeController.transfer or ForgeController.fusion
     local canDoAction = isTransfer and data.canTransfer or data.canFusion
@@ -222,8 +232,147 @@ function ForgeController:forgeAction(isTransfer)
 
     g_game.forgeRequest(actionType, data.isConvergence, data.selected.id, data.selected.tier,
         data.selectedTarget.id, chanceImproved, reduceTierLoss)
+end
 
-    ForgeController:hide()
+function ForgeController.resultSystemEvent(data)
+    ForgeController.result.buttonLabel = "Close"
+    -- TODO: waiting mehah check this arrows animations
+    if ForgeController.result.eventCount == 1 then
+        -- ForgeController.result.arrows[1] = filledRightArrow
+        -- ForgeController.result.arrows[2] = rightArrow
+        -- ForgeController.result.arrows[3] = rightArrow
+    elseif ForgeController.result.eventCount == 2 then
+        -- ForgeController.result.arrows[1] = filledRightArrow
+        -- ForgeController.result.arrows[2] = filledRightArrow
+        -- ForgeController.result.arrows[3] = rightArrow
+    elseif ForgeController.result.eventCount == 3 then
+        -- ForgeController.result.arrows[1] = rightArrow
+        -- ForgeController.result.arrows[2] = filledRightArrow
+        -- ForgeController.result.arrows[3] = filledRightArrow
+    elseif ForgeController.result.eventCount == 4 then
+        -- ForgeController.result.arrows[1] = rightArrow
+        -- ForgeController.result.arrows[2] = rightArrow
+        -- ForgeController.result.arrows[3] = filledRightArrow
+    elseif ForgeController.result.eventCount == 5 then
+        -- ForgeController.result.arrows[1] = filledRightArrow
+        -- ForgeController.result.arrows[2] = filledRightArrow
+        -- ForgeController.result.arrows[3] = filledRightArrow
+        if ForgeController.result.bonus > 0 then
+            ForgeController.result.buttonLabel = "Next"
+        end
+
+        if ForgeController.result.success then
+            ForgeController.result.rightShader = "Outfit - ForgeSuccess"
+            ForgeController.result.label = "Your transfer attempt was "
+            ForgeController.result.labelResult = "successful."
+            ForgeController.result.color = helpers.green
+
+            ForgeController.result.rightShader = ""
+            ForgeController.result.leftItemId = -1
+            ForgeController.result.leftTier = 0
+        else
+            ForgeController.result.label = "Your transfer attempt was "
+            ForgeController.result.labelResult = "failed."
+            ForgeController.result.rightShader = "Outfit - ForgeFailed"
+            ForgeController.result.leftShader = ""
+            ForgeController.result.color = helpers.red
+
+            scheduleEvent(function()
+                ForgeController.result.rightItemId = -1
+                ForgeController.result.rightTier = 0
+            end, 1000)
+        end
+        return
+    end
+
+    ForgeController.result.eventCount = ForgeController.result.eventCount + 1
+    scheduleEvent(function()
+        ForgeController.resultSystemEvent(ForgeController.result)
+    end, 750)
+end
+
+function forgeResultData(rawData)
+    ForgeController.result = cloneValue(helpers.baseResult)
+    ForgeController.showResult = true
+    ForgeController.showBonus = false
+
+    local data = cloneValue(rawData)
+    if data.leftTier > 0 then
+        data.leftClip = ItemsDatabase.getTierClip(data.leftTier)
+    end
+
+    if data.rightTier > 0 then
+        data.rightClip = ItemsDatabase.getTierClip(data.rightTier)
+    end
+
+    data.arrows = {
+        rightArrow,
+        rightArrow,
+        rightArrow,
+    }
+    ForgeController.result.buttonLabel = "Close"
+
+    data.label = ""
+    if ForgeController.fusion.selected and ForgeController.fusion.selected.id ~= -1 then
+        if ForgeController.fusion.isConvergence then
+            data.title = "Convergence Fusion Result"
+        else
+            data.title = "Fusion Result"
+        end
+    end
+    if ForgeController.transfer.selected and ForgeController.transfer.selected.id ~= -1 then
+        if ForgeController.transfer.isConvergence then
+            data.title = "Convergence Transfer Result"
+        else
+            data.title = "Transfer Result"
+        end
+    end
+    if data.bonus == 0 then
+        data.bonusAction = function() ForgeController:closeResult() end
+    else
+        data.button = "Next"
+
+        local isConvergence = ForgeController.transfer.selected == -1 and ForgeController.fusion.isConvergence
+        if data.bonus == 1 then
+            data.bonusItem = 37160
+            local dust = isConvergence and ForgeController.fusion.convergenceDust or ForgeController.transfer.dust
+            data.bonusLabel = string.format("Near! The used %s where not consumed.", dust)
+        elseif data.bonus == 2 then
+            data.bonusItem = 37110
+            data.bonusLabel = string.format("Fantastic! The used %s where not consumed.", data.coreCount)
+        elseif data.bonus == 3 then
+            data.bonusItem = 3031
+            data.bonusLabel = string.format("Awesome! The used %s where not consumed.",
+                comma_value(ForgeController.rawPrice))
+        elseif data.bonus == 4 then
+            data.bonusItem = data.leftItemId
+            if data.rightTier >= 2 then
+                data.bonusTier = data.rightTier - 1
+                data.bonusItemClip = ItemsDatabase.getTierClip(data.bonusTier)
+            end
+            data.bonusLabel = "What luck! Your item only lost one tier instead of being\nconsumed."
+        end
+
+        data.bonusAction = function()
+            ForgeController.showResult = false
+            ForgeController.showBonus = true
+            data.button = "Close"
+
+            scheduleEvent(function()
+                ForgeController.result.bonusAction = function()
+                    ForgeController:closeResult()
+                end
+            end, 150)
+        end
+    end
+
+    data.leftShader = "Outfit - ForgeDonor"
+    data.rightShader = "Outfit - cyclopedia-black"
+    ForgeController.result = data
+    data.eventCount = 1
+    scheduleEvent(function()
+        ForgeController.resultSystemEvent(ForgeController.result)
+    end, 750)
 end
 
 local buttonClip = { x = 0, y = 0, width = 43, height = 20 }
@@ -395,6 +544,17 @@ function ForgeController:handleSelect(data, item, isTransfer)
             data.selected.imagePath = imagePath
             data.selected.rarityClipObject = rarityClipObject
         end
+
+        if not isConvergence then
+            data.selectedTarget = cloneValue(item)
+            data.selectedTarget.targetTier = data.selectedTarget.tier + 1
+            data.selectedTarget.targetClip = ItemsDatabase.getTierClip(data.selectedTarget.targetTier)
+            local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(data.selectedTarget.id)
+            if imagePath then
+                data.selectedTarget.imagePath = imagePath
+                data.selectedTarget.rarityClipObject = rarityClipObject
+            end
+        end
     end
 
     local prices = isConvergence and data.convergencePrices or data.prices
@@ -549,6 +709,9 @@ local function handleParseConvergenceFusionItems(data)
 end
 
 function onOpenForge(data)
+    ForgeController.rawOpenForgeData = data
+    ForgeController.fusion.chanceImprovedChecked = false
+    ForgeController.fusion.reduceTierLossChecked = false
     ForgeController.conversion.dustMax = data.dustLevel or ForgeController.conversion.dustMax or 100
 
     -- FUSION ITEMS
@@ -632,9 +795,9 @@ end
 
 function ForgeController:getColor(currentType)
     ForgeController.conversion:handleButtons()
-    local red = '#d33c3c'
-    local base = '#c0c0c0'
-    local green = '#44ad25'
+    local red = helpers.red
+    local base = helpers.grey
+    local green = helpers.green
 
     if currentType == "dustToSilver" then
         if self.currentDust >= self.conversion.necessaryDustToSliver then
