@@ -114,7 +114,7 @@ jobs:
 
 
       - name: Setup vcpkg
-        uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
+        uses: lukka/run-vcpkg@${{ vars.LUKKA_RUN_VCPKG_SHA }}
         with:
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
