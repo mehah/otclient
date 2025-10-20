@@ -90,7 +90,7 @@ jobs:
 
 
       - name: Setup vcpkg
-        uses: lukka/run-vcpkg@${{ env.LUKKA_RUN_VCPKG_SHA }}
+        uses: lukka/run-vcpkg@7dfc9355c4745bfe35f0c90894c0dbcb9b1e9116
         with:
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
