@@ -295,68 +295,69 @@ function forgeResultData(rawData)
     ForgeController.result = cloneValue(helpers.baseResult)
     ForgeController.showResult = true
     ForgeController.showBonus = false
-
     local data = cloneValue(rawData)
-    if data.leftTier > 0 then
-        data.leftClip = ItemsDatabase.getTierClip(data.leftTier)
+    ForgeController.result = data
+    if ForgeController.result.leftTier > 0 then
+        ForgeController.result.leftClip = ItemsDatabase.getTierClip(ForgeController.result.leftTier)
     end
 
-    if data.rightTier > 0 then
-        data.rightClip = ItemsDatabase.getTierClip(data.rightTier)
+    if ForgeController.result.rightTier > 0 then
+        ForgeController.result.rightClip = ItemsDatabase.getTierClip(ForgeController.result.rightTier)
     end
 
-    data.arrows = {
+    ForgeController.result.arrows = {
         rightArrow,
         rightArrow,
         rightArrow,
     }
     ForgeController.result.buttonLabel = "Close"
 
-    data.label = ""
+    ForgeController.result.label = ""
     if ForgeController.fusion.selected and ForgeController.fusion.selected.id ~= -1 then
         if ForgeController.fusion.isConvergence then
-            data.title = "Convergence Fusion Result"
+            ForgeController.result.title = "Convergence Fusion Result"
         else
-            data.title = "Fusion Result"
+            ForgeController.result.title = "Fusion Result"
         end
     end
     if ForgeController.transfer.selected and ForgeController.transfer.selected.id ~= -1 then
         if ForgeController.transfer.isConvergence then
-            data.title = "Convergence Transfer Result"
+            ForgeController.result.title = "Convergence Transfer Result"
         else
-            data.title = "Transfer Result"
+            ForgeController.result.title = "Transfer Result"
         end
     end
-    if data.bonus == 0 then
-        data.bonusAction = function() ForgeController:closeResult() end
+    if ForgeController.result.bonus == 0 then
+        ForgeController.result.bonusAction = function() ForgeController:closeResult() end
     else
-        data.button = "Next"
+        ForgeController.result.button = "Next"
 
         local isConvergence = ForgeController.transfer.selected == -1 and ForgeController.fusion.isConvergence
-        if data.bonus == 1 then
-            data.bonusItem = 37160
+        if ForgeController.result.bonus == 1 then
+            ForgeController.result.bonusItem = 37160
             local dust = isConvergence and ForgeController.fusion.convergenceDust or ForgeController.transfer.dust
-            data.bonusLabel = string.format("Near! The used %s where not consumed.", dust)
-        elseif data.bonus == 2 then
-            data.bonusItem = 37110
-            data.bonusLabel = string.format("Fantastic! The used %s where not consumed.", data.coreCount)
-        elseif data.bonus == 3 then
-            data.bonusItem = 3031
-            data.bonusLabel = string.format("Awesome! The used %s where not consumed.",
+            ForgeController.result.bonusLabel = string.format("Near! The used %s where not consumed.", dust)
+        elseif ForgeController.result.bonus == 2 then
+            ForgeController.result.bonusItem = 37110
+            ForgeController.result.bonusLabel = string.format("Fantastic! The used %s where not consumed.",
+                ForgeController.result.coreCount)
+        elseif ForgeController.result.bonus == 3 then
+            ForgeController.result.bonusItem = 3031
+            ForgeController.result.bonusLabel = string.format("Awesome! The used %s where not consumed.",
                 comma_value(ForgeController.rawPrice))
-        elseif data.bonus == 4 then
-            data.bonusItem = data.leftItemId
-            if data.rightTier >= 2 then
-                data.bonusTier = data.rightTier - 1
-                data.bonusItemClip = ItemsDatabase.getTierClip(data.bonusTier)
+        elseif ForgeController.result.bonus == 4 then
+            ForgeController.result.bonusItem = ForgeController.result.leftItemId
+            if ForgeController.result.rightTier >= 2 then
+                ForgeController.result.bonusTier = ForgeController.result.rightTier - 1
+                ForgeController.result.bonusItemClip = ItemsDatabase.getTierClip(ForgeController.result.bonusTier)
             end
-            data.bonusLabel = "What luck! Your item only lost one tier instead of being\nconsumed."
+            ForgeController.result.bonusLabel = "What luck! Your item only lost one tier instead of being\nconsumed."
         end
 
-        data.bonusAction = function()
+        ForgeController.result.bonusAction = function()
             ForgeController.showResult = false
             ForgeController.showBonus = true
-            data.button = "Close"
+            ForgeController.result.button = "Close"
 
             scheduleEvent(function()
                 ForgeController.result.bonusAction = function()
@@ -366,10 +367,9 @@ function forgeResultData(rawData)
         end
     end
 
-    data.leftShader = "Outfit - ForgeDonor"
-    data.rightShader = "Outfit - cyclopedia-black"
-    ForgeController.result = data
-    data.eventCount = 1
+    ForgeController.result.leftShader = "Outfit - ForgeDonor"
+    ForgeController.result.rightShader = "Outfit - cyclopedia-black"
+    ForgeController.result.eventCount = 1
     scheduleEvent(function()
         ForgeController.resultSystemEvent(ForgeController.result)
     end, 750)
