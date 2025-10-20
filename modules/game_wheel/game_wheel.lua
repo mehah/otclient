@@ -170,9 +170,17 @@ function showWheelOfDestiny(container)
         WheelOfDestiny.show(container)  
     end  
 
-    WheelOfDestiny.updateSlicesProgress("topLeft", {
-        [1] = { value = 50, total = 50 },
-        [2] = { value = 30, total = 75 },
+    WheelOfDestiny.updateSlicesProgress("TopLeft", {
+        [1] = { value = 40, total = 50 },
+        [2] = { value = 0, total = 75 },
+        [3] = { value = 75, total = 75 },
+        [4] = { value = 80, total = 100 },
+        [5] = { value = 100, total = 100 },
+        [6] = { value = 0, total = 100 },
+        [7] = { value = 80, total = 150 },
+        [8] = { value = 0, total = 150 },
+        [9] = { value = 200, total = 200 },
+    })
         [3] = { value = 75, total = 75 },
         [4] = { value = 80, total = 100 },
         [5] = { value = 10, total = 100 },

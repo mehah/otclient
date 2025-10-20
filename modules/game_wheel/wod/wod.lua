@@ -116,13 +116,67 @@ local AccessValidator = {
 -- ============================================================================
 -- UI CONFIGURATORS
 -- ============================================================================
+local TOP_LEFT = "TopLeft"
+local TOP_RIGHT = "TopRight"
+local BOTTOM_LEFT = "BottomLeft"
+local BOTTOM_RIGHT = "BottomRight"
+local QuadrantFolder = {
+    [TOP_LEFT]     = 'top_left',
+    [TOP_RIGHT]    = 'top_right',
+    [BOTTOM_LEFT]  = 'bottom_left',
+    [BOTTOM_RIGHT] = 'bottom_right',
+}
 local baseQuadrantValues = { 50, 75, 75, 100, 100, 100, 150, 150, 200 }
+local quadrantFrames = {
+    [1] = 5,
+    [2] = 8,
+    [3] = 8,
+    [4] = 10,
+    [5] = 10,
+    [6] = 10,
+    [7] = 15,
+    [8] = 15,
+    [9] = 20
+}
 local QuadrantProgressConfig = {
-    topLeft = {
+    [TOP_LEFT] = {
         slicePrefix = 'colorTopLeft',
-        totals = baseQuadrantValues
+        totals = baseQuadrantValues,
+        path = "top_left"
     }
 }
+
+-- Atualiza dinamicamente a imagem do slot 1 de qualquer quadrante conforme o progresso
+-- Updates any slot image with N discrete frames (1..frames)
+local function updateQuadrantSlotImage(ui, quadrantKey, slotIndex, progress, frames)
+    local sliceWidget = ui:recursiveGetChildById(
+        string.format('color%s%d', quadrantKey:gsub('^%l', string.upper), slotIndex)
+    )
+    if not sliceWidget then return end
+
+    -- clamp & map progress [0..1] -> 1..frames
+    local p = math.max(0, math.min(1, progress))
+    if p == 0 then
+        return
+    end
+    local idx = math.floor(p * frames + 1) -- 0..1 -> 1..frames+1
+    if idx > frames then idx = frames end
+
+    local folder = QuadrantFolder[quadrantKey]
+    if not folder then return end
+
+    local imagePath = string.format(
+        '/images/game/wheel/wheel-colors/%s/slot%d/%d.png',
+        folder, slotIndex, idx
+    )
+
+    -- slot uses discrete images; keep it solid
+    sliceWidget:setOpacity(1)
+    sliceWidget:setImageSource(imagePath)
+    sliceWidget:raise()
+end
+
+
 
 local function applyQuadrantSliceProgress(ui, quadrantKey, sliceIndex, value, total)
     local numericIndex = tonumber(sliceIndex)
@@ -161,8 +215,25 @@ local function applyQuadrantSliceProgress(ui, quadrantKey, sliceIndex, value, to
     local progress = clampedValue / resolvedTotal
 
     sliceWidget:setOpacity(progress)
+    if numericIndex == 1 then
+        updateQuadrantSlotImage(ui, quadrantKey, numericIndex, progress, quadrantFrames[numericIndex])
+    end
+    if numericIndex == 2 or numericIndex == 3 then
+        updateQuadrantSlotImage(ui, quadrantKey, numericIndex, progress, quadrantFrames[numericIndex])
+    end
+    if numericIndex == 4 or numericIndex == 5 or numericIndex == 6 then
+        updateQuadrantSlotImage(ui, quadrantKey, numericIndex, progress, quadrantFrames[numericIndex])
+    end
+    if numericIndex == 7 or numericIndex == 8 then
+        updateQuadrantSlotImage(ui, quadrantKey, numericIndex, progress, quadrantFrames[numericIndex])
+    end
+    if numericIndex == 9 then
+        updateQuadrantSlotImage(ui, quadrantKey, numericIndex, progress, quadrantFrames[numericIndex])
+    end
     sliceWidget:setTooltip(string.format('%d/%d', sanitizedValue, resolvedTotal))
 end
+
+
 
 local UIConfigurator = {
     -- Configures vocation overlay
@@ -348,7 +419,7 @@ function WheelOfDestiny.show(container)
     UIConfigurator.setupBonusOverlays(wodUI, true)
     UIConfigurator.setupDataWindows(wodUI)
     UIConfigurator.setupVocationInformation(wodUI, basicVocation)
-    UIConfigurator.resetQuadrantSlices(wodUI, 'topLeft')
+    UIConfigurator.resetQuadrantSlices(wodUI, TOP_LEFT)
 
     -- Conectar ambos os botões summary
     local summaryButton = wodUI:getChildById('summaryButton')
