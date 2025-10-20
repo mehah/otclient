@@ -1,8 +1,8 @@
 <link href="game_questlog.css" />
 <html>
-<window id="main" anchor="parent" class="questLog-window" title="Quest Log" onescape="self:close()">
+<window id="main" placement="center" class="questLog-window" title="Quest Log" onescape="self:close()">
 
-  <div id="panelQuestLog" title="Quest Log" focusable="false" class="content-left minipanel" anchor="parent"
+  <div id="panelQuestLog" title="Quest Log" class="content-left minipanel" placement="top-left"
     layout="type: verticalBox;spacing:5">
     <TextListQuestLog id="areaPanelQuestList" class="quest-list"></TextListQuestLog>
     <select id="comboBoxFilter" onchange="self:onFilterQuestLog(event)">
@@ -18,27 +18,27 @@
       <tr>
         <td class="col1">
           <label>
-            <input type="checkbox" id="checkboxShowComplete" checked onchange="filterQuestListShowComplete(event)">
+            <input type="checkbox" id="checkboxShowComplete" checked onchange="self:filterQuestListShowComplete(event)">
             Show completed
           </label>
         </td>
         <td class="col2">Quests completed:</td>
-        <td class="col3" id="lblCompleteNumber"></td>
+        <td class="col3" id="lblCompleteNumber">0</td>
       </tr>
       <tr>
         <td class="col1">
           <label>
-            <input type="checkbox" id="checkboxShowHidden" onchange="filterQuestListShowHidden(event)">
+            <input type="checkbox" id="checkboxShowHidden" onchange="self:filterQuestListShowHidden(event)">
             Show hidden
           </label>
         </td>
         <td class="col2">Quests hidden:</td>
-        <td class="col3" id="lblHiddenNumber"></td>
+        <td class="col3" id="lblHiddenNumber">0</td>
       </tr>
     </table>
   </div>
 
-  <div id="panelQuestLineSelected" focusable="false" class="content-right minipanel" anchor="parent" title="No quest line Selected"
+  <div id="panelQuestLineSelected" focusable="false" class="content-right minipanel" placement="top-left" title="No quest line Selected"
     layout="type: verticalBox;">
     <TextListQuestLog id="ScrollAreaQuestList" ></TextListQuestLog>
     <MultiLineQuestLog id="panelQuestInfo" class="quest-info"></MultiLineQuestLog>
@@ -49,8 +49,8 @@
   <hr class="separator"/>
 
   <div id="buttonsPanel" class="buttons" focusable="false">
-    <button id="trackerButton" onclick="self:toggleMiniWindowsTracker()" text="Quest Tracker"></button>
-    <button id="closeButton" onclick="self:close()" text="Close"></button>
+    <button id="trackerButton" onclick="self:toggleMiniWindowsTracker()" >Quest Tracker</button>
+    <button id="closeButton" onclick="self:close()" >Close</button>
   </div>
 
 </window>
