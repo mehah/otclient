@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup vcpkg with baseline
-        uses: lukka/run-vcpkg@7dfc9355c4745bfe35f0c90894c0dbcb9b1e9116 # v11 (full commit SHA)
+        uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136 # v11 (full commit SHA)
         with:
           vcpkgGitCommitId: 8d73531d42c57b8e9f02f4db3f671ca3696eaf7b
 

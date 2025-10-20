@@ -105,7 +105,7 @@ jobs:
 
       - name: Install vcpkg
         if: ${{ matrix.buildtype == 'windows-release' }}
-        uses: lukka/run-vcpkg@7dfc9355c4745bfe35f0c90894c0dbcb9b1e9116
+        uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
         with:
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
