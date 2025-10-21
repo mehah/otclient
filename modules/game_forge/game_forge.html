@@ -47,8 +47,12 @@
                 <div
                   *for="local item in (self.fusion.currentList or {})"
                   onclick="self.fusion:handleSelect(item)"
+                  onhover="self:handleDescription('fusion-select-item')"
                 >
-                  <div class="item-to-select">
+                  <div
+                    class="item-to-select"
+                    onhover="self:handleDescription('fusion-select-item')"
+                  >
                     <img
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
@@ -106,7 +110,10 @@
                   >
                 </div>
               </div>
-              <div style="width: 66px; position: relative">
+              <div
+                style="width: 66px; position: relative"
+                onhover="self:handleDescription('fusion-select-item')"
+              >
                 <img
                   *if="self.fusion.selected.id == -1"
                   style="margin-top: 22px; margin-left: 30px"
@@ -180,7 +187,10 @@
                 class="transfer-requirement-item-container"
                 *if="not self.fusion.isConvergence"
               >
-                <div class="transfer-requirement">
+                <div
+                  class="transfer-requirement"
+                  onhover="self:handleDescription('fusion-preview-item')"
+                >
                   <img
                     *if="self.fusion.selected.id == -1"
                     style="margin-top: 22px; margin-left: 30px"
@@ -207,6 +217,7 @@
                   </div>
                 </div>
                 <div
+                  onhover="self:handleDescription('fusion-preview-item')"
                   class="transfer-requirement-item-cost"
                   *color="self:getColor('fusion-preview-count-label')"
                 >
@@ -216,6 +227,7 @@
               <div
                 class="transfer-requirement-item-container"
                 style="margin-left: 8px"
+                onhover="self:handleDescription('fusion-cost-dust')"
               >
                 <div class="transfer-requirement">
                   <UIItem style="item-id: 37160" />
@@ -236,7 +248,11 @@
                 class="fusion-buttons-container"
                 *width="self.fusion.isConvergence and 47 or 140"
               >
-                <div style="height: 45px" *if="not self.fusion.isConvergence">
+                <div
+                  style="height: 45px"
+                  *if="not self.fusion.isConvergence"
+                  onhover="self:handleDescription('fusion-improve-chance')"
+                >
                   <div class="fusion-buttons-text-container">
                     <span>Success Rate:</span>
                     <span
@@ -265,7 +281,11 @@
                     </div>
                   </div>
                 </div>
-                <div style="height: 45px" *if="not self.fusion.isConvergence">
+                <div
+                  style="height: 45px"
+                  *if="not self.fusion.isConvergence"
+                  onhover="self:handleDescription('fusion-reduce-loss')"
+                >
                   <div class="fusion-buttons-text-container">
                     <span>Tier Loss:</span>
                     <span
@@ -311,7 +331,10 @@
                   height="25"
                 />
               </div>
-              <div class="transfer-button-container">
+              <div
+                class="transfer-button-container"
+                onhover="self:handleDescription('fusion-forge-action')"
+              >
                 <div
                   class="transfer-button"
                   *disabled="self.fusion.canFusion == false"
@@ -412,12 +435,16 @@
               <div
                 class="transfer-select-donnor-container"
                 layout="type: grid; cell-size: 34 34;cell-spacing:2;num-columns:4"
+                onhover="self:handleDescription('transfer-donors-items')"
               >
                 <div
                   *for="local item in (self.transfer.currentList.donors or {})"
                   onclick="self.transfer:handleSelect(item)"
                 >
-                  <div class="item-to-select">
+                  <div
+                    class="item-to-select"
+                    onhover="self:handleDescription('transfer-cost-donor-item')"
+                  >
                     <img
                       *if="item.imagePath"
                       *image-source="item.imagePath"
@@ -465,7 +492,10 @@
                     style="margin-left: 8px"
                   />
                 </div>
-                <div class="transfer-select-convergence">
+                <div
+                  class="transfer-select-convergence"
+                  onhover="self:handleDescription('transfer-convergence')"
+                >
                   <input
                     id="transfer_convergence"
                     type="checkbox"
@@ -480,6 +510,7 @@
                 *if="self.transfer.selected and self.transfer.selected.key"
                 class="transfer-select-donnor-container"
                 layout="type: grid; cell-size: 34 34;cell-spacing:2;num-columns:4"
+                onhover="self:handleDescription('transfer-donors-items')"
               >
                 <div
                   *for="local item in (self.transfer.currentList.receivers or {})"
@@ -487,9 +518,11 @@
                   onclick="self:handleSelectTarget(item, true)"
                   *border-width="1"
                   *border-color="self.transfer.selectedTarget.key == item.key and 'white' or 'transparent'"
+                  onhover="self:handleDescription('transfer-cost-receiver-item')"
                 >
                   <div class="item-to-select">
                     <img
+                      onhover="self:handleDescription('transfer-cost-receiver-item')"
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
                       *border-width="1"
@@ -522,7 +555,10 @@
             <span class="transfer-header">{{self.transfer.title}}</span>
             <div class="transfer-requirements-wrapper">
               <div class="transfer-requirement-item-container">
-                <div class="transfer-requirement">
+                <div
+                  class="transfer-requirement"
+                  onhover="self:handleDescription('transfer-cost-donor-preview')"
+                >
                   <img
                     *if="self.transfer.selected.id == -1"
                     style="margin-top: 22px; margin-left: 30px"
@@ -551,6 +587,7 @@
                 <div
                   class="transfer-requirement-item-cost"
                   *color="self:getColor('transfer-preview-count-label')"
+                  onhover="self:handleDescription('transfer-cost-donor-preview')"
                 >
                   {{self.transfer.selected.countLabel}}
                 </div>
@@ -558,6 +595,7 @@
               <div
                 class="transfer-requirement-item-container"
                 style="margin-left: 8px"
+                onhover="self:handleDescription('transfer-cost-dust')"
               >
                 <div class="transfer-requirement">
                   <UIItem style="item-id: 37160" />
@@ -577,6 +615,7 @@
               <div
                 class="transfer-requirement-item-container"
                 style="margin-left: 8px"
+                onhover="self:handleDescription('transfer-cost-exalted-core')"
               >
                 <div class="transfer-requirement">
                   <UIItem style="item-id: 37110" />
@@ -600,7 +639,10 @@
                   height="25"
                 />
               </div>
-              <div class="transfer-button-container">
+              <div
+                class="transfer-button-container"
+                onhover="self:handleDescription('transfer-forge-action')"
+              >
                 <div
                   class="transfer-button"
                   *disabled="self.transfer.canTransfer == false"
@@ -700,10 +742,16 @@
             <div class="conversion-column">
               <div class="conversion-column-header"><p>Convert Dust</p></div>
               <div class="conversion-column-img">
-                <div class="conversion-column-item-container">
+                <div
+                  class="conversion-column-item-container"
+                  onhover="self:handleDescription('convert-dust')"
+                >
                   <UIItem style="item-id: 37160" />
                 </div>
-                <div class="conversion-column-item-cost">
+                <div
+                  class="conversion-column-item-cost"
+                  onhover="self:handleDescription('convert-dust')"
+                >
                   <p *color="self:getColor('dustToSilver')">
                     {{self.conversion.necessaryDustToSliver}}
                   </p>
@@ -726,6 +774,7 @@
                   class="conversion-column-item-conversion-button"
                   *disabled="self.conversion.disableDustConversion"
                   onclick="self.conversion:toggle(2)"
+                  onhover="self:handleDescription('convert-dust-cost')"
                 >
                   <UIItem style="item-id: 37109" />
                 </div>
@@ -737,10 +786,16 @@
             <div class="conversion-column" style="margin-left: 6px">
               <div class="conversion-column-header"><p>Convert Slivers</p></div>
               <div class="conversion-column-img">
-                <div class="conversion-column-item-container">
+                <div
+                  class="conversion-column-item-container"
+                  onhover="self:handleDescription('convert-sliver')"
+                >
                   <UIItem style="item-id: 37109" />
                 </div>
-                <div class="conversion-column-item-cost">
+                <div
+                  class="conversion-column-item-cost"
+                  onhover="self:handleDescription('convert-sliver')"
+                >
                   <p *color="self:getColor('sliverToCore')">
                     {{self.conversion.sliverToCore}}
                   </p>
@@ -762,9 +817,13 @@
                 <div
                   class="conversion-column-item-conversion-button"
                   *disabled="self.conversion.disableSliverConversion"
+                  onhover="self:handleDescription('convert-sliver-cost')"
                   onclick="self.conversion:toggle(3)"
                 >
-                  <UIItem style="item-id: 37110" />
+                  <UIItem
+                    style="item-id: 37110"
+                    onhover="self:handleDescription('convert-sliver-cost')"
+                  />
                 </div>
                 <div style="margin-top: 8px">
                   <p>{{self.conversion.sliverToCoreLabel}}</p>
@@ -776,10 +835,16 @@
                 <p>Increase Dust Limit</p>
               </div>
               <div class="conversion-column-img">
-                <div class="conversion-column-item-container">
+                <div
+                  class="conversion-column-item-container"
+                  onhover="self:handleDescription('increase-dust-limit')"
+                >
                   <UIItem style="item-id: 37160" />
                 </div>
-                <div class="conversion-column-item-cost">
+                <div
+                  class="conversion-column-item-cost"
+                  onhover="self:handleDescription('increase-dust-limit')"
+                >
                   <p *color="self:getColor('increaseDustLimit')">
                     {{self.conversion.dustMaxIncreaseCost}}
                   </p>
@@ -802,6 +867,7 @@
                   class="conversion-column-item-increase-button"
                   *disabled="self.conversion.disableIncreaseDustLimit"
                   onclick="self.conversion:toggle(4)"
+                  onhover="self:handleDescription('increase-dust-limit-cost')"
                 >
                   <UIItem style="item-id: 37160" />
                 </div>

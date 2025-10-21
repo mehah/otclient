@@ -32,8 +32,12 @@ local function resetInfo()
     ForgeController.showResult = false
     ForgeController.showBonus = false
     ForgeController.result = cloneValue(helpers.baseResult)
+    ForgeController.description = ""
 end
 
+function ForgeController:handleDescription(currentType)
+    helpers.handleDescription(ForgeController, currentType)
+end
 
 function ForgeController:show(skipRequest)
     if not g_game.getFeature(GameForgeConvergence) then
@@ -1071,7 +1075,7 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     for _, entry in ipairs(historyList) do
         entry.createdAt = formatHistoryDate(entry.createdAt)
         entry.actionType = historyActionLabels[entry.actionType]
-        entry.description = entry.description or '-'
+        entry.description = entry.description or ''
         if entry.actionType == historyActionLabels[0] or entry.actionType == historyActionLabels[1] then
             local firstSpaceIndex = string.find(entry.description, " ")
             if firstSpaceIndex then
