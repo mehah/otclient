@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 namespace Otc
 {
     enum OperatingSystem_t : uint16_t
@@ -868,11 +866,11 @@ namespace Otc
         FIRST = KNIGHT,
         LAST = DRUID,
     };
-  
-    enum PartyAnalyzerAction_t : uint8_t {
+
+    enum PartyAnalyzerAction_t : uint8_t
+    {
         PARTYANALYZERACTION_RESET = 0,
         PARTYANALYZERACTION_PRICETYPE = 1,
         PARTYANALYZERACTION_PRICEVALUE = 2,
     };
-
 }

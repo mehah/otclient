@@ -23,6 +23,7 @@
 #pragma once
 
 #include <asio/ip/tcp.hpp>
+#include <asio/streambuf.hpp>
 #include <asio/write.hpp>
 
 class InputMessage;

@@ -23,9 +23,10 @@
 #pragma once
 
 #include "declarations.h"
-#include <framework/core/timer.h>
+
 #include <framework/graphics/cachedtext.h>
 #include <framework/luaengine/luaobject.h>
+#include "framework/core/timer.h"
 
  // @bindclass
 class AnimatedText final : public LuaObject

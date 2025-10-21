@@ -22,7 +22,6 @@
 
 #pragma once
 #include "attachedeffect.h"
-#include <framework/luaengine/luaobject.h>
 
 static const std::vector<UIWidgetPtr> EMPTY_ATTACHED_WIDGETS;
 static const std::vector<AttachedEffectPtr> EMPTY_ATTACHED_EFFECTS;

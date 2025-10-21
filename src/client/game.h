@@ -22,12 +22,8 @@
 
 #pragma once
 
-#include "container.h"
-#include "creature.h"
 #include "declarations.h"
 #include "outfit.h"
-#include "protocolgame.h"
-#include <bitset>
 #include <framework/core/timer.h>
 
 struct UnjustifiedPoints
@@ -778,7 +774,7 @@ public:
     void sendPartyAnalyzerPriceType();
     void sendPartyAnalyzerPriceValue(); // For action 3, will get items from cyclopedia
     void sendPartyAnalyzerAction(uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items = {});
-    
+
     // outfit related
     void requestOutfit();
     void changeOutfit(const Outfit& outfit);
@@ -892,9 +888,9 @@ public:
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }
     bool isDead() { return m_dead; }
-    bool isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
-    bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
-    bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
+    bool isAttacking();
+    bool isFollowing();
+    bool isConnectionOk();
     auto mapUpdatedAt() const { return m_mapUpdatedAt; }
     void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 

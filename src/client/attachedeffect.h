@@ -21,9 +21,7 @@
  */
 
 #pragma once
-
 #include "outfit.h"
-#include "thingtype.h"
 
 class AttachedEffect final : public LuaObject
 {

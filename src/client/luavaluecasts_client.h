@@ -24,6 +24,7 @@
 
 #include "game.h"
 #include "outfit.h"
+#include "protocolgame.h"
 
  // outfit
 int push_luavalue(const Outfit& outfit);
