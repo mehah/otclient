@@ -39,6 +39,7 @@ public:
     TexturePtr getTexture(const std::string& fileName, bool smooth = false);
     const TexturePtr& getEmptyTexture() { return m_emptyTexture; }
     TexturePtr loadTexture(std::stringstream& file);
+    void loadTextureTransparentPixels(const std::string& fileName);
 
     const Matrix3* getMatrixById(uint16_t id);
     uint16_t getMatrixId(const Size& size, bool upsidedown);

@@ -87,6 +87,8 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             setImageAutoResize(node->value<bool>());
         else if (node->tag() == "image-individual-animation")
             setImageIndividualAnimation(node->value<bool>());
+        else if (node->tag() == "image-pixel-test")
+            setPixelTesting(node->value<bool>());
     }
 }
 
@@ -212,7 +214,7 @@ void UIWidget::setImageSource(const std::string_view source, const bool base64)
 
     if (source.empty()) {
         m_imageTexture = nullptr;
-        m_imageSource = {};
+        m_imageSource.clear();
         return;
     }
 
@@ -221,8 +223,11 @@ void UIWidget::setImageSource(const std::string_view source, const bool base64)
         const auto& decoded = g_crypt.base64Decode(source);
         stream.write(decoded.c_str(), decoded.size());
         m_imageTexture = g_textures.loadTexture(stream);
+        m_imageSource.clear();
     } else {
-        m_imageTexture = g_textures.getTexture(m_imageSource = source, isImageSmooth());
+        if (m_imageSource != source)
+            m_imageSource = std::string(source);
+        m_imageTexture = g_textures.getTexture(m_imageSource, isImageSmooth());
     }
 
     if (!m_imageTexture)

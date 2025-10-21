@@ -183,6 +183,47 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
     return texture;
 }
 
+void TextureManager::loadTextureTransparentPixels(const std::string& fileName)
+{
+    TexturePtr texture;
+    const auto& filePath = g_resources.resolvePath(fileName);
+
+    {
+        std::shared_lock l(m_mutex);
+        const auto it = m_textures.find(filePath);
+        if (it != m_textures.end()) {
+            texture = it->second;
+        }
+    }
+
+    if (!texture)
+        return;
+
+    const auto& filePathEx = g_resources.guessFilePath(filePath, "png");
+
+    std::stringstream file;
+    try {
+        g_resources.readFileStream(filePathEx, file);
+    } catch (const stdext::exception& e) {
+        g_logger.error("Unable to load texture '{}': {}", fileName, e.what());
+        return;
+    }
+
+    apng_data apng;
+    if (load_apng(file, &apng) != 0)
+        return;
+
+    const Size imageSize(apng.width, apng.height);
+    auto image = std::make_shared<Image>(imageSize, apng.bpp, apng.pdata);
+    if (!image) {
+        g_logger.error("Can't load texture: {}", filePath);
+    } else {
+        texture->loadTransparentPixels(image);
+    }
+
+    free_apng(&apng);
+}
+
 Matrix3 toMatrix(const Size& size, const bool upsideDown) {
     if (upsideDown) {
         return { 1.0f / size.width(), 0.0f,                                                  0.0f,
