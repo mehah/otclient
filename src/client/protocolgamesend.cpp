@@ -699,6 +699,24 @@ void ProtocolGame::sendShareExperience(const bool active)
     send(msg);
 }
 
+void ProtocolGame::sendPartyAnalyzerAction(const uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientPartyAnalyzerAction); // 43
+    msg->addU8(action);
+    
+    // Only add items data for PARTYANALYZERACTION_PRICEVALUE (action 3)
+    if (action == 3) { // PARTYANALYZERACTION_PRICEVALUE
+        msg->addU16(static_cast<uint16_t>(items.size()));
+        for (const auto& [itemId, price] : items) {
+            msg->addU16(itemId);
+            msg->addU64(price);
+        }
+    }
+    
+    send(msg);
+}
+
 void ProtocolGame::sendOpenOwnChannel()
 {
     const auto& msg = std::make_shared<OutputMessage>();
@@ -1261,7 +1279,7 @@ void ProtocolGame::sendTransferCoins(const std::string_view recipient, const uin
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientTransferCoins);
     msg->addString(recipient);
-    msg->addU16(amount);
+    msg->addU32(amount); // the server receive in unit32
     send(msg);
 }
 

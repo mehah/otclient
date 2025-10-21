@@ -119,7 +119,7 @@ Panel
       !tooltip: tr('Focus')
 
     SpellGroupIcon
-      id: groupIconUltimateStrike
+      id: groupIconUltimateStrikes
       image-clip: 120 0 20 20
       anchors.top: parent.top
       anchors.left: groupIconFocus.right
@@ -128,15 +128,15 @@ Panel
         image-clip: 120 20 20 20
 
     SpellProgressRect
-      id: progressRectUltimateStrike
-      anchors.fill: groupIconUltimateStrike
+      id: progressRectUltimateStrikes
+      anchors.fill: groupIconUltimateStrikes
       !tooltip: tr('Ultimate Strike')
 
     SpellGroupIcon
       id: groupIconGreatBeams
       image-clip: 140 0 20 20
       anchors.top: parent.top
-      anchors.left: groupIconUltimateStrike.right
+      anchors.left: groupIconUltimateStrikes.right
       margin-left: 3
       $on:
         image-clip: 140 20 20 20

@@ -27,10 +27,10 @@
 #include <framework/global.h>
 #include <framework/graphics/declarations.h>
 
-// Forward declaration
+ // Forward declaration
 class Color;
 
- //@bindsingleton g_window
+//@bindsingleton g_window
 class PlatformWindow
 {
     enum
@@ -81,7 +81,7 @@ public:
     // is only supported on Windows 10/11 via the DWM API. On other platforms,
     // or when not implemented in the derived class, this method does nothing.
     // Derived classes should override this method to provide platform-specific behavior.
-    virtual void setTitleBarColor(const Color& color) {}
+    virtual void setTitleBarColor(const Color& /*color*/) {}
 
     // Convenience methods for setting title bar color
     // Usage examples:
@@ -92,7 +92,7 @@ public:
     void setTitleBarColor(int r, int g, int b);
     void setTitleBarColor(float r, float g, float b);
     void setTitleBarColorRGB(uint8_t r, uint8_t g, uint8_t b);
-    
+
     virtual Size getDisplaySize() = 0;
     virtual std::string getClipboardText() = 0;
     virtual std::string getPlatformType() = 0;

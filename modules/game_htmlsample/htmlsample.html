@@ -1,0 +1,83 @@
+<link href="htmlsample.css" />
+<script type="text">
+  self.title = "HTML/CSS";
+  self.msg = "Welcome to HTML/CSS";
+</script>
+<html>
+  <window class="content" placement="center" *title="self.title">
+    <img class="shield" src="/data/images/ui/character/offhand" />
+
+    <div style="padding: 15px; text-align: center">{{self.msg}}</div>
+    <div class="form">
+      <div style="width: 70%; display: inline-block">
+        <div>
+          <label style="padding: 3">Name:</label>
+          <input type="text" *value="self.playerName" style="margin-left: 26" />
+        </div>
+        <div>
+          <label style="padding: 3">Look type:</label>
+          <input type="text" *value="self.lookType" />
+        </div>
+      </div>
+      <div style="display: inline-block">
+        <uicreature *outfit="{type = self.lookType}" />
+      </div>
+      <div>
+        <button onclick="self:addPlayer(self.playerName)">Add</button>
+      </div>
+    </div>
+    <div id="players" class="form">
+      <table style="width: 100%">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Outfit</th>
+            <th>Name</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *for="local player in self.players"
+            onclick="print('Player: '.. player.name)"
+          >
+            <td style="text-align: center; vertical-align: center">
+              {{index}}
+            </td>
+            <td>
+              <uicreature *outfit="{type = player.lookType}"></uicreature>
+            </td>
+            <td class="playerName">{{player.name}}</td>
+            <td>
+              <button
+                class="buttonRemovePlayer"
+                onclick="self:removePlayer(index)"
+              >
+                X
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top: 5">
+      <input
+        id="showEqualizerEffect"
+        type="checkbox"
+        *checked="self.showEqualizerEffect"
+      />
+      <label for="showEqualizerEffect">Show equalizer effect</label>
+    </div>
+    <div class="equalizerEffect" *visible="self.showEqualizerEffect">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="footer">
+      <button onclick="alert('HTML/CSS V.3b')">About</button>
+      <button style="float: right" onclick="self:unloadHtml()">Close</button>
+    </div>
+  </window>
+</html>

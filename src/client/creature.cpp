@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -60,7 +60,7 @@ void Creature::onCreate() {
 
 void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr& /*lightView*/)
 {
-    if (!canBeSeen() || !canDraw())
+    if (!canBeSeen() || !canDraw() || isDead())
         return;
 
     if (drawThings) {
@@ -120,21 +120,26 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
     if (!canDraw())
         return;
 
-    uint8_t frameSize = getExactSize();
-    if (size > 0)
-        frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
+    const int baseSprite = g_gameConfig.getSpriteSize();
+    const int nativeSize = g_gameConfig.isUseCropSizeForUIDraw()
+        ? getExactSize(0, 0, 0)
+        : std::max<int>(getRealSize(), getExactSize());
+    const int tileCount = 2;
+    const int fbSize = tileCount * baseSprite;
 
-    g_drawPool.bindFrameBuffer(frameSize); {
-        auto p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
-        if (center)
-            p /= 2;
+    g_drawPool.bindFrameBuffer(fbSize); {
+        Point p = center
+            ? Point((fbSize - nativeSize) / 2 + (nativeSize - baseSprite)) + getDisplacement()
+            : Point(fbSize - baseSprite) + getDisplacement();
 
         internalDraw(p);
-        if (isMarked())
-            internalDraw(p, getMarkedColor());
-        else if (isHighlighted())
-            internalDraw(p, getHighlightColor());
-    } g_drawPool.releaseFrameBuffer(destRect);
+        if (isMarked())           internalDraw(p, getMarkedColor());
+        else if (isHighlighted()) internalDraw(p, getHighlightColor());
+    }
+
+    Rect out = destRect;
+    if (size > 0) out = Rect(destRect.topLeft(), Size(size, size));
+    g_drawPool.releaseFrameBuffer(out);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, const int drawFlags)
@@ -206,23 +211,37 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     Rect healthRect = backgroundRect.expanded(-1);
     healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
+    Rect barsRect = backgroundRect;
+
     if (drawFlags & Otc::DrawBars) {
         g_drawPool.addFilledRect(backgroundRect, Color::black);
         g_drawPool.addFilledRect(healthRect, fillColor);
 
         if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
             if (const auto& player = g_game.getLocalPlayer()) {
-                backgroundRect.moveTop(backgroundRect.bottom());
+                if (player->isMage() && player->getMaxManaShield() > 0) {
+                    barsRect.moveTop(barsRect.bottom());
+                    g_drawPool.addFilledRect(barsRect, Color::black);
 
-                g_drawPool.addFilledRect(backgroundRect, Color::black);
+                    Rect manaShieldRect = barsRect.expanded(-1);
+                    const double maxManaShield = player->getMaxManaShield();
+                    manaShieldRect.setWidth((maxManaShield ? player->getManaShield() / maxManaShield : 1) * 25);
 
-                Rect manaRect = backgroundRect.expanded(-1);
+                    g_drawPool.addFilledRect(manaShieldRect, Color::darkPink);
+                }
+
+                barsRect.moveTop(barsRect.bottom());
+                g_drawPool.addFilledRect(barsRect, Color::black);
+
+                Rect manaRect = barsRect.expanded(-1);
                 const double maxMana = player->getMaxMana();
                 manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
 
                 g_drawPool.addFilledRect(manaRect, Color::blue);
             }
         }
+
+        backgroundRect = barsRect;
     }
 
     g_drawPool.setDrawOrder(DrawOrder::SECOND);
@@ -791,7 +810,7 @@ void Creature::setDirection(const Otc::Direction direction)
     setAttachedEffectDirection(static_cast<Otc::Direction>(m_numPatternX));
 }
 
-void Creature::setOutfit(const Outfit& outfit)
+void Creature::setOutfit(const Outfit& outfit, bool fireEvent)
 {
     if (m_outfit == outfit)
         return;
@@ -801,12 +820,16 @@ void Creature::setOutfit(const Outfit& outfit)
     m_outfit = outfit;
     m_numPatternZ = 0;
     m_exactSize = 0;
-    m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
+    if (m_walkingAnimationSpeed == 0) {
+        m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
+    }
 
     if (m_outfit.isInvalid())
         m_outfit.setCategory(m_outfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);
 
-    m_clientId = getThingType()->getId();
+    if (const auto thingType = getThingType())
+        m_clientId = thingType->getId();
+    else m_clientId = 0;
 
     if (m_outfit.hasMount()) {
         m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
@@ -822,7 +845,8 @@ void Creature::setOutfit(const Outfit& outfit)
     if (const auto& tile = getTile())
         tile->checkForDetachableThing();
 
-    callLuaField("onOutfitChange", m_outfit, oldOutfit);
+    if (fireEvent)
+        callLuaField("onOutfitChange", m_outfit, oldOutfit);
 }
 
 void Creature::setSpeed(uint16_t speed)
@@ -1104,15 +1128,19 @@ int Creature::getExactSize(int layer, int /*xPattern*/, int yPattern, int zPatte
 
     uint8_t exactSize = 0;
     if (m_outfit.isCreature()) {
-        const int numPatternY = getNumPatternY();
         const int layers = getLayers();
 
         zPattern = m_outfit.hasMount() ? 1 : 0;
 
-        for (yPattern = 0; yPattern < numPatternY; ++yPattern) {
-            if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
-                continue;
+        if (yPattern > 0) {
+            for (int pattern = 0; pattern < yPattern; ++pattern) {
+                if (pattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
+                    continue;
 
+                for (layer = 0; layer < layers; ++layer)
+                    exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
+            }
+        } else {
             for (layer = 0; layer < layers; ++layer)
                 exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
         }

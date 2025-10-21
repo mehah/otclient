@@ -82,12 +82,14 @@ protected:
     void cacheGraphs();
     void updateGraph(Graph& graph, bool& updated);
     void updateInfoBoxes();
+    std::string formatNumber(int value);
 
 private:
     // cache
     std::string m_minValue;
     std::string m_maxValue;
     std::string m_lastValue;
+    std::string m_avgValue;
     std::string m_title;
 
     bool m_showLabes{ true };

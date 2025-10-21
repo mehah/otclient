@@ -79,7 +79,22 @@ end
 function ItemsDatabase.setColorLootMessage(text)
     local function coloringLootName(match)
         local id, itemName = match:match("(%d+)|(.+)")
-        local itemInfo = g_things.getThingType(tonumber(id), ThingCategoryItem):getMeanPrice()
+        if not id or not itemName then
+            -- If pattern doesn't match itemId|itemName format, return the original match with braces
+            return "{" .. match .. "}"
+        end
+        
+        local itemId = tonumber(id)
+        if not itemId then
+            return itemName or match
+        end
+        
+        local thingType = g_things.getThingType(itemId, ThingCategoryItem)
+        if not thingType then
+            return itemName
+        end
+        
+        local itemInfo = thingType:getMeanPrice()
         if itemInfo then
             local color = ItemsDatabase.getColorForRarity(getColorForValue(itemInfo))
             return "{" .. itemName .. ", " .. color .. "}"

@@ -45,6 +45,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #endif
+#include <framework/html/htmlmanager.h>
 
 GraphicalApplication g_app;
 
@@ -109,6 +110,7 @@ void GraphicalApplication::terminate()
     g_particles.terminate();
 
     // destroy any remaining widget
+    g_html.terminate();
     g_ui.terminate();
 
     Application::terminate();

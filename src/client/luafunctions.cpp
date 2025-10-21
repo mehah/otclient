@@ -268,6 +268,10 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "partyPassLeadership", &Game::partyPassLeadership, &g_game);
     g_lua.bindSingletonFunction("g_game", "partyLeave", &Game::partyLeave, &g_game);
     g_lua.bindSingletonFunction("g_game", "partyShareExperience", &Game::partyShareExperience, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendPartyAnalyzerReset", &Game::sendPartyAnalyzerReset, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendPartyAnalyzerPriceType", &Game::sendPartyAnalyzerPriceType, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendPartyAnalyzerPriceValue", &Game::sendPartyAnalyzerPriceValue, &g_game);
+    
     g_lua.bindSingletonFunction("g_game", "requestOutfit", &Game::requestOutfit, &g_game);
     g_lua.bindSingletonFunction("g_game", "changeOutfit", &Game::changeOutfit, &g_game);
     g_lua.bindSingletonFunction("g_game", "addVip", &Game::addVip, &g_game);
@@ -397,6 +401,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_gameConfig", "getSpriteSize", &GameConfig::getSpriteSize, &g_gameConfig);
     g_lua.bindSingletonFunction("g_gameConfig", "isDrawingInformationByWidget", &GameConfig::isDrawingInformationByWidget, &g_gameConfig);
     g_lua.bindSingletonFunction("g_gameConfig", "isAdjustCreatureInformationBasedCropSize", &GameConfig::isAdjustCreatureInformationBasedCropSize, &g_gameConfig);
+    g_lua.bindSingletonFunction("g_gameConfig", "isUseCropSizeForUIDraw", &GameConfig::isUseCropSizeForUIDraw, &g_gameConfig);
 
     g_lua.bindSingletonFunction("g_gameConfig", "getShieldBlinkTicks", &GameConfig::getShieldBlinkTicks, &g_gameConfig);
     g_lua.bindSingletonFunction("g_gameConfig", "getCreatureNameFontName", &GameConfig::getCreatureNameFontName, &g_gameConfig);
@@ -842,6 +847,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("setExperience", &LocalPlayer::setExperience);
     g_lua.bindClassMemberFunction<LocalPlayer>("setLevel", &LocalPlayer::setLevel);
     g_lua.bindClassMemberFunction<LocalPlayer>("setMana", &LocalPlayer::setMana);
+    g_lua.bindClassMemberFunction<LocalPlayer>("setManaShield", &LocalPlayer::setManaShield);
     g_lua.bindClassMemberFunction<LocalPlayer>("setMagicLevel", &LocalPlayer::setMagicLevel);
     g_lua.bindClassMemberFunction<LocalPlayer>("setSoul", &LocalPlayer::setSoul);
     g_lua.bindClassMemberFunction<LocalPlayer>("setStamina", &LocalPlayer::setStamina);
@@ -859,6 +865,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("getLevelPercent", &LocalPlayer::getLevelPercent);
     g_lua.bindClassMemberFunction<LocalPlayer>("getMana", &LocalPlayer::getMana);
     g_lua.bindClassMemberFunction<LocalPlayer>("getMaxMana", &LocalPlayer::getMaxMana);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getManaShield", &LocalPlayer::getManaShield);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getMaxManaShield", &LocalPlayer::getMaxManaShield);
     g_lua.bindClassMemberFunction<LocalPlayer>("getMagicLevel", &LocalPlayer::getMagicLevel);
     g_lua.bindClassMemberFunction<LocalPlayer>("getMagicLevelPercent", &LocalPlayer::getMagicLevelPercent);
     g_lua.bindClassMemberFunction<LocalPlayer>("getSoul", &LocalPlayer::getSoul);
@@ -1000,6 +1008,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UICreature>("getCreatureSize", &UICreature::getCreatureSize);
     // note: check function
     g_lua.bindClassMemberFunction<UICreature>("getDirection", &UICreature::getDirection);
+    g_lua.bindClassMemberFunction<UICreature>("setDirection", &UICreature::setDirection);
     g_lua.bindClassMemberFunction<UICreature>("setCenter", &UICreature::setCenter);
     g_lua.bindClassMemberFunction<UICreature>("isCentered", &UICreature::isCentered);
 

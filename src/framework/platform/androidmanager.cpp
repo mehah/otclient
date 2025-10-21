@@ -25,6 +25,7 @@
 #include <framework/global.h>
 #include <framework/core/unzipper.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/sound/soundmanager.h>
 
 AndroidManager g_androidManager;
 
@@ -122,6 +123,10 @@ extern "C" {
 
 void Java_com_otclient_AndroidManager_nativeInit(JNIEnv* env, jobject androidManager) {
     g_androidManager.setAndroidManager(env, androidManager);
+}
+
+void Java_com_otclient_AndroidManager_nativeSetAudioEnabled(JNIEnv*, jobject, jboolean enabled) {
+    g_sounds.setAudioEnabled(enabled);
 }
 
 }

@@ -33,13 +33,15 @@ local function onGameEnd(self)
         self.events[TypeEvent.GAME_INIT] = nil
     end
 
-    local scheduledEventsList = self.scheduledEvents[TypeEvent.GAME_INIT]
+    local scheduledEventsList = self.scheduledEvents and self.scheduledEvents[TypeEvent.GAME_INIT]
     if scheduledEventsList then
         for _, eventId in pairs(scheduledEventsList) do
             removeEvent(eventId)
         end
 
-        self.scheduledEvents[TypeEvent.GAME_INIT] = nil
+        if self.scheduledEvents then
+            self.scheduledEvents[TypeEvent.GAME_INIT] = nil
+        end
     end
 
     if self.dataUI ~= nil and self.dataUI.onGameStart and self.ui then
@@ -62,11 +64,16 @@ Controller = {
     extendedOpcodes = nil,
     opcodes = nil,
     events = nil,
-    htmlRoot = nil,
+    uiEvents = nil,
+    htmlId = nil,
     keyboardAnchor = nil,
     scheduledEvents = nil,
     keyboardEvents = nil
 }
+
+if not G_CONTROLLER_CALLED then
+    G_CONTROLLER_CALLED = {}
+end
 
 function Controller:new()
     local module = g_modules.getCurrentModule()
@@ -74,6 +81,7 @@ function Controller:new()
         name = module and module:getName() or nil,
         currentTypeEvent = TypeEvent.MODULE_INIT,
         events = {},
+        uiEvents = {},
         scheduledEvents = {},
         keyboardEvents = {},
         attrs = {},
@@ -82,6 +90,11 @@ function Controller:new()
     }
     setmetatable(obj, self)
     self.__index = self
+
+    if obj.name then
+        G_CONTROLLER_CALLED[obj.name] = obj
+    end
+
     return obj
 end
 
@@ -132,14 +145,23 @@ function Controller:loadHtml(path, parent)
     end
 
     self:setUI(path, parent)
-    self.htmlRoot = HtmlLoader('/' .. self.name .. '/' .. path, parent, self)
-    self.ui = self.htmlRoot.widget
+    self.htmlId = g_html.load(self.name, path, g_ui.getRootWidget())
+    self.ui = g_html.getRootWidget(self.htmlId);
+end
+
+function Controller:unloadHtml()
+    if self.htmlId == nil then
+        error('HTML unload operation failed: no HTML was previously loaded.')
+        return
+    end
+
+    self:destroyUI()
 end
 
 function Controller:destroyUI()
-    if self.htmlRoot ~= nil then
-        self.htmlRoot.widget = nil
-        self.htmlRoot = nil
+    if self.htmlId ~= nil then
+        g_html.destroy(self.htmlId)
+        self.ui = nil
     end
 
     if self.ui then
@@ -147,33 +169,25 @@ function Controller:destroyUI()
         self.ui = nil
     end
 
-    for type, events in pairs(self.events) do
-        table.remove_if(events, function(i, event)
-            local canRemove = event:actorIsDestroyed()
-            if canRemove then
-                event:destroy() -- force destroy
-            end
-            return canRemove
-        end)
+    for _, event in pairs(self.uiEvents) do
+        event:destroy()
     end
-end
 
-function Controller:findElements(query)
-    return self.htmlRoot and self.htmlRoot:find(query:trim()) or {}
-end
-
-function Controller:findWidgets(query)
-    return self.htmlRoot and self.htmlRoot:findWidgets(query:trim()) or {}
-end
-
-function Controller:findElement(query)
-    local els = self:findElements(query)
-    return #els > 0 and els[1] or nil
+    self.uiEvents = {}
+    WidgetWatch.update() -- Prevent warnings from stale widget references in the watch list.
 end
 
 function Controller:findWidget(query)
-    local els = self:findWidgets(query)
-    return #els > 0 and els[1] or nil
+    return self.ui and self.ui:querySelector(query:trim())
+end
+
+function Controller:findWidgets(query)
+    return self.ui and self.ui:querySelectorAll(query:trim())
+end
+
+function Controller:createWidgetFromHTML(html, parent)
+    local widget = g_html.createWidgetFromHTML(html, parent, self.htmlId)
+    return widget
 end
 
 function Controller:loadUI(name, parent)
@@ -230,7 +244,7 @@ function Controller:terminate()
         end
     end
 
-    for type, events in pairs(self.scheduledEvents) do
+    for type, events in pairs(self.scheduledEvents or {}) do
         if events ~= nil then
             for _, eventId in pairs(events) do
                 removeEvent(eventId)
@@ -239,7 +253,7 @@ function Controller:terminate()
     end
 
     if self.ui ~= nil then
-        self.ui:destroy()
+        self:destroyUI()
     end
 
     self.ui = nil
@@ -251,7 +265,7 @@ function Controller:terminate()
     self.keyboardEvents = nil
     self.keyboardAnchor = nil
     self.scheduledEvents = nil
-    self.htmlRoot = nil
+    self.htmlId = nil
 
     self.__onGameStart = nil
     self.__onGameEnd = nil
@@ -273,6 +287,29 @@ function Controller:registerEvents(actor, events)
     return evt
 end
 
+function Controller:registerUIEvents(actor, events)
+    local evt = EventController:new(actor, events)
+    table.insert(self.uiEvents, evt)
+
+    -- fix html lazy loading
+    if actor and actor.isOnHtml and actor:isOnHtml() then
+        evt:connect()
+    end
+
+    return evt
+end
+
+function Controller:checkWidgetsDestroyed()
+    table.remove_if(self.uiEvents, function(i, e)
+        if e:actorIsDestroyed() then
+            e:disconnect()
+            return true
+        end
+
+        return false
+    end)
+end
+
 function Controller:registerExtendedOpcode(opcode, fnc)
     ProtocolGame.registerExtendedOpcode(opcode, fnc)
     table.insert(self.extendedOpcodes, opcode)
@@ -292,37 +329,49 @@ end
 
 local function registerScheduledEvent(controller, fncRef, fnc, delay, name)
     local currentType = controller.currentTypeEvent
+    controller.scheduledEvents = controller.scheduledEvents or {}
     if controller.scheduledEvents[currentType] == nil then
         controller.scheduledEvents[currentType] = {}
     end
 
     local _rmvEvent = function()
-        if controller.scheduledEvents[currentType][name] then
-            removeEvent(controller.scheduledEvents[currentType][name])
-            controller.scheduledEvents[currentType][name] = nil
+        if not controller.scheduledEvents then return end
+        local list = controller.scheduledEvents[currentType]
+        if not list then return end
+        if name and list[name] then
+            removeEvent(list[name])
+            list[name] = nil
         end
     end
     _rmvEvent()
 
     local evt = nil
     local action = function()
-        fnc()
+        local res = fnc()
 
         if fncRef == scheduleEvent then
             if name then
                 _rmvEvent()
             else
-                table.removevalue(controller.scheduledEvents[currentType], evt)
+                if controller.scheduledEvents and controller.scheduledEvents[currentType] then
+                    table.removevalue(controller.scheduledEvents[currentType], evt)
+                end
             end
+        elseif res == false then
+            removeEvent(evt)
         end
     end
 
     evt = fncRef(action, delay)
 
     if name then
-        controller.scheduledEvents[currentType][name] = evt
+        if controller.scheduledEvents then
+            controller.scheduledEvents[currentType][name] = evt
+        end
     else
-        table.insert(controller.scheduledEvents[currentType], evt)
+        if controller.scheduledEvents and controller.scheduledEvents[currentType] then
+            table.insert(controller.scheduledEvents[currentType], evt)
+        end
     end
 
     return evt

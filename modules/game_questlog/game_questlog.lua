@@ -155,7 +155,16 @@ local function save()
     if result:len() > 100 * 1024 * 1024 then
         return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
     end
-    g_resources.writeFileContents(file, result)
+    
+    -- Safely attempt to write the file, ignoring errors during logout
+    local writeStatus, writeError = pcall(function()
+        return g_resources.writeFileContents(file, result)
+    end)
+    
+    if not writeStatus then
+        -- Log the error but don't spam the console during normal logout
+        g_logger.debug("Could not save quest log settings during logout: " .. tostring(writeError))
+    end
 end
 
 local sortFunctions = {
@@ -1355,7 +1364,6 @@ end
 function questLogController:onInit()
     g_ui.importStyle("styles/game_questlog.otui")
     questLogController:loadHtml('game_questlog.html')
-    questLogController.ui:centerIn('parent')
     hide()
 
     UITextList.questLogList = questLogController.ui.panelQuestLog.areaPanelQuestList.questList
@@ -1364,10 +1372,10 @@ function questLogController:onInit()
     UITextList.questLogInfo:setBackgroundColor('#363636')
 
     UITextEdit.search = questLogController.ui.panelQuestLog.textEditSearchQuest
-    UIlabel.numberQuestComplete = questLogController.ui.panelQuestLog.filterPanel.lblCompleteNumber
-    UIlabel.numberQuestHidden = questLogController.ui.panelQuestLog.filterPanel.lblHiddenNumber
-    UICheckBox.showComplete = questLogController.ui.panelQuestLog.filterPanel.checkboxShowComplete
-    UICheckBox.showShidden = questLogController.ui.panelQuestLog.filterPanel.checkboxShowShidden
+    UIlabel.numberQuestComplete = questLogController:findWidget("#lblCompleteNumber")
+    UIlabel.numberQuestHidden = questLogController:findWidget("#lblHiddenNumber")
+    UICheckBox.showComplete = questLogController:findWidget("#checkboxShowComplete")
+    UICheckBox.showShidden = questLogController:findWidget("#checkboxShowHidden")
     UICheckBox.showInQuestTracker = questLogController.ui.panelQuestLineSelected.checkboxShowInQuestTracker
 
     questLogController:registerEvents(g_game, {
@@ -1430,7 +1438,7 @@ function questLogController:onGameStart()
         end
     else
         UICheckBox.showInQuestTracker:setVisible(false)
-        questLogController.ui.trackerButton:setVisible(false)
+        questLogController.ui.buttonsPanel.trackerButton:setVisible(false)
     end
 end
 
