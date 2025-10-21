@@ -275,3 +275,48 @@ void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixe
 
     glTexImage2D(GL_TEXTURE_2D, level, internalFormat, size.width(), size.height(), 0, format, GL_UNSIGNED_BYTE, pixels);
 }
+
+void Texture::loadTransparentPixels(const ImagePtr& image)
+{
+    m_transparentPixels.clear();
+
+    if (!image)
+        return;
+
+    GLenum format = 0;
+    switch (image->getBpp()) {
+        case 4:
+            format = GL_RGBA;
+            break;
+        case 3:
+            format = GL_RGB;
+            break;
+        case 2:
+            format = GL_LUMINANCE_ALPHA;
+            break;
+        case 1:
+            format = GL_LUMINANCE;
+            break;
+        default:
+            break;
+    }
+
+    if (format != GL_RGBA)
+        return;
+
+    const uint8_t* pixels = image->getPixelData();
+    const Size& size = image->getSize();
+
+    if (!pixels || size.area() <= 0)
+        return;
+
+    m_transparentPixels.assign(size.area(), 0);
+    for (int y = 0; y < size.height(); ++y) {
+        for (int x = 0; x < size.width(); ++x) {
+            const int pixelIndex = (y * size.width() + x) * 4;
+            if (pixels[pixelIndex + 3] == 0) {
+                m_transparentPixels[pixelIndex / 4] = 1;
+            }
+        }
+    }
+}
