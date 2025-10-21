@@ -149,7 +149,7 @@ function assignHotkey(button)
         end
 
         local shortCut = (keyCombo == "HalfQuote" and "'" or keyCombo)
-        display:setText(shortCut)
+        ActionBarController.ui.display:getFirstChild():setText(shortCut)
         display.combo = keyCombo
         warning:setVisible(false)
         buttonOk:setEnabled(true)
@@ -226,8 +226,6 @@ function assignHotkey(button)
 
     ui.onEnter = okFunc
     ui.onEscape = closeFunc
-
-
 end
 
 function unbindHotkey(hotkey)
