@@ -253,6 +253,13 @@ UIWidget
       image-clip: 209 209 52 52
       phantom: true
 
+      UIWidget
+        id: borderTopLeft1
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/1.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopLeft2
       anchors.top: parent.top
@@ -263,6 +270,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_2.png
       image-clip: 157 188 67 73
       phantom: true
+
+      UIWidget
+        id: borderTopLeft2
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/2.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorTopLeft3
@@ -275,6 +289,13 @@ UIWidget
       image-clip: 188 157 73 67
       phantom: true
 
+      UIWidget
+        id: borderTopLeft3
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/3.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopLeft4
       anchors.top: parent.top
@@ -285,6 +306,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_4.png
       image-clip: 105 184 65 77
       phantom: true
+
+      UIWidget
+        id: borderTopLeft4
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/4.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorTopLeft5
@@ -297,6 +325,13 @@ UIWidget
       image-clip: 127 127 81 81
       phantom: true
 
+      UIWidget
+        id: borderTopLeft5
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/5.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopLeft6
       anchors.top: parent.top
@@ -307,6 +342,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_6.png
       image-clip: 184 105 77 65
       phantom: true
+
+      UIWidget
+        id: borderTopLeft6
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/6.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorTopLeft7
@@ -319,6 +361,13 @@ UIWidget
       image-clip: 60 115 90 107
       phantom: true
 
+      UIWidget
+        id: borderTopLeft7
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/7.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopLeft8
       anchors.top: parent.top
@@ -330,6 +379,13 @@ UIWidget
       image-clip: 115 60 107 90
       phantom: true
 
+      UIWidget
+        id: borderTopLeft8
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/8.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopLeft9
       anchors.top: parent.top
@@ -340,6 +396,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_9.png
       image-clip: 12 12 196 196
       phantom: true
+
+      UIWidget
+        id: borderTopLeft9
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_left/9.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorQuadrantTopRight
@@ -357,6 +420,13 @@ UIWidget
       image-clip: 261 209 52 52
       phantom: true
 
+      UIWidget
+        id: borderTopRight1
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/1.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopRight2
       anchors.top: parent.top
@@ -367,6 +437,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_right/TopRight_2.png
       image-clip: 299 188 66 73
       phantom: true
+
+      UIWidget
+        id: borderTopRight2
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/2.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorTopRight3
@@ -379,6 +456,13 @@ UIWidget
       image-clip: 261 157 73 66
       phantom: true
 
+      UIWidget
+        id: borderTopRight3
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/3.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopRight4
       anchors.top: parent.top
@@ -389,6 +473,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_right/TopRight_4.png
       image-clip: 261 105 77 65
       phantom: true
+
+      UIWidget
+        id: borderTopRight4
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/4.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorTopRight5
@@ -401,6 +492,13 @@ UIWidget
       image-clip: 314 127 81 81
       phantom: true
 
+      UIWidget
+        id: borderTopRight5
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/5.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopRight6
       anchors.top: parent.top
@@ -411,6 +509,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_right/TopRight_6.png
       image-clip: 352 184 65 77
       phantom: true
+
+      UIWidget
+        id: borderTopRight6
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/6.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorTopRight7
@@ -423,6 +528,13 @@ UIWidget
       image-clip: 372 115 90 107
       phantom: true
 
+      UIWidget
+        id: borderTopRight7
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/7.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopRight8
       anchors.top: parent.top
@@ -434,6 +546,13 @@ UIWidget
       image-clip: 300 60 107 90
       phantom: true
 
+      UIWidget
+        id: borderTopRight8
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/8.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorTopRight9
       anchors.top: parent.top
@@ -444,6 +563,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/top_right/TopRight_9.png
       image-clip: 314 12 196 196
       phantom: true
+
+      UIWidget
+        id: borderTopRight9
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/top_right/9.png
+        visible: false
+        phantom: true
     
     UIWidget
       id: colorQuadrantBottomLeft
@@ -461,6 +587,15 @@ UIWidget
       image-clip: 209 261 52 52
       phantom: true
 
+      UIWidget
+        id: borderBottomLeft1
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/1.png
+        visible: true
+        phantom: true
+        size: 52 52
+        border: 5 red
+
     UIWidget
       id: colorBottomLeft2
       anchors.bottom: parent.bottom
@@ -471,6 +606,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_2.png
       image-clip: 157 261 67 73
       phantom: true
+
+      UIWidget
+        id: borderBottomLeft2
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/2.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorBottomLeft3
@@ -483,6 +625,13 @@ UIWidget
       image-clip: 188 298 73 67
       phantom: true
 
+      UIWidget
+        id: borderBottomLeft3
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/3.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorBottomLeft4
       anchors.bottom: parent.bottom
@@ -493,6 +642,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_4.png
       image-clip: 105 261 65 77
       phantom: true
+
+      UIWidget
+        id: borderBottomLeft4
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/4.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorBottomLeft5
@@ -505,6 +661,13 @@ UIWidget
       image-clip: 127 314 81 81
       phantom: true
 
+      UIWidget
+        id: borderBottomLeft5
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/5.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorBottomLeft6
       anchors.bottom: parent.bottom
@@ -515,6 +678,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_6.png
       image-clip: 184 352 77 65
       phantom: true
+
+      UIWidget
+        id: borderBottomLeft6
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/6.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorBottomLeft7
@@ -527,6 +697,13 @@ UIWidget
       image-clip: 60 300 90 107
       phantom: true
 
+      UIWidget
+        id: borderBottomLeft7
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/7.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorBottomLeft8
       anchors.bottom: parent.bottom
@@ -538,6 +715,13 @@ UIWidget
       image-clip: 115 372 107 90
       phantom: true
 
+      UIWidget
+        id: borderBottomLeft8
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/8.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorBottomLeft9
       anchors.bottom: parent.bottom
@@ -548,6 +732,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_9.png
       image-clip: 12 314 196 196
       phantom: true
+
+      UIWidget
+        id: borderBottomLeft9
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/9.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorQuadrantBottomRight
@@ -565,6 +756,13 @@ UIWidget
       image-clip: 261 261 52 52
       phantom: true
 
+      UIWidget
+        id: borderBottomRight1
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/1.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorBottomRight2
       anchors.bottom: parent.bottom
@@ -575,6 +773,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_2.png
       image-clip: 261 299 73 66
       phantom: true
+
+      UIWidget
+        id: borderBottomRight2
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/2.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorBottomRight3
@@ -587,6 +792,13 @@ UIWidget
       image-clip: 299 261 66 73
       phantom: true
 
+      UIWidget
+        id: borderBottomRight3
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/3.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorBottomRight4
       anchors.bottom: parent.bottom
@@ -597,6 +809,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_4.png
       image-clip: 261 352 77 65
       phantom: true
+
+      UIWidget
+        id: borderBottomRight4
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/4.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorBottomRight5
@@ -609,6 +828,13 @@ UIWidget
       image-clip: 314 314 81 81
       phantom: true
 
+      UIWidget
+        id: borderBottomRight5
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/5.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorBottomRight6
       anchors.bottom: parent.bottom
@@ -619,6 +845,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_6.png
       image-clip: 352 261 65 77
       phantom: true
+
+      UIWidget
+        id: borderBottomRight6
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/6.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorBottomRight7
@@ -631,6 +864,13 @@ UIWidget
       image-clip: 300 372 107 90
       phantom: true
 
+      UIWidget
+        id: borderBottomRight7
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/7.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: colorBottomRight8
       anchors.bottom: parent.bottom
@@ -641,6 +881,13 @@ UIWidget
       image-source: /images/game/wheel/wheel-colors/bottom_right/BottonRight_8.png
       image-clip: 372 300 90 107
       phantom: true
+
+      UIWidget
+        id: borderBottomRight8
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/8.png
+        visible: false
+        phantom: true
 
     UIWidget
       id: colorBottomRight9
@@ -653,35 +900,47 @@ UIWidget
       image-clip: 314 314 196 196
       phantom: true
 
+      UIWidget
+        id: borderBottomRight9
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_right/9.png
+        visible: false
+        phantom: true
+
     UIWidget
       id: largeBonusTL
       anchors.top: parent.top
       anchors.left: parent.left
       image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png
-        
-    UIWidget  
-      id: largeBonusTR  
-      anchors.top: parent.top  
-      anchors.right: parent.right  
-      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png  
-        
-    UIWidget  
-      id: largeBonusBL  
-      anchors.bottom: parent.bottom  
-      anchors.left: parent.left  
-      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png  
-        
-    UIWidget  
-      id: largeBonusBR  
-      anchors.bottom: parent.bottom  
-      anchors.right: parent.right  
-      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png  
-        
-  UIWidget  
-    id: vocationOverlay  
-    anchors.centerIn: parent  
-    size: 522 522  
+      phantom: true
+
+    UIWidget
+      id: largeBonusTR
+      anchors.top: parent.top
+      anchors.right: parent.right
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png
+      phantom: true
+
+    UIWidget
+      id: largeBonusBL
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png
+      phantom: true
+
+    UIWidget
+      id: largeBonusBR
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png
+      phantom: true
+
+  UIWidget
+    id: vocationOverlay
+    anchors.centerIn: parent
+    size: 522 522
     visible: false
+    phantom: true
 
   UICheckBox  
     id: summaryButton    
