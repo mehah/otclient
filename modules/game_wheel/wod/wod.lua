@@ -436,6 +436,8 @@ function WheelOfDestiny.show(container)
     UIConfigurator.setupVocationInformation(wodUI, basicVocation)
     UIConfigurator.resetQuadrantSlices(wodUI, TOP_LEFT)
     UIConfigurator.resetQuadrantSlices(wodUI, TOP_RIGHT)
+    UIConfigurator.resetQuadrantSlices(wodUI, BOTTOM_LEFT)
+    UIConfigurator.resetQuadrantSlices(wodUI, BOTTOM_RIGHT)
 
     -- Conectar ambos os botões summary
     local summaryButton = wodUI:getChildById('summaryButton')
