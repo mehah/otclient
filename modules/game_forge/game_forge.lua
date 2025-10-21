@@ -241,27 +241,42 @@ function ForgeController:resultSystemEvent()
         return
     end
 
-    -- TODO: waiting mehah check this arrows animations
     if ForgeController.result.eventCount == 1 then
-        -- ForgeController.result.arrows[1] = filledRightArrow
-        -- ForgeController.result.arrows[2] = rightArrow
-        -- ForgeController.result.arrows[3] = rightArrow
+        ForgeController.result.arrows = {
+            { arrow = helpers.filledRightArrow, },
+            { arrow = helpers.rightArrow, },
+            { arrow = helpers.rightArrow, }
+        }
     elseif ForgeController.result.eventCount == 2 then
-        -- ForgeController.result.arrows[1] = filledRightArrow
-        -- ForgeController.result.arrows[2] = filledRightArrow
-        -- ForgeController.result.arrows[3] = rightArrow
+        ForgeController.result.arrows = {
+            { arrow = helpers.filledRightArrow, },
+            { arrow = helpers.filledRightArrow, },
+            { arrow = helpers.rightArrow, }
+        }
     elseif ForgeController.result.eventCount == 3 then
-        -- ForgeController.result.arrows[1] = rightArrow
-        -- ForgeController.result.arrows[2] = filledRightArrow
-        -- ForgeController.result.arrows[3] = filledRightArrow
+        ForgeController.result.arrows = {
+            { arrow = helpers.filledRightArrow, },
+            { arrow = helpers.filledRightArrow, },
+            { arrow = helpers.filledRightArrow, }
+        }
     elseif ForgeController.result.eventCount == 4 then
-        -- ForgeController.result.arrows[1] = rightArrow
-        -- ForgeController.result.arrows[2] = rightArrow
-        -- ForgeController.result.arrows[3] = filledRightArrow
+        ForgeController.result.arrows = {
+            { arrow = helpers.rightArrow, },
+            { arrow = helpers.filledRightArrow, },
+            { arrow = helpers.filledRightArrow, }
+        }
     elseif ForgeController.result.eventCount == 5 then
-        -- ForgeController.result.arrows[1] = filledRightArrow
-        -- ForgeController.result.arrows[2] = filledRightArrow
-        -- ForgeController.result.arrows[3] = filledRightArrow
+        ForgeController.result.arrows = {
+            { arrow = helpers.rightArrow, },
+            { arrow = helpers.rightArrow, },
+            { arrow = helpers.filledRightArrow, }
+        }
+    elseif ForgeController.result.eventCount == 6 then
+        ForgeController.result.arrows = {
+            { arrow = helpers.rightArrow, },
+            { arrow = helpers.rightArrow, },
+            { arrow = helpers.rightArrow, }
+        }
         if (ForgeController.result.bonus or 0) > 0 then
             ForgeController.result.buttonLabel = "Next"
         end
@@ -306,9 +321,7 @@ function forgeResultData(rawData)
             ForgeController.result[key] = value
         end
     end
-    -- for k, v in pairs(ForgeController.result) do
-    --     g_logger.info("result data: " .. k .. " = " .. tostring(v))
-    -- end
+
     if ForgeController.result.leftTier > 0 then
         ForgeController.result.leftClip = ItemsDatabase.getTierClip(ForgeController.result.leftTier)
     end
@@ -318,9 +331,9 @@ function forgeResultData(rawData)
     end
 
     ForgeController.result.arrows = {
-        rightArrow,
-        rightArrow,
-        rightArrow,
+        { arrow = helpers.filledRightArrow, },
+        { arrow = helpers.rightArrow, },
+        { arrow = helpers.rightArrow, }
     }
     ForgeController.result.buttonLabel = "Close"
     ForgeController.result.bonusLabel = "-"
@@ -373,9 +386,9 @@ function forgeResultData(rawData)
         ForgeController.result.bonusAction = function()
             ForgeController.showResult = false
             ForgeController.showBonus = true
-            ForgeController.result.button = "Close"
 
             scheduleEvent(function()
+                ForgeController.result.button = "Close"
                 ForgeController.result.bonusAction = function()
                     ForgeController:closeResult()
                 end

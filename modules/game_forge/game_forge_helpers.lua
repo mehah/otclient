@@ -82,9 +82,9 @@ Helpers.baseResult = {
     bonusLabel = "",
     bonusAction = nil,
     arrows = {
-        Helpers.rightArrow,
-        Helpers.rightArrow,
-        Helpers.rightArrow,
+        { arrow = Helpers.rightArrow, },
+        { arrow = Helpers.filledRightArrow, },
+        { arrow = Helpers.rightArrow, }
     },
     buttonLabel = "Close"
 }
