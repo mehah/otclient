@@ -15,7 +15,6 @@ function controllerModal:onInit()
 end
 
 function controllerModal:onTerminate()
-
 end
 
 function controllerModal:onGameEnd()
@@ -40,7 +39,8 @@ end
 local function calculateAndSetWidth(ui, messageLabel, buttonsWidth, message)
     local horizontalPadding = ui:getPaddingLeft() + ui:getPaddingRight()
     local totalButtonsWidth = buttonsWidth + horizontalPadding
-    local calculatedWidth = math.max(totalButtonsWidth,  g_game.getFeature(GameEnterGameShowAppearance) and MINIMUM_WIDTH_OLD or MINIMUM_WIDTH_QT)
+    local calculatedWidth = math.max(totalButtonsWidth, g_game.getFeature(GameEnterGameShowAppearance) and
+        MINIMUM_WIDTH_OLD or MINIMUM_WIDTH_QT)
     if calculatedWidth > MAXIMUM_WIDTH then
         calculatedWidth = MAXIMUM_WIDTH
     end
@@ -64,7 +64,7 @@ end
 local function applyFinalHeight(ui, messageLabel, additionalHeight)
     local finalHeight = BASE_HEIGHT + additionalHeight + messageLabel:getHeight()
     ui:setHeight(finalHeight)
-    controllerModal:findWidget('#choiceList'):setWidth(ui:getWidth() * 0.9) --html not work 100%
+    controllerModal:findWidget('#choiceList'):setWidth(ui:getWidth() * 0.9) -- html not work 100%
 end
 
 function onModalDialog(id, title, message, buttons, enterButton, escapeButton, choices, priority)
@@ -95,7 +95,6 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton, c
             if choiceWidget then
                 choiceWidget.choiceId = choiceId
                 choiceWidget.choiceIndex = i
-                
                 if #choiceName > MAX_CHOICE_TEXT then
                     choiceWidget:setTooltip(choiceName)
                 end
@@ -129,7 +128,7 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton, c
         local buttonText = buttons[i][2]
         local buttonHtml = string.format('<button class="modal-button">%s</button>', buttonText)
         local button = controllerModal:createWidgetFromHTML(buttonHtml, buttonsPanel)
-        
+
         if button then
             button.onClick = createButtonHandler(id, buttonId, choiceList)
             buttonsWidth = buttonsWidth + button:getWidth() + button:getMarginLeft() + button:getMarginRight()
