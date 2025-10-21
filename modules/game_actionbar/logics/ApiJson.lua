@@ -430,6 +430,66 @@ local function isCustomAction(data)
     return not data["actionsetting"] or not data["actionsetting"]["action"]
 end
 
+local function isHotkeyConflicting(keyCombo)
+    if not keyCombo or keyCombo == "" then
+        return false
+    end
+    if modules.game_hotkeys and modules.game_hotkeys.isHotkeyUsedByManager then
+        if modules.game_hotkeys.isHotkeyUsedByManager(keyCombo) then
+            return true
+        end
+    end
+    if Keybind and Keybind.isKeyComboUsed then
+        if Keybind.isKeyComboUsed(keyCombo, nil, nil, CHAT_MODE.ON) then
+            return true
+        end
+        if Keybind.isKeyComboUsed(keyCombo, nil, nil, CHAT_MODE.OFF) then
+            return true
+        end
+    end
+    return false
+end
+
+local function removeConflictingDefaultHotkeys(defaultData)
+    if not defaultData or not defaultData.hotkeyOptions or not defaultData.hotkeyOptions.hotkeySets then
+        return defaultData
+    end
+    local hotkeySets = defaultData.hotkeyOptions.hotkeySets
+    for profileName, profile in pairs(hotkeySets) do
+        if profile.chatOff then
+            local filtered = {}
+            for _, entry in ipairs(profile.chatOff) do
+                if entry.keysequence then
+                    if not isHotkeyConflicting(entry.keysequence) then
+                        table.insert(filtered, entry)
+                    else
+                        g_logger.info(string.format("[ActionBar] Skipping default hotkey '%s' for profile '%s' (chatOff) - already in use", entry.keysequence, profileName))
+                    end
+                else
+                    table.insert(filtered, entry)
+                end
+            end
+            profile.chatOff = filtered
+        end
+        if profile.chatOn then
+            local filtered = {}
+            for _, entry in ipairs(profile.chatOn) do
+                if entry.keysequence then
+                    if not isHotkeyConflicting(entry.keysequence) then
+                        table.insert(filtered, entry)
+                    else
+                        g_logger.info(string.format("[ActionBar] Skipping default hotkey '%s' for profile '%s' (chatOn) - already in use", entry.keysequence, profileName))
+                    end
+                else
+                    table.insert(filtered, entry)
+                end
+            end
+            profile.chatOn = filtered
+        end
+    end
+    return defaultData
+end
+
 function ApiJson.loadData(file)
     local result = readJsonFile(file)
     if not result then
@@ -476,7 +536,12 @@ function ApiJson.createDefaultSettings()
         g_resources.makeDir("/settings/")
     end
 
-    if ApiJson.loadData(DEFAULT_OPTIONS_FILE) then
+    local defaultData = readJsonFile(DEFAULT_OPTIONS_FILE)
+    if defaultData then
+        defaultData = removeConflictingDefaultHotkeys(defaultData)
+        state.array = sanitizeTopLevelArray(defaultData)
+        state.actionBarMappingsIndex = nil
+        state.bootstrapComplete = false
         ApiJson.saveData()
     end
 end

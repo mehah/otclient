@@ -38,6 +38,7 @@ local function isHotkeyUsed(key, secondary)
     local chatMode = modules.game_console.isChatEnabled() and 'chatOn' or 'chatOff'
     return isHotkeyUsedInternal(key, chatMode, secondary)
 end
+
 local function manageKeyPress(window, keyCode, keyboardModifiers, keyText)
     local keyCombo = determineKeyComboDesc(keyCode, keyboardModifiers, keyText)
     local resetCombo = {"Shift", "Ctrl", "Alt"}
@@ -65,6 +66,65 @@ local function manageKeyPress(window, keyCode, keyboardModifiers, keyText)
         window.buttonOk:setEnabled(false)
     end
     return true
+end
+
+-- check game_hotkeys
+local function isHotkeyUsedByGameHotkeys(keyCombo)
+    if not keyCombo or keyCombo == "" then
+        return false
+    end
+
+    if modules.game_hotkeys and modules.game_hotkeys.isHotkeyUsedByManager then
+        return modules.game_hotkeys.isHotkeyUsedByManager(keyCombo)
+    end
+
+    return false
+end
+
+local function removeHotkeyFromGameHotkeys(keyCombo)
+    if not keyCombo or keyCombo == "" then
+        return false
+    end
+
+    if modules.game_hotkeys and modules.game_hotkeys.removeHotkeyByCombo then
+        return modules.game_hotkeys.removeHotkeyByCombo(keyCombo)
+    end
+
+    return false
+end
+
+-- check keybind
+local function isHotkeyUsedByKeybinds(keyCombo)
+    if not keyCombo or keyCombo == "" then
+        return false
+    end
+
+    -- Verificar con el módulo Keybind si la tecla está en uso
+    if Keybind and Keybind.isKeyComboUsed then
+        -- Verificar en ambos modos de chat
+        if Keybind.isKeyComboUsed(keyCombo, nil, nil, CHAT_MODE.ON) then
+            return true
+        end
+        if Keybind.isKeyComboUsed(keyCombo, nil, nil, CHAT_MODE.OFF) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function removeHotkeyFromActionBar(keyCombo)
+    if not keyCombo or keyCombo == "" then
+        return false
+    end
+    local button = getUsedHotkeyButton(keyCombo)
+    if button then
+        ApiJson.removeHotkey(button:getId())
+        unbindHotkey(keyCombo)
+        updateButton(button)
+        return true
+    end
+    return false
 end
 -- /*=============================================
 -- =            Windows hotkeys html             =
@@ -149,15 +209,32 @@ function assignHotkey(button)
         end
 
         local shortCut = (keyCombo == "HalfQuote" and "'" or keyCombo)
-        ActionBarController.ui.display:getFirstChild():setText(shortCut)
+        local fixbugHtmlSystem = ActionBarController.ui.display:getFirstChild()
+        if fixbugHtmlSystem then
+            fixbugHtmlSystem:setText(shortCut) -- Temp
+        end
         display.combo = keyCombo
         warning:setVisible(false)
         buttonOk:setEnabled(true)
         if isHotkeyUsed(keyCombo) then
             warning:setVisible(true)
-            warning:setText("This hotkey is already in use and will be overwritten.")
+            warning:setText("This hotkey is already in use in Action Bar and will be overwritten.")
         end
 
+        -- check game_hotkeys
+        if isHotkeyUsedByGameHotkeys(keyCombo) then
+            warning:setVisible(true)
+            warning:setText("This hotkey is already in use in Hotkeys Manager and will be overwritten.")
+        end
+
+        -- check keybinds
+        if isHotkeyUsedByKeybinds(keyCombo) then
+            warning:setVisible(true)
+            warning:setText("This hotkey is already in use in Keybinds and will be overwritten.")
+            print("Hotkey used in Keybinds: " .. keyCombo)
+            buttonOk:disable()
+            return true
+        end
         if table.contains(blockedKeys, keyCombo) then
             warning:setVisible(true)
             warning:setText("This hotkey is already in use and cannot be overwritten.")
@@ -182,7 +259,9 @@ function assignHotkey(button)
         end
 
         ApiJson.clearHotkey(hotkey)
-
+       if isHotkeyUsedByGameHotkeys(hotkey) then
+            removeHotkeyFromGameHotkeys(hotkey)
+        end
         local usedButton = getUsedHotkeyButton(hotkey)
         if usedButton then
             ApiJson.removeHotkey(usedButton:getId())
@@ -237,3 +316,5 @@ function unbindHotkey(hotkey)
     g_keyboard.unbindKeyDown(hotkey, nil, gameRootPanel)
     g_keyboard.unbindKeyUp(hotkey, nil, gameRootPanel)
 end
+
+
