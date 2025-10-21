@@ -251,14 +251,15 @@ UIWidget
       margin-left: 209
       image-source: /images/game/wheel/wheel-colors/top_left/TopLeft_1.png
       image-clip: 209 209 52 52
-      phantom: true
+      phantom: false
 
-      UIWidget
-        id: borderTopLeft1
-        anchors.fill: parent
-        image-source: /images/game/wheel/wheel-border/top_left/1.png
-        visible: false
-        phantom: true
+    UIWidget
+      id: borderTopLeft1
+      anchors.fill: parent
+      image-source: /images/game/wheel/wheel-border/top_left/1.png
+      visible: true
+      phantom: false
+      size: 522 522
 
     UIWidget
       id: colorTopLeft2

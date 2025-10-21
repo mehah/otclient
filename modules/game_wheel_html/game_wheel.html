@@ -1,0 +1,175 @@
+<html>
+  <style>
+    .tabs {
+      height: 34px;
+    }
+    .tabs-img {
+      width: 322px;
+      height: 34px;
+      display: inline-block;
+    }
+    .content {
+      height: 580px;
+      width: 100%;
+      margin-top: 8px;
+      border: 1px red;
+    }
+    .footer {
+      height: 20px;
+      background-color: lightblue;
+      width: 997px;
+    }
+
+    .footer-left {
+      display: inline-block;
+      width: 600px;
+      align-items: center;
+    }
+    .footer-left > div {
+      align-items: center;
+      display: inline-block;
+      margin-right: 4px;
+      width: 130px;
+      height: 20px;
+    }
+    .footer-left > div > p {
+      height: 20px;
+      --image-source: "/modules/game_wheel_html/images/balanceBg.png";
+      --image-size: 130 20;
+      align-items: center;
+      background-color: black;
+      height: 20px;
+    }
+
+    .footer-right {
+      display: inline-block;
+      width: 397px;
+    }
+    .footer-right > button {
+      display: inline-block;
+      margin-right: 4px;
+    }
+    button {
+      padding: 3px 10px !important;
+      float: right;
+    }
+    button:pressed {
+      padding: 3px 10px !important;
+    }
+
+    .panel-container {
+      width: 100%;
+      height: 100%;
+    }
+    .panel {
+      border: 1px red;
+      width: 213px;
+      height: 100px;
+      display: inline-block;
+    }
+    .panel-center {
+      width: 522px;
+      border: 1px blue;
+      height: 100%;
+      display: inline-block;
+      margin-left: 9px;
+      margin-right: 9px;
+    }
+    .backdrop-wheel {
+      --image-source: "/images/game/wheel/backdrop_skillwheel.png";
+      --image-size: 522 522;
+      width: 522px;
+      height: 522px;
+      text-align: center;
+      border: 1px red;
+      position: relative;
+    }
+    .backdrop-wheel-vocation-overlay {
+      width: 522px;
+      height: 522px;
+      text-align: center;
+    }
+    .wheel-center {
+      height: 2px;
+      width: 2px;
+      background-color: red;
+      position: absolute;
+      top: 261px;
+      left: 261px;
+    }
+    .wheel-center-cells {
+      position: absolute;
+    }
+  </style>
+  <window
+    placement="center"
+    title="Wheel of Destiny"
+    onescape="self:hide()"
+    style="height: 654px; width: 997px; border: 1px yellow"
+  >
+    <div>
+      <img
+        class="tabs-img"
+        src="/images/game/wheel/wheelMenu.png"
+        *image-clip="self.wheel.clip"
+        onclick="self:toggleMenu('wheel')"
+      />
+      <img
+        class="tabs-img"
+        src="/images/game/wheel/gemMenu.png"
+        *image-clip="self.gem.clip"
+        onclick="self:toggleMenu('gem')"
+      />
+      <img
+        class="tabs-img"
+        src="/images/game/wheel/fragmentMenu.png"
+        *image-clip="self.fragment.clip"
+        onclick="self:toggleMenu('fragment')"
+      />
+    </div>
+
+    <div class="content">
+      <div *if="self.currentTab == 'wheel'">
+        <div class="panel-container">
+          <div class="panel">panel left</div>
+          <div class="panel-center">
+            <div class="backdrop-wheel">
+              <img
+                *image-source="self.wheel.backdropVocationOverlay"
+                class="backdrop-wheel-vocation-overlay"
+                height="522"
+                width="522"
+              />
+
+              <img
+                *for="local border in self.wheel.borders"
+                class="wheel-center-cells"
+                *image-source="border.path"
+                *opacity="border.selected and 1 or 0"
+                *height="border.height"
+                *width="border.width"
+                onclick="self.wheel:handleSelectBorder(border.id)"
+              />
+            </div>
+          </div>
+          <div class="panel">panel right</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer" placement="bottom-left">
+      <div class="footer-left">
+        <div><p class="footer-texts">gold</p></div>
+        <div><p class="footer-texts">lesser fragments</p></div>
+        <div><p class="footer-texts">greater fragments</p></div>
+        <span>i<span>Current Preset: Default-Preset</span></span>
+      </div>
+
+      <div class="footer-right">
+        <button>Close</button>
+        <button>Reset</button>
+        <button>Apply</button>
+        <button>Ok</button>
+      </div>
+    </div>
+  </window>
+</html>
