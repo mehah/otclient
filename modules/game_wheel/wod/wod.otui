@@ -448,18 +448,29 @@ UIWidget
     UIWidget
       id: colorQuadrantBottomLeft
       anchors.fill: parent
-      phantom: true
+      phantom: false
 
     UIWidget
-      id: colorBottomLeft1
-      anchors.bottom: parent.bottom
-      anchors.left: parent.left
-      size: 52 52
-      margin-bottom: 209
-      margin-left: 209
-      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_1.png
-      image-clip: 209 261 52 52
-      phantom: true
+      id: colorBottomLeft1  
+      anchors.bottom: parent.bottom  
+      anchors.left: parent.left  
+      size: 52 52  
+      margin-bottom: 209  
+      margin-left: 209  
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_1.png  
+      image-clip: 209 261 52 52  
+      phantom: false  
+      focusable: false
+      image-draw-order: 0
+
+      UIWidget  
+        id: borderBottomLeft1  
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/1.png
+        image-clip: 209 261 52 52
+        visible: false
+        phantom: true
+        image-draw-order: 1
 
     UIWidget
       id: colorBottomLeft2
@@ -552,7 +563,7 @@ UIWidget
     UIWidget
       id: colorQuadrantBottomRight
       anchors.fill: parent
-      phantom: true
+      phantom: false
 
     UIWidget
       id: colorBottomRight1
@@ -658,30 +669,35 @@ UIWidget
       anchors.top: parent.top
       anchors.left: parent.left
       image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png
+      phantom: true
         
     UIWidget  
       id: largeBonusTR  
       anchors.top: parent.top  
       anchors.right: parent.right  
-      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png
+      phantom: true 
         
     UIWidget  
       id: largeBonusBL  
       anchors.bottom: parent.bottom  
       anchors.left: parent.left  
-      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png
+      phantom: true  
         
     UIWidget  
       id: largeBonusBR  
       anchors.bottom: parent.bottom  
       anchors.right: parent.right  
-      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png
+      phantom: true  
         
   UIWidget  
     id: vocationOverlay  
     anchors.centerIn: parent  
     size: 522 522  
     visible: false
+    phantom: true
 
   UICheckBox  
     id: summaryButton    

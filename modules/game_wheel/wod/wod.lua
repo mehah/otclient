@@ -438,6 +438,8 @@ function WheelOfDestiny.show(container)
     UIConfigurator.resetQuadrantSlices(wodUI, TOP_RIGHT)
     UIConfigurator.resetQuadrantSlices(wodUI, BOTTOM_LEFT)
     UIConfigurator.resetQuadrantSlices(wodUI, BOTTOM_RIGHT)
+    
+    WheelOfDestiny.setupSlotClickHandlers(wodUI)
 
     -- Conectar ambos os botões summary
     local summaryButton = wodUI:getChildById('summaryButton')
@@ -454,6 +456,59 @@ function WheelOfDestiny.show(container)
             onCheckChange = WheelOfDestiny.toggleSummaryPanel
         })
     end
+end
+
+local selectedSlots = {}  
+  
+local function toggleSlotBorder(slotWidget, quadrantKey, slotIndex)  
+    print("toggleSlotBorder called for " .. quadrantKey .. slotIndex)  
+      
+    local borderId = string.format('border%s%d', quadrantKey, slotIndex)  
+    local borderWidget = slotWidget:getChildById(borderId)  
+      
+    if not borderWidget then   
+        print("ERROR: Border widget not found: " .. borderId)  
+        return   
+    end  
+      
+    print("Border widget found!")  
+      
+    local slotKey = quadrantKey .. slotIndex  
+    local isSelected = selectedSlots[slotKey] or false  
+      
+    selectedSlots[slotKey] = not isSelected  
+    borderWidget:setVisible(not isSelected)  
+      
+    if not isSelected then  
+        borderWidget:raise() 
+    end  
+      
+    print("Border visibility set to: " .. tostring(not isSelected))  
+end
+  
+function WheelOfDestiny.setupSlotClickHandlers(ui)  
+    print("Setting up slot click handlers...")  
+      
+    local slot = ui:recursiveGetChildById('colorBottomLeft1')  
+    if not slot then  
+        print("ERROR: Slot colorBottomLeft1 not found")  
+        return  
+    end  
+      
+    print("Slot colorBottomLeft1 found, connecting event...")  
+      
+    connect(slot, {  
+        onMousePress = function(widget, mousePos, mouseButton)  
+            print("Mouse pressed on colorBottomLeft1! Button: " .. tostring(mouseButton))  
+            if mouseButton == MouseLeftButton then  
+                toggleSlotBorder(widget, 'BottomLeft', 1)  
+                return true  
+            end  
+            return false  
+        end  
+    })  
+      
+    print("Event connected successfully")  
 end
 
 -- Function to check if can access the wheel
