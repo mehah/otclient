@@ -109,7 +109,6 @@ function assignSpell(button)
             if selected:getText():lower():find("levitate") then
                 paramText:setText("up|down")
             end
-            spellList:ensureChildVisible(widget)
         end
     end
     if #widgets > 0 and not button.cache.spellData then
