@@ -463,7 +463,9 @@ local function removeConflictingDefaultHotkeys(defaultData)
                     if not isHotkeyConflicting(entry.keysequence) then
                         table.insert(filtered, entry)
                     else
-                        g_logger.info(string.format("[ActionBar] Skipping default hotkey '%s' for profile '%s' (chatOff) - already in use", entry.keysequence, profileName))
+                        g_logger.debug(string.format(
+                            "[ActionBar] Skipping default hotkey '%s' for profile '%s' (chatOff) - already in use",
+                            entry.keysequence, profileName))
                     end
                 else
                     table.insert(filtered, entry)
@@ -478,7 +480,9 @@ local function removeConflictingDefaultHotkeys(defaultData)
                     if not isHotkeyConflicting(entry.keysequence) then
                         table.insert(filtered, entry)
                     else
-                        g_logger.info(string.format("[ActionBar] Skipping default hotkey '%s' for profile '%s' (chatOn) - already in use", entry.keysequence, profileName))
+                        g_logger.debug(string.format(
+                            "[ActionBar] Skipping default hotkey '%s' for profile '%s' (chatOn) - already in use",
+                            entry.keysequence, profileName))
                     end
                 else
                     table.insert(filtered, entry)
@@ -660,7 +664,8 @@ function ApiJson.removeHotkey(buttonId)
         return
     end
 
-    local entries = getCurrentHotkeyEntries()
+    local chatMode = modules.game_console.isChatEnabled() and 'chatOn' or 'chatOff'
+    local entries = getCurrentHotkeyEntries(chatMode)
     if not entries then
         return
     end
@@ -679,7 +684,8 @@ function ApiJson.clearHotkey(hotkey)
         return
     end
 
-    local entries = getCurrentHotkeyEntries()
+    local chatMode = modules.game_console.isChatEnabled() and 'chatOn' or 'chatOff'
+    local entries = getCurrentHotkeyEntries(chatMode)
     if not entries then
         return
     end
@@ -704,7 +710,8 @@ function ApiJson.updateActionBarHotkey(actionName, hotkey)
         return
     end
 
-    local entries = getCurrentHotkeyEntries()
+    local chatMode = modules.game_console.isChatEnabled() and 'chatOn' or 'chatOff'
+    local entries = getCurrentHotkeyEntries(chatMode)
     if not entries then
         return
     end

@@ -99,9 +99,7 @@ local function isHotkeyUsedByKeybinds(keyCombo)
         return false
     end
 
-    -- Verificar con el módulo Keybind si la tecla está en uso
     if Keybind and Keybind.isKeyComboUsed then
-        -- Verificar en ambos modos de chat
         if Keybind.isKeyComboUsed(keyCombo, nil, nil, CHAT_MODE.ON) then
             return true
         end
@@ -171,13 +169,13 @@ function assignHotkey(button)
     barDesc = barDesc .. " Action Bar: Action Button " .. button:getId()
     ui:setTitle('Edit Hotkey for "' .. barDesc .. '"')
 
-    local chatMode = ui:querySelector("#chatMode")
-    local display = ui:querySelector("#display")
-    local desc = ui:querySelector("#desc")
-    local warning = ui:querySelector("#warning")
-    local buttonOk = ui:querySelector("#buttonOk")
-    local buttonClear = ui:querySelector("#buttonClear")
-    local buttonClose = ui:querySelector("#buttonClose")
+    local chatMode = ActionBarController:findWidget("#chatMode")
+    local display = ActionBarController:findWidget("#display")
+    local desc = ActionBarController:findWidget("#desc")
+    local warning = ActionBarController:findWidget("#warning")
+    local buttonOk = ActionBarController:findWidget("#buttonOk")
+    local buttonClear = ActionBarController:findWidget("#buttonClear")
+    local buttonClose = ActionBarController:findWidget("#buttonClose")
 
     desc:setText('Click "Ok" to assign the hotkey. Click "Clear" to remove the hotkey from "' .. barDesc .. '".')
 
@@ -213,6 +211,7 @@ function assignHotkey(button)
         if fixbugHtmlSystem then
             fixbugHtmlSystem:setText(shortCut) -- Temp
         end
+        display:setText(shortCut)
         display.combo = keyCombo
         warning:setVisible(false)
         buttonOk:setEnabled(true)
@@ -231,7 +230,6 @@ function assignHotkey(button)
         if isHotkeyUsedByKeybinds(keyCombo) then
             warning:setVisible(true)
             warning:setText("This hotkey is already in use in Keybinds and will be overwritten.")
-            print("Hotkey used in Keybinds: " .. keyCombo)
             buttonOk:disable()
             return true
         end
