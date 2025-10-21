@@ -3350,16 +3350,21 @@ void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
 void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 {
     const uint16_t size = msg->getU16();
+    constexpr uint16_t MAX_INVENTORY_TYPES = 10000;
+    if (size > MAX_INVENTORY_TYPES) {
+        g_logger.warning("[game_actionBar][parsePlayerInventory]: inventory size {} exceeds maximum allowed {}", size, MAX_INVENTORY_TYPES);
+        return;
+    }
     std::map<std::pair<uint16_t, uint8_t>, uint16_t> inventoryCounts;
 
-    for (auto i = 0; i < size; ++i) {
+    for (uint16_t i = 0; std::cmp_less(i, size); ++i) {
         const uint16_t itemId = msg->getU16();
         const uint8_t attribute = msg->getU8();
         const uint16_t amount = msg->getU16();
 
         uint8_t tier = 0;
         if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem)) {
-            if (thingType->getClassification() > 0) {
+            if (std::cmp_greater(thingType->getClassification(), 0)) {
                 tier = attribute;
             }
         }

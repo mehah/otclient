@@ -475,22 +475,21 @@ bool LocalPlayer::hasEquippedItemId(const uint16_t itemId, const uint8_t tier)
 
 uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tier)
 {
-    if (itemId == 0)
+    if (std::cmp_equal(itemId, 0))
         return 0;
+
+    const auto key = std::make_pair(itemId, tier);
+    const auto it = m_inventoryCountCache.find(key);
+    if (it != m_inventoryCountCache.end()) {
+        return it->second;
+    }
 
     uint32_t total = 0;
 
     const auto accumulate = [&](const ItemPtr& item) {
-        if (!item)
-            return;
-
-        if (item->getId() != itemId)
-            return;
-
-        if (item->getTier() != tier)
-            return;
-
-        total += item->getCount();
+        if (item && std::cmp_equal(item->getId(), itemId) && item->getTier() == tier) {
+            total += item->getCount();
+        }
     };
 
     for (const auto& item : m_inventoryItems)
@@ -504,13 +503,6 @@ uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tie
             accumulate(item);
     }
 
-    const auto key = std::make_pair(itemId, tier);
-    const auto it = m_inventoryCountCache.find(key);
-    if (it != m_inventoryCountCache.end()) {
-        if (it->second > total) {
-            total = it->second;
-        }
-    }
     constexpr uint32_t maxUint16 = 65535;
     if (total > maxUint16) {
         total = maxUint16;
