@@ -104,17 +104,17 @@ std::string LoginHttp::getSession() { return this->session; }
 
 void LoginHttp::httpLogin(const std::string& host, const std::string& path,
                           uint16_t port, const std::string& email,
-                          const std::string& password, int request_id,
-                          bool httpLogin) {
+                          const std::string& password, const std::string& token,
+                          int request_id, bool httpLogin) {
 #ifndef __EMSCRIPTEN__
     g_asyncDispatcher.detach_task(
-        [this, host, path, port, email, password, request_id, httpLogin] {
+        [this, host, path, port, email, password, token, request_id, httpLogin] {
         if (cancelled.load()) return;
         httplib::Result result =
-            this->loginHttpsJson(host, path, port, email, password);
+            this->loginHttpsJson(host, path, port, email, password, token);
         if (httpLogin && (!result || result->status != Success)) {
             if (cancelled.load()) return;
-            result = loginHttpJson(host, path, port, email, password);
+            result = loginHttpJson(host, path, port, email, password, token);
         }
 
         if (cancelled.load()) return;
@@ -154,7 +154,7 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
     });
 #else
     g_asyncDispatcher.detach_task(
-        [this, host, path, port, email, password, request_id, httpLogin] {
+        [this, host, path, port, email, password, token, request_id, httpLogin] {
         if (cancelled.load()) return;
         emscripten_fetch_attr_t attr;
         emscripten_fetch_attr_init(&attr);
@@ -166,6 +166,10 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
         attr.requestHeaders = headers;
         attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS;
         json body = json{ {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+        if (!token.empty()) {
+            body["token"] = token;
+            body["authenticatorToken"] = token;
+        }
         std::string bodyStr = body.dump(1);
         attr.requestData = bodyStr.data();
         attr.requestDataSize = bodyStr.length();
@@ -224,7 +228,8 @@ httplib::Result LoginHttp::loginHttpsJson(const std::string& host,
                                           const std::string& path,
                                           const uint16_t port,
                                           const std::string& email,
-                                          const std::string& password) {
+                                          const std::string& password,
+                                          const std::string& token) {
     httplib::SSLClient client(host, port);
 
     client.set_logger(
@@ -234,7 +239,11 @@ httplib::Result LoginHttp::loginHttpsJson(const std::string& host,
     client.enable_server_certificate_verification(false);
     client.enable_server_hostname_verification(false);
 
-    const json body = { {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+    json body = { {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+    if (!token.empty()) {
+        body["token"] = token;
+        body["authenticatorToken"] = token;
+    }
     const httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };
 
     httplib::Result response =
@@ -261,13 +270,18 @@ httplib::Result LoginHttp::loginHttpJson(const std::string& host,
                                          const std::string& path,
                                          const uint16_t port,
                                          const std::string& email,
-                                         const std::string& password) {
+                                         const std::string& password,
+                                         const std::string& token) {
     httplib::Client client(host, port);
     client.set_logger(
         [this](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
 
     const httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };
-    const json body = { {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+    json body = { {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+    if (!token.empty()) {
+        body["token"] = token;
+        body["authenticatorToken"] = token;
+    }
 
     httplib::Result response =
         client.Post(path, headers, body.dump(), "application/json");
