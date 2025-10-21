@@ -72,7 +72,7 @@ function onModalDialog(id, title, message, buttons, enterButton, escapeButton, c
         controllerModal:unloadHtml()
     end
     local MINIMUM_WIDTH = g_game.getFeature(GameEnterGameShowAppearance) and MINIMUM_WIDTH_OLD or MINIMUM_WIDTH_QT
-    controllerModal:loadHtml('message.html')
+    controllerModal:loadHtml('modaldialog.html')
     local ui = controllerModal.ui
     ui:hide()
     local messageLabel = controllerModal:findWidget('#messageLabel')
