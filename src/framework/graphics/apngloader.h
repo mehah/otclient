@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <sstream>
 #include <cstdint>
 
 struct apng_data

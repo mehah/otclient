@@ -21,7 +21,6 @@
  */
 
 #include "color.h"
-#include <framework/stdext/hash.h>
 #include <iomanip>
 
 #include "framework/stdext/string.h"

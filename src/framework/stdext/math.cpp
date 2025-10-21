@@ -20,8 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include <algorithm>
-#include <climits>
 #include <cmath>
 #include <random>
 #include <stdexcept>

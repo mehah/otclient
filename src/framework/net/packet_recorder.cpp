@@ -26,6 +26,8 @@
 
 #include "packet_recorder.h"
 
+#include "inputmessage.h"
+
 PacketRecorder::PacketRecorder(const std::string_view& file)
 {
     m_start = g_clock.millis();
@@ -41,7 +43,6 @@ PacketRecorder::PacketRecorder(const std::string_view& file)
 
 PacketRecorder::~PacketRecorder()
 {
-
 }
 
 void PacketRecorder::addInputPacket(const InputMessagePtr& packet)

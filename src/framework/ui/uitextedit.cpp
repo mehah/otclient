@@ -23,7 +23,6 @@
 #include "uitextedit.h"
 #include <framework/core/clock.h>
 #include <framework/graphics/bitmapfont.h>
-#include <framework/graphics/graphics.h>
 #include <framework/input/mouse.h>
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>

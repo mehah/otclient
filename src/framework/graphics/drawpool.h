@@ -32,7 +32,6 @@
 #include <framework/util/spinlock.h>
 
 #include "../stdext/storage.h"
-#include <unordered_set>
 
 enum class DrawPoolType : uint8_t
 {

@@ -24,7 +24,6 @@
 
 #include "declarations.h"
 #include "client/game.h"
-#include "soundsource.h"
 #include <framework/util/point.h>
 #include <future>
 

@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 #include <algorithm>
-#include <cmath>
 #include <functional>
 #include <vector>
 #include <framework/core/eventdispatcher.h>

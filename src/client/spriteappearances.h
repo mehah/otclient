@@ -23,7 +23,6 @@
 #pragma once
 
 #include "gameconfig.h"
-#include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
 #include <framework/luaengine/luaobject.h>
 

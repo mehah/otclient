@@ -1,5 +1,4 @@
 #include "textureatlas.h"
-#include "texturemanager.h"
 #include "graphics.h"
 #include "framebuffer.h"
 

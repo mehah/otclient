@@ -28,7 +28,6 @@
 #include "streamsoundsource.h"
 #include "combinedsoundsource.h"
 
-#include <cstdint>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/resourcemanager.h>

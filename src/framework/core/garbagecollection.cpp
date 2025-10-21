@@ -23,7 +23,6 @@
 #include "garbagecollection.h"
 #include <client/thingtypemanager.h>
 #include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/animatedtexture.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/texturemanager.h>

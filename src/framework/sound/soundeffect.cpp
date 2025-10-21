@@ -21,7 +21,6 @@
  */
 
 #include "soundeffect.h"
-#include "soundfile.h"
 #include "soundmanager.h"
 
 #include <AL/al.h>

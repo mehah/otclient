@@ -23,6 +23,8 @@
 #include "particletype.h"
 #include <framework/graphics/texturemanager.h>
 
+#include "animatedtexture.h"
+
 void ParticleType::load(const OTMLNodePtr& node)
 {
     for (const auto& childNode : node->children()) {

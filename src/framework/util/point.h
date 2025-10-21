@@ -23,7 +23,6 @@
 #pragma once
 
 #include <cmath>
-#include <ostream>
 
 template<class T>
 class TSize;
