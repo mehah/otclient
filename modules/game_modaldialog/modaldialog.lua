@@ -64,7 +64,7 @@ end
 local function applyFinalHeight(ui, messageLabel, additionalHeight)
     local finalHeight = BASE_HEIGHT + additionalHeight + messageLabel:getHeight()
     ui:setHeight(finalHeight)
-    controllerModal:findWidget('#choiceList'):setWidth(ui:getWidth() * 0.9) -- html not work 100%
+    controllerModal:findWidget('#choiceList'):setWidth(ui:getWidth() * 0.9) -- html not work "Width:100%"
 end
 
 function onModalDialog(id, title, message, buttons, enterButton, escapeButton, choices, priority)
