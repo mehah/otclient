@@ -1835,6 +1835,14 @@ void Game::imbuementDurations(const bool isOpen)
     m_protocolGame->sendImbuementDurations(isOpen);
 }
 
+void Game::openWheelOfDestiny(uint32_t playerId)
+{
+    if (!playerId || !canPerformGameAction())
+        return;
+
+    m_protocolGame->sendOpenWheelOfDestiny(playerId);
+}
+
 void Game::stashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos)
 {
     if (!canPerformGameAction())

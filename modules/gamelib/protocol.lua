@@ -2,6 +2,7 @@ GameServerOpcodes = {
     GameServerInitGame = 10,
     GameServerGMActions = 11,
     GameServerEnterGame = 15,
+    GameServerWheelOfDestinyOpenWindow = 16,
     GameServerLoginError = 20,
     GameServerLoginAdvice = 21,
     GameServerLoginWait = 22,

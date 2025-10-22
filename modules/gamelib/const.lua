@@ -435,6 +435,8 @@ ResourceTypes = {
     LESSER_GEMS = 81,
     REGULAR_GEMS = 82,
     GREATER_GEMS = 83,
+    LESSER_FRAGMENT = 84,
+    GREATER_FRAGMENT = 85,
     WHEEL_OF_DESTINY = 86,
     COIN_NORMAL = 90,
     COIN_TRANSFERRABLE = 91,
@@ -475,7 +477,7 @@ ExperienceRate = {
 
 PriceTypeEnum = {
     Market = 0,
-	Leader = 1
+    Leader = 1
 }
 
 -- Analyzer constants

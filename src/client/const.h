@@ -875,4 +875,57 @@ namespace Otc
         PARTYANALYZERACTION_PRICEVALUE = 2,
     };
 
+    enum class WheelSlots_t : uint8_t
+    {
+        SLOT_GREEN_200 = 1,
+        SLOT_GREEN_TOP_150 = 2,
+        SLOT_GREEN_TOP_100 = 3,
+
+        SLOT_RED_TOP_100 = 4,
+        SLOT_RED_TOP_150 = 5,
+        SLOT_RED_200 = 6,
+
+        SLOT_GREEN_BOTTOM_150 = 7,
+        SLOT_GREEN_MIDDLE_100 = 8,
+        SLOT_GREEN_TOP_75 = 9,
+
+        SLOT_RED_TOP_75 = 10,
+        SLOT_RED_MIDDLE_100 = 11,
+        SLOT_RED_BOTTOM_150 = 12,
+
+        SLOT_GREEN_BOTTOM_100 = 13,
+        SLOT_GREEN_BOTTOM_75 = 14,
+        SLOT_GREEN_50 = 15,
+
+        SLOT_RED_50 = 16,
+        SLOT_RED_BOTTOM_75 = 17,
+        SLOT_RED_BOTTOM_100 = 18,
+
+        SLOT_BLUE_TOP_100 = 19,
+        SLOT_BLUE_TOP_75 = 20,
+        SLOT_BLUE_50 = 21,
+
+        SLOT_PURPLE_50 = 22,
+        SLOT_PURPLE_TOP_75 = 23,
+        SLOT_PURPLE_TOP_100 = 24,
+
+        SLOT_BLUE_TOP_150 = 25,
+        SLOT_BLUE_MIDDLE_100 = 26,
+        SLOT_BLUE_BOTTOM_75 = 27,
+
+        SLOT_PURPLE_BOTTOM_75 = 28,
+        SLOT_PURPLE_MIDDLE_100 = 29,
+        SLOT_PURPLE_TOP_150 = 30,
+
+        SLOT_BLUE_200 = 31,
+        SLOT_BLUE_BOTTOM_150 = 32,
+        SLOT_BLUE_BOTTOM_100 = 33,
+
+        SLOT_PURPLE_BOTTOM_100 = 34,
+        SLOT_PURPLE_BOTTOM_150 = 35,
+        SLOT_PURPLE_200 = 36,
+
+        SLOT_FIRST = SLOT_GREEN_200,
+        SLOT_LAST = SLOT_PURPLE_200
+    };
 }
