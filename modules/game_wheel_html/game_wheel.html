@@ -92,7 +92,6 @@
     .wheel-center-cells {
       position: absolute;
       --image-pixel-valid: true;
-      border: 20px blue;
     }
   </style>
   <window
@@ -100,6 +99,7 @@
     title="Wheel of Destiny"
     onescape="self:hide()"
     style="height: 654px; width: 997px; border: 1px yellow"
+    onhover="self.wheel:handleOnHover(-1)"
   >
     <div>
       <img
@@ -122,36 +122,45 @@
       />
     </div>
 
-    <div class="content">
+    <div class="content" onhover="self.wheel:handleOnHover(-1)">
       <div *if="self.currentTab == 'wheel'">
-        <div class="panel-container">
+        <div class="panel-container" onhover="self.wheel:handleOnHover(-1)">
           <div class="panel">panel left</div>
-          <div class="panel-center">
+          <div class="panel-center" onhover="self.wheel:handleOnHover(-1)">
             <div class="backdrop-wheel">
+              <img
+                *for="local color in self.wheel.colors"
+                class="wheel-center-cells"
+                *image-source="color.path"
+                *opacity="color.selected and 0.75 or (color.adjacent and 0.2 or 0.01) or 0.01"
+                *height="color.height"
+                *width="color.width"
+                onclick="self.wheel:handleSlectSlot(color.id)"
+                *image-pixel-valid="true"
+              />
+              <img
+                *for="local border in self.wheel.borders"
+                class="wheel-center-cells"
+                *image-source="border.path"
+                *opacity="self.wheel.currentSelectSlot == border.id and 1 or 0.01"
+                *height="border.height"
+                *width="border.width"
+              />
               <img
                 *image-source="self.wheel.backdropVocationOverlay"
                 class="backdrop-wheel-vocation-overlay"
                 height="522"
                 width="522"
+                onhover="self.wheel:handleOnHover(-1)"
               />
-
               <img
-                *for="local border in self.wheel.borders"
-                class="wheel-center-cells"
-                *image-source="border.path"
-                *opacity="border.selected and 1 or 0"
-                *height="border.height"
-                *width="border.width"
-              />
-
-              <img
-                *for="local color in self.wheel.colors"
+                *for="local color in self.wheel.hovers"
                 class="wheel-center-cells"
                 *image-source="color.path"
-                *opacity="color.selected and 0.1 or 0.01"
+                *opacity="self.wheel.currentHoverSlot == color.id and 0.2 or 0.01"
                 *height="color.height"
                 *width="color.width"
-                onclick="self.wheel:handleSelectBorder(color.id)"
+                onhover="self.wheel:handleOnHover(color.id)"
                 *image-pixel-valid="true"
               />
             </div>
@@ -169,7 +178,7 @@
       </div>
 
       <div class="footer-right">
-        <button>Close</button>
+        <button onclick="self:hide()">Close</button>
         <button>Reset</button>
         <button>Apply</button>
         <button>Ok</button>
