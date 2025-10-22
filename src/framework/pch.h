@@ -60,6 +60,8 @@
 #include <bitset>
 #include <filesystem>
 #include <set>
+#include <queue>
+
 // FMT
 #include <fmt/chrono.h>
 #include <fmt/core.h>

@@ -29,6 +29,7 @@
 #include <framework/graphics/shadermanager.h>
 
 #include "gameconfig.h"
+#include "thingtype.h"
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 

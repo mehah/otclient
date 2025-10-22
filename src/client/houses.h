@@ -65,7 +65,7 @@ protected:
     void save(pugi::xml_node& node);
 
 private:
-    TileMap m_tiles;
+    stdext::map<Position, TilePtr, Position::Hasher> m_tiles;
     ItemVector m_doors;
     uint32_t m_lastDoorId{ 0 };
     uint32_t m_id{ 0 };

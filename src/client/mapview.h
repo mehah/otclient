@@ -22,10 +22,12 @@
 
 #pragma once
 
-#include "lightview.h"
-#include <framework/core/inputevent.h>
 #include <framework/graphics/declarations.h>
 #include <framework/luaengine/luaobject.h>
+
+#include "position.h"
+#include "staticdata.h"
+#include "framework/core/timer.h"
 
 struct AwareRange
 {
@@ -133,7 +135,7 @@ public:
     bool isDrawingHealthBars() const { return m_drawHealthBars; }
 
     void setDrawLights(bool enable);
-    bool isDrawingLights() const { return m_drawingLight && m_lightView->isDark(); }
+    bool isDrawingLights() const;
 
     void setLimitVisibleDimension(const bool v) { m_limitVisibleDimension = v; }
     bool isLimitedVisibleDimension() const { return m_limitVisibleDimension; }

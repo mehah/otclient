@@ -874,6 +874,7 @@ void MapView::setShader(const std::string_view name, const float fadein, const f
     });
 }
 
+bool MapView::isDrawingLights() const { return m_drawingLight && m_lightView->isDark(); }
 void MapView::setDrawLights(const bool enable)
 {
     m_drawingLight = enable;

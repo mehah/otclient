@@ -107,8 +107,6 @@ using ItemTypeList = std::vector<ItemTypePtr>;
 using TileList = std::list<TilePtr>;
 using ItemVector = std::vector<ItemPtr>;
 
-using TileMap = stdext::map<Position, TilePtr, Position::Hasher>;
-
 // net
 class ProtocolLogin;
 class ProtocolGame;
