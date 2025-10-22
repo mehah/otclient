@@ -666,40 +666,47 @@ local WheelSlotsParser = {
 }
 
 local function propagateAdjacentSelection(slotList, controller)
-    local byQuadrant = {}
-    for index, data in ipairs(slotList) do
-        local slotData = controller.wheel.data[index]
-        if slotData then
+    local toPropagate = {}
+
+    for index, slotData in ipairs(slotList) do
+        local definition = controller.wheel.slots[slotData.id] or {}
+        slotData.isComplete = slotData.currentPoints == slotData.totalPoints
+        slotData.isAdjacent = false
+        slotData.adjacentPath = ""
+
+        if slotData.isComplete then
+            slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
             slotData.adjacentPath = ""
-            if data.isComplete then
-                local colorPath = controller.wheel.getSlotFramePercentage(data)
-                slotData.colorPath = colorPath
-                slotData.isAdjacent = true
-                for _, slotId in ipairs(controller.wheel.slots[data.id].adjacents) do
-                    table.insert(byQuadrant, slotId)
-                end
-            else
-                if data.currentPoints > 0 then
-                    local colorPath = controller.wheel.getSlotFramePercentage(data)
-                    slotData.colorPath = colorPath
-                    slotData.isAdjacent = true
-                else
-                    slotData.colorPath = ""
-                    slotData.isAdjacent = false
-                end
+            slotData.isAdjacent = true
+
+            for _, slotId in ipairs(definition.adjacents or {}) do
+                table.insert(toPropagate, slotId)
             end
+        elseif slotData.currentPoints > 0 then
+            slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
+            slotData.adjacentPath = slotData.bgPath or ""
+            slotData.isAdjacent = true
+        else
+            slotData.colorPath = ""
         end
+
+        controller.wheel.data[index] = slotData
     end
 
-    for _, slotId in ipairs(byQuadrant) do
-        for index, data in ipairs(controller.wheel.data) do
-            if data.id == slotId then
-                controller.wheel.data[index].isAdjacent = true
-                if data.currentPoints == 0 then
-                    controller.wheel.data[index].adjacentPath = controller.wheel.data[index].adjacentPath
-                elseif data.currentPoints < data.totalPoints then
-                    controller.wheel.data[index].adjacentPath = controller.wheel.getSlotFramePercentage(data)
+    for _, slotId in ipairs(toPropagate) do
+        for index, slotData in ipairs(controller.wheel.data) do
+            if slotData.id == slotId then
+                slotData.isAdjacent = true
+
+                if slotData.currentPoints > 0 then
+                    slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
+                    slotData.adjacentPath = slotData.bgPath or ""
+                else
+                    slotData.colorPath = ""
+                    slotData.adjacentPath = slotData.bgPath or ""
                 end
+
+                controller.wheel.data[index] = slotData
                 break
             end
         end

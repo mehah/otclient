@@ -164,6 +164,15 @@
                   *height="data.height"
                   *width="data.width"
                   *opacity="data.isComplete and 0.75 or (data.isAdjacent and 0.5 or 0.01) or 0.01"
+                  image-draw-order="2"
+                  *image-pixel-valid="true"
+                />
+                <img
+                  class="wheel-center-cells"
+                  *image-source="data.adjacentPath"
+                  *height="data.height"
+                  *width="data.width"
+                  *opacity="data.adjacentPath ~= '' and 0.5 or 0.01"
                   *image-pixel-valid="true"
                   image-draw-order="1"
                 />
