@@ -676,7 +676,11 @@ local function propagateAdjacentSelection(slotList, controller)
 
         if slotData.isComplete then
             slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
-            slotData.adjacentPath = ""
+            if definition.adjacents and #definition.adjacents > 0 then
+                slotData.adjacentPath = slotData.bgPath or ""
+            else
+                slotData.adjacentPath = ""
+            end
             slotData.isAdjacent = true
 
             for _, slotId in ipairs(definition.adjacents or {}) do
