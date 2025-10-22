@@ -1,7 +1,7 @@
-local wod = dofile("wod.lua")
+local wheel = dofile("wheel.lua")
 
 local helper = {
-    wod = wod,
+    wheel = wheel,
 }
 
 return helper

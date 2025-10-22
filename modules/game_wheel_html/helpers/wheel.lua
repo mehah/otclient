@@ -82,7 +82,7 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_GREEN_200 },
+        adjacents = { WheelSlots.SLOT_GREEN_200, WheelSlots.SLOT_GREEN_BOTTOM_150 },
     },
     [WheelSlots.SLOT_GREEN_BOTTOM_150] = {
         quadrant = "top_left",
@@ -99,7 +99,7 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_GREEN_200 },
+        adjacents = { WheelSlots.SLOT_GREEN_200, WheelSlots.SLOT_GREEN_TOP_150 },
     },
     [WheelSlots.SLOT_GREEN_TOP_100] = {
         quadrant = "top_left",
@@ -235,7 +235,7 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_RED_200 },
+        adjacents = { WheelSlots.SLOT_RED_200, WheelSlots.SLOT_RED_BOTTOM_150 },
     },
     [WheelSlots.SLOT_RED_BOTTOM_150] = {
         quadrant = "top_right",
@@ -252,7 +252,7 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_RED_200 },
+        adjacents = { WheelSlots.SLOT_RED_200, WheelSlots.SLOT_RED_TOP_150 },
     },
     [WheelSlots.SLOT_RED_TOP_100] = {
         quadrant = "top_right",
@@ -388,7 +388,7 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_BLUE_200 },
+        adjacents = { WheelSlots.SLOT_BLUE_200, WheelSlots.SLOT_BLUE_BOTTOM_150 },
     },
     [WheelSlots.SLOT_BLUE_BOTTOM_150] = {
         quadrant = "bottom_left",
@@ -405,7 +405,7 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_BLUE_200 },
+        adjacents = { WheelSlots.SLOT_BLUE_200, WheelSlots.SLOT_BLUE_TOP_150 },
     },
     [WheelSlots.SLOT_BLUE_TOP_100] = {
         quadrant = "bottom_left",
@@ -542,7 +542,7 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_PURPLE_200 }
+        adjacents = { WheelSlots.SLOT_PURPLE_200, WheelSlots.SLOT_PURPLE_BOTTOM_150 }
     },
     [WheelSlots.SLOT_PURPLE_BOTTOM_150] = {
         quadrant = "bottom_right",
@@ -559,7 +559,7 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_PURPLE_200 }
+        adjacents = { WheelSlots.SLOT_PURPLE_200, WheelSlots.SLOT_PURPLE_TOP_150 }
     },
     [WheelSlots.SLOT_PURPLE_TOP_100] = {
         quadrant = "bottom_right",
@@ -667,11 +667,17 @@ local WheelSlotsParser = {
 
 local function propagateAdjacentSelection(slotList, controller)
     local byQuadrant = {}
-    for _, data in ipairs(slotList) do
+    for index, data in ipairs(slotList) do
         if data.isComplete then
+            data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
             for _, slotId in ipairs(controller.wheel.slots[data.id].adjacents) do
                 table.insert(byQuadrant, slotId)
             end
+        else
+            if data.currentPoint > 0 then
+                data.colorPath = controller.wheel.getSlotFramePercentage(data)
+            end
+            controller.wheel.data[index].isAdjacent = false
         end
     end
 
@@ -680,9 +686,9 @@ local function propagateAdjacentSelection(slotList, controller)
             if data.id == slotId then
                 controller.wheel.data[index].isAdjacent = true
                 if data.currentPoints == 0 then
-                    controller.wheel.data[index].colorPath = controller.wheel.data[index].adjacentPath
+                    controller.wheel.data[index].adjacentPath = controller.wheel.data[index].adjacentPath
                 elseif data.currentPoints < data.totalPoints then
-                    controller.wheel.data[index].colorPath = controller.wheel.getSlotFramePercentage(data)
+                    controller.wheel.data[index].adjacentPath = controller.wheel.getSlotFramePercentage(data)
                 end
                 break
             end

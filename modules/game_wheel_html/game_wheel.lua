@@ -132,7 +132,7 @@ local indexByTotalPoints = {
 }
 
 function WheelController.wheel.getSlotFramePercentage(data)
-    data.totalPoints = helper.wod.WheelSlotsParser[data.id].totalPoints
+    data.totalPoints = helper.wheel.WheelSlotsParser[data.id].totalPoints
     local numericValue = tonumber(data.currentPoints) or 0
     local sanitizedValue = math.max(0, numericValue)
     local clampedValue = math.min(sanitizedValue, data.totalPoints)
@@ -158,10 +158,10 @@ function WheelController.wheel:onChangeSlotPoints(value)
     local slotId = WheelController.wheel.currentSelectSlotId
     local data = WheelController.wheel.data[slotId]
     if not data then return end
-    data.index = helper.wod.WheelSlotsParser[slotId].index
-    data.quadrant = helper.wod.WheelSlotsParser[slotId].quadrant
-    data.color = helper.wod.WheelSlotsParser[slotId].color
-    data.totalPoints = helper.wod.WheelSlotsParser[slotId].totalPoints
+    data.index = helper.wheel.WheelSlotsParser[slotId].index
+    data.quadrant = helper.wheel.WheelSlotsParser[slotId].quadrant
+    data.color = helper.wheel.WheelSlotsParser[slotId].color
+    data.totalPoints = helper.wheel.WheelSlotsParser[slotId].totalPoints
     g_logger.info("CHANGE SLOT ID POINTS: " .. tostring(slotId) .. " index: " .. data.index)
 
     if type(value) == "string" then
@@ -183,25 +183,29 @@ function WheelController.wheel:onChangeSlotPoints(value)
         -- g_logger.info("Setting slot ID " .. slotId .. " points to " .. data.currentPoints .. " tp: " .. data.totalPoints)
 
         -- g_logger.info(">>> cPath" .. data.colorPath)
+        data.isComplete = data.currentPoints == data.totalPoints
         WheelController.wheel.data[slotId] = data
+        helper.wheel.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
         return
     end
 
 
     local numericValue = tonumber(value) or 0
     if numericValue == 0 then return end
-    local newPoints = data.currentPoints + numericValue
-    if newPoints < 0 then
-        newPoints = 0
+    data.currentPoints = data.currentPoints + numericValue
+    if data.currentPoints < 0 then
+        data.currentPoints = 0
     end
-    if newPoints > data.totalPoints then
-        newPoints = data.totalPoints
+    if data.currentPoints > data.totalPoints then
+        data.currentPoints = data.totalPoints
     end
     -- WheelController.wheel.slots[slotId].currentPoints = newPoints
-    data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
+    -- data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
     -- g_logger.info(">>> cPath" .. data.colorPath)
-    WheelController.wheel.data[slotId].currentPoints = newPoints
+    data.isComplete = data.currentPoints == data.totalPoints
+    WheelController.wheel.data[slotId] = data
     WheelController.wheel.currentSelectSlotData = data
+    helper.wheel.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
     -- g_logger.info("Setting slot ID " ..
     --     slotId ..
     --     " points to " ..
@@ -230,7 +234,7 @@ function WheelController.wheel:fillQuadrantsBorders()
             isAdjacent = data.isAdjacent,
             colorPath = "",
             hoverPath = string.format(baseWheelColorPath, data.quadrant, data.color, data.index),
-            adjacentPath = string.format(baseColorSlotPath, data.quadrant, data.index, quadrantFrames[data.index]),
+            adjacentPath = "",
             adjacents = data.adjacents,
             id = slot,
             borderPath = string.format(baseBorderPath, data.quadrant, data.index),
@@ -241,10 +245,10 @@ function WheelController.wheel:fillQuadrantsBorders()
         }
 
         current.colorPath = WheelController.wheel.getSlotFramePercentage(current)
-        table.insert(WheelController.wheel.data, current)
+        WheelController.wheel.data[slot] = current
     end
 
-    helper.wod.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
+    helper.wheel.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
 end
 
 function WheelController.wheel:handleSelectSlot(slotId)
@@ -330,8 +334,8 @@ function onWheelOfDestinyOpenWindow(data)
     data.wheelPoints = data.wheelPoints or {}
     local currentPoints = 0
     for slot, point in pairs(data.wheelPoints) do
-        if helper.wod.WheelSlotsParser[slot] then
-            helper.wod.WheelSlotsParser[slot].currentPoints = point
+        if helper.wheel.WheelSlotsParser[slot] then
+            helper.wheel.WheelSlotsParser[slot].currentPoints = point
             currentPoints = currentPoints + point
         end
     end
@@ -354,6 +358,6 @@ function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.points = currentPoints
     WheelController.wheel.extraPoints = data.extraPoints
     WheelController.wheel.totalPoints = data.points + data.extraPoints
-    WheelController.wheel.slots = helper.wod.WheelSlotsParser
+    WheelController.wheel.slots = helper.wheel.WheelSlotsParser
     WheelController.wheel:fillQuadrantsBorders()
 end
