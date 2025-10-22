@@ -352,6 +352,9 @@ end
 
 function clearSlot()
     local slot = actionBarPanel:getChildById(slotToEdit)
+    if slot.hotkey and slot.hotkey ~= '' then  
+        g_keyboard.unbindKeyPress(slot.hotkey)  
+    end  
     slot:setImageSource('/images/game/actionbar/slot-actionbar')
     slot:setImageClip('0 0 0 0')
     slot:clearItem()
@@ -365,10 +368,17 @@ function clearSlot()
     slot:getChildById('tier'):setVisible(false)
     slot:getChildById('text'):setText('')
     slot:setTooltip('')
+    slot.hotkey = nil    
+    slot:getChildById('key'):setText('')  
+    setupHotkeys()  
+    saveActionBar()
 end
 
 function clearSlotById(slotId)
     local slot = actionBarPanel:getChildById(slotId)
+    if slot.hotkey and slot.hotkey ~= '' then  
+        g_keyboard.unbindKeyPress(slot.hotkey)  
+    end    
     slot:setImageSource('/images/game/actionbar/slot-actionbar')
     slot:setImageClip('0 0 0 0')
     slot:clearItem()
@@ -382,6 +392,10 @@ function clearSlotById(slotId)
     slot:getChildById('tier'):setVisible(false)
     slot:getChildById('text'):setText('')
     slot:setTooltip('')
+    slot.hotkey = nil    
+    slot:getChildById('key'):setText('')  
+    setupHotkeys()  
+    saveActionBar()
 end
 
 function clearHotkey()
@@ -786,7 +800,7 @@ function hotkeyClear(assignWindow)
     comboPreview:setText(tr('Current hotkey to change: none'))
     comboPreview.keyCombo = ''
     comboPreview:resizeToText()
-    assignWindow:getChildById('applyButton'):disable()
+    assignWindow:getChildById('applyButton'):enable()
 end
 
 function hotkeyCaptureOk(assignWindow, keyCombo)
@@ -799,15 +813,23 @@ function hotkeyCaptureOk(assignWindow, keyCombo)
             end
         end
     end
-    unbindHotkeys()
-    slot.hotkey = keyCombo
-    local text = slot.hotkey
-    text = text:gsub('Shift', 'S')
-    text = text:gsub('Alt', 'A')
-    text = text:gsub('Ctrl', 'C')
-    text = text:gsub('+', '')
-    slot:getChildById('key'):setText(text)
+    if slot.hotkey and slot.hotkey ~= '' then  
+        g_keyboard.unbindKeyPress(slot.hotkey)  
+    end
+    if keyCombo == '' then  
+        slot.hotkey = nil  
+        slot:getChildById('key'):setText('')  
+    else  
+        slot.hotkey = keyCombo  
+        local text = slot.hotkey  
+        text = text:gsub('Shift', 'S')  
+        text = text:gsub('Alt', 'A')  
+        text = text:gsub('Ctrl', 'C')  
+        text = text:gsub('+', '')  
+        slot:getChildById('key'):setText(text)  
+    end 
     setupHotkeys()
+    saveActionBar()
     if assignWindow == editHotkeyWindow then
         closeEditHotkeyWindow()
         return
