@@ -668,16 +668,26 @@ local WheelSlotsParser = {
 local function propagateAdjacentSelection(slotList, controller)
     local byQuadrant = {}
     for index, data in ipairs(slotList) do
-        if data.isComplete then
-            data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
-            for _, slotId in ipairs(controller.wheel.slots[data.id].adjacents) do
-                table.insert(byQuadrant, slotId)
+        local slotData = controller.wheel.data[index]
+        if slotData then
+            slotData.adjacentPath = ""
+            if data.isComplete then
+                local colorPath = controller.wheel.getSlotFramePercentage(data)
+                slotData.colorPath = colorPath
+                slotData.isAdjacent = true
+                for _, slotId in ipairs(controller.wheel.slots[data.id].adjacents) do
+                    table.insert(byQuadrant, slotId)
+                end
+            else
+                if data.currentPoints > 0 then
+                    local colorPath = controller.wheel.getSlotFramePercentage(data)
+                    slotData.colorPath = colorPath
+                    slotData.isAdjacent = true
+                else
+                    slotData.colorPath = ""
+                    slotData.isAdjacent = false
+                end
             end
-        else
-            if data.currentPoint > 0 then
-                data.colorPath = controller.wheel.getSlotFramePercentage(data)
-            end
-            controller.wheel.data[index].isAdjacent = false
         end
     end
 

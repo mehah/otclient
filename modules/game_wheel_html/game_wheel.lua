@@ -139,12 +139,17 @@ function WheelController.wheel.getSlotFramePercentage(data)
     local progress = clampedValue / data.totalPoints
     local frames = quadrantFrames[data.index]
 
-    -- clamp & map progress [0..1] -> 1..frames
-    local p = math.max(1, math.min(1, progress))
-    if p == 0 then
-        return string.format(baseColorSlotPath, data.quadrant, data.index, frames)
+    if not frames or frames <= 0 then
+        return ""
     end
-    local idx = math.floor(p * frames)
+
+    local clampedProgress = math.max(0, math.min(1, progress))
+    if clampedProgress == 0 then
+        return ""
+    end
+
+    local idx = math.ceil(clampedProgress * frames)
+    if idx < 1 then idx = 1 end
     if idx > frames then idx = frames end
     local path = string.format(baseColorSlotPath, data.quadrant, data.index, idx)
     g_logger.info(string.format(
