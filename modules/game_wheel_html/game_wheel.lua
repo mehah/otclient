@@ -9,6 +9,7 @@ WheelController.wheel = {
     clip = baseButtonClipped,
     backdropVocationOverlay = nil,
     borders = {},
+    colors = {},
 }
 WheelController.gem = {
     clip = baseButtonClip
@@ -77,12 +78,19 @@ local quadrants = {
     "bottom_right",
     "bottom_left"
 }
+local colorQuadrants = {
+    "TopLeft",
+    "TopRight",
+    "BottomRight",
+    "BottomLeft"
+}
 local baseBorderPath = "/images/game/wheel/wheel-border/%s/%s.png"
+local baseWheelColorPath = "/images/game/wheel/wheel-colors/%s/%s_%s.png"
 local otherBorders = { "revelationPerk", "vesselGem" }
 function WheelController.wheel:fillQuadrantsBorders()
     WheelController.wheel.borders = {}
     for _, quadrant in pairs(quadrants) do
-        for i = 1, 9 do
+        for i = 1, 1 do
             table.insert(WheelController.wheel.borders, {
                 id = string.format("%s_%s", quadrant, tostring(i)),
                 path = string.format(baseBorderPath, quadrant, tostring(i)),
@@ -92,23 +100,36 @@ function WheelController.wheel:fillQuadrantsBorders()
             })
         end
 
-        local revelation = baseBorderPath:format(quadrant, otherBorders[1])
-        table.insert(WheelController.wheel.borders, {
-            id = string.format("%s_%s", quadrant, otherBorders[1]),
-            path = revelation,
-            height = "178",
-            width = "179",
-            selected = false,
-        })
+        -- local revelation = baseBorderPath:format(quadrant, otherBorders[1])
+        -- table.insert(WheelController.wheel.borders, {
+        --     id = string.format("%s_%s", quadrant, otherBorders[1]),
+        --     path = revelation,
+        --     height = "178",
+        --     width = "179",
+        --     selected = false,
+        -- })
 
-        local vesselGem = baseBorderPath:format(quadrant, otherBorders[2])
-        table.insert(WheelController.wheel.borders, {
-            id = string.format("%s_%s", quadrant, otherBorders[2]),
-            path = vesselGem,
-            height = "85",
-            width = "119",
-            selected = false,
-        })
+        -- local vesselGem = baseBorderPath:format(quadrant, otherBorders[2])
+        -- table.insert(WheelController.wheel.borders, {
+        --     id = string.format("%s_%s", quadrant, otherBorders[2]),
+        --     path = vesselGem,
+        --     height = "85",
+        --     width = "119",
+        --     selected = false,
+        -- })
+    end
+
+    for _, color in pairs(colorQuadrants) do
+        for i = 1, 1 do
+            local _quadrant = quadrants[i]
+            table.insert(WheelController.wheel.colors, {
+                id = string.format("%s_%s", _quadrant, tostring(i)),
+                path = string.format(baseWheelColorPath, _quadrant, color, tostring(i)),
+                height = "522",
+                width = "522",
+                selected = true
+            })
+        end
     end
 end
 

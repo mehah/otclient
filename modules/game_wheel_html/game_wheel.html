@@ -89,16 +89,10 @@
       height: 522px;
       text-align: center;
     }
-    .wheel-center {
-      height: 2px;
-      width: 2px;
-      background-color: red;
-      position: absolute;
-      top: 261px;
-      left: 261px;
-    }
     .wheel-center-cells {
       position: absolute;
+      --image-pixel-test: true;
+      border: 20px blue;
     }
   </style>
   <window
@@ -148,7 +142,17 @@
                 *opacity="border.selected and 1 or 0"
                 *height="border.height"
                 *width="border.width"
-                onclick="self.wheel:handleSelectBorder(border.id)"
+              />
+
+              <img
+                *for="local color in self.wheel.colors"
+                class="wheel-center-cells"
+                *image-source="color.path"
+                *opacity="0"
+                *height="color.height"
+                *width="color.width"
+                onclick="self.wheel:handleSelectBorder(color.id)"
+                image-pixel-test="true"
               />
             </div>
           </div>
