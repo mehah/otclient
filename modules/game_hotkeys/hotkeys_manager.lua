@@ -896,25 +896,19 @@ function removeHotkeyByCombo(keyCombo)
     if not keyCombo or keyCombo == "" then
         return false
     end
-
     local hotkeyLabel = currentHotkeys and currentHotkeys:getChildById(keyCombo)
     if hotkeyLabel then
         if boundCombosCallback[keyCombo] then
             g_keyboard.unbindKeyPress(keyCombo, boundCombosCallback[keyCombo])
             boundCombosCallback[keyCombo] = nil
         end
-
         if currentHotkeyLabel == hotkeyLabel then
             currentHotkeyLabel = nil
         end
-
         hotkeyLabel:destroy()
-
         updateHotkeyForm(true)
-
         return true
     end
-
     return false
 end
 
@@ -922,17 +916,14 @@ function isHotkeyUsedByManager(keyCombo)
     if not keyCombo or keyCombo == "" then
         return false
     end
-
     if boundCombosCallback[keyCombo] then
         return true
     end
-
     if currentHotkeys then
         local hotkeyLabel = currentHotkeys:getChildById(keyCombo)
         if hotkeyLabel then
             return true
         end
     end
-
     return false
 end

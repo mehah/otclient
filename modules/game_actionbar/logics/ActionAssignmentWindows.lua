@@ -1,6 +1,10 @@
 -- /*=============================================
 -- =            Spells html Windows             =
 -- =============================================*/
+local function string_empty(str)
+    return #str == 0
+end
+
 function ActionBarController:onSearchTextChange(event)
     for _, child in pairs(ActionBarController:findWidget("#spellList"):getChildren()) do
         local name = child:getText():lower()
@@ -139,7 +143,7 @@ function assignSpell(button)
         if paramValue:lower():find("up|down") then
             paramValue = ""
         end
-        if not string.empty(paramValue) then
+        if not string_empty(paramValue) then
             param = param .. ' "' .. paramValue:gsub('"', '') .. '"'
         end
         ApiJson.createOrUpdateText(tonumber(barID), tonumber(buttonID), param, true)

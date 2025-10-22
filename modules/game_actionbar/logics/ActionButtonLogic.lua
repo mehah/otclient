@@ -1,6 +1,10 @@
 -- /*=============================================
 -- =            util             =
 -- =============================================*/
+local function string_empty(str)
+    return #str == 0
+end
+
 local function short_text(text, chars_limit)
     if #text > chars_limit then
         local newstring = ''
@@ -46,8 +50,8 @@ local function getButtonById(id)
 end
 
 local function buttonIsEmpty(button)
-    return button.item:getItemId() == 0 and string.empty(button.item.text:getText()) and
-               string.empty(button.item.text:getImageSource())
+    return button.item:getItemId() == 0 and string_empty(button.item.text:getText()) and
+               string_empty(button.item.text:getImageSource())
 end
 local function getActionName(actionType)
     for k, v in pairs(UseTypes) do
@@ -107,7 +111,7 @@ local function onCheckKeyUp(button)
     end
 end
 local function bindHotkey(button, hotkey)
-    if not gameRootPanel or not button or not hotkey or string.empty(hotkey) then
+    if not gameRootPanel or not button or not hotkey or string_empty(hotkey) then
         return
     end
 
@@ -144,7 +148,7 @@ local function setupHotkeyButton(button)
         if data["actionsetting"] then
             if data["actionsetting"]["action"] == "TriggerActionButton_" .. button:getId() then
                 local keySequence = data["keysequence"]
-                if keySequence and not string.empty(keySequence) then
+                if keySequence and not string_empty(keySequence) then
                     if not data["secondary"] then
                         button.cache.hotkey = keySequence
                     end

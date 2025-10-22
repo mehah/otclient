@@ -74,7 +74,3 @@ function string:wrap(width)
     end
     return wrapped
 end
-
-function string.empty(str)
-    return #str == 0
-end
