@@ -24,7 +24,7 @@
 
 #include "../global.h"
 
-#include <stduuid/uuid.h>
+#include <uuid.h>
 #include <string>
 
 #ifdef USE_GMP

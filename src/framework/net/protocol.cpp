@@ -37,7 +37,7 @@
 #include <framework/net/packet_player.h>
 #include <framework/net/packet_recorder.h>
 
-extern asio::io_service g_ioService;
+extern asio::io_context g_ioService;
 
 Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {
     inflateInit2(&m_zstream, -15);

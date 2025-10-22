@@ -24,9 +24,9 @@
 
 #include "server.h"
 #include "connection.h"
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 
-extern asio::io_service g_ioService;
+extern asio::io_context g_ioService;
 
 Server::Server(const int port)
     : m_acceptor(g_ioService, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))

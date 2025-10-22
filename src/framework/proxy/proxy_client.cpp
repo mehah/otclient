@@ -94,7 +94,7 @@ void Proxy::check(const std::error_code& ec)
             ping();
         }
     }
-    m_timer.expires_from_now(std::chrono::milliseconds(CHECK_INTERVAL));
+    m_timer.expires_after(std::chrono::milliseconds(CHECK_INTERVAL));
     m_timer.async_wait([capture0 = shared_from_this()](auto&& PH1) {
         capture0->check(std::forward<decltype(PH1)>(PH1));
     });
@@ -379,7 +379,7 @@ void Session::check(const std::error_code& ec)
 
     selectProxies();
 
-    m_timer.expires_from_now(std::chrono::milliseconds(CHECK_INTERVAL));
+    m_timer.expires_after(std::chrono::milliseconds(CHECK_INTERVAL));
     m_timer.async_wait([capture0 = shared_from_this()](auto&& PH1) {
         capture0->check(std::forward<decltype(PH1)>(PH1));
     });

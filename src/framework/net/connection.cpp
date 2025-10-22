@@ -30,9 +30,9 @@
 #include <asio/read_until.hpp>
 #include <utility>
 
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 
-asio::io_service g_ioService;
+asio::io_context g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> Connection::m_outputStreams;
 
 Connection::Connection() :
@@ -118,7 +118,7 @@ void Connection::internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>:
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.expires_after(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
     m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
@@ -138,7 +138,7 @@ void Connection::write(const uint8_t* buffer, const size_t size)
             m_outputStream = std::make_shared<asio::streambuf>();
 
         m_delayedWriteTimer.cancel();
-        m_delayedWriteTimer.expires_from_now(asio::chrono::milliseconds(0));
+        m_delayedWriteTimer.expires_after(asio::chrono::milliseconds(0));
         m_delayedWriteTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
             capture0->onCanWrite(std::forward<decltype(PH1)>(PH1));
         });
@@ -164,7 +164,7 @@ void Connection::internal_write()
     });
 
     m_writeTimer.cancel();
-    m_writeTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(WRITE_TIMEOUT)));
+    m_writeTimer.expires_after(asio::chrono::seconds(static_cast<uint32_t>(WRITE_TIMEOUT)));
     m_writeTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
@@ -184,7 +184,7 @@ void Connection::read(const uint16_t bytes, const RecvCallback& callback)
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.expires_after(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
     m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
@@ -205,7 +205,7 @@ void Connection::read_until(const std::string_view what, const RecvCallback& cal
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.expires_after(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
     m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
@@ -224,7 +224,7 @@ void Connection::read_some(const RecvCallback& callback)
     });
 
     m_readTimer.cancel();
-    m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
+    m_readTimer.expires_after(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
     m_readTimer.async_wait([capture0 = asConnection()](auto&& PH1) {
         capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
     });
