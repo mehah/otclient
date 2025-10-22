@@ -56,11 +56,11 @@ end
 function loadIcon(iconId)
     local spell, profile, spellName = Spells.getSpellByIcon(iconId)
     if not spellName then
-        print('[WARNING] loadIcon: empty spellName for tfs spell id: ' .. iconId)
+        print('[WARNING] loadIcon: empty spellName for server spell id: ' .. iconId)
         return nil, nil
     end
     if not profile then
-        print('[WARNING] loadIcon: empty profile for tfs spell id: ' .. iconId)
+        print('[WARNING] loadIcon: empty profile for server spell id: ' .. iconId)
         return nil, nil
     end
 
