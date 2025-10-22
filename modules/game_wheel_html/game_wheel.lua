@@ -139,18 +139,37 @@ function WheelController.wheel.getSlotFramePercentage(data)
     local progress = clampedValue / data.totalPoints
     local frames = quadrantFrames[data.index]
 
-    -- clamp & map progress [0..1] -> 1..frames
-    local p = math.max(1, math.min(1, progress))
-    if p == 0 then
-        return string.format(baseColorSlotPath, data.quadrant, data.index, frames)
+    if not frames or frames <= 0 then
+        return ""
     end
-    local idx = math.floor(p * frames)
+
+    local clampedProgress = math.max(0, math.min(1, progress))
+    if clampedProgress == 0 then
+        return ""
+    end
+
+    local idx = math.ceil(clampedProgress * frames)
+    if idx < 1 then idx = 1 end
     if idx > frames then idx = frames end
     local path = string.format(baseColorSlotPath, data.quadrant, data.index, idx)
     g_logger.info(string.format(
         "quadrant: %s, index: %d, currentPoints: %d, totalPoints: %d, progress: %.2f, frames: %d, idx: %d, path: %s",
         data.quadrant, data.index, data.currentPoints, data.totalPoints, progress, frames, idx, path))
     return path
+end
+
+function WheelController.wheel.getSlotFinalFramePath(data)
+    if not data or not data.index or not data.quadrant then
+        return ""
+    end
+
+    local frames = quadrantFrames[data.index]
+
+    if not frames or frames <= 0 then
+        return ""
+    end
+
+    return string.format(baseColorSlotPath, data.quadrant, data.index, frames)
 end
 
 function WheelController.wheel:onChangeSlotPoints(value)
@@ -162,27 +181,20 @@ function WheelController.wheel:onChangeSlotPoints(value)
     data.quadrant = helper.wheel.WheelSlotsParser[slotId].quadrant
     data.color = helper.wheel.WheelSlotsParser[slotId].color
     data.totalPoints = helper.wheel.WheelSlotsParser[slotId].totalPoints
-    g_logger.info("CHANGE SLOT ID POINTS: " .. tostring(slotId) .. " index: " .. data.index)
-
     if type(value) == "string" then
-        local points = 0
         if value == "-max" then
-            WheelController.wheel.totalPoints = WheelController.wheel.totalPoints + data.currentPoints
-            -- g_logger.info("current points: " .. data.currentPoints)
+            WheelController.wheel.points = WheelController.wheel.points + data.currentPoints
             data.currentPoints = 0
         elseif value == "+max" then
             local diff = data.totalPoints - data.currentPoints
-            if diff > WheelController.wheel.totalPoints then
-                diff = WheelController.wheel.totalPoints
+            if diff > WheelController.wheel.points then
+                diff = WheelController.wheel.points
             end
             data.currentPoints = data.currentPoints + diff
-            WheelController.wheel.totalPoints = WheelController.wheel.totalPoints - diff
+            WheelController.wheel.points = WheelController.wheel.points - diff
         end
         WheelController.wheel.currentSelectSlotData = data
         data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
-        -- g_logger.info("Setting slot ID " .. slotId .. " points to " .. data.currentPoints .. " tp: " .. data.totalPoints)
-
-        -- g_logger.info(">>> cPath" .. data.colorPath)
         data.isComplete = data.currentPoints == data.totalPoints
         WheelController.wheel.data[slotId] = data
         helper.wheel.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
@@ -199,17 +211,10 @@ function WheelController.wheel:onChangeSlotPoints(value)
     if data.currentPoints > data.totalPoints then
         data.currentPoints = data.totalPoints
     end
-    -- WheelController.wheel.slots[slotId].currentPoints = newPoints
-    -- data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
-    -- g_logger.info(">>> cPath" .. data.colorPath)
     data.isComplete = data.currentPoints == data.totalPoints
     WheelController.wheel.data[slotId] = data
     WheelController.wheel.currentSelectSlotData = data
     helper.wheel.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
-    -- g_logger.info("Setting slot ID " ..
-    --     slotId ..
-    --     " points to " ..
-    --     WheelController.wheel.data[slotId].currentPoints .. " tp: " .. WheelController.wheel.data[slotId].totalPoints)
 end
 
 function WheelController.wheel:fillQuadrantsBorders()
