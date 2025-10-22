@@ -1,59 +1,15 @@
+local helper = dofile("helpers/helper.lua")
+
+
+
+
 WheelController = Controller:new()
 WheelButton = nil
 
 local baseButtonClip = { x = 0, y = 0, width = 322, height = 34 }
 local baseButtonClipped = { x = 0, y = 34, width = 322, height = 34 }
 
-local WheelSlots =
-{
-    SLOT_GREEN_200 = 1,
-    SLOT_GREEN_TOP_150 = 2,
-    SLOT_GREEN_TOP_100 = 3,
 
-    SLOT_RED_TOP_100 = 4,
-    SLOT_RED_TOP_150 = 5,
-    SLOT_RED_200 = 6,
-
-    SLOT_GREEN_BOTTOM_150 = 7,
-    SLOT_GREEN_MIDDLE_100 = 8,
-    SLOT_GREEN_TOP_75 = 9,
-
-    SLOT_RED_TOP_75 = 10,
-    SLOT_RED_MIDDLE_100 = 11,
-    SLOT_RED_BOTTOM_150 = 12,
-
-    SLOT_GREEN_BOTTOM_100 = 13,
-    SLOT_GREEN_BOTTOM_75 = 14,
-    SLOT_GREEN_50 = 15,
-
-    SLOT_RED_50 = 16,
-    SLOT_RED_BOTTOM_75 = 17,
-    SLOT_RED_BOTTOM_100 = 18,
-
-    SLOT_BLUE_TOP_100 = 19,
-    SLOT_BLUE_TOP_75 = 20,
-    SLOT_BLUE_50 = 21,
-
-    SLOT_PURPLE_50 = 22,
-    SLOT_PURPLE_TOP_75 = 23,
-    SLOT_PURPLE_TOP_100 = 24,
-
-    SLOT_BLUE_TOP_150 = 25,
-    SLOT_BLUE_MIDDLE_100 = 26,
-    SLOT_BLUE_BOTTOM_75 = 27,
-
-    SLOT_PURPLE_BOTTOM_75 = 28,
-    SLOT_PURPLE_MIDDLE_100 = 29,
-    SLOT_PURPLE_TOP_150 = 30,
-
-    SLOT_BLUE_200 = 31,
-    SLOT_BLUE_BOTTOM_150 = 32,
-    SLOT_BLUE_BOTTOM_100 = 33,
-
-    SLOT_PURPLE_BOTTOM_100 = 34,
-    SLOT_PURPLE_BOTTOM_150 = 35,
-    SLOT_PURPLE_200 = 36,
-}
 
 WheelController.wheel = {
     clip = baseButtonClipped,
@@ -61,9 +17,14 @@ WheelController.wheel = {
     borders = {},
     colors = {},
     slots = {},
-    currentSelectSlot = -1,
+    currentSelectSlotId = -1,
     hovers = {},
     currentHoverSlot = -1,
+    points = 0,
+    extraPoints = 0,
+    totalPoints = 0,
+    currentSelectSlotData = nil,
+    data = {}
 }
 WheelController.gem = {
     clip = baseButtonClip
@@ -151,428 +112,158 @@ local quadrantFrames = {
     [9] = 20
 }
 
-local WheelSlotsParser = {
-    [WheelSlots.SLOT_GREEN_200] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 9,
-        currentPoints = 0,
-        totalPoints = 200,
-        adjacents = {}
-    },
-    [WheelSlots.SLOT_GREEN_TOP_150] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 8,
-        currentPoints = 0,
-        totalPoints = 150,
-        adjacents = { WheelSlots.SLOT_GREEN_200 },
-    },
-    [WheelSlots.SLOT_GREEN_BOTTOM_150] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 7,
-        currentPoints = 0,
-        totalPoints = 150,
-        adjacents = { WheelSlots.SLOT_GREEN_200 },
-    },
-    [WheelSlots.SLOT_GREEN_TOP_100] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 6,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_GREEN_BOTTOM_150, WheelSlots.SLOT_RED_TOP_100 },
-    },
-    [WheelSlots.SLOT_GREEN_MIDDLE_100] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 5,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_GREEN_BOTTOM_150, WheelSlots.SLOT_GREEN_TOP_150, },
-    },
-    [WheelSlots.SLOT_GREEN_BOTTOM_100] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 4,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_GREEN_BOTTOM_150, WheelSlots.SLOT_BLUE_BOTTOM_100, },
-    },
-    [WheelSlots.SLOT_GREEN_TOP_75] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 3,
-        currentPoints = 0,
-        totalPoints = 75,
-        adjacents = { WheelSlots.SLOT_GREEN_MIDDLE_100, WheelSlots.SLOT_GREEN_TOP_100, WheelSlots.SLOT_RED_TOP_75, },
-    },
-    [WheelSlots.SLOT_GREEN_BOTTOM_75] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 2,
-        currentPoints = 0,
-        totalPoints = 75,
-        adjacents = { WheelSlots.SLOT_GREEN_MIDDLE_100, WheelSlots.SLOT_GREEN_BOTTOM_100, WheelSlots.SLOT_BLUE_BOTTOM_75, },
-    },
-    [WheelSlots.SLOT_GREEN_50] = {
-        quadrant = "top_left",
-        border = "top_left",
-        color = "TopLeft",
-        index = 1,
-        currentPoints = 0,
-        totalPoints = 50,
-        adjacents = { WheelSlots.SLOT_GREEN_BOTTOM_75, WheelSlots.SLOT_GREEN_TOP_75, },
-    },
-    [WheelSlots.SLOT_RED_200] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 9,
-        currentPoints = 0,
-        totalPoints = 200,
-        adjacents = {},
-    },
-    [WheelSlots.SLOT_RED_TOP_150] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 8,
-        currentPoints = 0,
-        totalPoints = 150,
-        adjacents = { WheelSlots.SLOT_RED_200 },
-    },
-    [WheelSlots.SLOT_RED_BOTTOM_150] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 7,
-        currentPoints = 0,
-        totalPoints = 150,
-        adjacents = { WheelSlots.SLOT_RED_200 },
-    },
-    [WheelSlots.SLOT_RED_TOP_100] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 6,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_RED_TOP_150, WheelSlots.SLOT_GREEN_TOP_100 },
-    },
-    [WheelSlots.SLOT_RED_MIDDLE_100] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 5,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_RED_TOP_150, WheelSlots.SLOT_RED_BOTTOM_150 },
-    },
-    [WheelSlots.SLOT_RED_BOTTOM_100] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 4,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_RED_BOTTOM_150, WheelSlots.SLOT_PURPLE_BOTTOM_100 },
-    },
-    [WheelSlots.SLOT_RED_TOP_75] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 3,
-        currentPoints = 0,
-        totalPoints = 75,
-        adjacents = { WheelSlots.SLOT_RED_TOP_100, WheelSlots.SLOT_RED_MIDDLE_100, WheelSlots.SLOT_GREEN_TOP_75, },
-    },
-    [WheelSlots.SLOT_RED_BOTTOM_75] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 2,
-        currentPoints = 0,
-        totalPoints = 75,
-        adjacents = { WheelSlots.SLOT_RED_BOTTOM_100, WheelSlots.SLOT_RED_MIDDLE_100, WheelSlots.SLOT_PURPLE_BOTTOM_75, },
-    },
-    [WheelSlots.SLOT_RED_50] = {
-        quadrant = "top_right",
-        border = "top_right",
-        color = "TopRight",
-        index = 1,
-        currentPoints = 0,
-        totalPoints = 50,
-        adjacents = { WheelSlots.SLOT_RED_BOTTOM_75, WheelSlots.SLOT_RED_TOP_75 },
-    },
-    [WheelSlots.SLOT_BLUE_200] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 9,
-        currentPoints = 0,
-        totalPoints = 200,
-        adjacents = {}
-    },
-    [WheelSlots.SLOT_BLUE_TOP_150] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 8,
-        currentPoints = 0,
-        totalPoints = 150,
-        adjacents = { WheelSlots.SLOT_BLUE_200 },
-    },
-    [WheelSlots.SLOT_BLUE_BOTTOM_150] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 7,
-        currentPoints = 0,
-        totalPoints = 150,
-        adjacents = { WheelSlots.SLOT_BLUE_200 },
-    },
-    [WheelSlots.SLOT_BLUE_TOP_100] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 4,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_BLUE_BOTTOM_150, WheelSlots.SLOT_PURPLE_TOP_100 },
-
-    },
-    [WheelSlots.SLOT_BLUE_MIDDLE_100] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 5,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_BLUE_BOTTOM_150, WheelSlots.SLOT_BLUE_TOP_150 },
-    },
-    [WheelSlots.SLOT_BLUE_BOTTOM_100] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 6,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_BLUE_TOP_150, WheelSlots.SLOT_PURPLE_BOTTOM_100 },
-    },
-    [WheelSlots.SLOT_BLUE_TOP_75] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 2,
-        currentPoints = 0,
-        totalPoints = 75,
-        adjacents = { WheelSlots.SLOT_BLUE_MIDDLE_100, WheelSlots.SLOT_BLUE_TOP_100, WheelSlots.SLOT_PURPLE_TOP_75 },
-    },
-    [WheelSlots.SLOT_BLUE_BOTTOM_75] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 3,
-        currentPoints = 0,
-        totalPoints = 75,
-        adjacents = { WheelSlots.SLOT_BLUE_MIDDLE_100, WheelSlots.SLOT_BLUE_BOTTOM_100, WheelSlots.SLOT_PURPLE_BOTTOM_75 },
-    },
-    [WheelSlots.SLOT_BLUE_50] = {
-        quadrant = "bottom_left",
-        border = "bottom_left",
-        color = "BottomLeft",
-        index = 1,
-        currentPoints = 0,
-        totalPoints = 50,
-        adjacents = { WheelSlots.SLOT_BLUE_BOTTOM_75, WheelSlots.SLOT_BLUE_TOP_75 },
-    },
-    [WheelSlots.SLOT_PURPLE_200] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 9,
-        currentPoints = 0,
-        totalPoints = 200,
-        adjacents = {}
-    },
-    [WheelSlots.SLOT_PURPLE_TOP_150] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 7,
-        currentPoints = 0,
-        totalPoints = 150,
-        adjacents = { WheelSlots.SLOT_PURPLE_200 }
-    },
-    [WheelSlots.SLOT_PURPLE_BOTTOM_150] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 8,
-        currentPoints = 0,
-        totalPoints = 150,
-        adjacents = { WheelSlots.SLOT_PURPLE_200 }
-    },
-    [WheelSlots.SLOT_PURPLE_TOP_100] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 4,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_PURPLE_TOP_150, WheelSlots.SLOT_BLUE_TOP_100 },
-    },
-    [WheelSlots.SLOT_PURPLE_MIDDLE_100] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 5,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_PURPLE_TOP_150, WheelSlots.SLOT_PURPLE_BOTTOM_150 }
-    },
-    [WheelSlots.SLOT_PURPLE_BOTTOM_100] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 6,
-        currentPoints = 0,
-        totalPoints = 100,
-        adjacents = { WheelSlots.SLOT_PURPLE_BOTTOM_150, WheelSlots.SLOT_RED_BOTTOM_100 },
-    },
-    [WheelSlots.SLOT_PURPLE_TOP_75] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 2,
-        currentPoints = 0,
-        totalPoints = 75,
-        adjacents = { WheelSlots.SLOT_PURPLE_MIDDLE_100, WheelSlots.SLOT_PURPLE_TOP_100, WheelSlots.SLOT_BLUE_TOP_75 },
-    },
-    [WheelSlots.SLOT_PURPLE_BOTTOM_75] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 3,
-        currentPoints = 0,
-        totalPoints = 75,
-        adjacents = { WheelSlots.SLOT_PURPLE_MIDDLE_100, WheelSlots.SLOT_PURPLE_BOTTOM_100, WheelSlots.SLOT_RED_BOTTOM_75 },
-    },
-    [WheelSlots.SLOT_PURPLE_50] = {
-        quadrant = "bottom_right",
-        border = "bottom_right",
-        color = "BottomRight",
-        index = 1,
-        currentPoints = 0,
-        totalPoints = 50,
-        adjacents = { WheelSlots.SLOT_PURPLE_BOTTOM_75, WheelSlots.SLOT_PURPLE_TOP_75 },
-    },
-}
 
 local baseBorderPath = "/images/game/wheel/wheel-border/%s/%s.png"
 local baseWheelColorPath = "/images/game/wheel/wheel-colors/%s/%s_%s.png"
 local baseColorSlotPath = "/images/game/wheel/wheel-colors/%s/slot%s/%s.png"
 local otherBorders = { "revelationPerk", "vesselGem" }
 
-local function propagateAdjacentSelection(slotList)
-    -- group slots by quadrant and index safely
-    local byQuadrant = {}
-
-    for _, data in ipairs(slotList) do
-        if data.selected then
-            for _, slotId in ipairs(WheelController.wheel.slots[data.id].adjacents) do
-                table.insert(byQuadrant, slotId)
-            end
-        end
-    end
-
-    for _, slotId in ipairs(byQuadrant) do
-        for _, data in ipairs(slotList) do
-            if data.id == slotId then
-                data.adjacent = true
-                break
-            end
-        end
-    end
-end
-
 function WheelController.wheel:handleOnHover(slotId)
     if WheelController.wheel.currentHoverSlot == slotId then return end
-    g_logger.info("Hover slotId: " .. slotId)
     WheelController.wheel.currentHoverSlot = slotId
+end
+
+local indexByTotalPoints = {
+    [50] = 1,
+    [75] = 2,
+    [100] = 3,
+    [150] = 4,
+    [200] = 5
+}
+
+function WheelController.wheel.getSlotFramePercentage(data)
+    data.totalPoints = helper.wod.WheelSlotsParser[data.id].totalPoints
+    local numericValue = tonumber(data.currentPoints) or 0
+    local sanitizedValue = math.max(0, numericValue)
+    local clampedValue = math.min(sanitizedValue, data.totalPoints)
+    local progress = clampedValue / data.totalPoints
+    local frames = quadrantFrames[data.index]
+
+    -- clamp & map progress [0..1] -> 1..frames
+    local p = math.max(1, math.min(1, progress))
+    if p == 0 then
+        return string.format(baseColorSlotPath, data.quadrant, data.index, frames)
+    end
+    local idx = math.floor(p * frames)
+    if idx > frames then idx = frames end
+    local path = string.format(baseColorSlotPath, data.quadrant, data.index, idx)
+    g_logger.info(string.format(
+        "quadrant: %s, index: %d, currentPoints: %d, totalPoints: %d, progress: %.2f, frames: %d, idx: %d, path: %s",
+        data.quadrant, data.index, data.currentPoints, data.totalPoints, progress, frames, idx, path))
+    return path
+end
+
+function WheelController.wheel:onChangeSlotPoints(value)
+    if not WheelController.wheel.currentSelectSlotId then return end
+    local slotId = WheelController.wheel.currentSelectSlotId
+    local data = WheelController.wheel.data[slotId]
+    if not data then return end
+    data.index = helper.wod.WheelSlotsParser[slotId].index
+    data.quadrant = helper.wod.WheelSlotsParser[slotId].quadrant
+    data.color = helper.wod.WheelSlotsParser[slotId].color
+    data.totalPoints = helper.wod.WheelSlotsParser[slotId].totalPoints
+    g_logger.info("CHANGE SLOT ID POINTS: " .. tostring(slotId) .. " index: " .. data.index)
+
+    if type(value) == "string" then
+        local points = 0
+        if value == "-max" then
+            WheelController.wheel.totalPoints = WheelController.wheel.totalPoints + data.currentPoints
+            -- g_logger.info("current points: " .. data.currentPoints)
+            data.currentPoints = 0
+        elseif value == "+max" then
+            local diff = data.totalPoints - data.currentPoints
+            if diff > WheelController.wheel.totalPoints then
+                diff = WheelController.wheel.totalPoints
+            end
+            data.currentPoints = data.currentPoints + diff
+            WheelController.wheel.totalPoints = WheelController.wheel.totalPoints - diff
+        end
+        WheelController.wheel.currentSelectSlotData = data
+        data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
+        -- g_logger.info("Setting slot ID " .. slotId .. " points to " .. data.currentPoints .. " tp: " .. data.totalPoints)
+
+        -- g_logger.info(">>> cPath" .. data.colorPath)
+        WheelController.wheel.data[slotId] = data
+        return
+    end
+
+
+    local numericValue = tonumber(value) or 0
+    if numericValue == 0 then return end
+    local newPoints = data.currentPoints + numericValue
+    if newPoints < 0 then
+        newPoints = 0
+    end
+    if newPoints > data.totalPoints then
+        newPoints = data.totalPoints
+    end
+    -- WheelController.wheel.slots[slotId].currentPoints = newPoints
+    data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
+    -- g_logger.info(">>> cPath" .. data.colorPath)
+    WheelController.wheel.data[slotId].currentPoints = newPoints
+    WheelController.wheel.currentSelectSlotData = data
+    -- g_logger.info("Setting slot ID " ..
+    --     slotId ..
+    --     " points to " ..
+    --     WheelController.wheel.data[slotId].currentPoints .. " tp: " .. WheelController.wheel.data[slotId].totalPoints)
 end
 
 function WheelController.wheel:fillQuadrantsBorders()
     WheelController.wheel.borders = {}
     WheelController.wheel.colors = {}
     WheelController.wheel.hovers = {}
+    WheelController.wheel.data = {}
 
     for slot, data in pairs(self.slots) do
-        table.insert(WheelController.wheel.borders, {
+        if slot == 4 then
+            g_logger.info("INDEX: " .. data.index .. " QUADRANT: " .. data.quadrant)
+        end
+        local current = {
+            quadrant = data.quadrant,
+            border = data.border,
+            color = data.color,
+            index = data.index,
+            currentPoints = data.currentPoints,
+            totalPoints = data.totalPoints,
+            isHovered = data.isHovered,
+            isSelected = data.isSelected,
+            isAdjacent = data.isAdjacent,
+            colorPath = "",
+            hoverPath = string.format(baseWheelColorPath, data.quadrant, data.color, data.index),
+            adjacentPath = string.format(baseColorSlotPath, data.quadrant, data.index, quadrantFrames[data.index]),
+            adjacents = data.adjacents,
             id = slot,
-            path = string.format(baseBorderPath, data.quadrant, data.index),
+            borderPath = string.format(baseBorderPath, data.quadrant, data.index),
+            bgPath = string.format(baseWheelColorPath, data.quadrant, data.color, data.index),
             height = "522",
             width = "522",
-            index = data.index,
-            selected = false
-        })
+            isComplete = data.currentPoints == data.totalPoints,
+        }
 
-        -- local baseColorSlotPath = "/images/game/wheel/wheel-colors/%s/slot%s/%s.png"
-        local slotPath = string.format(baseColorSlotPath, data.quadrant, data.index, quadrantFrames[data.index])
-
-        g_logger.info(string.format("slot id %d, index: %d, path: %s", slot, data.index, slotPath))
-
-        table.insert(WheelController.wheel.colors, {
-            id = slot,
-            path = slotPath,
-            -- path = string.format(baseWheelColorPath, data.quadrant, data.color, data.index),
-            height = "522",
-            width = "522",
-            index = data.index,
-            selected = data.currentPoints == data.totalPoints,
-            adjacent = data.index == 1,
-        })
-
-        table.insert(WheelController.wheel.hovers, {
-            id = slot,
-            path = string.format(baseWheelColorPath, data.quadrant, data.color, data.index),
-            height = "522",
-            width = "522",
-            index = data.index,
-        })
+        current.colorPath = WheelController.wheel.getSlotFramePercentage(current)
+        table.insert(WheelController.wheel.data, current)
     end
 
-    propagateAdjacentSelection(WheelController.wheel.colors)
+    helper.wod.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
 end
 
-function WheelController.wheel:handleSlectSlot(slotId)
-    g_logger.info("slotId: " .. slotId)
-    if WheelController.wheel.currentSelectSlot == slotId then return end
-    WheelController.wheel.currentSelectSlot = slotId
+function WheelController.wheel:handleSelectSlot(slotId)
+    WheelController.wheel.currentSelectSlotId = slotId
+    WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
+    g_logger.info("Selected slot ID: " .. slotId)
 end
 
 function WheelController:show(skipRequest)
     -- if not g_game.getFeature(GameForgeConvergence) then
     --     return WheelController:hide()
     -- end
-    WheelController.wheel.currentSelectSlot = -1
+    WheelController.wheel.currentSelectSlotId = -1
+    WheelController.wheel.currentSelectSlotData = nil
     local player = g_game.getLocalPlayer()
-    g_logger.info("player id: " .. tostring(player:getId()))
     g_game.openWheelOfDestiny(player:getId())
 
     local basicVocationId = getBasicVocation(player:getVocation())
     local overlayImage = getVocationImage(basicVocationId)
-
     if not overlayImage then
         return WheelController:hide()
     end
@@ -637,12 +328,32 @@ end
 
 function onWheelOfDestinyOpenWindow(data)
     data.wheelPoints = data.wheelPoints or {}
+    local currentPoints = 0
     for slot, point in pairs(data.wheelPoints) do
-        if WheelSlotsParser[slot] then
-            WheelSlotsParser[slot].currentPoints = point
+        if helper.wod.WheelSlotsParser[slot] then
+            helper.wod.WheelSlotsParser[slot].currentPoints = point
+            currentPoints = currentPoints + point
         end
     end
 
-    WheelController.wheel.slots = WheelSlotsParser
+    -- for k, v in pairs(data) do
+    --     g_logger.info("WOD DATA key: " .. k .. " value: " .. tostring(v))
+    -- end
+
+    for k, v in pairs(data.promotionScrolls) do
+        g_logger.info("Promotion Scrolls key: " .. k .. " value: " .. tostring(v))
+    end
+
+    data.points = data.points or 0
+    data.extraPoints = data.extraPoints or 0
+
+    g_logger.info(string.format(
+        "Received WOD data: points=%d, extraPoints=%d, currentPoints=%d, data.promotionScrolls=%d",
+        data.points, data.extraPoints, currentPoints, #data.promotionScrolls))
+
+    WheelController.wheel.points = currentPoints
+    WheelController.wheel.extraPoints = data.extraPoints
+    WheelController.wheel.totalPoints = data.points + data.extraPoints
+    WheelController.wheel.slots = helper.wod.WheelSlotsParser
     WheelController.wheel:fillQuadrantsBorders()
 end

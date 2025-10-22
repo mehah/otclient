@@ -64,7 +64,8 @@
     .panel {
       border: 1px red;
       width: 213px;
-      height: 100px;
+
+      height: 100%;
       display: inline-block;
     }
     .panel-center {
@@ -125,44 +126,95 @@
     <div class="content" onhover="self.wheel:handleOnHover(-1)">
       <div *if="self.currentTab == 'wheel'">
         <div class="panel-container" onhover="self.wheel:handleOnHover(-1)">
-          <div class="panel">panel left</div>
+          <div class="panel">
+            <window title="Section" style="width: 180px; height: 248px">
+              <div
+                *if="self.wheel.currentSelectSlotData ~= nil"
+                style="height: 220px"
+              >
+                <div>1/50</div>
+                <div>
+                  <button onclick="self.wheel:onChangeSlotPoints('-max')">
+                    -Max
+                  </button>
+                  <button onclick="self.wheel:onChangeSlotPoints(-1)">
+                    -1
+                  </button>
+                  <button onclick="self.wheel:onChangeSlotPoints(1)">+1</button>
+                  <button onclick="self.wheel:onChangeSlotPoints('+max')">
+                    +Max
+                  </button>
+                </div>
+              </div>
+              <div>
+                <span> Available Promotion Points </span>
+                <span>{{self.wheel.points}}/{{self.wheel.totalPoints}}</span>
+              </div>
+            </window>
+          </div>
           <div class="panel-center" onhover="self.wheel:handleOnHover(-1)">
             <div class="backdrop-wheel">
-              <img
-                *for="local color in self.wheel.colors"
-                class="wheel-center-cells"
-                *image-source="color.path"
-                *opacity="color.selected and 0.75 or (color.adjacent and 0.2 or 0.01) or 0.01"
-                *height="color.height"
-                *width="color.width"
-                onclick="self.wheel:handleSlectSlot(color.id)"
-                *image-pixel-valid="true"
-              />
-              <img
-                *for="local border in self.wheel.borders"
-                class="wheel-center-cells"
-                *image-source="border.path"
-                *opacity="self.wheel.currentSelectSlot == border.id and 1 or 0.01"
-                *height="border.height"
-                *width="border.width"
-              />
+              <span
+                style="position: absolute"
+                *for="local data in self.wheel.data"
+              >
+                <img
+                  class="wheel-center-cells"
+                  *image-source="data.colorPath"
+                  *height="data.height"
+                  *width="data.width"
+                  *opacity="data.isComplete and 0.75 or (data.isAdjacent and 0.5 or 0.01) or 0.01"
+                  *image-pixel-valid="true"
+                  image-draw-order="1"
+                />
+                <img
+                  class="wheel-center-cells"
+                  *image-source="data.bgPath"
+                  *height="data.height"
+                  *width="data.width"
+                  onclick="self.wheel:handleSelectSlot(data.id)"
+                  opacity="0.001"
+                  *image-pixel-valid="true"
+                  image-draw-order="0"
+                />
+
+                <img
+                  class="wheel-center-cells"
+                  *image-source="data.hoverPath"
+                  *opacity="self.wheel.currentHoverSlot == data.id and 0.2 or 0.01"
+                  *height="data.height"
+                  *width="data.width"
+                  onhover="self.wheel:handleOnHover(data.id)"
+                  *image-pixel-valid="true"
+                />
+                <img
+                  class="wheel-center-cells"
+                  *image-source="data.borderPath"
+                  *height="data.height"
+                  *width="data.width"
+                  *opacity="self.wheel.currentSelectSlotId == data.id and 1 or 0.01"
+                  image-draw-order="3"
+                  *image-pixel-valid="true"
+                />
+              </span>
               <img
                 *image-source="self.wheel.backdropVocationOverlay"
                 class="backdrop-wheel-vocation-overlay"
                 height="522"
                 width="522"
                 onhover="self.wheel:handleOnHover(-1)"
+                image-draw-order="2"
               />
+              <!-- 
               <img
-                *for="local color in self.wheel.hovers"
                 class="wheel-center-cells"
-                *image-source="color.path"
-                *opacity="self.wheel.currentHoverSlot == color.id and 0.2 or 0.01"
-                *height="color.height"
-                *width="color.width"
-                onhover="self.wheel:handleOnHover(color.id)"
+                *if="self.wheel.currentSelectSlotData ~= nil and self.wheel.currentSelectSlotData.borderPath ~= nil"
+                *image-source="self.wheel.currentSelectSlotData.borderPath"
+                *height="self.wheel.currentSelectSlotData.height"
+                *width="self.wheel.currentSelectSlotData.width"
+                image-draw-order="3"
                 *image-pixel-valid="true"
-              />
+              /> -->
             </div>
           </div>
           <div class="panel">panel right</div>
