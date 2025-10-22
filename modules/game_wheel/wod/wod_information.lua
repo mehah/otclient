@@ -184,7 +184,56 @@ local VocationInformation = {
             [3] = tr('Sorcerer Revelation 5:\nLegendary mage status'),  
             [4] = tr('Druid Revelation 5:\nLegendary druid status'),  
             [5] = tr('Monk Revelation 5:\nLegendary master status')  
-        }  
-    }  
+        }
+    },
+     -- Dados de progresso dos quadrantes    
+    quadrantProgress = {
+        default = {  
+            TopLeft = {  
+                [1] = { value = 40, total = 50 },  
+                [2] = { value = 0, total = 75 },  
+                [3] = { value = 75, total = 75 },  
+                [4] = { value = 80, total = 100 },  
+                [5] = { value = 100, total = 100 },  
+                [6] = { value = 0, total = 100 },  
+                [7] = { value = 80, total = 150 },  
+                [8] = { value = 0, total = 150 },  
+                [9] = { value = 200, total = 200 }  
+            }, 
+            BottomLeft = {  
+                [1] = { value = 1, total = 10 },  
+                [2] = { value = 2, total = 20 },  
+                [3] = { value = 3, total = 30 },  
+                [4] = { value = 4, total = 40 },  
+                [5] = { value = 5, total = 50 },  
+                [6] = { value = 6, total = 60 },  
+                [7] = { value = 7, total = 70 },  
+                [8] = { value = 8, total = 80 },  
+                [9] = { value = 9, total = 90 }  
+            },  
+            BottomRight = {  
+                [1] = { value = 40, total = 50 },  
+                [2] = { value = 0, total = 75 },  
+                [3] = { value = 75, total = 75 },  
+                [4] = { value = 80, total = 100 },  
+                [5] = { value = 100, total = 100 },  
+                [6] = { value = 0, total = 100 },  
+                [7] = { value = 80, total = 150 },  
+                [8] = { value = 0, total = 150 },  
+                [9] = { value = 200, total = 200 }  
+            },  
+            TopRight = {  
+                [1] = { value = 40, total = 50 },  
+                [2] = { value = 25, total = 75 },  
+                [3] = { value = 75, total = 75 },  
+                [4] = { value = 80, total = 100 },  
+                [5] = { value = 100, total = 100 },  
+                [6] = { value = 15, total = 100 },  
+                [7] = { value = 80, total = 150 },  
+                [8] = { value = 120, total = 150 },  
+                [9] = { value = 200, total = 200 }  
+            }      
+        }
+    } 
 }
 return VocationInformation

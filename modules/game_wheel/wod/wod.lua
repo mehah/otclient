@@ -489,26 +489,34 @@ end
 function WheelOfDestiny.setupSlotClickHandlers(ui)  
     print("Setting up slot click handlers...")  
       
-    local slot = ui:recursiveGetChildById('colorBottomLeft1')  
-    if not slot then  
-        print("ERROR: Slot colorBottomLeft1 not found")  
-        return  
+    local quadrants = {  
+        {key = 'BottomLeft', count = 9},  
+        -- Adicionar outros quadrantes depois  
+    }  
+      
+    for _, quadrant in ipairs(quadrants) do  
+        for i = 1, quadrant.count do  
+            local slotId = string.format('color%s%d', quadrant.key, i)  
+            local slot = ui:recursiveGetChildById(slotId)  
+              
+            if slot then  
+                print(string.format("Connecting %s...", slotId))  
+                connect(slot, {  
+                    onMousePress = function(widget, mousePos, mouseButton)  
+                        if mouseButton == MouseLeftButton then  
+                            toggleSlotBorder(widget, quadrant.key, i)  
+                            return true  
+                        end  
+                        return false  
+                    end  
+                })  
+            else  
+                print(string.format("ERROR: Slot %s not found", slotId))  
+            end  
+        end  
     end  
       
-    print("Slot colorBottomLeft1 found, connecting event...")  
-      
-    connect(slot, {  
-        onMousePress = function(widget, mousePos, mouseButton)  
-            print("Mouse pressed on colorBottomLeft1! Button: " .. tostring(mouseButton))  
-            if mouseButton == MouseLeftButton then  
-                toggleSlotBorder(widget, 'BottomLeft', 1)  
-                return true  
-            end  
-            return false  
-        end  
-    })  
-      
-    print("Event connected successfully")  
+    print("All slot click handlers connected")  
 end
 
 -- Function to check if can access the wheel

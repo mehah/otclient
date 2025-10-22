@@ -164,57 +164,56 @@ function SelectWindow(type, isBackButtonPress)
     end  
 end  
   
--- Funções para cada tab (agora carregam os módulos específicos)  
-function showWheelOfDestiny(container)  
-    if WheelOfDestiny and WheelOfDestiny.show then  
-        WheelOfDestiny.show(container)  
-    end  
 
-    WheelOfDestiny.updateSlicesProgress("TopLeft", {
-        [1] = { value = 40, total = 50 },
-        [2] = { value = 0, total = 75 },
-        [3] = { value = 75, total = 75 },
-        [4] = { value = 80, total = 100 },
-        [5] = { value = 100, total = 100 },
-        [6] = { value = 0, total = 100 },
-        [7] = { value = 80, total = 150 },
-        [8] = { value = 0, total = 150 },
-        [9] = { value = 200, total = 200 },
-    })
-    WheelOfDestiny.updateSlicesProgress("BottomLeft", {
-        [1] = { value = 40, total = 50 },
-        [2] = { value = 0, total = 75 },
-        [3] = { value = 75, total = 75 },
-        [4] = { value = 80, total = 100 },
-        [5] = { value = 100, total = 100 },
-        [6] = { value = 0, total = 100 },
-        [7] = { value = 80, total = 150 },
-        [8] = { value = 0, total = 150 },
-        [9] = { value = 200, total = 200 },
-    })
-    WheelOfDestiny.updateSlicesProgress("BottomRight", {
-        [1] = { value = 40, total = 50 },
-        [2] = { value = 0, total = 75 },
-        [3] = { value = 75, total = 75 },
-        [4] = { value = 80, total = 100 },
-        [5] = { value = 100, total = 100 },
-        [6] = { value = 0, total = 100 },
-        [7] = { value = 80, total = 150 },
-        [8] = { value = 0, total = 150 },
-        [9] = { value = 200, total = 200 },
-    })
-    WheelOfDestiny.updateSlicesProgress("TopRight", {
-        [1] = { value = 40, total = 50 },
-        [2] = { value = 25, total = 75 },
-        [3] = { value = 75, total = 75 },
-        [4] = { value = 80, total = 100 },
-        [5] = { value = 100, total = 100 },
-        [6] = { value = 15, total = 100 },
-        [7] = { value = 80, total = 150 },
-        [8] = { value = 120, total = 150 },
-        [9] = { value = 200, total = 200 },
-    })
-end  
+function showWheelOfDestiny(container)    
+    if not WheelOfDestiny or not WheelOfDestiny.show then  
+        return  
+    end  
+      
+    WheelOfDestiny.show(container)  
+      
+    -- Obter vocação do jogador  
+    local player = g_game.getLocalPlayer()  
+    if not player then   
+        return   
+    end  
+      
+    -- Obter vocação básica  
+    local basicVocation = WheelOfDestiny.getPlayerBasicVocation()  
+    if not basicVocation then   
+        return   
+    end  
+      
+    -- Carregar módulo de informações  
+    local VocationInfo = dofile('wod/wod_information.lua')  
+    if not VocationInfo or not VocationInfo.quadrantProgress then  
+        return  
+    end  
+      
+    -- Usar dados específicos da vocação ou fallback para default  
+    local progressData = VocationInfo.quadrantProgress[basicVocation] or   
+                        VocationInfo.quadrantProgress.default  
+      
+    if not progressData then  
+        return  
+    end  
+      
+    if progressData.TopLeft then  
+        WheelOfDestiny.updateSlicesProgress("TopLeft", progressData.TopLeft)  
+    end  
+      
+    if progressData.BottomLeft then  
+        WheelOfDestiny.updateSlicesProgress("BottomLeft", progressData.BottomLeft)  
+    end  
+      
+    if progressData.BottomRight then  
+        WheelOfDestiny.updateSlicesProgress("BottomRight", progressData.BottomRight)  
+    end  
+      
+    if progressData.TopRight then  
+        WheelOfDestiny.updateSlicesProgress("TopRight", progressData.TopRight)  
+    end  
+end
   
 function showGemAtelier(container)  
     if GemAtelier and GemAtelier.show then  

@@ -481,7 +481,18 @@ UIWidget
       margin-left: 157
       image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_2.png
       image-clip: 157 261 67 73
-      phantom: true
+      phantom: false
+      focusable: false
+      image-draw-order: 0
+
+      UIWidget
+        id: borderBottomLeft2
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/2.png
+        image-clip: 157 261 67 73
+        visible: false
+        phantom: true
+        image-draw-order: 1
 
     UIWidget
       id: colorBottomLeft3
@@ -492,7 +503,18 @@ UIWidget
       margin-left: 188
       image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_3.png
       image-clip: 188 298 73 67
-      phantom: true
+      phantom: false
+      focusable: false
+      image-draw-order: 0
+
+      UIWidget
+        id: borderBottomLeft3
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/3.png
+        image-clip: 188 298 73 67
+        visible: false
+        phantom: true
+        image-draw-order: 1
 
     UIWidget
       id: colorBottomLeft4
@@ -503,7 +525,18 @@ UIWidget
       margin-left: 105
       image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_4.png
       image-clip: 105 261 65 77
-      phantom: true
+      phantom: false
+      focusable: false
+      image-draw-order: 0
+
+      UIWidget
+        id: borderBottomLeft4
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/4.png
+        image-clip: 105 261 65 77
+        visible: false
+        phantom: true
+        image-draw-order: 1
 
     UIWidget
       id: colorBottomLeft5
@@ -514,51 +547,106 @@ UIWidget
       margin-left: 127
       image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_5.png
       image-clip: 127 314 81 81
-      phantom: true
+      phantom: false
+      focusable: false
+      image-draw-order: 0
 
-    UIWidget
-      id: colorBottomLeft6
-      anchors.bottom: parent.bottom
-      anchors.left: parent.left
-      size: 77 65
-      margin-bottom: 105
-      margin-left: 184
-      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_6.png
-      image-clip: 184 352 77 65
-      phantom: true
+      UIWidget
+        id: borderBottomLeft5
+        anchors.fill: parent
+        image-source: /images/game/wheel/wheel-border/bottom_left/5.png
+        image-clip: 127 314 81 81
+        visible: false
+        phantom: true
+        image-draw-order: 1
 
-    UIWidget
-      id: colorBottomLeft7
-      anchors.bottom: parent.bottom
-      anchors.left: parent.left
-      size: 90 107
-      margin-bottom: 115
-      margin-left: 60
-      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_7.png
-      image-clip: 60 300 90 107
-      phantom: true
-
-    UIWidget
-      id: colorBottomLeft8
-      anchors.bottom: parent.bottom
-      anchors.left: parent.left
-      size: 107 90
-      margin-bottom: 60
-      margin-left: 115
-      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_8.png
-      image-clip: 115 372 107 90
-      phantom: true
-
-    UIWidget
-      id: colorBottomLeft9
-      anchors.bottom: parent.bottom
-      anchors.left: parent.left
-      size: 196 196
-      margin-bottom: 12
-      margin-left: 12
-      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_9.png
-      image-clip: 12 314 196 196
-      phantom: true
+    UIWidget  
+      id: colorBottomLeft6  
+      anchors.bottom: parent.bottom  
+      anchors.left: parent.left  
+      size: 77 65  
+      margin-bottom: 105  
+      margin-left: 184  
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_6.png  
+      image-clip: 184 352 77 65  
+      phantom: false  
+      focusable: false  
+      image-draw-order: 0  
+      
+      UIWidget  
+        id: borderBottomLeft6  
+        anchors.fill: parent  
+        image-source: /images/game/wheel/wheel-border/bottom_left/6.png  
+        image-clip: 184 352 77 65  
+        visible: false  
+        phantom: true  
+        image-draw-order: 1  
+      
+    UIWidget  
+      id: colorBottomLeft7  
+      anchors.bottom: parent.bottom  
+      anchors.left: parent.left  
+      size: 90 107  
+      margin-bottom: 115  
+      margin-left: 60  
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_7.png  
+      image-clip: 60 300 90 107  
+      phantom: false  
+      focusable: false  
+      image-draw-order: 0  
+      
+      UIWidget  
+        id: borderBottomLeft7  
+        anchors.fill: parent  
+        image-source: /images/game/wheel/wheel-border/bottom_left/7.png  
+        image-clip: 60 300 90 107  
+        visible: false  
+        phantom: true  
+        image-draw-order: 1  
+      
+    UIWidget  
+      id: colorBottomLeft8  
+      anchors.bottom: parent.bottom  
+      anchors.left: parent.left  
+      size: 107 90  
+      margin-bottom: 60  
+      margin-left: 115  
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_8.png  
+      image-clip: 115 372 107 90  
+      phantom: false  
+      focusable: false  
+      image-draw-order: 0  
+      
+      UIWidget  
+        id: borderBottomLeft8  
+        anchors.fill: parent  
+        image-source: /images/game/wheel/wheel-border/bottom_left/8.png  
+        image-clip: 115 372 107 90  
+        visible: false  
+        phantom: true  
+        image-draw-order: 1  
+      
+    UIWidget  
+      id: colorBottomLeft9  
+      anchors.bottom: parent.bottom  
+      anchors.left: parent.left  
+      size: 196 196  
+      margin-bottom: 12  
+      margin-left: 12  
+      image-source: /images/game/wheel/wheel-colors/bottom_left/BottonLeft_9.png  
+      image-clip: 12 314 196 196  
+      phantom: false  
+      focusable: false  
+      image-draw-order: 0  
+      
+      UIWidget  
+        id: borderBottomLeft9  
+        anchors.fill: parent  
+        image-source: /images/game/wheel/wheel-border/bottom_left/9.png  
+        image-clip: 12 314 196 196  
+        visible: false  
+        phantom: true  
+        image-draw-order: 1
 
     UIWidget
       id: colorQuadrantBottomRight
