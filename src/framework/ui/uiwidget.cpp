@@ -1480,12 +1480,10 @@ UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
 
 UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool wantsPhantom)
 {
-    const bool insidePadding = containsPaddingPoint(childPos);
-
-    if (isClipping() && !insidePadding)
+    if (isClipping() && !containsPaddingPoint(childPos))
         return nullptr;
 
-    if (insidePadding && isPixelTesting() && isPixelTransparent(childPos))
+    if (isPixelTesting() && isPixelTransparent(childPos))
         return nullptr;
 
     for (auto& child : std::ranges::reverse_view(m_children)) {
@@ -1495,7 +1493,7 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool w
 
             if (child->containsPoint(childPos)
                 && (wantsPhantom
-                    || (!child->isPhantom() && (!child->isPixelTesting() || !child->isPixelTransparent(childPos)))))
+                || (!child->isPhantom() && (!child->isPixelTesting() || !child->isPixelTransparent(childPos)))))
                 return child;
         }
     }
