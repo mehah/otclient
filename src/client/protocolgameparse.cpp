@@ -21,6 +21,7 @@
 */
 
 #include "protocolgame.h"
+#include "protocolcodes.h"
 
 #include "effect.h"
 #include "framework/net/inputmessage.h"

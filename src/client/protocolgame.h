@@ -22,39 +22,9 @@
 
 #pragma once
 
-#include "creature.h"
 #include "declarations.h"
-#include "protocolcodes.h"
-#include <framework/net/protocol.h>
-#include <string>
-
-struct BossCooldownData {
-    uint32_t bossRaceId;
-    uint64_t cooldownTime;
-    
-    BossCooldownData(uint32_t raceId, uint64_t cooldown)
-        : bossRaceId(raceId), cooldownTime(cooldown) {}
-};
-
-struct PartyMemberData {
-    uint32_t memberID;
-    uint8_t highlight;
-    uint64_t loot;
-    uint64_t supply;
-    uint64_t damage;
-    uint64_t healing;
-    
-    PartyMemberData(uint32_t id, uint8_t highlightValue, uint64_t lootValue, uint64_t supplyValue, uint64_t damageValue, uint64_t healingValue)
-        : memberID(id), highlight(highlightValue), loot(lootValue), supply(supplyValue), damage(damageValue), healing(healingValue) {}
-};
-
-struct PartyMemberName {
-    uint32_t memberID;
-    std::string memberName;
-    
-    PartyMemberName(uint32_t id, const std::string& name)
-        : memberID(id), memberName(name) {}
-};
+#include "staticdata.h"
+#include "framework/net/protocol.h"
 
 class ProtocolGame final : public Protocol
 {
@@ -414,7 +384,7 @@ private:
     bool m_gameInitialized{ false };
     bool m_mapKnown{ false };
     bool m_firstRecv{ true };
-    bool m_record {false};
+    bool m_record{ false };
 
     ticks_t m_lastPartyAnalyzerCall{ 0 };
 

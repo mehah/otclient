@@ -36,11 +36,12 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/ui/uiwidget.h>
+#include "protocolcodes.h"
 
 #include "animator.h"
 #include "gameconfig.h"
 #include "statictext.h"
-
+#include "thingtype.h"
 double Creature::speedA = 0;
 double Creature::speedB = 0;
 double Creature::speedC = 0;
