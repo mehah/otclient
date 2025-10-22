@@ -42,8 +42,9 @@ function assignSpell(button)
     local playerLevel = player:getLevel()
     local spells = modules.gamelib.SpellInfo['Default']
     local defaultIconsFolder = SpelllistSettings['Default'].iconFile
+    local showAllSpells = (playerVocation == 0)
     for spellName, spellData in pairs(spells) do
-        if table.contains(spellData.vocations, playerVocation) then
+        if showAllSpells or table.contains(spellData.vocations, playerVocation) then
             local widget = g_ui.createWidget('SpellPreview', spellList)
             local spellId = spellData.clientId
             local clip = Spells.getImageClip(spellId)
@@ -181,6 +182,13 @@ function assignSpell(button)
                 widget.imageGroup:setImageClip(offSet .. " 0 20 20")
                 widget.imageGroup:setVisible(true)
             end
+        end
+        local newWidgets = spellList:getChildren()
+        table.sort(newWidgets, function(a, b)
+            return a:getText() < b:getText()
+        end)
+        for i, widget in ipairs(newWidgets) do
+            spellList:moveChildToIndex(widget, i)
         end
     end
 end
