@@ -1482,10 +1482,10 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool w
 {
     const bool insidePadding = containsPaddingPoint(childPos);
 
-    if (!insidePadding)
+    if (isClipping() && !insidePadding)
         return nullptr;
 
-    if (isPixelTesting() && isPixelTransparent(childPos))
+    if (insidePadding && isPixelTesting() && isPixelTransparent(childPos))
         return nullptr;
 
     for (auto& child : std::ranges::reverse_view(m_children)) {
