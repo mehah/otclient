@@ -37,6 +37,8 @@
 #include <framework/net/packet_player.h>
 #include <framework/net/packet_recorder.h>
 
+#include "gameconfig.h"
+
 Game g_game;
 
 void Game::init()

@@ -27,12 +27,17 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 
+#include "gameconfig.h"
+
 LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
     });
 }
+
+bool LightView::isEnabled() const { return m_pool->isEnabled(); }
+void LightView::setEnabled(const bool v) { m_pool->setEnable(v); }
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
     if (!m_texture || (m_mapSize == size && m_tileSize == tileSize))

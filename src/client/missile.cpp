@@ -28,6 +28,10 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/shadermanager.h>
 
+#include "gameconfig.h"
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
+
 void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())

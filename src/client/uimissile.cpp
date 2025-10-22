@@ -21,7 +21,10 @@
  */
 
 #include "uimissile.h"
+
+#include "gameconfig.h"
 #include "lightview.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 UIMissile::UIMissile() { setProp(PropDraggable, true, false); }
 

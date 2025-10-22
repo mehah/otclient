@@ -37,6 +37,8 @@
 #include <framework/ui/uiwidget.h>
 #include <queue>
 
+#include "framework/graphics/drawpoolmanager.h"
+
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
 #include "towns.h"

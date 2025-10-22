@@ -186,7 +186,7 @@ enum class AlignSelf : uint8_t
     Baseline
 };
 
-enum class Unit { Auto, FitContent, Px, Em, Percent, Invalid };
+enum class Unit : uint8_t { Auto, FitContent, Px, Em, Percent, Invalid };
 
 enum class OverflowType : uint8_t
 {

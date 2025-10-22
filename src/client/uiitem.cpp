@@ -24,6 +24,8 @@
 #include "lightview.h"
 #include <framework/graphics/fontmanager.h>
 
+#include "gameconfig.h"
+
 UIItem::UIItem() { setProp(PropDraggable, true, false); }
 
 void UIItem::drawSelf(const DrawPoolType drawPane)

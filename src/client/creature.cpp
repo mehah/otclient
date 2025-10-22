@@ -37,6 +37,8 @@
 #include <framework/graphics/texturemanager.h>
 #include <framework/ui/uiwidget.h>
 
+#include "animator.h"
+#include "gameconfig.h"
 #include "statictext.h"
 
 double Creature::speedA = 0;

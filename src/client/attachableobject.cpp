@@ -34,6 +34,7 @@
 #include "game.h"
 #include "map.h"
 #include "uimap.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 extern ParticleManager g_particles;
 

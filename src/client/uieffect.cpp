@@ -21,7 +21,10 @@
  */
 
 #include "uieffect.h"
+
+#include "gameconfig.h"
 #include "lightview.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 UIEffect::UIEffect() { setProp(PropDraggable, true, false); }
 

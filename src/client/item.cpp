@@ -31,6 +31,11 @@
 #include <framework/core/clock.h>
 #include <framework/core/filestream.h>
 #include <framework/graphics/shadermanager.h>
+
+#include "animator.h"
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
 #ifdef FRAMEWORK_EDITOR
 #include <framework/core/binarytree.h>
 #endif

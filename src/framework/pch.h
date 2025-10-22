@@ -57,6 +57,7 @@
 #include <parallel_hashmap/btree.h>
 #include <parallel_hashmap/phmap.h>
 #include <pugixml.hpp>
+#include <bitset>
 
 // FMT
 #include <fmt/chrono.h>

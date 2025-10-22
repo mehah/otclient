@@ -33,26 +33,6 @@
 
 #include "../stdext/storage.h"
 
-enum class DrawPoolType : uint8_t
-{
-    MAP,
-    CREATURE_INFORMATION,
-    LIGHT,
-    FOREGROUND_MAP,
-    FOREGROUND,
-    LAST
-};
-
-enum DrawOrder : uint8_t
-{
-    FIRST,  // GROUND
-    SECOND, // BORDER
-    THIRD,  // BOTTOM & TOP
-    FOURTH, // TOP ~ TOP
-    FIFTH,  // ABOVE ALL - MISSILE
-    LAST
-};
-
 struct DrawHashController
 {
     DrawHashController(bool agroup = false) : m_agroup(agroup) {}

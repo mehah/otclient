@@ -874,3 +874,204 @@ namespace Otc
         PARTYANALYZERACTION_PRICEVALUE = 2,
     };
 }
+
+enum FrameGroupType : uint8_t
+{
+    FrameGroupDefault = 0,
+    FrameGroupIdle = FrameGroupDefault,
+    FrameGroupMoving,
+    FrameGroupInitial
+};
+
+enum ThingCategory : uint8_t
+{
+    ThingCategoryItem = 0,
+    ThingCategoryCreature,
+    ThingCategoryEffect,
+    ThingCategoryMissile,
+    ThingInvalidCategory,
+    ThingExternalTexture,
+    ThingLastCategory = ThingInvalidCategory,
+};
+
+enum StaticDataCategory : uint8_t
+{
+    StaticDataMonster = 0,
+    StaticDataAchievement,
+    StaticDataHouse,
+    StaticDataBoss,
+    StaticDataQuest,
+    StaticDataLast = StaticDataQuest,
+};
+
+enum ThingAttr : uint8_t
+{
+    ThingAttrGround = 0,
+    ThingAttrGroundBorder = 1,
+    ThingAttrOnBottom = 2,
+    ThingAttrOnTop = 3,
+    ThingAttrContainer = 4,
+    ThingAttrStackable = 5,
+    ThingAttrForceUse = 6,
+    ThingAttrMultiUse = 7,
+    ThingAttrWritable = 8,
+    ThingAttrWritableOnce = 9,
+    ThingAttrFluidContainer = 10,
+    ThingAttrSplash = 11,
+    ThingAttrNotWalkable = 12,
+    ThingAttrNotMoveable = 13,
+    ThingAttrBlockProjectile = 14,
+    ThingAttrNotPathable = 15,
+    ThingAttrPickupable = 16,
+    ThingAttrHangable = 17,
+    ThingAttrHookSouth = 18,
+    ThingAttrHookEast = 19,
+    ThingAttrRotateable = 20,
+    ThingAttrLight = 21,
+    ThingAttrDontHide = 22,
+    ThingAttrTranslucent = 23,
+    ThingAttrDisplacement = 24,
+    ThingAttrElevation = 25,
+    ThingAttrLyingCorpse = 26,
+    ThingAttrAnimateAlways = 27,
+    ThingAttrMinimapColor = 28,
+    ThingAttrLensHelp = 29,
+    ThingAttrFullGround = 30,
+    ThingAttrLook = 31,
+    ThingAttrCloth = 32,
+    ThingAttrMarket = 33,
+    ThingAttrUsable = 34,
+    ThingAttrWrapable = 35,
+    ThingAttrUnwrapable = 36,
+    ThingAttrTopEffect = 37,
+    ThingAttrUpgradeClassification = 38,
+    ThingAttrWearOut = 39,
+    ThingAttrClockExpire = 40,
+    ThingAttrExpire = 41,
+    ThingAttrExpireStop = 42,
+    ThingAttrPodium = 43,
+    ThingAttrDecoKit = 44,
+
+    // additional
+    ThingAttrOpacity = 100,
+
+    ThingAttrDefaultAction = 251,
+
+    ThingAttrFloorChange = 252,
+    ThingAttrNoMoveAnimation = 253, // 10.10: real value is 16, but we need to do this for backwards compatibility
+    ThingAttrChargeable = 254, // deprecated
+    ThingLastAttr = 255
+};
+
+enum ThingFlagAttr :uint64_t
+{
+    ThingFlagAttrNone = 0,
+    ThingFlagAttrGround = 1 << 0,
+    ThingFlagAttrGroundBorder = 1 << 1,
+    ThingFlagAttrOnBottom = 1 << 2,
+    ThingFlagAttrOnTop = 1 << 3,
+    ThingFlagAttrContainer = 1 << 4,
+    ThingFlagAttrStackable = 1 << 5,
+    ThingFlagAttrForceUse = 1 << 6,
+    ThingFlagAttrMultiUse = 1 << 7,
+    ThingFlagAttrWritable = 1 << 8,
+    ThingFlagAttrChargeable = 1 << 9,
+    ThingFlagAttrWritableOnce = 1 << 10,
+    ThingFlagAttrFluidContainer = 1 << 11,
+    ThingFlagAttrSplash = 1 << 12,
+    ThingFlagAttrNotWalkable = 1 << 13,
+    ThingFlagAttrNotMoveable = 1 << 14,
+    ThingFlagAttrBlockProjectile = 1 << 15,
+    ThingFlagAttrNotPathable = 1 << 16,
+    ThingFlagAttrPickupable = 1 << 17,
+    ThingFlagAttrHangable = 1 << 18,
+    ThingFlagAttrHookSouth = 1 << 19,
+    ThingFlagAttrHookEast = 1 << 20,
+    ThingFlagAttrRotateable = 1 << 21,
+    ThingFlagAttrLight = 1 << 22,
+    ThingFlagAttrDontHide = 1 << 23,
+    ThingFlagAttrTranslucent = 1 << 24,
+    ThingFlagAttrDisplacement = 1 << 25,
+    ThingFlagAttrElevation = 1 << 26,
+    ThingFlagAttrLyingCorpse = 1 << 27,
+    ThingFlagAttrAnimateAlways = 1 << 28,
+    ThingFlagAttrMinimapColor = 1 << 29,
+    ThingFlagAttrLensHelp = 1 << 30,
+    ThingFlagAttrFullGround = static_cast<uint64_t>(1) << 31,
+    ThingFlagAttrLook = static_cast<uint64_t>(1) << 32,
+    ThingFlagAttrCloth = static_cast<uint64_t>(1) << 33,
+    ThingFlagAttrMarket = static_cast<uint64_t>(1) << 34,
+    ThingFlagAttrUsable = static_cast<uint64_t>(1) << 35,
+    ThingFlagAttrWrapable = static_cast<uint64_t>(1) << 36,
+    ThingFlagAttrUnwrapable = static_cast<uint64_t>(1) << 37,
+    ThingFlagAttrWearOut = static_cast<uint64_t>(1) << 38,
+    ThingFlagAttrClockExpire = static_cast<uint64_t>(1) << 39,
+    ThingFlagAttrExpire = static_cast<uint64_t>(1) << 40,
+    ThingFlagAttrExpireStop = static_cast<uint64_t>(1) << 41,
+    ThingFlagAttrPodium = static_cast<uint64_t>(1) << 42,
+    ThingFlagAttrTopEffect = static_cast<uint64_t>(1) << 43,
+    ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44,
+    ThingFlagAttrDecoKit = static_cast<uint64_t>(1) << 45,
+    ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46
+};
+
+enum STACK_PRIORITY : uint8_t
+{
+    GROUND = 0,
+    GROUND_BORDER = 1,
+    ON_BOTTOM = 2,
+    ON_TOP = 3,
+    CREATURE = 4,
+    COMMON_ITEMS = 5
+};
+
+enum PLAYER_ACTION : uint8_t
+{
+    PLAYER_ACTION_NONE = 0,
+    PLAYER_ACTION_LOOK = 1,
+    PLAYER_ACTION_USE = 2,
+    PLAYER_ACTION_OPEN = 3,
+    PLAYER_ACTION_AUTOWALK_HIGHLIGHT = 4
+};
+
+enum ITEM_CATEGORY : uint8_t
+{
+    ITEM_CATEGORY_ARMORS = 1,
+    ITEM_CATEGORY_AMULETS = 2,
+    ITEM_CATEGORY_BOOTS = 3,
+    ITEM_CATEGORY_CONTAINERS = 4,
+    ITEM_CATEGORY_DECORATION = 5,
+    ITEM_CATEGORY_FOOD = 6,
+    ITEM_CATEGORY_HELMETS_HATS = 7,
+    ITEM_CATEGORY_LEGS = 8,
+    ITEM_CATEGORY_OTHERS = 9,
+    ITEM_CATEGORY_POTIONS = 10,
+    ITEM_CATEGORY_RINGS = 11,
+    ITEM_CATEGORY_RUNES = 12,
+    ITEM_CATEGORY_SHIELDS = 13,
+    ITEM_CATEGORY_TOOLS = 14,
+    ITEM_CATEGORY_VALUABLES = 15,
+    ITEM_CATEGORY_AMMUNITION = 16,
+    ITEM_CATEGORY_AXES = 17,
+    ITEM_CATEGORY_CLUBS = 18,
+    ITEM_CATEGORY_DISTANCE_WEAPONS = 19,
+    ITEM_CATEGORY_SWORDS = 20,
+    ITEM_CATEGORY_WANDS_RODS = 21,
+    ITEM_CATEGORY_PREMIUM_SCROLLS = 22,
+    ITEM_CATEGORY_TIBIA_COINS = 23,
+    ITEM_CATEGORY_CREATURE_PRODUCTS = 24,
+    ITEM_CATEGORY_QUIVER = 25,
+    ITEM_CATEGORY_TWOHANDWEAPON = 26,
+    ITEM_CATEGORY_HELMETS = 27,
+    ITEM_CATEGORY_BACKPACK = 28,
+    ITEM_CATEGORY_ONEHANDWEAPON = 29,
+    ITEM_CATEGORY_ARROW = 30
+};
+
+enum SpriteMask :uint8_t
+{
+    SpriteMaskRed = 1,
+    SpriteMaskGreen,
+    SpriteMaskBlue,
+    SpriteMaskYellow
+};

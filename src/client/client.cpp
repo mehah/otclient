@@ -34,6 +34,9 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/ui/ui.h>
 
+#include "thingtypemanager.h"
+#include "framework/graphics/drawpoolmanager.h"
+
 Client g_client;
 
 void Client::init(std::vector<std::string>& /*args*/)

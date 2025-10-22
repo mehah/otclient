@@ -26,6 +26,8 @@
 #include "outfit.h"
 #include <framework/core/timer.h>
 
+#include "framework/core/declarations.h"
+
 struct UnjustifiedPoints
 {
     bool operator==(const UnjustifiedPoints& other) const

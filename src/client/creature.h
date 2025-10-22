@@ -29,13 +29,9 @@
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 
-struct PreyMonster
-{
-    std::string name;
-    Outfit outfit;
-};
+#include "staticdata.h"
 
-// @bindclass
+ // @bindclass
 class Creature : public Thing
 {
 public:

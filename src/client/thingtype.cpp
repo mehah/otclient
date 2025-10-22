@@ -34,6 +34,8 @@
 #include <framework/graphics/texture.h>
 #include <framework/otml/otml.h>
 
+#include "animator.h"
+
 const static TexturePtr m_textureNull;
 
 void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCategory category, const appearances::Appearance& appearance)
@@ -960,6 +962,33 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr) {
 }
 
 bool ThingType::isTall(const bool useRealSize) { return useRealSize ? getRealSize() > g_gameConfig.getSpriteSize() : getHeight() > 1; }
+int ThingType::getAnimationPhases() { return m_animator ? m_animator->getAnimationPhases() : m_animationPhases; }
+
+int ThingType::getMeanPrice() {
+    static constexpr std::array<std::pair<uint32_t, uint32_t>, 3> forcedPrices = { {
+        {3043, 10000},// Crystal Coin
+        {3031, 1}, // Gold Coin
+        {3035, 100} // Platinum Coin
+    } };
+
+    const uint32_t itemId = getId();
+
+    const auto it = std::ranges::find_if(forcedPrices, [itemId](const auto& pair) { return pair.first == itemId; });
+
+    if (it != forcedPrices.end()) {
+        return it->second;
+    }
+
+    const auto npcCount = m_npcData.size();
+    if (npcCount == 0) {
+        return 0;
+    }
+
+    const int totalBuyPrice = std::accumulate(m_npcData.begin(), m_npcData.end(), 0,
+        [](int sum, const auto& npc) { return sum + npc.buyPrice; });
+
+    return totalBuyPrice / static_cast<int>(npcCount);
+}
 
 #ifdef FRAMEWORK_EDITOR
 void ThingType::serialize(const FileStreamPtr& fin)
