@@ -18,7 +18,7 @@ function ActionBarController:onClearSearchText()
 end
 
 function assignSpell(button)
-    local dev = false
+    local dev = true
     local actionbar = button:getParent():getParent()
     if actionbar.locked then
         alert('Action bar is locked')
