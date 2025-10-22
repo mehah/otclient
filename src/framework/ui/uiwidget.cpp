@@ -1480,9 +1480,7 @@ UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
 
 UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool wantsPhantom)
 {
-    const bool insidePadding = containsPaddingPoint(childPos);
-
-    if (!insidePadding)
+    if (isClipping() && !containsPaddingPoint(childPos))
         return nullptr;
 
     if (isPixelTesting() && isPixelTransparent(childPos))
@@ -1495,7 +1493,7 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool w
 
             if (child->containsPoint(childPos)
                 && (wantsPhantom
-                    || (!child->isPhantom() && (!child->isPixelTesting() || !child->isPixelTransparent(childPos)))))
+                || (!child->isPhantom() && (!child->isPixelTesting() || !child->isPixelTransparent(childPos)))))
                 return child;
         }
     }
@@ -2085,10 +2083,8 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
     }
 
     if (!checkContainsPoint || containsPoint(mousePos)) {
-        widgetList.emplace_back(static_self_cast<UIWidget>());
-
-        if (isPixelTesting() && isPixelTransparent(mousePos))
-            return false;
+        if (!isPixelTesting() || !isPixelTransparent(mousePos))
+            widgetList.emplace_back(static_self_cast<UIWidget>());
 
         if ((!isPhantom() && !isOnHtml()) || isDraggable())
             return true;
