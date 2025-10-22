@@ -18,6 +18,7 @@ function ActionBarController:onClearSearchText()
 end
 
 function assignSpell(button)
+    local dev = false
     local actionbar = button:getParent():getParent()
     if actionbar.locked then
         alert('Action bar is locked')
@@ -36,6 +37,7 @@ function assignSpell(button)
     local imageWidget = ActionBarController:findWidget("#image")
     local paramLabel = ActionBarController:findWidget("#paramLabel")
     local paramText = ActionBarController:findWidget("#paramText")
+    ActionBarController:findWidget("#dev"):setVisible(dev)
     local playerVocation = translateVocation(player:getVocation())
     local playerLevel = player:getLevel()
     local spells = modules.gamelib.SpellInfo['Default']
@@ -61,7 +63,7 @@ function assignSpell(button)
             end
             local primaryGroup = Spells.getPrimaryGroup(spellData)
             if primaryGroup ~= -1 then
-                local offSet = (primaryGroup == 2 and 23) or (primaryGroup == 3 and 40) or 1
+                local offSet = (primaryGroup == 2 and 20) or (primaryGroup == 3 and 40) or 0
                 widget.imageGroup:setImageClip(offSet .. " 0 20 20")
                 widget.imageGroup:setVisible(true)
             end
@@ -153,6 +155,34 @@ function assignSpell(button)
         okFunc(false)
     end
     ActionBarController:findWidget("#buttonClose").onClick = cancelFunc
+    ActionBarController:findWidget("#dev").onClick = function()
+        spellList:destroyChildren()
+        for spellName, spellData in pairs(spells) do
+            local widget = g_ui.createWidget('SpellPreview', spellList)
+            local spellId = spellData.clientId
+            local clip = Spells.getImageClip(spellId)
+            radio:addWidget(widget)
+            widget:setId(spellData.id)
+            widget:setText(spellName .. "\n" .. spellData.words)
+            widget.voc = spellData.vocations
+            widget.param = spellData.parameter
+            widget.source = defaultIconsFolder
+            widget.clip = clip
+            widget.image:setImageSource(widget.source)
+            widget.image:setImageClip(widget.clip)
+            if spellData.level then
+                widget.levelLabel:setVisible(true)
+                widget.levelLabel:setText(string.format("Level: %d", spellData.level))
+                widget.image.gray:setVisible(playerLevel < spellData.level)
+            end
+            local primaryGroup = Spells.getPrimaryGroup(spellData)
+            if primaryGroup ~= -1 then
+                local offSet = (primaryGroup == 2 and 20) or (primaryGroup == 3 and 40) or 0
+                widget.imageGroup:setImageClip(offSet .. " 0 20 20")
+                widget.imageGroup:setVisible(true)
+            end
+        end
+    end
 end
 -- /*=============================================
 -- =            SetText html Windows             =
