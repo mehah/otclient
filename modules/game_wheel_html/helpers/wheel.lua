@@ -677,7 +677,7 @@ local function propagateAdjacentSelection(slotList, controller)
         if slotData.isComplete then
             slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
             if definition.adjacents and #definition.adjacents > 0 then
-                slotData.adjacentPath = slotData.bgPath or ""
+                slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
             else
                 slotData.adjacentPath = ""
             end
@@ -688,7 +688,7 @@ local function propagateAdjacentSelection(slotList, controller)
             end
         elseif slotData.currentPoints > 0 then
             slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
-            slotData.adjacentPath = slotData.bgPath or ""
+            slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
             slotData.isAdjacent = true
         else
             slotData.colorPath = ""
@@ -704,10 +704,10 @@ local function propagateAdjacentSelection(slotList, controller)
 
                 if slotData.currentPoints > 0 then
                     slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
-                    slotData.adjacentPath = slotData.bgPath or ""
+                    slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
                 else
                     slotData.colorPath = ""
-                    slotData.adjacentPath = slotData.bgPath or ""
+                    slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
                 end
 
                 controller.wheel.data[index] = slotData

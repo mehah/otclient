@@ -158,6 +158,20 @@ function WheelController.wheel.getSlotFramePercentage(data)
     return path
 end
 
+function WheelController.wheel.getSlotFinalFramePath(data)
+    if not data or not data.index or not data.quadrant then
+        return ""
+    end
+
+    local frames = quadrantFrames[data.index]
+
+    if not frames or frames <= 0 then
+        return ""
+    end
+
+    return string.format(baseColorSlotPath, data.quadrant, data.index, frames)
+end
+
 function WheelController.wheel:onChangeSlotPoints(value)
     if not WheelController.wheel.currentSelectSlotId then return end
     local slotId = WheelController.wheel.currentSelectSlotId
