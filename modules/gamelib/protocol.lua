@@ -2,7 +2,6 @@ GameServerOpcodes = {
     GameServerInitGame = 10,
     GameServerGMActions = 11,
     GameServerEnterGame = 15,
-    GameServerWheelOfDestinyOpenWindow = 16,
     GameServerLoginError = 20,
     GameServerLoginAdvice = 21,
     GameServerLoginWait = 22,
@@ -23,6 +22,7 @@ GameServerOpcodes = {
 
     -- original tibia ONLY
     GameServerPassiveCooldown = 94,
+    GameServerWheelOfDestinyOpenWindow = 95,
     GameServerFullMap = 100,
     GameServerMapTopRow = 101,
     GameServerMapRightRow = 102,

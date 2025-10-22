@@ -47,7 +47,6 @@ namespace Proto
         GameServerLoginOrPendingState = 10,
         GameServerGMActions = 11,
         GameServerEnterGame = 15,
-        GameServerWheelOfDestinyOpenWindow = 16,
         GameServerUpdateNeeded = 17,
         GameServerLoginError = 20,
         GameServerLoginAdvice = 21,
@@ -84,6 +83,7 @@ namespace Proto
         // original tibia ONLY
         GameServerImbuementDurations = 93,
         GameServerPassiveCooldown = 94,
+        GameServerWheelOfDestinyOpenWindow = 95,
         GameServerBosstiaryData = 97,
         GameServerBosstiarySlots = 98,
         GameServerSendClientCheck = 99,
