@@ -87,8 +87,8 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             setImageAutoResize(node->value<bool>());
         else if (node->tag() == "image-individual-animation")
             setImageIndividualAnimation(node->value<bool>());
-        else if (node->tag() == "image-pixel-test")
-            setPixelTesting(node->value<bool>());
+        else if (node->tag() == "image-pixel-valid")
+            setPixelHit(node->value<bool>());
     }
 }
 

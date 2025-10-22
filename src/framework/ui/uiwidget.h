@@ -342,7 +342,7 @@ protected:
     UIWidgetPtr m_focusedChild;
 
     bool m_anchorable{ true };
-    bool m_pixelTest{ false };
+    bool m_pixelHit{ false };
 
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
     std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
@@ -424,7 +424,7 @@ public:
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
     void setAutoRepeatDelay(const int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
-    void setPixelTesting(bool pixelTest);
+    void setPixelHit(bool pixelHit);
     void setDisplay(DisplayType type);
     void setFloat(FloatType type) { m_floatType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setClear(ClearType type) { m_clearType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
@@ -681,7 +681,7 @@ public:
     bool intersects(const Rect rect) { return m_rect.intersects(rect); }
     bool intersectsMargin(const Rect rect) { return getMarginRect().intersects(rect); }
     bool intersectsPadding(const Rect rect) { return getPaddingRect().intersects(rect); }
-    bool isPixelTesting() const { return m_pixelTest; }
+    bool getPixelHit() const { return m_pixelHit; }
     bool isPixelTransparent(const Point& mousePos);
 
     std::string getId() { return m_id; }
