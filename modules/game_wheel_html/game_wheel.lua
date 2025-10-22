@@ -87,17 +87,46 @@ local colorQuadrants = {
 local baseBorderPath = "/images/game/wheel/wheel-border/%s/%s.png"
 local baseWheelColorPath = "/images/game/wheel/wheel-colors/%s/%s_%s.png"
 local otherBorders = { "revelationPerk", "vesselGem" }
+
+local vision = {
+    [1] = { 2, 3 },
+    [2] = { 4, 5 },
+    [3] = { 5, 6 },
+    [4] = { 7 },
+    [5] = { 7, 8 },
+    [6] = { 8 },
+    [7] = { 9 },
+    [8] = { 9 },
+}
+
 function WheelController.wheel:fillQuadrantsBorders()
-    WheelController.wheel.borders = {}
-    for _, quadrant in pairs(quadrants) do
-        for i = 1, 1 do
-            table.insert(WheelController.wheel.borders, {
-                id = string.format("%s_%s", quadrant, tostring(i)),
-                path = string.format(baseBorderPath, quadrant, tostring(i)),
-                height = "522",
-                width = "522",
-                selected = true
-            })
+    local shouldAddBorders = #WheelController.wheel.borders == 0
+    local shouldAddColors = #WheelController.wheel.colors == 0
+    for q, quadrant in pairs(quadrants) do
+        for i = 1, 9 do
+            if i == 1 then
+                g_logger.info("Adding border for quadrant: " .. quadrant .. " index: " .. tostring(i))
+            end
+
+            if shouldAddBorders then
+                table.insert(WheelController.wheel.borders, {
+                    id = string.format("%s_%s", quadrant, tostring(i)),
+                    path = string.format(baseBorderPath, quadrant, tostring(i)),
+                    height = "522",
+                    width = "522",
+                    selected = false
+
+                })
+            end
+            if shouldAddColors then
+                table.insert(WheelController.wheel.colors, {
+                    id = string.format("%s_%s", quadrant, tostring(i)),
+                    path = string.format(baseWheelColorPath, quadrant, colorQuadrants[q], tostring(i)),
+                    height = "522",
+                    width = "522",
+                    selected = i == 1
+                })
+            end
         end
 
         -- local revelation = baseBorderPath:format(quadrant, otherBorders[1])
@@ -118,23 +147,11 @@ function WheelController.wheel:fillQuadrantsBorders()
         --     selected = false,
         -- })
     end
-
-    for _, color in pairs(colorQuadrants) do
-        for i = 1, 1 do
-            local _quadrant = quadrants[i]
-            table.insert(WheelController.wheel.colors, {
-                id = string.format("%s_%s", _quadrant, tostring(i)),
-                path = string.format(baseWheelColorPath, _quadrant, color, tostring(i)),
-                height = "522",
-                width = "522",
-                selected = true
-            })
-        end
-    end
 end
 
 function WheelController.wheel:handleSelectBorder(borderId)
-    g_logger.info("borderid: " .. borderId)
+    local index = borderId:match("_(%d+)$") or borderId
+    g_logger.info("borderid: " .. borderId .. " index: " .. index)
     for _, border in pairs(WheelController.wheel.borders) do
         if border.id == borderId then
             border.selected = not border.selected
@@ -149,6 +166,10 @@ function WheelController:show(skipRequest)
     --     return WheelController:hide()
     -- end
     local player = g_game.getLocalPlayer()
+    g_logger.info("player id: " .. tostring(player:getId()))
+
+
+
     local basicVocationId = getBasicVocation(player:getVocation())
     local overlayImage = getVocationImage(basicVocationId)
 
@@ -158,6 +179,7 @@ function WheelController:show(skipRequest)
 
     self.wheel.backdropVocationOverlay = overlayImage .. ".png"
     WheelController.wheel:fillQuadrantsBorders()
+    WheelController.wheel:handleSelectBorder("reset")
 
     local needsReload = not self.ui or self.ui:isDestroyed()
     if needsReload then
@@ -176,6 +198,10 @@ function WheelController:show(skipRequest)
     if WheelButton then
         WheelButton:setOn(true)
     end
+
+    print("openWheelOfDestiny =" .. type(g_game.openWheelOfDestiny)) -- deve imprimir 'function: 0x...'
+
+    -- g_game.openWheelOfDestiny(player:getId())
 end
 
 function WheelController:hide()
