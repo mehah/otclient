@@ -673,6 +673,7 @@ local function propagateAdjacentSelection(slotList, controller)
         slotData.isComplete = slotData.currentPoints == slotData.totalPoints
         slotData.isAdjacent = false
         slotData.adjacentPath = ""
+        slotData.enabledBy = {}
 
         if slotData.isComplete then
             slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
@@ -684,7 +685,7 @@ local function propagateAdjacentSelection(slotList, controller)
             slotData.isAdjacent = true
 
             for _, slotId in ipairs(definition.adjacents or {}) do
-                table.insert(toPropagate, slotId)
+                table.insert(toPropagate, { target = slotId, source = slotData.id })
             end
         elseif slotData.currentPoints > 0 then
             slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
@@ -692,15 +693,23 @@ local function propagateAdjacentSelection(slotList, controller)
             slotData.isAdjacent = true
         else
             slotData.colorPath = ""
+            if slotData.index == 1 then
+                slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
+                slotData.isAdjacent = true
+            end
         end
 
         controller.wheel.data[index] = slotData
     end
 
-    for _, slotId in ipairs(toPropagate) do
+    for _, propagation in ipairs(toPropagate) do
+        local slotId = propagation.target
+        local sourceId = propagation.source
         for index, slotData in ipairs(controller.wheel.data) do
             if slotData.id == slotId then
                 slotData.isAdjacent = true
+                slotData.enabledBy = slotData.enabledBy or {}
+                slotData.enabledBy[sourceId] = true
 
                 if slotData.currentPoints > 0 then
                     slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
