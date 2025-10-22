@@ -123,6 +123,37 @@ function WheelController.wheel:handleOnHover(slotId)
     WheelController.wheel.currentHoverSlot = slotId
 end
 
+function WheelController.wheel:getSlotDataById(slotId)
+    for index, slotData in pairs(self.data) do
+        if slotData.id == slotId then
+            return slotData, index
+        end
+    end
+
+    return nil, nil
+end
+
+function WheelController.wheel:hasLockedAdjacent(slotId)
+    local definition = helper.wheel.WheelSlotsParser[slotId]
+    if not definition or not definition.adjacents then
+        return false
+    end
+
+    for _, adjacentId in ipairs(definition.adjacents) do
+        local adjacentData = self:getSlotDataById(adjacentId)
+        if adjacentData then
+            local enabledBy = adjacentData.enabledBy or {}
+            local hasPoints = (adjacentData.currentPoints or 0) > 0
+
+            if hasPoints and enabledBy[slotId] then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
 local indexByTotalPoints = {
     [50] = 1,
     [75] = 2,
@@ -183,6 +214,9 @@ function WheelController.wheel:onChangeSlotPoints(value)
     data.totalPoints = helper.wheel.WheelSlotsParser[slotId].totalPoints
     if type(value) == "string" then
         if value == "-max" then
+            if self:hasLockedAdjacent(slotId) then
+                return
+            end
             WheelController.wheel.points = WheelController.wheel.points + data.currentPoints
             data.currentPoints = 0
         elseif value == "+max" then
@@ -204,6 +238,9 @@ function WheelController.wheel:onChangeSlotPoints(value)
 
     local numericValue = tonumber(value) or 0
     if numericValue == 0 then return end
+    if numericValue < 0 and self:hasLockedAdjacent(slotId) then
+        return
+    end
     data.currentPoints = data.currentPoints + numericValue
     if data.currentPoints < 0 then
         data.currentPoints = 0
@@ -247,6 +284,7 @@ function WheelController.wheel:fillQuadrantsBorders()
             height = "522",
             width = "522",
             isComplete = data.currentPoints == data.totalPoints,
+            enabledBy = {},
         }
 
         current.colorPath = WheelController.wheel.getSlotFramePercentage(current)
