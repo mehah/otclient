@@ -148,6 +148,7 @@ UIWidget
     phantom: true
     focusable: false
     margin-right: 12
+    padding-bottom: 2
     anchors.left: bottomSplitter.left
     anchors.right: bottomSplitter.right
     anchors.top: gameBottomStatsBarPanel.bottom
