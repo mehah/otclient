@@ -23,17 +23,13 @@
 #pragma once
 
 #include "declarations.h"
-#include "uilayout.h"
 
 #include <framework/core/timer.h>
-#include <framework/graphics/bitmapfont.h>
 #include <framework/graphics/declarations.h>
 #include <framework/luaengine/luaobject.h>
-#include <framework/otml/otmlnode.h>
 #include <framework/html/declarations.h>
 
-#include "framework/graphics/drawpool.h"
-#include "framework/graphics/texture.h"
+#include "framework/graphics/bitmapfontwrapoptions.h"
 
 template<typename T = int>
 struct EdgeGroup
@@ -695,7 +691,7 @@ public:
     Fw::AutoFocusPolicy getAutoFocusPolicy() { return m_autoFocusPolicy; }
     int getAutoRepeatDelay() { return m_autoRepeatDelay; }
     Point getVirtualOffset() { return m_virtualOffset; }
-    std::string getStyleName() { return m_style->tag(); }
+    std::string getStyleName();
     Point getLastClickPosition() { return m_lastClickPosition; }
 
     // base style
@@ -925,8 +921,8 @@ public:
     int getImageBorderRight() { return m_imageBorder.right; }
     int getImageBorderBottom() { return m_imageBorder.bottom; }
     int getImageBorderLeft() { return m_imageBorder.left; }
-    int getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
-    int getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
+    int getImageTextureWidth();
+    int getImageTextureHeight();
 
     // text related
 private:
@@ -1033,7 +1029,7 @@ public:
     Fw::AlignmentFlag getTextAlign() { return m_textAlign; }
     Point getTextOffset() { return m_textOffset; }
     bool isTextWrap() { return hasProp(PropTextWrap); }
-    std::string getFont() { return m_font->getName(); }
+    std::string getFont();
     Size getTextSize() { return m_textSize; }
 
     // custom style

@@ -1965,6 +1965,9 @@ bool UIWidget::onDoubleClick(const Point& mousePos)
     return callLuaField<bool>("onDoubleClick", mousePos);
 }
 
+int UIWidget::getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
+int UIWidget::getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
+std::string UIWidget::getStyleName() { return m_style->tag(); }
 UIWidgetPtr UIWidget::getHoveredChild()
 {
     const auto& hovered = g_ui.getHoveredWidget();

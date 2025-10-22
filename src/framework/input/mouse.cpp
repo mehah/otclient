@@ -25,6 +25,8 @@
 #include <framework/platform/platformwindow.h>
 #include <framework/ui/uiwidget.h>
 
+#include "framework/otml/otmldocument.h"
+
 Mouse g_mouse;
 
 void Mouse::init() {}

@@ -24,8 +24,9 @@
 #include "uiwidget.h"
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
-#include <framework/graphics/textureatlas.h>
 #include <framework/html/htmlnode.h>
+
+#include "framework/otml/otmlnode.h"
 
 namespace {
     WordBreakMode parseWordBreakMode(const std::string& v) {
@@ -309,6 +310,8 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
         onTextChange(text, oldText);
     }
 }
+
+std::string UIWidget::getFont() { return m_font->getName(); }
 
 void UIWidget::setFont(const std::string_view fontName)
 {

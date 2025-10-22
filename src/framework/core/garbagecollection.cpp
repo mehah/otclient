@@ -28,6 +28,8 @@
 #include <framework/graphics/texturemanager.h>
 #include <framework/luaengine/luainterface.h>
 
+#include "client/thingtype.h"
+
 constexpr uint32_t LUA_TIME = 15 * 60 * 1000; // 15min
 constexpr uint32_t TEXTURE_TIME = 30 * 60 * 1000; // 30min
 constexpr uint32_t THINGTYPE_TIME = 2 * 1000; // 2seg

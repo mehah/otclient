@@ -58,7 +58,8 @@
 #include <parallel_hashmap/phmap.h>
 #include <pugixml.hpp>
 #include <bitset>
-
+#include <filesystem>
+#include <set>
 // FMT
 #include <fmt/chrono.h>
 #include <fmt/core.h>
