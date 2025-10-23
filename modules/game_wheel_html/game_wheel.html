@@ -12,23 +12,19 @@
       height: 580px;
       width: 100%;
       margin-top: 8px;
-      border: 1px red;
     }
     .footer {
       height: 20px;
-      background-color: lightblue;
       width: 997px;
     }
 
     .footer-left {
       display: inline-block;
-      width: 600px;
+      width: 630px;
       align-items: center;
     }
     .footer-left > div {
-      align-items: center;
       display: inline-block;
-      margin-right: 4px;
       width: 130px;
       height: 20px;
     }
@@ -37,21 +33,21 @@
       --image-source: "/modules/game_wheel_html/images/balanceBg.png";
       --image-size: 130 20;
       align-items: center;
-      background-color: black;
       height: 20px;
     }
 
     .footer-right {
       display: inline-block;
-      width: 397px;
+      width: 340px;
     }
     .footer-right > button {
       display: inline-block;
       margin-right: 4px;
+      float: right;
     }
     button {
       padding: 3px 10px !important;
-      float: right;
+      color: #c0c0c0;
     }
     button:pressed {
       padding: 3px 10px !important;
@@ -62,15 +58,12 @@
       height: 100%;
     }
     .panel {
-      border: 1px red;
       width: 213px;
-
       height: 100%;
       display: inline-block;
     }
     .panel-center {
       width: 522px;
-      border: 1px blue;
       height: 100%;
       display: inline-block;
       margin-left: 9px;
@@ -82,7 +75,6 @@
       width: 522px;
       height: 522px;
       text-align: center;
-      border: 1px red;
       position: relative;
     }
     .backdrop-wheel-vocation-overlay {
@@ -94,12 +86,47 @@
       position: absolute;
       --ignore-transparent-pixel: true;
     }
+    .section-progress-bg {
+      --image-source: "/images/game/wheel/progressBg.png";
+      --image-size: 205 20;
+      width: 205px;
+      height: 20px;
+      position: relative;
+      text-align: center;
+      color: #c0c0c0;
+      align-items: center;
+      margin-top: 4px;
+    }
+    .section-progress {
+      position: absolute;
+      height: 19px;
+      top: 0;
+    }
+    .panel-window {
+      --image-source: "/images/ui/window.png";
+      --image-border: 3;
+      position: relative;
+    }
+    .panel-title {
+      position: relative;
+      top: 5;
+      left: 0;
+      text-align: center;
+    }
+    .change-preset-icon {
+      --image-clip: 0 0 20 20;
+      width: 20px;
+      height: 20px;
+    }
+    .change-preset-icon:pressed {
+      --image-clip: 0 20 20 20;
+    }
   </style>
   <window
     placement="center"
     title="Wheel of Destiny"
     onescape="self:hide()"
-    style="height: 654px; width: 997px; border: 1px yellow"
+    style="height: 654px; width: 968px"
     onhover="self.wheel:handleOnHover(-1)"
   >
     <div>
@@ -127,30 +154,88 @@
       <div *if="self.currentTab == 'wheel'">
         <div class="panel-container" onhover="self.wheel:handleOnHover(-1)">
           <div class="panel">
-            <window title="Section" style="width: 180px; height: 248px">
+            <div class="panel-window" style="width: 213px; height: 248px">
+              <p class="panel-title">Section</p>
               <div
-                *if="self.wheel.currentSelectSlotData ~= nil"
-                style="height: 220px"
+                style="
+                  height: 190px;
+                  width: 205px;
+                  margin-top: 10px;
+                  margin-left: 4px;
+                "
               >
-                <div>1/50</div>
-                <div>
-                  <button onclick="self.wheel:onChangeSlotPoints('-max')">
-                    -Max
-                  </button>
-                  <button onclick="self.wheel:onChangeSlotPoints(-1)">
-                    -1
-                  </button>
-                  <button onclick="self.wheel:onChangeSlotPoints(1)">+1</button>
-                  <button onclick="self.wheel:onChangeSlotPoints('+max')">
-                    +Max
-                  </button>
+                <div *if="self.wheel.currentSelectSlotData ~= nil">
+                  <div class="section-progress-bg">
+                    <img
+                      class="section-progress"
+                      src="/images/game/wheel/progressBar.png"
+                      *width="((self.wheel.currentSelectSlotData.currentPoints / self.wheel.currentSelectSlotData.totalPoints) * 205)"
+                    />
+                    <div>
+                      <p>
+                        <span
+                          >{{self.wheel.currentSelectSlotData.currentPoints}}/</span
+                        >
+                        <span
+                          >{{self.wheel.currentSelectSlotData.totalPoints}}</span
+                        >
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style="
+                      margin-top: 4px;
+                      height: 130px;
+                      width: 205px;
+                      border: 1px red;
+                    "
+                  >
+                    reserved
+                  </div>
+                  <div style="margin-top: 8px; height: 20px">
+                    <div style="background-color: blue">
+                      <button
+                        style="float: right"
+                        onclick="self.wheel:onChangeSlotPoints('+max')"
+                        *disabled="self.wheel.currentSelectSlotData.currentPoints >= self.wheel.currentSelectSlotData.totalPoints"
+                      >
+                        +Max
+                      </button>
+                      <button
+                        *disabled="self.wheel.currentSelectSlotData.currentPoints >= self.wheel.currentSelectSlotData.totalPoints"
+                        style="float: right"
+                        onclick="self.wheel:onChangeSlotPoints(1)"
+                      >
+                        +1
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        *disabled="self.wheel.currentSelectSlotData.currentPoints <= 0"
+                        onclick="self.wheel:onChangeSlotPoints('-max')"
+                      >
+                        -Max
+                      </button>
+                      <button
+                        *disabled="self.wheel.currentSelectSlotData.currentPoints <= 0"
+                        onclick="self.wheel:onChangeSlotPoints(-1)"
+                      >
+                        -1
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div>
-                <span> Available Promotion Points </span>
-                <span>{{self.wheel.points}}/{{self.wheel.totalPoints}}</span>
+              <div style="width: 205px; margin-left: 4px; color: #c0c0c0">
+                <p style="text-align: center; width: 205px">
+                  Available Promotion Points
+                </p>
+                <p style="text-align: center; width: 205px">
+                  <span> {{self.wheel.points}} </span>
+                  <span>/{{self.wheel.totalPoints}}</span>
+                </p>
               </div>
-            </window>
+            </div>
           </div>
           <div class="panel-center" onhover="self.wheel:handleOnHover(-1)">
             <div class="backdrop-wheel">
@@ -196,15 +281,6 @@
                   onhover="self.wheel:handleOnHover(data.id)"
                   *ignore-transparent-pixel="true"
                 />
-                <img
-                  class="wheel-center-cells"
-                  *image-source="data.borderPath"
-                  *height="data.height"
-                  *width="data.width"
-                  *opacity="self.wheel.currentSelectSlotId == data.id and 1 or 0.01"
-                  image-draw-order="3"
-                  *ignore-transparent-pixel="true"
-                />
               </span>
               <img
                 *image-source="self.wheel.backdropVocationOverlay"
@@ -214,7 +290,7 @@
                 onhover="self.wheel:handleOnHover(-1)"
                 image-draw-order="2"
               />
-              <!-- 
+
               <img
                 class="wheel-center-cells"
                 *if="self.wheel.currentSelectSlotData ~= nil and self.wheel.currentSelectSlotData.borderPath ~= nil"
@@ -223,26 +299,60 @@
                 *width="self.wheel.currentSelectSlotData.width"
                 image-draw-order="3"
                 *ignore-transparent-pixel="true"
-              /> -->
+              />
             </div>
           </div>
-          <div class="panel">panel right</div>
+          <div class="panel">
+            <div class="panel-window" style="width: 213px; height: 100px">
+              <p class="panel-title">Dedication Perks</p>
+            </div>
+            <div
+              class="panel-window"
+              style="width: 213px; height: 150px; margin-top: 8px"
+            >
+              <p class="panel-title">Conviction Perks</p>
+            </div>
+            <div
+              class="panel-window"
+              style="width: 213px; height: 150px; margin-top: 8px"
+            >
+              <p class="panel-title">Vessels</p>
+            </div>
+            <div
+              class="panel-window"
+              style="width: 213px; height: 120px; margin-top: 8px"
+            >
+              <p class="panel-title">Revelation Perks</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="footer" placement="bottom-left">
       <div class="footer-left">
         <div><p class="footer-texts">gold</p></div>
-        <div><p class="footer-texts">lesser fragments</p></div>
-        <div><p class="footer-texts">greater fragments</p></div>
-        <span>i<span>Current Preset: Default-Preset</span></span>
+        <div style="margin-left: 4px">
+          <p class="footer-texts">lesser fragments</p>
+        </div>
+        <div style="margin-left: 4px">
+          <p class="footer-texts">greater fragments</p>
+        </div>
+        <span style="margin-left: 4px"
+          ><img
+            class="change-preset-icon"
+            src="/images/game/wheel/change_preset_icon.png"
+          />
+          <span style="padding-top: 2px">
+            Current Preset: Default-Preset
+          </span></span
+        >
       </div>
 
       <div class="footer-right">
         <button onclick="self:hide()">Close</button>
-        <button>Reset</button>
-        <button>Apply</button>
-        <button>Ok</button>
+        <button disabled>Reset</button>
+        <button disabled>Apply</button>
+        <button onclick="self:hide()">Ok</button>
       </div>
     </div>
   </window>

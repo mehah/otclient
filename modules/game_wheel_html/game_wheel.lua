@@ -309,13 +309,7 @@ function WheelController:show(skipRequest)
     local player = g_game.getLocalPlayer()
     g_game.openWheelOfDestiny(player:getId())
 
-    local basicVocationId = getBasicVocation(player:getVocation())
-    local overlayImage = getVocationImage(basicVocationId)
-    if not overlayImage then
-        return WheelController:hide()
-    end
 
-    self.wheel.backdropVocationOverlay = overlayImage .. ".png"
 
     local needsReload = not self.ui or self.ui:isDestroyed()
     if needsReload then
@@ -387,10 +381,6 @@ function onWheelOfDestinyOpenWindow(data)
     --     g_logger.info("WOD DATA key: " .. k .. " value: " .. tostring(v))
     -- end
 
-    for k, v in pairs(data.promotionScrolls) do
-        g_logger.info("Promotion Scrolls key: " .. k .. " value: " .. tostring(v))
-    end
-
     data.points = data.points or 0
     data.extraPoints = data.extraPoints or 0
 
@@ -402,5 +392,13 @@ function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.extraPoints = data.extraPoints
     WheelController.wheel.totalPoints = data.points + data.extraPoints
     WheelController.wheel.slots = helper.wheel.WheelSlotsParser
+    local basicVocationId = getBasicVocation(data.vocationId)
+    local overlayImage = getVocationImage(basicVocationId)
+    if not overlayImage then
+        return WheelController:hide()
+    end
+
+    WheelController.wheel.backdropVocationOverlay = overlayImage .. ".png"
+
     WheelController.wheel:fillQuadrantsBorders()
 end
