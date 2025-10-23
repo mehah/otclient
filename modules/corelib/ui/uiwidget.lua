@@ -307,9 +307,13 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
     end
 
     local data = {}
-    data[trEventName] = function(widget, value)
-        event.name = trEventName
-        event.value = value
+    data[trEventName] = function(widget, value, value2)
+        if trEventName == 'onMousePress' then
+            event.mousePos = value
+            event.mouseButton = value2
+        else
+            event.value = value
+        end
         execEventCall()
     end
 
