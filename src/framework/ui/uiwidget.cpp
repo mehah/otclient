@@ -1483,7 +1483,7 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool w
     if (isClipping() && !containsPaddingPoint(childPos))
         return nullptr;
 
-    if (getPixelHit() && isPixelTransparent(childPos))
+    if (isPixelTesting() && isPixelTransparent(childPos))
         return nullptr;
 
     for (auto& child : std::ranges::reverse_view(m_children)) {
@@ -1493,7 +1493,7 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool w
 
             if (child->containsPoint(childPos)
                 && (wantsPhantom
-                || (!child->isPhantom() && (!child->getPixelHit() || !child->isPixelTransparent(childPos)))))
+                || (!child->isPhantom() && (!child->isPixelTesting() || !child->isPixelTransparent(childPos)))))
                 return child;
         }
     }
@@ -2083,7 +2083,7 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
     }
 
     if (!checkContainsPoint || containsPoint(mousePos)) {
-        if (!getPixelHit() || !isPixelTransparent(mousePos))
+        if (!isPixelTesting() || !isPixelTransparent(mousePos))
             widgetList.emplace_back(static_self_cast<UIWidget>());
 
         if ((!isPhantom() && !isOnHtml()) || isDraggable())
@@ -2370,12 +2370,12 @@ void UIWidget::setPlacement(const std::string& placement) {
     scheduleHtmlTask(PropApplyAnchorAlignment);
 }
 
-void UIWidget::setPixelHit(const bool pixelHit)
+void UIWidget::setIsPixelTesting(const bool isPixelTesting)
 {
-    if (m_pixelHit == pixelHit)
+    if (m_isPixelTesting == isPixelTesting)
         return;
 
-    m_pixelHit = pixelHit;
+    m_isPixelTesting = isPixelTesting;
 }
 
 bool UIWidget::isPixelTransparent(const Point& mousePos)

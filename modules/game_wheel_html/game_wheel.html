@@ -92,7 +92,7 @@
     }
     .wheel-center-cells {
       position: absolute;
-      --image-pixel-valid: true;
+      --ignore-transparent-pixel: true;
     }
   </style>
   <window
@@ -165,7 +165,7 @@
                   *width="data.width"
                   *opacity="data.isComplete and 0.75 or (data.isAdjacent and 0.5 or 0.01) or 0.01"
                   image-draw-order="2"
-                  *image-pixel-valid="true"
+                  *ignore-transparent-pixel="true"
                 />
                 <img
                   class="wheel-center-cells"
@@ -173,7 +173,7 @@
                   *height="data.height"
                   *width="data.width"
                   *opacity="data.adjacentPath ~= '' and 0.5 or 0.01"
-                  *image-pixel-valid="true"
+                  *ignore-transparent-pixel="true"
                   image-draw-order="1"
                 />
                 <img
@@ -183,7 +183,7 @@
                   *width="data.width"
                   onclick="self.wheel:handleSelectSlot(data.id)"
                   opacity="0.001"
-                  *image-pixel-valid="true"
+                  *ignore-transparent-pixel="true"
                   image-draw-order="0"
                 />
 
@@ -194,7 +194,7 @@
                   *height="data.height"
                   *width="data.width"
                   onhover="self.wheel:handleOnHover(data.id)"
-                  *image-pixel-valid="true"
+                  *ignore-transparent-pixel="true"
                 />
                 <img
                   class="wheel-center-cells"
@@ -203,7 +203,7 @@
                   *width="data.width"
                   *opacity="self.wheel.currentSelectSlotId == data.id and 1 or 0.01"
                   image-draw-order="3"
-                  *image-pixel-valid="true"
+                  *ignore-transparent-pixel="true"
                 />
               </span>
               <img
@@ -222,7 +222,7 @@
                 *height="self.wheel.currentSelectSlotData.height"
                 *width="self.wheel.currentSelectSlotData.width"
                 image-draw-order="3"
-                *image-pixel-valid="true"
+                *ignore-transparent-pixel="true"
               /> -->
             </div>
           </div>
