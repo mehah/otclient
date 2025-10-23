@@ -17,12 +17,18 @@ on:
       - ".github/workflows/build-docker.yml"
       - "src/**"
 
+permissions:
+  contents: read
+  pull-requests: read
+
 env:
+  LUKKA_RUN_VCPKG_SHA: "${{ vars.LUKKA_RUN_VCPKG_SHA }}"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   cancel-runs:
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false) }}
     if: github.event_name == 'pull_request' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

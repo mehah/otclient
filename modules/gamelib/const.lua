@@ -295,8 +295,9 @@ MessageModes = {
     OfflineTrainning = 54,
     Transaction = 55,
     Potion = 56,
+    ValuableLoot = 57,
 
-    Last = 57,
+    Last = 58,
     Invalid = 255
 }
 
@@ -434,6 +435,8 @@ ResourceTypes = {
     LESSER_GEMS = 81,
     REGULAR_GEMS = 82,
     GREATER_GEMS = 83,
+    LESSER_FRAGMENT = 84,
+    GREATER_FRAGMENT = 85,
     WHEEL_OF_DESTINY = 86,
     COIN_NORMAL = 90,
     COIN_TRANSFERRABLE = 91,
@@ -471,4 +474,19 @@ ExperienceRate = {
     XP_BOOST = 3,
     STAMINA_MULTIPLIER = 4
 }
+
+PriceTypeEnum = {
+    Market = 0,
+    Leader = 1
+}
+
+-- Analyzer constants
+ANALYZER_HEAL = 0
+ANALYZER_DAMAGE_DEALT = 1
+ANALYZER_DAMAGE_RECEIVED = 2
+-- Party Analyser constants
+PARTYANALYZERACTION_RESET = 0
+PARTYANALYZERACTION_PRICETYPE = 1
+PARTYANALYZERACTION_PRICEVALUE = 2
+
 -- @}

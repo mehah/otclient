@@ -209,6 +209,10 @@ Wiki: https://github.com/mehah/otclient/wiki/Tutorial-Attached-Effects
 <details>
   <summary>🧩 Support HTML/CSS Syntax</summary>
 
+https://github.com/user-attachments/assets/b16359d3-09a4-4181-bcb8-c76339b64b37
+
+https://github.com/user-attachments/assets/d3844223-7e35-45da-a872-3141f1c5860a
+
 https://github.com/user-attachments/assets/9f20814f-0aed-4b70-8852-334ac745ec11  
 
 https://github.com/user-attachments/assets/3ac8473c-8e90-4639-b815-ef183c7e2adf
@@ -421,7 +425,7 @@ If it doesn't work, enable **curl**:
 <tr>
 <td align="center">Interface</td>
 <td align="center">Density Pixel</td>
-<td align="center">Joystick (patrykq)</td>
+<td align="center">Joystick</td>
 </tr>
 </table>
 </p>
@@ -559,10 +563,12 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 ## ❤️ Roadmap
 | TO-DO list | Status | PR |
 |---|---|---|
-| wheel of destiny | ![](https://geps.dev/progress/1) | None |
+| wheel of destiny | ![](https://geps.dev/progress/10) | [#1311](https://github.com/mehah/otclient/pull/1311) |
 | Forge | ![](https://geps.dev/progress/1) | None |
-| Analyzer | ![](https://geps.dev/progress/10) | [#802](https://github.com/mehah/otclient/pull/802) |
 | Sound tibia 13 | ![](https://geps.dev/progress/80) | [#1098](https://github.com/mehah/otclient/pull/1098) |
+| Prey and tasks | ![](https://geps.dev/progress/0) | None |
+| compendium | ![](https://geps.dev/progress/0) | None |
+| Party List | ![](https://geps.dev/progress/0) | None |
 
 ---
 

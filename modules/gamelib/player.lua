@@ -69,6 +69,57 @@ Icons[PlayerStates.Agony] = { clip = 28, tooltip = tr('You are Agony'),  id = 'c
 Icons[PlayerStates.Rewards] = { clip = 30, tooltip = tr('Rewards'),  id = 'condition_Rewards' }
 Icons[PlayerStates.Hungry] = { clip = 32, tooltip = tr('You are hungry'),  id = 'condition_hungry' }
 
+local PLAYER_STATE_SEGMENT = 4294967296
+
+local function isStateBitActive(states, mask)
+    if not states or mask == 0 then
+        return false
+    end
+
+    if mask < PLAYER_STATE_SEGMENT then
+        local low = states % PLAYER_STATE_SEGMENT
+        return math.floor(low / mask) % 2 == 1
+    end
+
+    local highMask = math.floor(mask / PLAYER_STATE_SEGMENT)
+    local high = math.floor(states / PLAYER_STATE_SEGMENT)
+    return highMask > 0 and math.floor(high / highMask) % 2 == 1
+end
+
+function Player.iterateChangedStates(now, old, callback)
+    if now == old then
+        return
+    end
+
+    local lowNow = now % PLAYER_STATE_SEGMENT
+    local lowOld = old % PLAYER_STATE_SEGMENT
+    local maxLow = math.max(lowNow, lowOld)
+    local mask = 1
+
+    while mask <= maxLow do
+        local nowActive = math.floor(lowNow / mask) % 2 == 1
+        local oldActive = math.floor(lowOld / mask) % 2 == 1
+        if nowActive ~= oldActive then
+            callback(mask)
+        end
+        mask = mask * 2
+    end
+
+    local highNow = math.floor(now / PLAYER_STATE_SEGMENT)
+    local highOld = math.floor(old / PLAYER_STATE_SEGMENT)
+    local maxHigh = math.max(highNow, highOld)
+    mask = 1
+
+    while mask <= maxHigh do
+        local nowActive = math.floor(highNow / mask) % 2 == 1
+        local oldActive = math.floor(highOld / mask) % 2 == 1
+        if nowActive ~= oldActive then
+            callback(mask * PLAYER_STATE_SEGMENT)
+        end
+        mask = mask * 2
+    end
+end
+
 combatStates= {
 	CLIENT_COMBAT_PHYSICAL = 0,
 	CLIENT_COMBAT_FIRE = 1,
@@ -210,22 +261,11 @@ function Player:getItemsCount(itemId)
 end
 
 function Player:hasState(state, states)
-    if not states then
-        states = self:getStates()
-    end
+    return isStateBitActive(states or self:getStates(), state)
+end
 
-    for i = 1, 32 do
-        local pow = math.pow(2, i - 1)
-        if pow > states then
-            break
-        end
-
-        local states = bit.band(states, pow)
-        if states == state then
-            return true
-        end
-    end
-    return false
+function Player.isStateActive(states, state)
+    return isStateBitActive(states, state)
 end
 
 function Player:getVocationNameByClientId()

@@ -183,4 +183,6 @@ MainWindow
     anchors.top: prev.bottom
     margin-top: 5
     margin-right: 10
-    @onClick: modules.client_options.hide()
+    @onClick: |
+      modules.client_options.saveOptions()
+      modules.client_options.hide()

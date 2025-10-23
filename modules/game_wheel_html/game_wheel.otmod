@@ -1,0 +1,9 @@
+Module
+  name: game_wheel_html
+  description: game_wheel_html
+  author: game_wheel_html
+  website: game_wheel_html
+  scripts: [ game_wheel.lua  ]
+  sandboxed: true
+  @onLoad: WheelController:init()
+  @onUnload: WheelController:terminate()

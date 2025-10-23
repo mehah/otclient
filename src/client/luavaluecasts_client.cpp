@@ -1601,3 +1601,123 @@ int push_luavalue(const ForgeOpenData& data) {
     g_lua.setField("dustLevel");
     return 1;
 }
+
+// Custom structs implementations
+int push_luavalue(const BossCooldownData& data) {
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(data.bossRaceId);
+    g_lua.setField("bossRaceId");
+    g_lua.pushInteger(data.cooldownTime);
+    g_lua.setField("cooldownTime");
+    return 1;
+}
+
+int push_luavalue(const PartyMemberData& data) {
+    g_lua.createTable(0, 6);
+    g_lua.pushInteger(data.memberID);
+    g_lua.setField("memberID");
+    g_lua.pushInteger(data.highlight);
+    g_lua.setField("highlight");
+    g_lua.pushInteger(data.loot);
+    g_lua.setField("loot");
+    g_lua.pushInteger(data.supply);
+    g_lua.setField("supply");
+    g_lua.pushInteger(data.damage);
+    g_lua.setField("damage");
+    g_lua.pushInteger(data.healing);
+    g_lua.setField("healing");
+    return 1;
+}
+
+int push_luavalue(const PartyMemberName& data) {
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(data.memberID);
+    g_lua.setField("memberID");
+    g_lua.pushString(data.memberName);
+    g_lua.setField("memberName");
+    return 1;
+}
+
+int push_luavalue(const GemData* data) {
+    g_lua.createTable(0, 6);
+    g_lua.pushInteger(data->locked);
+    g_lua.setField("locked");
+    g_lua.pushInteger(data->affinity);
+    g_lua.setField("affinity");
+    g_lua.pushInteger(data->quality);
+    g_lua.setField("quality");
+    g_lua.pushInteger(data->basicModifier1);
+    g_lua.setField("basicModifier1");
+    g_lua.pushInteger(data->basicModifier2);
+    g_lua.setField("basicModifier2");
+    g_lua.pushInteger(data->supremeModifier);
+    g_lua.setField("supremeModifier");
+    return 1;
+}
+
+int push_luavalue(const WheelData& data) {
+    g_lua.createTable(0, 10);
+    g_lua.pushInteger(data.ownerId);
+    g_lua.setField("ownerId");
+    g_lua.pushInteger(data.canUse);
+    g_lua.setField("canUse");
+    g_lua.pushInteger(data.options);
+    g_lua.setField("options");
+    g_lua.pushInteger(data.vocationId);
+    g_lua.setField("vocationId");
+    g_lua.pushInteger(data.points);
+    g_lua.setField("points");
+    g_lua.pushInteger(data.extraPoints);
+    g_lua.setField("extraPoints");
+
+    g_lua.createTable(data.wheelPoints.size(), 0);
+    for (size_t i = 0; i < data.wheelPoints.size(); ++i) {
+        g_lua.pushInteger(data.wheelPoints[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("wheelPoints");
+
+    g_lua.createTable(data.promotionScrolls.size(), 0);
+    for (size_t i = 0; i < data.promotionScrolls.size(); ++i) {
+        g_lua.createTable(0, 2);
+        g_lua.pushInteger(data.promotionScrolls[i].first);
+        g_lua.setField("scrollId");
+        g_lua.pushInteger(data.promotionScrolls[i].second);
+        g_lua.setField("quantity");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("promotionScrolls");
+
+    g_lua.pushInteger(data.extraPointsForMonkQuest);
+    g_lua.setField("extraPointsForMonkQuest");
+
+    g_lua.createTable(data.activeGems.size(), 0);
+    for (size_t i = 0; i < data.activeGems.size(); ++i) {
+        g_lua.pushInteger(data.activeGems[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("activeGems");
+
+    g_lua.createTable(0, data.revealedGems.size());
+    for (const auto& [gemId, gemData] : data.revealedGems) {
+        g_lua.pushInteger(gemId);
+        push_luavalue(&gemData);
+        g_lua.rawSet();
+    }
+    g_lua.setField("revealedGems");
+    g_lua.createTable(0, data.basicGrades.size());
+    for (const auto& [gradeId, gradeLevel] : data.basicGrades) {
+        g_lua.pushInteger(gradeId);
+        g_lua.pushInteger(gradeLevel);
+        g_lua.rawSet();
+    }
+    g_lua.setField("basicGrades");
+    g_lua.createTable(0, data.supremeGrades.size());
+    for (const auto& [gradeId, gradeLevel] : data.supremeGrades) {
+        g_lua.pushInteger(gradeId);
+        g_lua.pushInteger(gradeLevel);
+        g_lua.rawSet();
+    }
+    g_lua.setField("supremeGrades");
+    return 1;
+}

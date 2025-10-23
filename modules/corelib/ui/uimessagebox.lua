@@ -70,15 +70,19 @@ function UIMessageBox.display(title, message, buttons, onEnterCallback, onEscape
     return messageBox
 end
 
+function alert(msg)
+    displayInfoBox("Alert", msg)
+end
+
 function displayInfoBox(title, message)
     local messageBox
     local defaultCallback = function()
         messageBox:ok()
     end
-    messageBox = UIMessageBox.display(title, message, {{
+    messageBox = UIMessageBox.display(title, message, { {
         text = 'Ok',
         callback = defaultCallback
-    }}, defaultCallback, defaultCallback)
+    } }, defaultCallback, defaultCallback)
     return messageBox
 end
 
@@ -87,10 +91,10 @@ function displayErrorBox(title, message)
     local defaultCallback = function()
         messageBox:ok()
     end
-    messageBox = UIMessageBox.display(title, message, {{
+    messageBox = UIMessageBox.display(title, message, { {
         text = 'Ok',
         callback = defaultCallback
-    }}, defaultCallback, defaultCallback)
+    } }, defaultCallback, defaultCallback)
     return messageBox
 end
 
@@ -99,10 +103,10 @@ function displayCancelBox(title, message)
     local defaultCallback = function()
         messageBox:cancel()
     end
-    messageBox = UIMessageBox.display(title, message, {{
+    messageBox = UIMessageBox.display(title, message, { {
         text = 'Cancel',
         callback = defaultCallback
-    }}, defaultCallback, defaultCallback)
+    } }, defaultCallback, defaultCallback)
     return messageBox
 end
 
@@ -110,8 +114,8 @@ function displayGeneralBox(title, message, buttons, onEnterCallback, onEscapeCal
     return UIMessageBox.display(title, message, buttons, onEnterCallback, onEscapeCallback)
 end
 
-function displayGeneralSHOPBox(title, message,description, buttons, onEnterCallback, onEscapeCallback)
-    return UIMessageBox.displaySHOP(title, message,description, buttons, onEnterCallback, onEscapeCallback)
+function displayGeneralSHOPBox(title, message, description, buttons, onEnterCallback, onEscapeCallback)
+    return UIMessageBox.displaySHOP(title, message, description, buttons, onEnterCallback, onEscapeCallback)
 end
 
 function UIMessageBox:addButton(text, callback)
@@ -169,8 +173,10 @@ function UIMessageBox.displaySHOP(title, message, description, buttons, onEnterC
     messageBox.additionalLabel:setTextWrap(true)
     messageBox.additionalLabel:setTextAlign(AlignCenter)
 
-    local contentWidth = messageBox.content:getTextSize().width + messageBox.content:getPaddingLeft() + messageBox.content:getPaddingRight()
-    local contentHeight = messageBox.content:getHeight() + messageBox.content:getPaddingTop() + messageBox.content:getPaddingBottom()
+    local contentWidth = messageBox.content:getTextSize().width + messageBox.content:getPaddingLeft() +
+    messageBox.content:getPaddingRight()
+    local contentHeight = messageBox.content:getHeight() + messageBox.content:getPaddingTop() +
+    messageBox.content:getPaddingBottom()
 
     currentSizes.width = contentWidth + 32
     currentSizes.height = contentHeight + 20

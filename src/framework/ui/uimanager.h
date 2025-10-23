@@ -39,6 +39,7 @@ public:
     void inputEvent(const InputEvent& event);
 
     void updatePressedWidget(const UIWidgetPtr& newPressedWidget, const Point& clickedPos = {}, bool fireClicks = true);
+    void updatePressedWidgetHTML(const UIWidgetList& widgets, const Point& clickedPos = {}, bool fireClicks = true);
     bool updateDraggingWidget(const UIWidgetPtr& draggingWidget, const Point& clickedPos = {});
     void updateHoveredWidget(bool now = false);
 
@@ -91,6 +92,8 @@ private:
     UIWidgetPtr m_draggingWidget;
     UIWidgetPtr m_hoveredWidget;
     UIWidgetPtr m_pressedWidget;
+    UIWidgetList m_hoveredWidgets;
+    UIWidgetList m_pressedWidgets;
     bool m_hoverUpdateScheduled{ false };
     bool m_drawDebugBoxes{ false };
     stdext::map<std::string, OTMLNodePtr> m_styles;

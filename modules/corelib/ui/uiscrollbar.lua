@@ -10,13 +10,13 @@ local function calcValues(self)
     local pxrange, center
     if self.orientation == 'vertical' then
         pxrange = (self:getHeight() - decrementButton:getHeight() - decrementButton:getMarginTop() -
-                      decrementButton:getMarginBottom() - incrementButton:getHeight() - incrementButton:getMarginTop() -
-                      incrementButton:getMarginBottom())
+            decrementButton:getMarginBottom() - incrementButton:getHeight() - incrementButton:getMarginTop() -
+            incrementButton:getMarginBottom())
         center = self:getY() + math.floor(self:getHeight() / 2)
     else -- horizontal
         pxrange = (self:getWidth() - decrementButton:getWidth() - decrementButton:getMarginLeft() -
-                      decrementButton:getMarginRight() - incrementButton:getWidth() - incrementButton:getMarginLeft() -
-                      incrementButton:getMarginRight())
+            decrementButton:getMarginRight() - incrementButton:getWidth() - incrementButton:getMarginLeft() -
+            incrementButton:getMarginRight())
         center = self:getX() + math.floor(self:getWidth() / 2)
     end
 
@@ -273,6 +273,10 @@ function UIScrollBar:setStep(step)
     self.step = step
 end
 
+function UIScrollBar:setPixelsScroll(v)
+    self.pixelsScroll = v
+end
+
 function UIScrollBar:setOrientation(orientation)
     self.orientation = orientation
 end
@@ -323,24 +327,31 @@ end
 function UIScrollBar:getMaximum()
     return self.maximum
 end
+
 function UIScrollBar:getMinimum()
     return self.minimum
 end
+
 function UIScrollBar:getValue()
     return math.round(self.value)
 end
+
 function UIScrollBar:getStep()
     return self.step
 end
+
 function UIScrollBar:getOrientation()
     return self.orientation
 end
+
 function UIScrollBar:getShowValue()
     return self.showValue
 end
+
 function UIScrollBar:getSymbol()
     return self.symbol
 end
+
 function UIScrollBar:getMouseScroll()
     return self.mouseScroll
 end

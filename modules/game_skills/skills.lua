@@ -1042,7 +1042,7 @@ local function getExperienceTooltip(localPlayer)
     end
     
     local states = localPlayer:getStates()
-    local isInBattle = bit.band(states, PlayerStates.Swords) > 0 or bit.band(states, PlayerStates.RedSwords) > 0
+    local isInBattle = Player.isStateActive(states, PlayerStates.Swords) or Player.isStateActive(states, PlayerStates.RedSwords)
     
     if not isInBattle then
         return tr('%s XP for next level', comma_value(expNeeded))
@@ -1503,4 +1503,35 @@ function onForgeBonusesChange(localPlayer, momentum, transcendence, amplificatio
     setSkillValueWithTooltips('momentum', momentum, tooltips.momentum, true)
     setSkillValueWithTooltips('transcendence', transcendence, tooltips.transcendence, true)
     setSkillValueWithTooltips('amplification', amplification, tooltips.amplification, true)
+end
+
+-- Function to get experience rate values for other modules
+function getExpRating(type)
+    if type then
+        return ExpRating[type] or 0
+    else
+        return ExpRating
+    end
+end
+
+-- Function to calculate the total experience rate multiplier (excluding base rate)
+function getTotalExpRateMultiplier()
+    local baseRate = ExpRating[ExperienceRate.BASE] or 100
+    local expRateTotal = baseRate
+
+    for type, value in pairs(ExpRating) do
+        if type ~= ExperienceRate.BASE and type ~= ExperienceRate.STAMINA_MULTIPLIER then
+            expRateTotal = expRateTotal + (value or 0)
+        end
+    end
+
+    local staminaMultiplier = ExpRating[ExperienceRate.STAMINA_MULTIPLIER] or 100
+    expRateTotal = expRateTotal * staminaMultiplier / 100
+
+    return expRateTotal / 100  -- Return as a decimal multiplier
+end
+
+-- Function to get just the base experience rate
+function getBaseExpRate()
+    return ExpRating[ExperienceRate.BASE] or 100
 end

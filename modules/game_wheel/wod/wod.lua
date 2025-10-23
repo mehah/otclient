@@ -161,6 +161,61 @@ local QuadrantProgressConfig = {
     }
 }
 
+local QuadrantSlotConfig = {
+    [TOP_LEFT] = {
+        slotPrefix = 'colorTopLeft',
+        borderPrefix = 'borderTopLeft',
+        slotCount = #baseQuadrantValues
+    },
+    [TOP_RIGHT] = {
+        slotPrefix = 'colorTopRight',
+        borderPrefix = 'borderTopRight',
+        slotCount = #baseQuadrantValues
+    },
+    [BOTTOM_LEFT] = {
+        slotPrefix = 'colorBottomLeft',
+        borderPrefix = 'borderBottomLeft',
+        slotCount = #baseQuadrantValues
+    },
+    [BOTTOM_RIGHT] = {
+        slotPrefix = 'colorBottomRight',
+        borderPrefix = 'borderBottomRight',
+        slotCount = #baseQuadrantValues
+    }
+}
+
+local selectedSlots = {
+    [TOP_LEFT] = nil,
+    [TOP_RIGHT] = nil,
+    [BOTTOM_LEFT] = nil,
+    [BOTTOM_RIGHT] = nil
+}
+
+local function refreshQuadrantSelectionBorder(ui, quadrantKey, selectedIndex)
+    local config = QuadrantSlotConfig[quadrantKey]
+    if not config then
+        return
+    end
+
+    for index = 1, config.slotCount do
+        local borderId = string.format('%s%d', config.borderPrefix, index)
+        g_logger.info("borderId: " .. borderId)
+        local borderWidget = ui:recursiveGetChildById(borderId)
+        if borderWidget then
+            local shouldShow = selectedIndex ~= nil and index == selectedIndex
+            borderWidget:setVisible(shouldShow)
+            if shouldShow then
+                local slotWidget = borderWidget:getParent()
+                if slotWidget then
+                    slotWidget:raise()
+                end
+                borderWidget:raise()
+                break
+            end
+        end
+    end
+end
+
 -- Atualiza dinamicamente a imagem do slot 1 de qualquer quadrante conforme o progresso
 -- Updates any slot image with N discrete frames (1..frames)
 local function updateQuadrantSlotImage(ui, quadrantKey, slotIndex, progress, frames)
@@ -269,6 +324,9 @@ local UIConfigurator = {
             return
         end
 
+        selectedSlots[quadrantKey] = nil
+        refreshQuadrantSelectionBorder(ui, quadrantKey, nil)
+
         for index, defaultTotal in ipairs(quadrantConfig.totals or {}) do
             applyQuadrantSliceProgress(ui, quadrantKey, index, 0, defaultTotal)
         end
@@ -276,6 +334,43 @@ local UIConfigurator = {
 
     setQuadrantSliceProgress = function(ui, quadrantKey, sliceIndex, value, total)
         applyQuadrantSliceProgress(ui, quadrantKey, sliceIndex, value, total)
+    end,
+
+
+    setupSlotSelection = function(ui)
+        for quadrantKey, config in pairs(QuadrantSlotConfig) do
+            selectedSlots[quadrantKey] = nil
+            refreshQuadrantSelectionBorder(ui, quadrantKey, nil)
+
+            for index = 1, config.slotCount do
+                local slotId = string.format('%s%d', config.slotPrefix, index)
+                local slotWidget = ui:recursiveGetChildById(slotId)
+                if slotWidget then
+                    slotWidget:setPhantom(false)
+                    slotWidget:setFocusable(false)
+
+                    local slotIndex = index
+                    local quadrantId = quadrantKey
+                    connect(slotWidget, {
+                        onMousePress = function(widget, mousePos, mouseButton)
+                            if mouseButton ~= MouseLeftButton then
+                                return false
+                            end
+
+                            WheelOfDestiny.selectQuadrantSlot(quadrantId, slotIndex)
+                            return true
+                        end
+                    })
+                end
+
+                local borderId = string.format('%s%d', config.borderPrefix, index)
+                local borderWidget = ui:recursiveGetChildById(borderId)
+                if borderWidget then
+                    borderWidget:setVisible(false)
+                    borderWidget:setPhantom(true)
+                end
+            end
+        end
     end,
 
 
@@ -438,6 +533,7 @@ function WheelOfDestiny.show(container)
     UIConfigurator.resetQuadrantSlices(wodUI, TOP_RIGHT)
     UIConfigurator.resetQuadrantSlices(wodUI, BOTTOM_LEFT)
     UIConfigurator.resetQuadrantSlices(wodUI, BOTTOM_RIGHT)
+    UIConfigurator.setupSlotSelection(wodUI)
 
     -- Conectar ambos os botões summary
     local summaryButton = wodUI:getChildById('summaryButton')
@@ -492,6 +588,30 @@ function WheelOfDestiny.updateSlicesProgress(quadrantKey, progressList)
             applyQuadrantSliceProgress(currentWodUI, quadrantKey, numericIndex, value, total)
         end
     end
+end
+
+function WheelOfDestiny.selectQuadrantSlot(quadrantKey, slotIndex)
+    if not currentWodUI then
+        return
+    end
+
+    local config = QuadrantSlotConfig[quadrantKey]
+    if not config then
+        return
+    end
+
+    local numericIndex = tonumber(slotIndex)
+    if not numericIndex or numericIndex < 1 or numericIndex > config.slotCount then
+        return
+    end
+
+    if selectedSlots[quadrantKey] == numericIndex then
+        selectedSlots[quadrantKey] = nil
+    else
+        selectedSlots[quadrantKey] = numericIndex
+    end
+
+    refreshQuadrantSelectionBorder(currentWodUI, quadrantKey, selectedSlots[quadrantKey])
 end
 
 -- Function to get player's basic vocation

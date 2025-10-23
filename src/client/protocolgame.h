@@ -26,6 +26,35 @@
 #include "declarations.h"
 #include "protocolcodes.h"
 #include <framework/net/protocol.h>
+#include <string>
+
+struct BossCooldownData {
+    uint32_t bossRaceId;
+    uint64_t cooldownTime;
+    
+    BossCooldownData(uint32_t raceId, uint64_t cooldown)
+        : bossRaceId(raceId), cooldownTime(cooldown) {}
+};
+
+struct PartyMemberData {
+    uint32_t memberID;
+    uint8_t highlight;
+    uint64_t loot;
+    uint64_t supply;
+    uint64_t damage;
+    uint64_t healing;
+    
+    PartyMemberData(uint32_t id, uint8_t highlightValue, uint64_t lootValue, uint64_t supplyValue, uint64_t damageValue, uint64_t healingValue)
+        : memberID(id), highlight(highlightValue), loot(lootValue), supply(supplyValue), damage(damageValue), healing(healingValue) {}
+};
+
+struct PartyMemberName {
+    uint32_t memberID;
+    std::string memberName;
+    
+    PartyMemberName(uint32_t id, const std::string& name)
+        : memberID(id), memberName(name) {}
+};
 
 class ProtocolGame final : public Protocol
 {
@@ -93,6 +122,7 @@ public:
     void sendPassLeadership(uint32_t creatureId);
     void sendLeaveParty();
     void sendShareExperience(bool active);
+    void sendPartyAnalyzerAction(uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items = {});
     void sendOpenOwnChannel();
     void sendInviteToOwnChannel(std::string_view name);
     void sendExcludeFromOwnChannel(std::string_view name);
@@ -145,6 +175,7 @@ public:
     void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
+    void sendOpenWheelOfDestiny(uint32_t playerId);
     void sendRequestBestiary();
     void sendRequestBestiaryOverview(std::string_view catName);
     void sendRequestBestiarySearch(uint16_t raceId);
@@ -198,6 +229,7 @@ private:
     void parseBugReport(const InputMessagePtr& msg);
     void parsePendingGame(const InputMessagePtr& msg);
     void parseEnterGame(const InputMessagePtr& msg);
+    void parseWheelOfDestinyOpenWindow(const InputMessagePtr& msg);
     void parseLogin(const InputMessagePtr& msg) const;
     void parseGMActions(const InputMessagePtr& msg);
     void parseUpdateNeeded(const InputMessagePtr& msg);
@@ -385,6 +417,8 @@ private:
     bool m_mapKnown{ false };
     bool m_firstRecv{ true };
     bool m_record {false};
+
+    ticks_t m_lastPartyAnalyzerCall{ 0 };
 
     std::string m_accountName;
     std::string m_accountPassword;

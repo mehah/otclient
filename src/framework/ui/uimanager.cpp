@@ -31,6 +31,7 @@
 #include <framework/platform/platformwindow.h>
 
 #include "framework/graphics/graphics.h"
+#include <framework/html/htmlmanager.h>
 
 UIManager g_ui;
 
@@ -38,6 +39,7 @@ void UIManager::init()
 {
     // creates root widget
     m_rootWidget = std::make_shared<UIWidget>();
+    m_rootWidget->m_positionType = PositionType::Relative;
     m_rootWidget->setId("root");
     m_mouseReceiver = m_rootWidget;
     m_keyboardReceiver = m_rootWidget;
@@ -56,6 +58,8 @@ void UIManager::terminate()
     m_styles.clear();
     m_destroyedWidgets.clear();
     m_checkEvent = nullptr;
+    m_hoveredWidgets.clear();
+    m_pressedWidgets.clear();
 }
 
 void UIManager::render(DrawPoolType drawPane) const
@@ -87,15 +91,25 @@ void UIManager::inputEvent(const InputEvent& event)
             m_keyboardReceiver->propagateOnKeyUp(event.keyCode, event.keyboardModifiers);
             break;
         case Fw::MousePressInputEvent:
+            m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
+
             if (event.mouseButton == Fw::MouseLeftButton && m_mouseReceiver->isVisible()) {
                 auto pressedWidget = m_mouseReceiver->recursiveGetChildByPos(event.mousePos, false);
-                if (pressedWidget && !pressedWidget->isEnabled())
-                    pressedWidget = nullptr;
 
-                updatePressedWidget(pressedWidget, event.mousePos);
+                bool isOnHTML = false;
+                if (pressedWidget) {
+                    isOnHTML = pressedWidget->isOnHtml();
+
+                    if (!pressedWidget->isEnabled())
+                        pressedWidget = nullptr;
+                }
+
+                if (isOnHTML)
+                    updatePressedWidgetHTML(pressedWidget ? widgetList : UIWidgetList{}, event.mousePos);
+                else
+                    updatePressedWidget(pressedWidget, event.mousePos);
             }
 
-            m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
             for (const auto& widget : widgetList) {
                 widget->recursiveFocus(Fw::MouseFocusReason);
                 if (widget->onMousePress(event.mousePos, event.mouseButton))
@@ -127,8 +141,12 @@ void UIManager::inputEvent(const InputEvent& event)
                 }
             }
 
-            if (m_pressedWidget && event.mouseButton == Fw::MouseLeftButton)
-                updatePressedWidget(nullptr, event.mousePos, !accepted);
+            if (m_pressedWidget && event.mouseButton == Fw::MouseLeftButton) {
+                if (m_pressedWidget->isOnHtml())
+                    updatePressedWidgetHTML(UIWidgetList{}, event.mousePos, !accepted);
+                else
+                    updatePressedWidget(nullptr, event.mousePos, !accepted);
+            }
             break;
         }
         case Fw::MouseMoveInputEvent:
@@ -171,6 +189,29 @@ void UIManager::inputEvent(const InputEvent& event)
             break;
         default:
             break;
+    }
+}
+
+void  UIManager::updatePressedWidgetHTML(const UIWidgetList& newPressed, const Point& clickedPos, bool fireClicks) {
+    auto oldPressedWidgets = std::move(m_pressedWidgets);
+    m_pressedWidgets = newPressed;
+    m_pressedWidget = !newPressed.empty() ? newPressed.front() : nullptr;
+
+    for (const auto& p : newPressed) {
+        const auto w = p.get();
+        if (!w->isEnabled())
+            continue;
+
+        w->updateState(Fw::PressedState, true);
+    }
+
+    for (const auto& p : std::views::reverse(oldPressedWidgets)) {
+        const auto w = p.get();
+
+        if (fireClicks && w->isEnabled() && w->containsPoint(clickedPos))
+            w->onClick(clickedPos);
+
+        w->updateState(Fw::PressedState, false);
     }
 }
 
@@ -234,11 +275,43 @@ void UIManager::updateHoveredWidget(const bool now)
             return;
 
         m_hoverUpdateScheduled = false;
-        //if(!g_window.isMouseButtonPressed(Fw::MouseLeftButton) && !g_window.isMouseButtonPressed(Fw::MouseRightButton)) {
-        auto hoveredWidget = m_rootWidget->recursiveGetChildByPos(g_window.getMousePosition(), false);
+
+        const auto& mousePos = g_window.getMousePosition();
+        auto hoveredWidget = m_rootWidget->recursiveGetChildByPos(mousePos, false);
+
+        if (hoveredWidget && hoveredWidget->isOnHtml()) {
+            UIWidgetList newHovered;
+            m_mouseReceiver->propagateOnMouseEvent(mousePos, newHovered);
+
+            for (const auto& p : std::views::reverse(m_hoveredWidgets)) {
+                const auto w = p.get();
+
+                bool still = std::any_of(newHovered.begin(), newHovered.end(),
+                                         [&](const UIWidgetPtr& p) { return p.get() == w; });
+                if (!still) {
+                    w->updateState(Fw::HoverState, false);
+                    w->onHoverChange(false);
+                }
+            }
+
+            for (const auto& p : newHovered) {
+                const auto w = p.get();
+                if (!w->isEnabled())
+                    continue;
+
+                bool was = std::any_of(m_hoveredWidgets.begin(), m_hoveredWidgets.end(),
+                                       [&](const UIWidgetPtr& q) { return q.get() == w; });
+                if (!was) {
+                    w->updateState(Fw::HoverState, true);
+                    w->onHoverChange(true);
+                }
+            }
+
+            m_hoveredWidgets = std::move(newHovered);
+        }
+
         if (hoveredWidget && !hoveredWidget->isEnabled())
             hoveredWidget = nullptr;
-        //}
 
         if (hoveredWidget != m_hoveredWidget) {
             const UIWidgetPtr oldHovered = m_hoveredWidget;
@@ -286,11 +359,27 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
     if (m_hoveredWidget == widget)
         updateHoveredWidget();
 
-    if (m_pressedWidget == widget)
+    if (m_pressedWidget == widget) {
         updatePressedWidget(nullptr);
+    }
 
     if (m_draggingWidget == widget)
         updateDraggingWidget(nullptr);
+
+    if (widget->isOnHtml()) {
+        { // Pressed Widgets
+            auto it = std::find(m_pressedWidgets.begin(), m_pressedWidgets.end(), widget);
+            if (it != m_pressedWidgets.end()) {
+                m_pressedWidgets.erase(it);
+            }
+        }
+        {  // Hovered Widgets
+            auto it = std::find(m_hoveredWidgets.begin(), m_hoveredWidgets.end(), widget);
+            if (it != m_hoveredWidgets.end()) {
+                m_hoveredWidgets.erase(it);
+            }
+        }
+    }
 
     // Avoid the garbage collector
     if (!g_modules.isAutoReloadEnabled())
@@ -598,8 +687,13 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
     if (!widget)
         throw Exception("unable to create widget of type '{}'", widgetType);
 
-    if (parent)
-        parent->addChild(widget);
+    if (parent) {
+        if (parent->m_insertChildIndex > -1) {
+            parent->insertChild(parent->m_insertChildIndex, widget);
+            parent->m_insertChildIndex = -1;
+        } else
+            parent->addChild(widget);
+    }
 
     widget->callLuaField("onCreate");
 

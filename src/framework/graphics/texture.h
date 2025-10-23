@@ -24,6 +24,7 @@
 
 #include "declarations.h"
 #include <framework/core/timer.h>
+#include <vector>
 
 class Texture
 {
@@ -48,7 +49,7 @@ public:
     const Size& getSize() const { return m_size; }
     auto getTransformMatrixId() const { return m_transformMatrixId; }
 
-    const auto getAtlasRegion(Fw::TextureAtlasType type) const { return m_atlas[type]; }
+    auto getAtlasRegion(Fw::TextureAtlasType type) const { return m_atlas[type]; }
     const AtlasRegion* getAtlasRegion() const;
 
     ticks_t getTime() const { return m_time; }
@@ -68,6 +69,13 @@ public:
     bool setupSize(const Size& size);
 
     virtual void allowAtlasCache();
+
+    void loadTransparentPixels(const ImagePtr& image);
+    bool hasTransparentPixels() const { return !m_transparentPixels.empty(); }
+    bool isPixelTransparent(uint32_t index) const
+    {
+        return index < m_transparentPixels.size() && m_transparentPixels[index] == 1;
+    }
 
 protected:
     void bind();
@@ -92,6 +100,7 @@ protected:
     uint16_t m_transformMatrixId{ 0 };
 
     ImagePtr m_image;
+    std::vector<char> m_transparentPixels;
 
     enum Prop : uint16_t
     {

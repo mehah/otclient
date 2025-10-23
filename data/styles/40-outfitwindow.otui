@@ -51,7 +51,6 @@ PresetButton < Panel
     id: creature
     anchors.centerIn: parent
     size: 64 64
-    margin-bottom: 10
     phantom: true
   
   Label
@@ -308,7 +307,7 @@ OutfitWindow < MainWindow
       UICreature
         id: UIfamiliar
         anchors.centerIn: parent
-        size: 256 256
+        size: 64 64
         @onSetup: |
           if not g_game.getFeature(GamePlayerFamiliars) then
             self:hide()
@@ -317,14 +316,16 @@ OutfitWindow < MainWindow
       UICreature
         id: creature
         anchors.centerIn: parent
-        size: 256 256
+        size: 64 64
+        margin-top: 26
+        margin-left: -16
       
       Panel
         id: bars
         anchors.horizontalCenter: prev.horizontalCenter
         anchors.top: prev.top
         margin-top: 47
-        margin-left: 28
+        margin-right: 20
         size: 300 32
 
         Label

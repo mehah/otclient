@@ -582,6 +582,38 @@ struct ForgeOpenData
     uint16_t dustLevel{ 0 };
 };
 
+struct GemData
+{
+    uint8_t locked;
+    uint8_t affinity;
+    uint8_t quality;          // 0=Lesser, 1=Regular, 2=Greater
+    uint8_t basicModifier1;
+    uint8_t basicModifier2;
+    uint8_t supremeModifier;
+};
+
+struct WheelData
+{
+    uint32_t ownerId;
+    uint8_t canUse;
+    uint8_t options;     // 0=cannot change, 1=can inc/dec, 2=only inc
+    uint8_t vocationId;
+    uint16_t points;
+    uint16_t extraPoints;
+
+    std::array<uint16_t, static_cast<size_t>(Otc::WheelSlots_t::SLOT_LAST)> wheelPoints;
+
+    std::vector<std::pair<uint16_t, uint8_t>> promotionScrolls;
+    uint8_t extraPointsForMonkQuest;
+
+    std::vector<uint16_t> activeGems;
+
+    std::unordered_map<uint16_t, GemData> revealedGems;
+
+    std::unordered_map<uint8_t, uint8_t> basicGrades;
+    std::unordered_map<uint8_t, uint8_t> supremeGrades;
+};
+
 //@bindsingleton g_game
 class Game
 {
@@ -774,6 +806,10 @@ public:
     void partyPassLeadership(uint32_t creatureId);
     void partyLeave();
     void partyShareExperience(bool active);
+    void sendPartyAnalyzerReset();
+    void sendPartyAnalyzerPriceType();
+    void sendPartyAnalyzerPriceValue(); // For action 3, will get items from cyclopedia
+    void sendPartyAnalyzerAction(uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items = {});
 
     // outfit related
     void requestOutfit();
@@ -932,6 +968,7 @@ public:
     void clearImbuement(uint8_t slot);
     void closeImbuingWindow();
     void imbuementDurations(bool isOpen = false);
+    void openWheelOfDestiny(uint32_t playerId);
 
     void enableTileThingLuaCallback(const bool value) { m_tileThingsLuaCallback = value; }
     bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
