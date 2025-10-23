@@ -142,6 +142,19 @@
       bottom: 24;
       right: 24;
     }
+    .mediumperks {
+      position: absolute;
+      height: 30px;
+      width: 30px;
+      --image-source: "/images/game/wheel/icons-skillwheel-mediumperks.png";
+    }
+    .smallperks {
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      --image-source: "/images/game/wheel/icons-skillwheel-smallperks.png";
+      --image-size: 16 16;
+    }
   </style>
   <window
     placement="center"
@@ -269,8 +282,8 @@
                   *image-source="data.colorPath"
                   *height="data.height"
                   *width="data.width"
-                  *opacity="data.isComplete and 0.75 or (data.isAdjacent and 0.5 or 0.01) or 0.01"
-                  image-draw-order="2"
+                  *opacity="data.isComplete and 0.65 or (data.isAdjacent and 0.2 or 0.01) or 0.01"
+                  image-draw-order="1"
                   *ignore-transparent-pixel="true"
                 />
                 <img
@@ -278,7 +291,7 @@
                   *image-source="data.adjacentPath"
                   *height="data.height"
                   *width="data.width"
-                  *opacity="data.adjacentPath ~= '' and 0.5 or 0.01"
+                  *opacity="data.adjacentPath ~= '' and 0.2 or 0.01"
                   *ignore-transparent-pixel="true"
                   image-draw-order="1"
                 />
@@ -288,6 +301,7 @@
                   *height="data.height"
                   *width="data.width"
                   onclick="self.wheel:handleSelectSlot(data.id)"
+                  onMousePress="self.wheel:handleMousePress(event, data.id)"
                   opacity="0.001"
                   *ignore-transparent-pixel="true"
                   image-draw-order="0"
@@ -301,6 +315,25 @@
                   *width="data.width"
                   onhover="self.wheel:handleOnHover(data.id)"
                   *ignore-transparent-pixel="true"
+                />
+
+                <img
+                  *if="data.iconClip ~= nil"
+                  *image-clip="data.iconClip"
+                  *margin-top="data.top"
+                  *margin-left="data.left"
+                  image-draw-order="1"
+                  class="mediumperks"
+                  style="display: block"
+                />
+                <img
+                  *if="data.miniIconClip ~= nil"
+                  class="smallperks"
+                  *image-clip="data.miniIconClip"
+                  style="display: block"
+                  *margin-top="data.top + 16"
+                  *margin-left="data.left - 3"
+                  image-draw-order="1"
                 />
               </span>
               <img

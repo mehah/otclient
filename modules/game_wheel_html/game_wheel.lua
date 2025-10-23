@@ -284,6 +284,8 @@ function WheelController.wheel:fillQuadrantsBorders()
             width = "522",
             isComplete = data.currentPoints == data.totalPoints,
             enabledBy = {},
+            top = data.top or 0,
+            left = data.left or 0,
         }
 
         current.colorPath = WheelController.wheel.getSlotFramePercentage(current)
@@ -426,5 +428,36 @@ function onWheelOfDestinyOpenWindow(data)
         WheelController.wheel.trLargePerkClip = { x = 442, y = 0, width = 34, height = 34 }
         WheelController.wheel.blLargePerkClip = { x = 476, y = 0, width = 34, height = 34 }
         WheelController.wheel.brLargePerkClip = { x = 510, y = 0, width = 34, height = 34 }
+    end
+
+    WheelController.wheel.icons = {}
+
+    WheelController.wheel.tempClip = { x = 1050, y = 0, width = 30, height = 30 }
+    WheelController.wheel.tempClip2 = { x = 32, y = 0, width = 16, height = 16 }
+
+    for id, iconInfo in pairs(helper.icons.WheelIcons[data.vocationId]) do
+        local iconRect = iconInfo.iconRect
+        local miniIconRect = iconInfo.miniIconRect
+
+        local x, y, width, height = iconRect:match("(%d+) (%d+) (%d+) (%d+)")
+
+        WheelController.wheel.data[id].iconClip = {
+            x = tonumber(x),
+            y = tonumber(y),
+            width = tonumber(width),
+            height = tonumber(height)
+        }
+
+        WheelController.wheel.data[id].left = WheelController.wheel.data[id].left or 0
+        WheelController.wheel.data[id].top = WheelController.wheel.data[id].top or 0
+
+        x, y, width, height = miniIconRect:match("(%d+) (%d+) (%d+) (%d+)")
+
+        WheelController.wheel.data[id].miniIconClip = {
+            x = tonumber(x),
+            y = tonumber(y),
+            width = tonumber(width),
+            height = tonumber(height)
+        }
     end
 end

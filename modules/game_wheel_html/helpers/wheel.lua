@@ -65,7 +65,9 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = {}
+        adjacents = {},
+        left = 80,
+        top = 80,
     },
     [WheelSlots.SLOT_GREEN_TOP_150] = {
         quadrant = "top_left",
@@ -83,6 +85,8 @@ local WheelSlotsParser = {
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_GREEN_200, WheelSlots.SLOT_GREEN_BOTTOM_150 },
+        top = 90,
+        left = 160,
     },
     [WheelSlots.SLOT_GREEN_BOTTOM_150] = {
         quadrant = "top_left",
@@ -100,6 +104,8 @@ local WheelSlotsParser = {
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_GREEN_200, WheelSlots.SLOT_GREEN_TOP_150 },
+        top = 160,
+        left = 90
     },
     [WheelSlots.SLOT_GREEN_TOP_100] = {
         quadrant = "top_left",
@@ -117,6 +123,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 120,
+        left = 210
     },
     [WheelSlots.SLOT_GREEN_MIDDLE_100] = {
         quadrant = "top_left",
@@ -134,6 +142,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 155,
+        left = 155,
     },
     [WheelSlots.SLOT_GREEN_BOTTOM_100] = {
         quadrant = "top_left",
@@ -151,6 +161,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 215,
+        left = 120
     },
     [WheelSlots.SLOT_GREEN_TOP_75] = {
         quadrant = "top_left",
@@ -168,6 +180,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 175,
+        left = 215
     },
     [WheelSlots.SLOT_GREEN_BOTTOM_75] = {
         quadrant = "top_left",
@@ -185,6 +199,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 220,
+        left = 175
     },
     [WheelSlots.SLOT_GREEN_50] = {
         quadrant = "top_left",
@@ -202,6 +218,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 225,
+        left = 225
     },
     [WheelSlots.SLOT_RED_200] = {
         quadrant = "top_right",
@@ -219,6 +237,8 @@ local WheelSlotsParser = {
         adjacentPath = "",
         borderPath = "",
         adjacents = {},
+        top = 80,
+        left = 410,
     },
     [WheelSlots.SLOT_RED_TOP_150] = {
         quadrant = "top_right",
@@ -236,6 +256,8 @@ local WheelSlotsParser = {
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_RED_200, WheelSlots.SLOT_RED_BOTTOM_150 },
+        top = 90,
+        left = 335
     },
     [WheelSlots.SLOT_RED_BOTTOM_150] = {
         quadrant = "top_right",
@@ -253,6 +275,8 @@ local WheelSlotsParser = {
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_RED_200, WheelSlots.SLOT_RED_TOP_150 },
+        top = 155,
+        left = 405
     },
     [WheelSlots.SLOT_RED_TOP_100] = {
         quadrant = "top_right",
@@ -270,6 +294,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 120,
+        left = 280
     },
     [WheelSlots.SLOT_RED_MIDDLE_100] = {
         quadrant = "top_right",
@@ -287,6 +313,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 155,
+        left = 340,
     },
     [WheelSlots.SLOT_RED_BOTTOM_100] = {
         quadrant = "top_right",
@@ -304,6 +332,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 215,
+        left = 370
     },
     [WheelSlots.SLOT_RED_TOP_75] = {
         quadrant = "top_right",
@@ -321,6 +351,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 175,
+        left = 275
     },
     [WheelSlots.SLOT_RED_BOTTOM_75] = {
         quadrant = "top_right",
@@ -338,6 +370,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 215,
+        left = 315
     },
     [WheelSlots.SLOT_RED_50] = {
         quadrant = "top_right",
@@ -355,6 +389,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 225,
+        left = 266
     },
     [WheelSlots.SLOT_BLUE_200] = {
         quadrant = "bottom_left",
@@ -371,7 +407,9 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = {}
+        adjacents = {},
+        top = 412,
+        left = 80
     },
     [WheelSlots.SLOT_BLUE_TOP_150] = {
         quadrant = "bottom_left",
@@ -389,6 +427,8 @@ local WheelSlotsParser = {
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_BLUE_200, WheelSlots.SLOT_BLUE_BOTTOM_150 },
+        top = 405,
+        left = 155
     },
     [WheelSlots.SLOT_BLUE_BOTTOM_150] = {
         quadrant = "bottom_left",
@@ -406,6 +446,8 @@ local WheelSlotsParser = {
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_BLUE_200, WheelSlots.SLOT_BLUE_TOP_150 },
+        top = 335,
+        left = 90
     },
     [WheelSlots.SLOT_BLUE_TOP_100] = {
         quadrant = "bottom_left",
@@ -423,7 +465,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-
+        top = 280,
+        left = 120,
     },
     [WheelSlots.SLOT_BLUE_MIDDLE_100] = {
         quadrant = "bottom_left",
@@ -441,6 +484,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 335,
+        left = 155,
     },
     [WheelSlots.SLOT_BLUE_BOTTOM_100] = {
         quadrant = "bottom_left",
@@ -458,6 +503,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 370,
+        left = 215
     },
     [WheelSlots.SLOT_BLUE_TOP_75] = {
         quadrant = "bottom_left",
@@ -475,6 +522,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 275,
+        left = 175,
     },
     [WheelSlots.SLOT_BLUE_BOTTOM_75] = {
         quadrant = "bottom_left",
@@ -492,6 +541,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 315,
+        left = 215
     },
     [WheelSlots.SLOT_BLUE_50] = {
         quadrant = "bottom_left",
@@ -509,6 +560,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 265,
+        left = 225
     },
     [WheelSlots.SLOT_PURPLE_200] = {
         quadrant = "bottom_right",
@@ -525,7 +578,9 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = {}
+        adjacents = {},
+        top = 412,
+        left = 412,
     },
     [WheelSlots.SLOT_PURPLE_TOP_150] = {
         quadrant = "bottom_right",
@@ -542,7 +597,9 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_PURPLE_200, WheelSlots.SLOT_PURPLE_BOTTOM_150 }
+        adjacents = { WheelSlots.SLOT_PURPLE_200, WheelSlots.SLOT_PURPLE_BOTTOM_150 },
+        top = 335,
+        left = 405,
     },
     [WheelSlots.SLOT_PURPLE_BOTTOM_150] = {
         quadrant = "bottom_right",
@@ -559,7 +616,9 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
-        adjacents = { WheelSlots.SLOT_PURPLE_200, WheelSlots.SLOT_PURPLE_TOP_150 }
+        adjacents = { WheelSlots.SLOT_PURPLE_200, WheelSlots.SLOT_PURPLE_TOP_150 },
+        top = 405,
+        left = 335
     },
     [WheelSlots.SLOT_PURPLE_TOP_100] = {
         quadrant = "bottom_right",
@@ -577,6 +636,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 280,
+        left = 370,
     },
     [WheelSlots.SLOT_PURPLE_MIDDLE_100] = {
         quadrant = "bottom_right",
@@ -594,6 +655,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 340,
+        left = 335,
     },
     [WheelSlots.SLOT_PURPLE_BOTTOM_100] = {
         quadrant = "bottom_right",
@@ -611,6 +674,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 370,
+        left = 280
     },
     [WheelSlots.SLOT_PURPLE_TOP_75] = {
         quadrant = "bottom_right",
@@ -628,6 +693,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 275,
+        left = 315
     },
     [WheelSlots.SLOT_PURPLE_BOTTOM_75] = {
         quadrant = "bottom_right",
@@ -645,6 +712,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 315,
+        left = 275
     },
     [WheelSlots.SLOT_PURPLE_50] = {
         quadrant = "bottom_right",
@@ -662,6 +731,8 @@ local WheelSlotsParser = {
         hoverPath = "",
         adjacentPath = "",
         borderPath = "",
+        top = 265,
+        left = 266
     },
 }
 
