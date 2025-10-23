@@ -39,6 +39,7 @@
 #include <framework/core/eventdispatcher.h>
 
 #include "animatedtext.h"
+#include "attachedeffect.h"
 #include "gameconfig.h"
 #include "thingtype.h"
 

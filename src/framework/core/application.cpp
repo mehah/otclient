@@ -41,6 +41,8 @@
 
 #include <locale>
 
+#include "clock.h"
+
 #ifdef FRAMEWORK_NET
 #ifdef __EMSCRIPTEN__
 #include <framework/net/webconnection.h>

@@ -37,6 +37,8 @@
 #include "uimap.h"
 #include <algorithm>
 
+#include "framework/core/clock.h"
+
 Tile::Tile(const Position& position) : m_position(position) {}
 
 void updateElevation(const ThingPtr& thing, uint8_t& drawElevation) {

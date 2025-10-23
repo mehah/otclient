@@ -30,6 +30,7 @@
 
 #include <algorithm>
 
+#include "attachedeffect.h"
 #include "client.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "map.h"

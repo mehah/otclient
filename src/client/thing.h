@@ -23,9 +23,7 @@
 #pragma once
 
 #include "attachableobject.h"
-#include "declarations.h"
-#include <framework/core/clock.h>
-#include <framework/luaengine/luaobject.h>
+#include <framework/core/timer.h>
 
 #include "staticdata.h"
 
@@ -174,24 +172,12 @@ public:
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
     virtual void onDisappear() {};
-    const Color& getMarkedColor() {
-        if (m_markedColor == Color::white)
-            return Color::white;
-
-        m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f);
-        return m_markedColor;
-    }
+    const Color& getMarkedColor();
 
     bool isMarked() { return m_markedColor != Color::white; }
     void setMarked(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
 
-    const Color& getHighlightColor() {
-        if (m_highlightColor == Color::white)
-            return Color::white;
-
-        m_highlightColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f);
-        return m_highlightColor;
-    }
+    const Color& getHighlightColor();
 
     bool isHighlighted() { return m_highlightColor != Color::white; }
     void setHighlight(const Color& color) { if (m_highlightColor != color) m_highlightColor = color; }

@@ -26,7 +26,9 @@
 
 #include <framework/graphics/shadermanager.h>
 
+#include "attachedeffect.h"
 #include "thingtype.h"
+#include "framework/core/clock.h"
 
 void Thing::setPosition(const Position& position, uint8_t /*stackPos*/)
 {
@@ -212,4 +214,20 @@ uint16_t Thing::getClassification() { return getThingType()->getClassification()
 
 bool Thing::canDraw(const Color& color) const {
     return m_canDraw && m_clientId > 0 && color.aF() > Fw::MIN_ALPHA && getThingType() && getThingType()->getOpacity() > Fw::MIN_ALPHA;
+}
+
+const Color& Thing::getMarkedColor() {
+    if (m_markedColor == Color::white)
+        return Color::white;
+
+    m_markedColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f);
+    return m_markedColor;
+}
+
+const Color& Thing::getHighlightColor() {
+    if (m_highlightColor == Color::white)
+        return Color::white;
+
+    m_highlightColor.setAlpha(0.1f + std::abs(500 - g_clock.millis() % 1000) / 1000.0f);
+    return m_highlightColor;
 }

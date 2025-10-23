@@ -213,6 +213,8 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
     return true;
 }
 
+bool LocalPlayer::isWalkLocked() { return m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration; }
+
 void LocalPlayer::stopAutoWalk()
 {
     m_autoWalkDestination = {};

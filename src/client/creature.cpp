@@ -39,6 +39,7 @@
 #include <framework/ui/uiwidget.h>
 
 #include "animator.h"
+#include "attachedeffect.h"
 #include "gameconfig.h"
 #include "statictext.h"
 #include "thingtype.h"

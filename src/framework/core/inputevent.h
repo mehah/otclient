@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "declarations.h"
+
 struct InputEvent
 {
     InputEvent()
