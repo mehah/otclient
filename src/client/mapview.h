@@ -26,52 +26,9 @@
 #include <framework/luaengine/luaobject.h>
 
 #include "framework/core/timer.h"
-#include "position.h"
 #include "staticdata.h"
 
-struct AwareRange
-{
-    uint8_t left{ 0 };
-    uint8_t top{ 0 };
-    uint8_t right{ 0 };
-    uint8_t bottom{ 0 };
-
-    uint8_t horizontal() const { return left + right + 1; }
-    uint8_t vertical() const { return top + bottom + 1; }
-
-    Size dimension() const { return { left * 2 + 1 , top * 2 + 1 }; }
-
-    bool operator==(const AwareRange& other) const
-    { return left == other.left && top == other.top && right == other.right && bottom == other.bottom; }
-};
-
-struct MapPosInfo
-{
-    Rect rect;
-    Rect srcRect;
-    Point drawOffset;
-    float horizontalStretchFactor;
-    float verticalStretchFactor;
-    float scaleFactor;
-
-    bool isInRange(const Position& pos, const bool ignoreZ = false) const
-    {
-        return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 2, awareRange.top - 1, awareRange.bottom - 2, ignoreZ);
-    }
-
-    bool isInRangeEx(const Position& pos, const bool ignoreZ = false)  const
-    {
-        return camera.isInRange(pos, awareRange.left, awareRange.right, awareRange.top, awareRange.bottom, ignoreZ);
-    }
-
-private:
-    Position camera;
-    AwareRange awareRange;
-
-    friend class MapView;
-};
-
-// @bindclass
+ // @bindclass
 class MapView final : public LuaObject
 {
 public:

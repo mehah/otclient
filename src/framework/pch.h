@@ -57,6 +57,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <thread>
 
 // ===== Third-Party Libraries =====
 // zlib
