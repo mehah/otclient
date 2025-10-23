@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include "game.h"
 #include "map.h"
 #include "mapview.h"
 #include "uimap.h"
