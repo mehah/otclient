@@ -28,7 +28,7 @@
 
 #include <asio/read.hpp>
 #include <asio/read_until.hpp>
-#include <utility>
+#include <asio/connect.hpp>
 
 #include <asio/io_context.hpp>
 
@@ -55,7 +55,7 @@ Connection::~Connection()
 void Connection::poll()
 {
     // reset must always be called prior to poll
-    g_ioService.reset();
+    g_ioService.restart();
     g_ioService.poll();
 }
 
@@ -99,8 +99,7 @@ void Connection::connect(const std::string_view host, const uint16_t port, const
     m_error.clear();
     m_connectCallback = connectCallback;
 
-    const asio::ip::tcp::resolver::query query(host.data(), stdext::unsafe_cast<std::string>(port));
-    m_resolver.async_resolve(query, [this](auto&& error, auto&& endpointIterator) {
+    m_resolver.async_resolve(host, stdext::unsafe_cast<std::string>(port), [this](auto&& error, auto&& endpointIterator) {
         onResolve(std::move(error), std::move(endpointIterator));
     });
 
@@ -111,10 +110,10 @@ void Connection::connect(const std::string_view host, const uint16_t port, const
     });
 }
 
-void Connection::internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>::iterator& endpointIterator)
+void Connection::internal_connect(const asio::ip::tcp::resolver::results_type& endpointIterator)
 {
-    m_socket.async_connect(*endpointIterator, [capture0 = asConnection()](auto&& PH1) {
-        capture0->onConnect(std::forward<decltype(PH1)>(PH1));
+    asio::async_connect(m_socket, endpointIterator, [capture0 = asConnection()](const std::error_code& error, const asio::ip::tcp::endpoint& /*endpoint*/) {
+        capture0->onConnect(error);
     });
 
     m_readTimer.cancel();
@@ -230,7 +229,7 @@ void Connection::read_some(const RecvCallback& callback)
     });
 }
 
-void Connection::onResolve(const std::error_code& error, const asio::ip::basic_resolver<asio::ip::tcp>::iterator&
+void Connection::onResolve(const std::error_code& error, const asio::ip::tcp::resolver::results_type&
                            endpointIterator)
 {
     m_readTimer.cancel();
@@ -305,8 +304,8 @@ void Connection::onRecv(const std::error_code& error, const size_t recvSize)
     if (m_connected) {
         if (!error) {
             if (m_recvCallback) {
-                const auto* header = asio::buffer_cast<const char*>(m_inputStream.data());
-                m_recvCallback((uint8_t*)header, recvSize);
+                const auto* header = static_cast<const char*>(m_inputStream.data().data());
+                m_recvCallback(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(header)), recvSize);
             }
         } else
             handleError(error);
@@ -341,7 +340,7 @@ int Connection::getIp()
     std::error_code error;
     const asio::ip::tcp::endpoint ip = m_socket.remote_endpoint(error);
     if (!error)
-        return asio::detail::socket_ops::host_to_network_long(ip.address().to_v4().to_ulong());
+        return asio::detail::socket_ops::host_to_network_long(ip.address().to_v4().to_uint());
 
     g_logger.error("Getting remote ip");
     return 0;

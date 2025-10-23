@@ -56,7 +56,7 @@ void Proxy::terminate()
         g_proxies.erase(self);
         disconnect();
         std::error_code ec;
-        m_timer.cancel(ec);
+        m_timer.cancel();
     });
 }
 
@@ -127,7 +127,7 @@ void Proxy::connect()
             }
             endpoint = asio::ip::tcp::endpoint(address, self->m_port);
         } else {
-            endpoint = asio::ip::tcp::endpoint(*results);
+            endpoint = (*results.begin()).endpoint();
             endpoint.port(self->m_port);
         }
         self->m_resolvedIp = endpoint.address().to_string();
@@ -353,7 +353,7 @@ void Session::terminate(std::error_code ec)
             std::error_code ecc;
             m_socket.shutdown(asio::ip::tcp::socket::shutdown_both, ecc);
             m_socket.close(ecc);
-            m_timer.cancel(ecc);
+            m_timer.cancel();
         } else if (m_disconnectCallback) {
             m_disconnectCallback(ec);
         }

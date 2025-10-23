@@ -67,7 +67,7 @@ void ProtocolGame::onRecv(const InputMessagePtr& inputMessage)
         m_firstRecv = false;
 
         if (g_game.getClientVersion() >= 1405) {
-            const int padding = inputMessage->getU8();
+            (void)inputMessage->getU8();
         } else if (g_game.getFeature(Otc::GameMessageSizeCheck)) {
             const int size = inputMessage->getU16();
             if (size != inputMessage->getUnreadSize()) {
