@@ -69,6 +69,13 @@
 #include <fmt/args.h>
 #include <fmt/ranges.h>
 
+#include <asio.hpp>
+#include <asio/ssl.hpp>
+#include <asio/ip/tcp.hpp>
+#include <asio/streambuf.hpp>
+#include <asio/write.hpp>
+#include <asio/io_service.hpp>
+
 // FMT Custom Formatter for Enums
 template <typename E>
 std::enable_if_t<std::is_enum_v<E>, std::underlying_type_t<E>>

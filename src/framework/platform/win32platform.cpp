@@ -23,13 +23,12 @@
 #ifdef WIN32
 
 #include "platform.h"
+
 #include <framework/core/eventdispatcher.h>
 #include <framework/stdext/stdext.h>
 #include <tchar.h>
 
-#ifdef NDEBUG
 #include <shellapi.h>
-#endif
 
 void Platform::init(std::vector<std::string>& args)
 {

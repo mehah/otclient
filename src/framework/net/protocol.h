@@ -26,10 +26,9 @@
 #else
 #include "connection.h"
 #endif
-#include "declarations.h"
 
+#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
-#include <framework/proxy/proxy.h>
 
  // @bindclass
 class Protocol : public LuaObject

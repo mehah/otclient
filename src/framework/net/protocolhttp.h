@@ -25,9 +25,6 @@
 #include <framework/global.h>
 #include <framework/stdext/uri.h>
 
-#include <asio.hpp>
-#include <asio/ssl.hpp>
-
  //  result
 class HttpSession;
 

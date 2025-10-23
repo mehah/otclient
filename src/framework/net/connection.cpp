@@ -26,12 +26,6 @@
 #include <framework/core/application.h>
 #include "framework/core/graphicalapplication.h"
 
-#include <asio/read.hpp>
-#include <asio/read_until.hpp>
-#include <utility>
-
-#include <asio/io_service.hpp>
-
 asio::io_service g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> Connection::m_outputStreams;
 
