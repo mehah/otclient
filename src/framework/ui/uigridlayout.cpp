@@ -27,6 +27,8 @@
 
 #include <utility>
 
+#include "framework/otml/otmlnode.h"
+
 UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
 void UIGridLayout::applyStyle(const OTMLNodePtr& styleNode)

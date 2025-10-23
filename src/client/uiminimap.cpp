@@ -26,6 +26,7 @@
 
 #include "minimap.h"
 #include "uimapanchorlayout.h"
+#include "framework/otml/otmlnode.h"
 
 void UIMinimap::drawSelf(const DrawPoolType drawPane)
 {

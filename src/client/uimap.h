@@ -25,8 +25,6 @@
 #include "declarations.h"
 #include <framework/ui/uiwidget.h>
 
-#include "mapview.h"
-
 class UIMap final : public UIWidget
 {
 public:

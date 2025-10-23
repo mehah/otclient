@@ -29,6 +29,8 @@
 #include <framework/core/modulemanager.h>
 #include <framework/core/resourcemanager.h>
 
+#include "framework/otml/otmlnode.h"
+
 HtmlManager g_html;
 
 namespace {
