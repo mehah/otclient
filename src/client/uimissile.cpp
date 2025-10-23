@@ -73,7 +73,7 @@ void UIMissile::setMissileId(const int id)
 }
 
 int UIMissile::getMissileId() { return m_missile ? m_missile->getId() : 0; }
-auto UIMissile::getDirection() { return m_missile ? m_missile->getDirection() : Otc::Direction::InvalidDirection; }
+Otc::Direction UIMissile::getDirection() { return m_missile ? m_missile->getDirection() : Otc::Direction::InvalidDirection; }
 void UIMissile::setDirection(const Otc::Direction dir) { if (m_missile) m_missile->setDirection(dir); }
 
 void UIMissile::setMissile(const MissilePtr& e)

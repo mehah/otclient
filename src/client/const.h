@@ -873,6 +873,22 @@ namespace Otc
         PARTYANALYZERACTION_PRICETYPE = 1,
         PARTYANALYZERACTION_PRICEVALUE = 2,
     };
+
+    enum FloorViewMode
+    {
+        NORMAL,
+        FADE,
+        LOCKED,
+        ALWAYS,
+        ALWAYS_WITH_TRANSPARENCY
+    };
+
+    enum AntialiasingMode :uint8_t
+    {
+        ANTIALIASING_DISABLED,
+        ANTIALIASING_ENABLED,
+        ANTIALIASING_SMOOTH_RETRO
+    };
 }
 
 enum FrameGroupType : uint8_t

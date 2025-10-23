@@ -25,6 +25,8 @@
 #include "uiwidget.h"
 #include <utility>
 
+#include "framework/otml/otmlnode.h"
+
 UIBoxLayout::UIBoxLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
 void UIBoxLayout::applyStyle(const OTMLNodePtr& styleNode)

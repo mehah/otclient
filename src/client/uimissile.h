@@ -39,7 +39,7 @@ public:
     void clearMissile() { setMissileId(0); }
 
     int getMissileId();
-    auto getDirection();
+    Otc::Direction getDirection();
     auto getMissile() { return m_missile; }
     bool isVirtual() { return m_virtual; }
     bool isMissileVisible() { return m_missileVisible; }

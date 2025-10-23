@@ -34,6 +34,7 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/ui/ui.h>
 
+#include "mapview.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "thingtypemanager.h"
 

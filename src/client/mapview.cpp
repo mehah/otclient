@@ -133,7 +133,7 @@ void MapView::drawFloor()
             g_drawPool.setOpacity(fadeLevel);
 
         Position _camera = cameraPosition;
-        const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
+        const bool alwaysTransparent = m_floorViewMode == Otc::ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
 
         const auto& map = m_floors[z].cachedVisibleTiles;
 
@@ -190,7 +190,7 @@ void MapView::drawLights() {
         if (fadeLevel == 0.f) break;
 
         Position _camera = cameraPosition;
-        const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
+        const bool alwaysTransparent = m_floorViewMode == Otc::ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
 
         const auto& map = m_floors[z].cachedVisibleTiles;
 
@@ -220,7 +220,7 @@ void MapView::drawCreatureInformation() {
     if (m_drawManaBar) { flags |= Otc::DrawManaBar; }
 
     Position _camera = m_posInfo.camera;
-    const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && _camera.coveredUp(m_posInfo.camera.z - m_floorMin);
+    const bool alwaysTransparent = m_floorViewMode == Otc::ALWAYS_WITH_TRANSPARENCY && _camera.coveredUp(m_posInfo.camera.z - m_floorMin);
     for (const auto& [uid, creature] : g_map.getCreatures()) {
         const auto& tile = creature->getTile();
         if (!tile || !m_posInfo.isInRange(creature->getPosition()))
@@ -295,7 +295,7 @@ void MapView::updateVisibleTiles()
         m_floors[m_floorMin].cachedVisibleTiles.clear();
     } while (++m_floorMin <= m_floorMax);
 
-    m_lockedFirstVisibleFloor = m_floorViewMode == LOCKED ? m_posInfo.camera.z : -1;
+    m_lockedFirstVisibleFloor = m_floorViewMode == Otc::LOCKED ? m_posInfo.camera.z : -1;
 
     const auto prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
 
@@ -304,7 +304,7 @@ void MapView::updateVisibleTiles()
             onFloorChange(m_posInfo.camera.z, m_lastCameraPosition.z);
         }
 
-        const auto cachedFirstVisibleFloor = calcFirstVisibleFloor(m_floorViewMode != ALWAYS);
+        const auto cachedFirstVisibleFloor = calcFirstVisibleFloor(m_floorViewMode != Otc::ALWAYS);
         m_cachedFirstVisibleFloor = cachedFirstVisibleFloor;
         m_cachedLastVisibleFloor = std::max<uint8_t>(cachedFirstVisibleFloor, calcLastVisibleFloor());
 
@@ -312,7 +312,7 @@ void MapView::updateVisibleTiles()
     }
 
     auto cachedFirstVisibleFloor = m_cachedFirstVisibleFloor;
-    if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY || canFloorFade()) {
+    if (m_floorViewMode == Otc::ALWAYS_WITH_TRANSPARENCY || canFloorFade()) {
         cachedFirstVisibleFloor = calcFirstVisibleFloor(false);
     }
 
@@ -362,7 +362,7 @@ void MapView::updateVisibleTiles()
                         bool addTile = true;
 
                         if (checkIsCovered && tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
-                            if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
+                            if (m_floorViewMode != Otc::ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
                                 addTile = false;
                             }
                         }
@@ -452,7 +452,7 @@ void MapView::updateRect(const Rect& rect) {
 
 void MapView::updateGeometry(const Size& visibleDimension)
 {
-    float scaleFactor = m_antiAliasingMode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
+    float scaleFactor = m_antiAliasingMode == Otc::ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
 
     auto maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
 
@@ -618,7 +618,7 @@ void MapView::setVisibleDimension(const Size& visibleDimension)
     updateGeometry(visibleDimension);
 }
 
-void MapView::setFloorViewMode(const FloorViewMode floorViewMode)
+void MapView::setFloorViewMode(const Otc::FloorViewMode floorViewMode)
 {
     m_floorViewMode = floorViewMode;
 
@@ -626,12 +626,12 @@ void MapView::setFloorViewMode(const FloorViewMode floorViewMode)
     requestUpdateVisibleTiles();
 }
 
-void MapView::setAntiAliasingMode(const AntialiasingMode mode)
+void MapView::setAntiAliasingMode(const Otc::AntialiasingMode mode)
 {
     m_antiAliasingMode = mode;
 
     g_mainDispatcher.addEvent([=, this] {
-        m_pool->getFrameBuffer()->setSmooth(mode != ANTIALIASING_DISABLED);
+        m_pool->getFrameBuffer()->setSmooth(mode != Otc::ANTIALIASING_DISABLED);
     });
 
     updateGeometry(m_visibleDimension);
@@ -834,7 +834,7 @@ TilePtr MapView::getTopTile(Position tilePos) const
         return nullptr;
 
     // we must check every floor, from top to bottom to check for a clickable tile
-    if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange()))
+    if (m_floorViewMode == Otc::ALWAYS_WITH_TRANSPARENCY && tilePos.isInRange(m_lastCameraPosition, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange()))
         return g_map.getTile(tilePos);
 
     tilePos.coveredUp(tilePos.z - m_cachedFirstVisibleFloor);

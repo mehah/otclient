@@ -32,21 +32,6 @@
 class MapView final : public LuaObject
 {
 public:
-    enum FloorViewMode
-    {
-        NORMAL,
-        FADE,
-        LOCKED,
-        ALWAYS,
-        ALWAYS_WITH_TRANSPARENCY
-    };
-
-    enum AntialiasingMode :uint8_t
-    {
-        ANTIALIASING_DISABLED,
-        ANTIALIASING_ENABLED,
-        ANTIALIASING_SMOOTH_RETRO
-    };
 
     MapView();
     ~MapView() override;
@@ -68,8 +53,8 @@ public:
     void setVisibleDimension(const Size& visibleDimension);
 
     // view mode related
-    FloorViewMode getFloorViewMode() const { return m_floorViewMode; }
-    void setFloorViewMode(FloorViewMode viewMode);
+    Otc::FloorViewMode getFloorViewMode() const { return m_floorViewMode; }
+    void setFloorViewMode(Otc::FloorViewMode viewMode);
 
     // camera related
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
@@ -129,7 +114,7 @@ public:
     TilePtr getTopTile(Position tilePos) const;
 
     void setCrosshairTexture(const std::string& texturePath);
-    void setAntiAliasingMode(AntialiasingMode mode);
+    void setAntiAliasingMode(Otc::AntialiasingMode mode);
 
     void onMouseMove(const Position& mousePos, bool isVirtualMove = false);
     void onKeyRelease(const InputEvent& inputEvent);
@@ -206,7 +191,7 @@ private:
     void drawFloor();
     void drawLights();
 
-    bool canFloorFade() const { return m_floorViewMode == FADE && m_floorFading; }
+    bool canFloorFade() const { return m_floorViewMode == Otc::FADE && m_floorFading; }
 
     float getFadeLevel(const uint8_t z) const
     {
@@ -285,7 +270,7 @@ private:
 
     FadeType m_fadeType{ FadeType::NONE };
 
-    AntialiasingMode m_antiAliasingMode{ ANTIALIASING_DISABLED };
+    Otc::AntialiasingMode m_antiAliasingMode{ Otc::ANTIALIASING_DISABLED };
 
     std::vector<FloorData> m_floors;
     std::vector<std::vector<FloorData>> m_floorThreads;
@@ -298,7 +283,7 @@ private:
     CreaturePtr m_followingCreature;
 
     MapPosInfo m_posInfo;
-    FloorViewMode m_floorViewMode{ NORMAL };
+    Otc::FloorViewMode m_floorViewMode{ Otc::NORMAL };
 
     Timer m_fadeTimer;
 
