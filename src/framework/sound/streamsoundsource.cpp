@@ -23,6 +23,7 @@
 #include "streamsoundsource.h"
 #include "soundbuffer.h"
 #include "soundfile.h"
+#include "framework/core/resourcemanager.h"
 
 StreamSoundSource::StreamSoundSource()
 {

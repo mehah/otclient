@@ -24,6 +24,8 @@
 
 #include <framework/graphics/image.h>
 
+#include "framework/otml/otmlnode.h"
+
 void UIQrCode::parseCustomStyle(const OTMLNodePtr& styleNode)
 {
     UIWidget::parseCustomStyle(styleNode);
