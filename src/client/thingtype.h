@@ -23,14 +23,14 @@
 #pragma once
 
 #include "declarations.h"
+#include <appearances.pb.h>
 #include <framework/core/declarations.h>
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/declarations.h>
-#include <appearances.pb.h>
 
-#include "staticdata.h"
 #include "framework/core/timer.h"
 #include "framework/graphics/declarations.h"
+#include "staticdata.h"
 
 using namespace otclient::protobuf;
 

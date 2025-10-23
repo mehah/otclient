@@ -31,14 +31,16 @@
 #include "tile.h"
 
 #include "framework/graphics/texturemanager.h"
+#include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
-#include <framework/core/asyncdispatcher.h>
 
 #include <algorithm>
+
+#include "gameconfig.h"
 
 MapView::MapView() : m_lightView(std::make_unique<LightView>(Size())), m_pool(g_drawPool.get(DrawPoolType::MAP))
 {

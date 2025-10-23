@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "particlesystem.h"
 #include "particle.h"
 #include "particleaffector.h"
+#include "particlesystem.h"
 #include <framework/core/clock.h>
 #include <framework/graphics/drawpoolmanager.h>
 

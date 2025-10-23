@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/global.h>
 #include <framework/core/inputevent.h>
+#include <framework/global.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>

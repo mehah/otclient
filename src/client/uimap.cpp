@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "uimap.h"
 #include "game.h"
 #include "map.h"
 #include "mapview.h"
+#include "uimap.h"
 #include <framework/graphics/drawpoolmanager.h>
 
 UIMap::UIMap()

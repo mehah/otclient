@@ -29,6 +29,7 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 
+#include "protocolcodes.h"
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
@@ -36,7 +37,6 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/ui/uiwidget.h>
-#include "protocolcodes.h"
 
 #include "animator.h"
 #include "gameconfig.h"

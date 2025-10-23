@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "item.h"
 #include "container.h"
 #include "game.h"
+#include "item.h"
 #include "spritemanager.h"
 #include "thing.h"
 #include "thingtypemanager.h"
@@ -33,11 +33,11 @@
 #include <framework/graphics/shadermanager.h>
 
 #include "animator.h"
-#include "gameconfig.h"
-#include "thingtype.h"
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/painter.h"
+#include "gameconfig.h"
+#include "thingtype.h"
 #ifdef FRAMEWORK_EDITOR
 #include <framework/core/binarytree.h>
 #endif

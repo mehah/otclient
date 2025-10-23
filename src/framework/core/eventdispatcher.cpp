@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "eventdispatcher.h"
 #include "asyncdispatcher.h"
+#include "eventdispatcher.h"
 
 #include "timer.h"
 

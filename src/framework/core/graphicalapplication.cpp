@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "graphicalapplication.h"
 #include "garbagecollection.h"
+#include "graphicalapplication.h"
 
 #include "framework/stdext/time.h"
 #include <framework/core/asyncdispatcher.h>

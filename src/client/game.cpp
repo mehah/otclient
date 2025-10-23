@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "game.h"
 #include "container.h"
 #include "creature.h"
+#include "game.h"
 #include "localplayer.h"
 #include "map.h"
 #include "protocolcodes.h"

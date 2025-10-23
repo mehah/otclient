@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "uiitem.h"
 #include "lightview.h"
+#include "uiitem.h"
 
 #include "gameconfig.h"
 

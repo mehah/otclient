@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include "client/game.h"
+#include "declarations.h"
 #include <framework/util/point.h>
 #include <future>
 

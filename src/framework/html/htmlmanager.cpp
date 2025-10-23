@@ -23,11 +23,11 @@
 #include "htmlmanager.h"
 #include "htmlnode.h"
 #include "htmlparser.h"
-#include <framework/ui/uimanager.h>
 #include <framework/ui/ui.h>
+#include <framework/ui/uimanager.h>
 
-#include <framework/core/resourcemanager.h>
 #include <framework/core/modulemanager.h>
+#include <framework/core/resourcemanager.h>
 
 HtmlManager g_html;
 

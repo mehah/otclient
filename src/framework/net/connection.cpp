@@ -23,8 +23,8 @@
 
 #include "connection.h"
 
-#include <framework/core/application.h>
 #include "framework/core/graphicalapplication.h"
+#include <framework/core/application.h>
 
 asio::io_service g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> Connection::m_outputStreams;

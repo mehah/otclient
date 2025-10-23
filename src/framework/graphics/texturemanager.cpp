@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "texturemanager.h"
 #include "animatedtexture.h"
 #include "graphics.h"
 #include "image.h"
+#include "texturemanager.h"
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>

@@ -22,10 +22,10 @@
 
 #include "uieffect.h"
 
-#include "gameconfig.h"
-#include "lightview.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/otml/otmlnode.h"
+#include "gameconfig.h"
+#include "lightview.h"
 
 UIEffect::UIEffect() { setProp(PropDraggable, true, false); }
 

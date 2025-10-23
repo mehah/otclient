@@ -25,9 +25,9 @@
 #include <framework/graphics/declarations.h>
 #include <framework/luaengine/luaobject.h>
 
+#include "framework/core/timer.h"
 #include "position.h"
 #include "staticdata.h"
-#include "framework/core/timer.h"
 
 struct AwareRange
 {

@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "thing.h"
 #include "game.h"
 #include "map.h"
+#include "thing.h"
 
 #include <framework/graphics/shadermanager.h>
 

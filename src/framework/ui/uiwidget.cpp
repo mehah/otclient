@@ -20,20 +20,20 @@
  * THE SOFTWARE.
  */
 
-#include "uiwidget.h"
 #include "uianchorlayout.h"
 #include "uimanager.h"
 #include "uitranslator.h"
+#include "uiwidget.h"
 
 #include <framework/core/eventdispatcher.h>
+#include <framework/html/htmlnode.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
-#include <framework/html/htmlnode.h>
 
-#include <framework/platform/platformwindow.h>
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 #include <framework/html/htmlmanager.h>
+#include <framework/platform/platformwindow.h>
 
 UIWidget::UIWidget()
 {

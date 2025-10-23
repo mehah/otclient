@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "declarations.h"
 #include "attachableobject.h"
+#include "declarations.h"
 #include <framework/core/clock.h>
 #include <framework/luaengine/luaobject.h>
 

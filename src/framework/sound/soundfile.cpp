@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "soundfile.h"
 #include "oggsoundfile.h"
+#include "soundfile.h"
 #include <framework/core/resourcemanager.h>
 
 SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)

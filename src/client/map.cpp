@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "map.h"
 #include "game.h"
 #include "item.h"
 #include "localplayer.h"
+#include "map.h"
 #include "mapview.h"
 #include "minimap.h"
 #include "missile.h"
@@ -37,6 +37,8 @@
 #include <framework/ui/uiwidget.h>
 #include <queue>
 
+#include "animatedtext.h"
+#include "gameconfig.h"
 #include "framework/graphics/drawpoolmanager.h"
 
 #ifdef FRAMEWORK_EDITOR

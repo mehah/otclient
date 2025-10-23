@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "particleemitter.h"
 #include "particle.h"
+#include "particleemitter.h"
 #include "particlemanager.h"
 #include "particlesystem.h"
 

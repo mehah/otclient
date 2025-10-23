@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "attachedeffectmanager.h"
 #include "attachedeffect.h"
+#include "attachedeffectmanager.h"
 #include "thingtypemanager.h"
 #include <framework/core/resourcemanager.h>
 

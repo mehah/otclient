@@ -23,9 +23,9 @@
 #include "luavaluecasts_client.h"
 #include <framework/luaengine/luainterface.h>
 
+#include "item.h"
 #include "protocolgame.h"
 #include "staticdata.h"
-#include "item.h"
 
 int push_luavalue(const Outfit& outfit)
 {

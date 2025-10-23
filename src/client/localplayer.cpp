@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "localplayer.h"
 #include "game.h"
+#include "localplayer.h"
 #include "map.h"
 #include "tile.h"
 #include <framework/core/eventdispatcher.h>

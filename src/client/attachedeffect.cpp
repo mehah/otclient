@@ -31,9 +31,9 @@
 #include <framework/graphics/texturemanager.h>
 
 #include "animator.h"
-#include "thingtype.h"
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include "thingtype.h"
 
 AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {

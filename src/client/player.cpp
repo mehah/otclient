@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "player.h"
 #include "game.h"
+#include "player.h"
 
 bool Player::isMage() const {
     switch (m_vocation) {

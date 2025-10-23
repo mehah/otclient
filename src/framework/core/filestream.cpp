@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "filestream.h"
 #include "binarytree.h"
+#include "filestream.h"
 #include "graphicalapplication.h"
 #include <framework/core/application.h>
 

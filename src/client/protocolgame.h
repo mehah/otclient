@@ -23,8 +23,8 @@
 #pragma once
 
 #include "declarations.h"
-#include "staticdata.h"
 #include "framework/net/protocol.h"
+#include "staticdata.h"
 
 class ProtocolGame final : public Protocol
 {

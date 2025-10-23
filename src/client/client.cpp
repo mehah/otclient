@@ -34,8 +34,8 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/ui/ui.h>
 
-#include "thingtypemanager.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include "thingtypemanager.h"
 
 Client g_client;
 

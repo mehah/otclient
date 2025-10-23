@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "particle.h"
 #include "drawpoolmanager.h"
+#include "particle.h"
 
 #include <framework/graphics/animatedtexture.h>
 

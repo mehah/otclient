@@ -32,9 +32,9 @@
 #include "effect.h"
 #include "game.h"
 #include "item.h"
+#include "localplayer.h"
 #include "map.h"
 #include "uimap.h"
-#include "localplayer.h"
 #include <algorithm>
 
 Tile::Tile(const Position& position) : m_position(position) {}

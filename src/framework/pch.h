@@ -24,12 +24,12 @@
 
  // ===== C Standard Library =====
 #include <cassert>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cmath>
 
 // ===== C++ Standard Library =====
 #include <algorithm>
@@ -77,13 +77,13 @@
 #include <fmt/ranges.h>
 
 // Asio (standalone)
-#include <asio/ssl.hpp>
+#include <asio/io_service.hpp>
 #include <asio/ip/tcp.hpp>
+#include <asio/read.hpp>
+#include <asio/read_until.hpp>
+#include <asio/ssl.hpp>
 #include <asio/streambuf.hpp>
 #include <asio/write.hpp>
-#include <asio/io_service.hpp>
-#include <asio/read_until.hpp>
-#include <asio/read.hpp>
 
 // ===== Utilities / Helpers =====
 // FMT Custom Formatter for Enums

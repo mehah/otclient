@@ -23,11 +23,11 @@
 #include "bitmapfont.h"
 #include "graphics.h"
 #include "image.h"
-#include "texturemanager.h"
 #include "textureatlas.h"
+#include "texturemanager.h"
 
-#include <framework/otml/otml.h>
 #include "drawpoolmanager.h"
+#include <framework/otml/otml.h>
 
 static thread_local std::vector<Point> s_glyphsPositions(1);
 static thread_local std::vector<int>   s_lineWidths(1);

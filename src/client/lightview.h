@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <framework/graphics/declarations.h>
-#include "staticdata.h"
 #include "framework/graphics/coordsbuffer.h"
 #include "framework/luaengine/luaobject.h"
+#include "staticdata.h"
+#include <framework/graphics/declarations.h>
 
 class LightView final : public LuaObject
 {

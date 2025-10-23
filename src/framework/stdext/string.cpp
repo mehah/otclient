@@ -21,9 +21,9 @@
  */
 
 #include <algorithm>
+#include <charconv>
 #include <ranges>
 #include <vector>
-#include <charconv>
 
 #include "types.h"
 
@@ -124,8 +124,8 @@ namespace stdext
     }
 
 #ifdef WIN32
-#include <winsock2.h>
 #include <windows.h>
+#include <winsock2.h>
 
     std::wstring utf8_to_utf16(const std::string_view src)
     {

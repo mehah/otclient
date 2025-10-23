@@ -26,8 +26,8 @@
 
 #include <framework/core/timer.h>
 #include <framework/graphics/declarations.h>
-#include <framework/luaengine/luaobject.h>
 #include <framework/html/declarations.h>
+#include <framework/luaengine/luaobject.h>
 
 #include "framework/graphics/bitmapfontwrapoptions.h"
 

@@ -25,11 +25,11 @@
 #include <framework/core/application.h>
 #include <random>
 
+#include "client/game.h"
+#include "framework/core/graphicalapplication.h"
+#include "framework/proxy/proxy.h"
 #include "inputmessage.h"
 #include "outputmessage.h"
-#include "framework/core/graphicalapplication.h"
-#include "client/game.h"
-#include "framework/proxy/proxy.h"
 #ifdef __EMSCRIPTEN__
 #include "webconnection.h"
 #else

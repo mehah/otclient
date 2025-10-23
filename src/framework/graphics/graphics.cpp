@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "graphics.h"
 #include "fontmanager.h"
+#include "graphics.h"
 
 #include "painter.h"
 #include "texturemanager.h"

@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "logger.h"
 #include "eventdispatcher.h"
+#include "logger.h"
 
 #include <framework/core/asyncdispatcher.h>
 

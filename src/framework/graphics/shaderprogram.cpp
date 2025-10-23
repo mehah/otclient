@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "shaderprogram.h"
 #include "graphics.h"
+#include "shaderprogram.h"
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>

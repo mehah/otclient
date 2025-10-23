@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
-#include "thingtype.h"
 #include "game.h"
 #include "lightview.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
+#include "thingtype.h"
 
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/filestream.h>

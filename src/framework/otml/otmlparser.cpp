@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "otmlparser.h"
 #include "otmldocument.h"
 #include "otmlexception.h"
+#include "otmlparser.h"
 
 OTMLParser::OTMLParser(const OTMLDocumentPtr& doc, std::istream& in) :
     currentDepth(0), currentLine(0),

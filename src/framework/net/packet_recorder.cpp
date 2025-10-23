@@ -20,9 +20,9 @@
 * THE SOFTWARE.
 */
 
-#include <framework/global.h>
 #include <framework/core/clock.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/global.h>
 
 #include "packet_recorder.h"
 

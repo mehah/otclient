@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "thingtypemanager.h"
 #include "creature.h"
 #include "game.h"
 #include "thingtype.h"
+#include "thingtypemanager.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"

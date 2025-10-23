@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "uimanager.h"
 #include "ui.h"
+#include "uimanager.h"
 
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/modulemanager.h>

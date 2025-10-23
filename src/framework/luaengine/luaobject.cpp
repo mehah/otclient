@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
-#include "luaobject.h"
 #include "luainterface.h"
+#include "luaobject.h"
 
-#include <framework/core/application.h>
 #include "framework/core/graphicalapplication.h"
+#include <framework/core/application.h>
 
 #include <typeinfo>
 

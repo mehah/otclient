@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "uiminimap.h"
 #include "game.h"
 #include "luavaluecasts_client.h"
+#include "uiminimap.h"
 
 #include "minimap.h"
 #include "uimapanchorlayout.h"

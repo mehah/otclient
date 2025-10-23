@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "soundsource.h"
 #include "soundbuffer.h"
 #include "soundeffect.h"
+#include "soundsource.h"
 
 #include "framework/stdext/time.h"
 

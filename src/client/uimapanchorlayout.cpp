@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "uimapanchorlayout.h"
 #include "declarations.h"
+#include "uimapanchorlayout.h"
 #include "uiminimap.h"
 #include <framework/ui/uiwidget.h>
 

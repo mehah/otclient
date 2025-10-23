@@ -23,8 +23,8 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/util/crypt.h>
 
-#include <utility>
 #include <openssl/ssl.h>
+#include <utility>
 
 #include "protocolhttp.h"
 

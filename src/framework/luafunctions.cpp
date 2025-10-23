@@ -40,10 +40,10 @@
 #include "framework/graphics/particlemanager.h"
 #include "framework/graphics/shadermanager.h"
 #include "framework/graphics/texturemanager.h"
+#include "framework/html/htmlmanager.h"
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
-#include "framework/html/htmlmanager.h"
 #endif
 
 #ifdef FRAMEWORK_SOUND

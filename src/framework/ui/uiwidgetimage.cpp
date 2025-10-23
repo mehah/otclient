@@ -24,8 +24,8 @@
 #include "uiwidget.h"
 #include <framework/graphics/animatedtexture.h>
 #include <framework/graphics/texture.h>
-#include <framework/graphics/texturemanager.h>
 #include <framework/graphics/textureatlas.h>
+#include <framework/graphics/texturemanager.h>
 #include <framework/util/crypt.h>
 
 void UIWidget::initImage() {

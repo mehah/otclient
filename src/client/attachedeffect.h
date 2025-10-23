@@ -21,11 +21,11 @@
  */
 
 #pragma once
-#include "outfit.h"
-#include "staticdata.h"
 #include "framework/core/timer.h"
 #include "framework/graphics/declarations.h"
 #include "framework/luaengine/luaobject.h"
+#include "outfit.h"
+#include "staticdata.h"
 
 class AttachedEffect final : public LuaObject
 {
