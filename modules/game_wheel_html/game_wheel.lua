@@ -361,6 +361,18 @@ function WheelController:onInit()
     WheelController:toggleMenu('wheel')
 end
 
+function WheelController.wheel:handleMousePress(event, id)
+    if event.mouseButton == MouseRightButton then
+        local data = WheelController.wheel.data[id]
+        WheelController.wheel.currentSelectSlotId = id
+        if data.currentPoints == data.totalPoints then
+            WheelController.wheel:onChangeSlotPoints("-max")
+        elseif data.currentPoints >= 0 then
+            WheelController.wheel:onChangeSlotPoints("+max")
+        end
+    end
+end
+
 function onWheelOfDestinyOpenWindow(data)
     data.wheelPoints = data.wheelPoints or {}
     local currentPoints = 0
