@@ -121,6 +121,27 @@
     .change-preset-icon:pressed {
       --image-clip: 0 20 20 20;
     }
+    .largeperks {
+      position: absolute;
+      height: 34px;
+      width: 34px;
+    }
+    .largeperks-tl {
+      top: 24;
+      left: 24;
+    }
+    .largeperks-tr {
+      top: 24;
+      right: 24;
+    }
+    .largeperks-bl {
+      bottom: 24;
+      left: 24;
+    }
+    .largeperks-br {
+      bottom: 24;
+      right: 24;
+    }
   </style>
   <window
     placement="center"
@@ -287,7 +308,6 @@
                 class="backdrop-wheel-vocation-overlay"
                 height="522"
                 width="522"
-                onhover="self.wheel:handleOnHover(-1)"
                 image-draw-order="2"
               />
 
@@ -299,6 +319,76 @@
                 *width="self.wheel.currentSelectSlotData.width"
                 image-draw-order="3"
                 *ignore-transparent-pixel="true"
+              />
+
+              <img
+                src="/images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png"
+                style="
+                  position: absolute;
+                  height: 178px;
+                  width: 178px;
+                  left: 0;
+                  top: 0;
+                "
+              />
+              <img
+                src="/images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png"
+                style="
+                  position: absolute;
+                  height: 178px;
+                  width: 178px;
+                  right: 0;
+                  top: 0;
+                "
+              />
+              <img
+                src="/images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png"
+                style="
+                  position: absolute;
+                  height: 178px;
+                  width: 178px;
+                  left: 0;
+                  bottom: 0;
+                "
+              />
+              <img
+                src="/images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png"
+                style="
+                  position: absolute;
+                  height: 178px;
+                  width: 178px;
+                  right: 0;
+                  bottom: 0;
+                "
+              />
+
+              <img
+                class="largeperks largeperks-tl"
+                src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                height="34"
+                width="34"
+                *image-clip="self.wheel.tlLargePerkClip"
+              />
+              <img
+                class="largeperks largeperks-tr"
+                src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                height="34"
+                width="34"
+                *image-clip="self.wheel.trLargePerkClip"
+              />
+              <img
+                class="largeperks largeperks-bl"
+                src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                height="34"
+                width="34"
+                *image-clip="self.wheel.blLargePerkClip"
+              />
+              <img
+                class="largeperks largeperks-br"
+                src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                height="34"
+                width="34"
+                *image-clip="self.wheel.brLargePerkClip"
               />
             </div>
           </div>

@@ -119,7 +119,6 @@ local baseColorSlotPath = "/images/game/wheel/wheel-colors/%s/slot%s/%s.png"
 local otherBorders = { "revelationPerk", "vesselGem" }
 
 function WheelController.wheel:handleOnHover(slotId)
-    if WheelController.wheel.currentHoverSlot == slotId then return end
     WheelController.wheel.currentHoverSlot = slotId
 end
 
@@ -401,4 +400,31 @@ function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.backdropVocationOverlay = overlayImage .. ".png"
 
     WheelController.wheel:fillQuadrantsBorders()
+
+    if data.vocationId == VocationConfig.KNIGHT then
+        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        WheelController.wheel.trLargePerkClip = { x = 34, y = 0, width = 34, height = 34 }
+        WheelController.wheel.blLargePerkClip = { x = 68, y = 0, width = 34, height = 34 }
+        WheelController.wheel.brLargePerkClip = { x = 102, y = 0, width = 34, height = 34 }
+    elseif data.vocationId == VocationConfig.PALADIN then
+        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        WheelController.wheel.trLargePerkClip = { x = 136, y = 0, width = 34, height = 34 }
+        WheelController.wheel.blLargePerkClip = { x = 170, y = 0, width = 34, height = 34 }
+        WheelController.wheel.brLargePerkClip = { x = 204, y = 0, width = 34, height = 34 }
+    elseif data.vocationId == VocationConfig.SORCERER then
+        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        WheelController.wheel.trLargePerkClip = { x = 238, y = 0, width = 34, height = 34 }
+        WheelController.wheel.blLargePerkClip = { x = 272, y = 0, width = 34, height = 34 }
+        WheelController.wheel.brLargePerkClip = { x = 306, y = 0, width = 34, height = 34 }
+    elseif data.vocationId == VocationConfig.DRUID then
+        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        WheelController.wheel.trLargePerkClip = { x = 374, y = 0, width = 34, height = 34 }
+        WheelController.wheel.blLargePerkClip = { x = 340, y = 0, width = 34, height = 34 }
+        WheelController.wheel.brLargePerkClip = { x = 408, y = 0, width = 34, height = 34 }
+    elseif data.vocationId == VocationConfig.MONK then
+        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        WheelController.wheel.trLargePerkClip = { x = 442, y = 0, width = 34, height = 34 }
+        WheelController.wheel.blLargePerkClip = { x = 476, y = 0, width = 34, height = 34 }
+        WheelController.wheel.brLargePerkClip = { x = 510, y = 0, width = 34, height = 34 }
+    end
 end
