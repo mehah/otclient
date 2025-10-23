@@ -23,11 +23,11 @@
 #include "lightview.h"
 #include "uiitem.h"
 
-#include "gameconfig.h"
-#include "item.h"
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/otml/otmlnode.h"
+#include "gameconfig.h"
+#include "item.h"
 
 UIItem::UIItem() { setProp(PropDraggable, true, false); }
 

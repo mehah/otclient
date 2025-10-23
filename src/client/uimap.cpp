@@ -26,8 +26,8 @@
 #include "uimap.h"
 #include <framework/graphics/drawpoolmanager.h>
 
-#include "lightview.h"
 #include "framework/otml/otmlnode.h"
+#include "lightview.h"
 
 UIMap::UIMap()
 {

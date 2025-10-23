@@ -38,8 +38,8 @@
 #include <queue>
 
 #include "animatedtext.h"
-#include "gameconfig.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include "gameconfig.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"

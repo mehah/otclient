@@ -52,12 +52,12 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <tuple>
 #include <typeinfo>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <thread>
 
 // ===== Third-Party Libraries =====
 // zlib

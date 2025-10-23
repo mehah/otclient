@@ -27,8 +27,8 @@
 #include <framework/graphics/shadermanager.h>
 
 #include "attachedeffect.h"
-#include "thingtype.h"
 #include "framework/core/clock.h"
+#include "thingtype.h"
 
 void Thing::setPosition(const Position& position, uint8_t /*stackPos*/)
 {
