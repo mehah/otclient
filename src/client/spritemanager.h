@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "gameconfig.h"
 #include <framework/core/declarations.h>
 #include <framework/core/filestream.h>
 #include <framework/graphics/declarations.h>

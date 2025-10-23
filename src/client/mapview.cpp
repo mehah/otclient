@@ -23,9 +23,7 @@
 #include "mapview.h"
 
 #include "animatedtext.h"
-#include "client.h"
 #include "creature.h"
-#include "game.h"
 #include "lightview.h"
 #include "map.h"
 #include "missile.h"

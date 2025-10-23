@@ -23,7 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include "tile.h"
 #include <framework/ui/uiwidget.h>
 
 #include "mapview.h"

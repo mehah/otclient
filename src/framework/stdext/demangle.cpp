@@ -24,9 +24,6 @@
 
 #ifdef _MSC_VER
 
-#include <winsock2.h>
-#include <Windows.h>
-
 #pragma warning (push)
 #pragma warning (disable:4091) // warning C4091: 'typedef ': ignored on left of '' when no variable is declared
 #include <ImageHlp.h>

@@ -29,7 +29,6 @@
 
 #ifndef USE_GMP
 #include <openssl/bn.h>
-#include <openssl/err.h>
 #include <openssl/rsa.h>
 #endif
 

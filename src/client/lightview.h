@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/graphics/declarations.h>
 #include "staticdata.h"
 #include "framework/graphics/coordsbuffer.h"

@@ -22,7 +22,6 @@
 
 #include "uisprite.h"
 #include <client/spritemanager.h>
-#include <framework/graphics/texturemanager.h>
 
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"

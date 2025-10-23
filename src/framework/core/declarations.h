@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include <framework/global.h>
-
 class ConfigManager;
 class ModuleManager;
 class ResourceManager;

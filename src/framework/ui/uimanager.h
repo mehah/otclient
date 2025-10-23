@@ -27,6 +27,8 @@
 #include <framework/otml/declarations.h>
 #include <framework/platform/platform.h>
 
+#include "framework/core/declarations.h"
+
  //@bindsingleton g_ui
 class UIManager
 {

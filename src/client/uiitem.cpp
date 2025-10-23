@@ -22,7 +22,6 @@
 
 #include "uiitem.h"
 #include "lightview.h"
-#include <framework/graphics/fontmanager.h>
 
 #include "gameconfig.h"
 

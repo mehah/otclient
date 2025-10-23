@@ -25,7 +25,6 @@
 #include "win32window.h"
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
 #include <framework/util/color.h>
 #include "framework/core/graphicalapplication.h"

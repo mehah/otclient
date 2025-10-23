@@ -31,7 +31,6 @@
 #include <algorithm>
 
 #include "client.h"
-#include "game.h"
 #include "map.h"
 #include "uimap.h"
 #include "framework/graphics/drawpoolmanager.h"

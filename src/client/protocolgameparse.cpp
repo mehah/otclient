@@ -38,6 +38,7 @@
 #include <ctime>
 #include <framework/core/eventdispatcher.h>
 
+#include "animatedtext.h"
 #include "gameconfig.h"
 #include "thingtype.h"
 

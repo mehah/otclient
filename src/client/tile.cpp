@@ -33,7 +33,6 @@
 #include "game.h"
 #include "item.h"
 #include "map.h"
-#include "protocolgame.h"
 #include "uimap.h"
 #include "localplayer.h"
 #include <algorithm>

@@ -27,7 +27,6 @@
 #include <framework/global.h>
 
 #include <windows.h>
-#include <winsock2.h>
 
 #ifdef _MSC_VER
 
