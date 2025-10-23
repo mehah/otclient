@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "mapview.h"
 #include "outfit.h"
 #include "thing.h"
 #include <framework/core/declarations.h>

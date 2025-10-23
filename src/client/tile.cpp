@@ -37,6 +37,7 @@
 #include "uimap.h"
 #include <algorithm>
 
+#include "mapview.h"
 #include "framework/core/clock.h"
 
 Tile::Tile(const Position& position) : m_position(position) {}

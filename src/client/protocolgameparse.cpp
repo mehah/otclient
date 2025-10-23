@@ -41,6 +41,7 @@
 #include "animatedtext.h"
 #include "attachedeffect.h"
 #include "gameconfig.h"
+#include "mapview.h"
 #include "thingtype.h"
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
