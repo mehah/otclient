@@ -182,9 +182,6 @@ function WheelController.wheel.getSlotFramePercentage(data)
     if idx < 1 then idx = 1 end
     if idx > frames then idx = frames end
     local path = string.format(baseColorSlotPath, data.quadrant, data.index, idx)
-    g_logger.info(string.format(
-        "quadrant: %s, index: %d, currentPoints: %d, totalPoints: %d, progress: %.2f, frames: %d, idx: %d, path: %s",
-        data.quadrant, data.index, data.currentPoints, data.totalPoints, progress, frames, idx, path))
     return path
 end
 
@@ -260,9 +257,6 @@ function WheelController.wheel:fillQuadrantsBorders()
     WheelController.wheel.data = {}
 
     for slot, data in pairs(self.slots) do
-        if slot == 4 then
-            g_logger.info("INDEX: " .. data.index .. " QUADRANT: " .. data.quadrant)
-        end
         local current = {
             quadrant = data.quadrant,
             border = data.border,
@@ -298,7 +292,6 @@ end
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId
     WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
-    g_logger.info("Selected slot ID: " .. slotId)
 end
 
 function WheelController:show(skipRequest)
