@@ -20,7 +20,7 @@ WheelController.wheel = {
     currentSelectSlotId = -1,
     hovers = {},
     currentHoverSlot = -1,
-    points = 0,
+    currentPoints = 0,
     extraPoints = 0,
     totalPoints = 0,
     currentSelectSlotData = nil,
@@ -112,6 +112,14 @@ local quadrantFrames = {
     [9] = 20
 }
 
+local quadrantFramesByMaxPoints = {
+    [50] = 5,
+    [75] = 8,
+    [100] = 10,
+    [150] = 15,
+    [200] = 20
+}
+
 
 local baseBorderPath = "/images/game/wheel/wheel-border/%s/%s.png"
 local baseWheelColorPath = "/images/game/wheel/wheel-colors/%s/%s_%s.png"
@@ -131,35 +139,6 @@ function WheelController.wheel:getSlotDataById(slotId)
 
     return nil, nil
 end
-
-function WheelController.wheel:hasLockedAdjacent(slotId)
-    local definition = helper.wheel.WheelSlotsParser[slotId]
-    if not definition or not definition.adjacents then
-        return false
-    end
-
-    for _, adjacentId in ipairs(definition.adjacents) do
-        local adjacentData = self:getSlotDataById(adjacentId)
-        if adjacentData then
-            local enabledBy = adjacentData.enabledBy or {}
-            local hasPoints = (adjacentData.currentPoints or 0) > 0
-
-            if hasPoints and enabledBy[slotId] then
-                return true
-            end
-        end
-    end
-
-    return false
-end
-
-local indexByTotalPoints = {
-    [50] = 1,
-    [75] = 2,
-    [100] = 3,
-    [150] = 4,
-    [200] = 5
-}
 
 function WheelController.wheel.getSlotFramePercentage(data)
     data.totalPoints = helper.wheel.WheelSlotsParser[data.id].totalPoints
@@ -199,99 +178,11 @@ function WheelController.wheel.getSlotFinalFramePath(data)
     return string.format(baseColorSlotPath, data.quadrant, data.index, frames)
 end
 
-function WheelController.wheel:onChangeSlotPoints(value)
-    if not WheelController.wheel.currentSelectSlotId then return end
-    local slotId = WheelController.wheel.currentSelectSlotId
-    local data = WheelController.wheel.data[slotId]
-    if not data then return end
-    data.index = helper.wheel.WheelSlotsParser[slotId].index
-    data.quadrant = helper.wheel.WheelSlotsParser[slotId].quadrant
-    data.color = helper.wheel.WheelSlotsParser[slotId].color
-    data.totalPoints = helper.wheel.WheelSlotsParser[slotId].totalPoints
-    if type(value) == "string" then
-        if value == "-max" then
-            if self:hasLockedAdjacent(slotId) then
-                return
-            end
-            WheelController.wheel.points = WheelController.wheel.points + data.currentPoints
-            data.currentPoints = 0
-        elseif value == "+max" then
-            local diff = data.totalPoints - data.currentPoints
-            if diff > WheelController.wheel.points then
-                diff = WheelController.wheel.points
-            end
-            data.currentPoints = data.currentPoints + diff
-            WheelController.wheel.points = WheelController.wheel.points - diff
-        end
-        WheelController.wheel.currentSelectSlotData = data
-        data.colorPath = WheelController.wheel.getSlotFramePercentage(data)
-        data.isComplete = data.currentPoints == data.totalPoints
-        WheelController.wheel.data[slotId] = data
-        helper.wheel.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
-        return
-    end
-
-
-    local numericValue = tonumber(value) or 0
-    if numericValue == 0 then return end
-    if numericValue < 0 and self:hasLockedAdjacent(slotId) then
-        return
-    end
-    data.currentPoints = data.currentPoints + numericValue
-    if data.currentPoints < 0 then
-        data.currentPoints = 0
-    end
-    if data.currentPoints > data.totalPoints then
-        data.currentPoints = data.totalPoints
-    end
-    data.isComplete = data.currentPoints == data.totalPoints
-    WheelController.wheel.data[slotId] = data
-    WheelController.wheel.currentSelectSlotData = data
-    helper.wheel.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
-end
-
-function WheelController.wheel:fillQuadrantsBorders()
-    WheelController.wheel.borders = {}
-    WheelController.wheel.colors = {}
-    WheelController.wheel.hovers = {}
-    WheelController.wheel.data = {}
-
-    for slot, data in pairs(self.slots) do
-        local current = {
-            quadrant = data.quadrant,
-            border = data.border,
-            color = data.color,
-            index = data.index,
-            currentPoints = data.currentPoints,
-            totalPoints = data.totalPoints,
-            isHovered = data.isHovered,
-            isSelected = data.isSelected,
-            isAdjacent = data.isAdjacent,
-            colorPath = "",
-            hoverPath = string.format(baseWheelColorPath, data.quadrant, data.color, data.index),
-            adjacentPath = "",
-            adjacents = data.adjacents,
-            id = slot,
-            borderPath = string.format(baseBorderPath, data.quadrant, data.index),
-            bgPath = string.format(baseWheelColorPath, data.quadrant, data.color, data.index),
-            height = "522",
-            width = "522",
-            isComplete = data.currentPoints == data.totalPoints,
-            enabledBy = {},
-            top = data.top or 0,
-            left = data.left or 0,
-        }
-
-        current.colorPath = WheelController.wheel.getSlotFramePercentage(current)
-        WheelController.wheel.data[slot] = current
-    end
-
-    helper.wheel.propagateAdjacentSelection(WheelController.wheel.data, WheelController)
-end
-
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId
     WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
+
+    g_logger.info("Selected slot ID: " .. tostring(slotId)) --- IGNORE ---
 end
 
 function WheelController:show(skipRequest)
@@ -302,8 +193,6 @@ function WheelController:show(skipRequest)
     WheelController.wheel.currentSelectSlotData = nil
     local player = g_game.getLocalPlayer()
     g_game.openWheelOfDestiny(player:getId())
-
-
 
     local needsReload = not self.ui or self.ui:isDestroyed()
     if needsReload then
@@ -350,7 +239,9 @@ function WheelController:toggle()
 end
 
 function WheelController:onInit()
-    self:registerEvents(g_game, { onWheelOfDestinyOpenWindow = onWheelOfDestinyOpenWindow })
+    self:registerEvents(g_game, {
+        onWheelOfDestinyOpenWindow = onWheelOfDestinyOpenWindow
+    })
 
     if not WheelButton then
         WheelButton = modules.game_mainpanel.addToggleButton('WheelButton', tr('Open Wheel of Destiny'),
@@ -365,36 +256,482 @@ function WheelController.wheel:handleMousePress(event, id)
     if event.mouseButton == MouseRightButton then
         local data = WheelController.wheel.data[id]
         WheelController.wheel.currentSelectSlotId = id
-        if data.currentPoints == data.totalPoints then
-            WheelController.wheel:onChangeSlotPoints("-max")
-        elseif data.currentPoints >= 0 then
-            WheelController.wheel:onChangeSlotPoints("+max")
+        if WheelController.wheel.pointInvested[id] >= data.totalPoints then
+            WheelController.wheel:onRemoveAllPoints()
+        elseif WheelController.wheel.pointInvested[id] >= 0 then
+            WheelController.wheel:onAddAllPoints()
         end
     end
 end
 
-function onWheelOfDestinyOpenWindow(data)
-    data.wheelPoints = data.wheelPoints or {}
-    local currentPoints = 0
-    for slot, point in pairs(data.wheelPoints) do
-        if helper.wheel.WheelSlotsParser[slot] then
-            helper.wheel.WheelSlotsParser[slot].currentPoints = point
-            currentPoints = currentPoints + point
+function WheelController.wheel:isSlotInvested(index)
+    if not WheelController.wheel.pointInvested[index] then return false end
+    return WheelController.wheel.pointInvested[index] > 0
+end
+
+function WheelController.wheel:isSlotFull(index)
+    return WheelController.wheel.pointInvested[index] == helper.bonus.WheelBonus[index - 1].maxPoints
+end
+
+function WheelController.wheel:canRemovePoints(index)
+    if not WheelController.wheel:isSlotInvested(index) then
+        return false
+    end
+
+    if WheelController.wheel.options ~= 1 then
+        return false
+    end
+
+    local button = helper.buttons.WheelButtons[index]
+    if button.radius == button.BIG_LARGE_CIRCLE then
+        return true
+    end
+
+    local nodes = helper.nodes.WheelNodes[index]
+
+    local iconInfo = nodes
+    if not iconInfo.connections or #iconInfo.connections == 0 then
+        return true
+    end
+
+    local c = nodes.connections
+    for _, id in pairs(c) do
+        if WheelController.wheel:isSlotInvested(id) and not helper.nodes.canReachConnectedNodes(id, index) then
+            return false
         end
     end
+
+    return true
+end
+
+function WheelController.wheel:removePoint(index, points)
+    local bonus = helper.bonus.WheelBonus[index - 1]
+    if points > 0 then
+        local button = helper.buttons.WheelButtons[index]
+        if points >= bonus.maxPoints then
+            local maxcolor = 20
+            if button.radius == button.BIG_LARGE_CIRCLE then
+                maxcolor = 20
+            elseif button.radius == button.LARGE_CIRCLE then
+                maxcolor = 15
+            elseif button.radius == button.BIG_MEDIUM_CIRCLE then
+                maxcolor = 10
+            elseif button.radius == button.MEDIUM_CIRCLE then
+                maxcolor = 8
+            elseif button.radius == button.SMALL_CIRCLE then
+                maxcolor = 5
+            end
+            local path = button.colorImageBase .. maxcolor
+            WheelController.wheel.data[index].colorPath = path .. ".png"
+            WheelController.wheel.insertUnlockedThe(index)
+        else
+            local _maxcolor = math.floor(points / 10) + 1
+            _maxcolor = math.min(quadrantFramesByMaxPoints[bonus.maxPoints], _maxcolor)
+            if _maxcolor > 0 then
+                WheelController.wheel.data[index].colorPath = button.colorImageBase .. _maxcolor .. ".png"
+            end
+        end
+    else
+        WheelController.wheel.data[index].colorPath = ""
+    end
+end
+
+function WheelController.wheel:removeUnlockedThe(index)
+    local iconInfo = helper.nodes.WheelNodes[index]
+    if #iconInfo.connections == 0 then
+        return false
+    end
+
+    for _, unlocked_point in pairs(iconInfo.connections) do
+        local skipUnlock = {}
+        for __, alternative_unlocker in ipairs(helper.nodes.WheelNodes[unlocked_point].connecteds) do
+            if alternative_unlocker ~= index and WheelController.wheel.isSlotInvested(alternative_unlocker) then
+                skipUnlock[#skipUnlock + 1] = unlocked_point
+            end
+        end
+
+        if not table.contains(skipUnlock, unlocked_point) then
+            WheelController.wheel.data[unlocked_point].adjacentPath = ""
+        end
+    end
+end
+
+function WheelController.wheel:getTotalPoints()
+    return WheelController.wheel.points +
+        (WheelController.wheel.extraGemPoints + WheelController.wheel.promotionScrollPoints)
+end
+
+local function handleUpdatePoints()
+    WheelController.wheel.passivePoints = {}
+
+    local usedPoints = 0
+    for id, _points in pairs(WheelController.wheel.pointInvested) do
+        usedPoints = usedPoints + _points
+        local bonus = helper.bonus.WheelBonus[id - 1]
+        WheelController.wheel.passivePoints[bonus.domain] = (WheelController.wheel.passivePoints[bonus.domain] or 0) +
+            _points
+        if bonus.maxPoints <= _points then
+            WheelController.wheel:insertUnlockedThe(id)
+        end
+    end
+
+    WheelController.wheel.usedPoints = usedPoints
+    local totalPoints = WheelController.wheel:getTotalPoints()
+    WheelController.wheel.summaryPointsLabel = string.format("%d/%d", totalPoints - WheelController.wheel.usedPoints,
+        totalPoints)
+end
+
+function WheelController.wheel:onRemoveAllPoints()
+    local index = WheelController.wheel.currentSelectSlotId
+
+    if not WheelController.wheel:canRemovePoints(index) then
+        return false
+    end
+
+    WheelController.wheel.pointInvested[index] = 0
+    WheelController.wheel:removePoint(index, WheelController.wheel.pointInvested[index])
+    WheelController.wheel:removeUnlockedThe(index)
+    handleUpdatePoints()
+end
+
+function WheelController.wheel:onAddAllPoints()
+    local index = WheelController.wheel.currentSelectSlotId
+    if not index or index == -1 then
+        return false
+    end
+    if WheelController.wheel.options ~= 1 then
+        return false
+    end
+    local pointInvested = WheelController.wheel.pointInvested[index]
+    local bonus = helper.bonus.WheelBonus[index - 1]
+    if pointInvested >= bonus.maxPoints then
+        return
+    end
+
+    local totalPoints = WheelController.wheel:getTotalPoints()
+
+    local pointToInvest = math.max(totalPoints - WheelController.wheel.usedPoints, 0)
+
+    if pointToInvest == 1 then
+        return WheelController.wheel:onAddOnePoint()
+    end
+
+    if not WheelController.wheel:canAddPoints(index, true) then
+        return
+    end
+
+
+    WheelController.wheel.pointInvested[index] = math.min((pointInvested + pointToInvest), bonus.maxPoints)
+    WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
+    WheelController.wheel:insertUnlockedThe(index)
+    handleUpdatePoints()
+    -- WheelController.wheel.checkManagerPointsButtons(index)
+    -- WheelController.wheel.configureDedicationPerk()
+    -- WheelController.wheel.configureConvictionPerk()
+    -- WheelController.wheel.configureVessels()
+    -- WheelController.wheel.configureSummary()
+    -- WheelController.wheel.configurePassives()
+
+    -- WheelController.wheel.checkApplyButton()
+end
+
+function WheelController.wheel:onAddOnePoint()
+    local index = WheelController.wheel.currentSelectSlotId
+    if not index or index == -1 then
+        return false
+    end
+    if WheelController.wheel.options ~= 1 then
+        return false
+    end
+
+    local pointInvested = WheelController.wheel.pointInvested[index]
+    local bonus = helper.bonus.WheelBonus[index - 1]
+
+
+    if pointInvested >= bonus.maxPoints then
+        return
+    end
+    g_logger.info("pointInvested>" .. pointInvested .. " bonus.maxPoints>" .. bonus.maxPoints)
+
+    if not WheelController.wheel:canAddPoints(index, true) then
+        return
+    end
+
+    g_logger.info("can add")
+    WheelController.wheel.pointInvested[index] = pointInvested + 1
+    WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
+    WheelController.wheel:insertUnlockedThe(index)
+
+    handleUpdatePoints()
+end
+
+function WheelController.wheel:onRemoveOnePoint()
+    local index = WheelController.wheel.currentSelectSlotId
+    if not index or index == -1 then
+        return false
+    end
+    if WheelController.wheel.options ~= 1 then
+        return false
+    end
+
+    if not WheelController.wheel:canRemovePoints(index) then
+        return
+    end
+
+    local pointInvested = WheelController.wheel.pointInvested[index]
+    if pointInvested == 0 then
+        return
+    end
+
+    WheelController.wheel.pointInvested[index] = pointInvested - 1
+    WheelController.wheel:removePoint(index, WheelController.wheel.pointInvested[index])
+    handleUpdatePoints()
+end
+
+function WheelController.wheel:canAddPoints(index, ignoreMaxPoint)
+    if WheelController.wheel.vocationId == 0 then
+        return false
+    end
+
+    if ignoreMaxPoint == nil then
+        ignoreMaxPoint = false
+    end
+
+    local bonus = helper.bonus.WheelBonus[index - 1]
+    if not ignoreMaxPoint then
+        if WheelController.wheel.pointInvested[index] >= bonus.maxPoints then
+            return false
+        end
+    end
+
+    if not WheelController.wheel.points then
+        WheelController.wheel.points = 0
+    end
+
+    local totalPoints = WheelController.wheel.points +
+        (WheelController.wheel.extraGemPoints + WheelController.wheel.promotionScrollPoints)
+
+    if not ignoreMaxPoint then
+        if totalPoints - WheelController.wheel.usedPoints <= 0 then
+            return false
+        end
+    end
+
+    if bonus.maxPoints == 50 then
+        return true
+    end
+
+    local iconInfo = helper.nodes.WheelNodes[index]
+    if #iconInfo.connecteds == 0 then
+        return true
+    end
+
+    for _, id in pairs(iconInfo.connecteds) do
+        local _bonus = helper.bonus.WheelBonus[id - 1]
+        local pointInvested = WheelController.wheel.pointInvested[id]
+        if pointInvested >= _bonus.maxPoints then
+            return true
+        end
+    end
+
+    return false
+end
+
+function WheelController.wheel:handleChangePointsButton(currentType)
+    local index = WheelController.wheel.currentSelectSlotId
+
+    if currentType == "all" and (not index or index == -1) then
+        return false
+    end
+
+    if WheelController.wheel:canAddPoints(index) and currentType == "add" then
+        return true
+    end
+    if WheelController.wheel:canRemovePoints(index) and currentType == "remove" then
+        return true
+    end
+
+    return false
+end
+
+function WheelController.wheel:insertUnlockedThe(index)
+    local iconInfo = helper.nodes.WheelNodes[index]
+    if #iconInfo.connections == 0 then
+        return false
+    end
+
+    local bonus = helper.bonus.WheelBonus[index - 1]
+    local pointInvested = WheelController.wheel.pointInvested[index]
+    if pointInvested < bonus.maxPoints then
+        return false
+    end
+
+    for _, id in pairs(iconInfo.connections) do
+        local data = WheelController.wheel.data[id]
+        WheelController.wheel.data[id].adjacentPath = string.format(baseColorSlotPath,
+            data.quadrant,
+            data.index,
+            quadrantFramesByMaxPoints[data.totalPoints])
+    end
+end
+
+function WheelController.wheel:insertPoint(index, points)
+    local bonus = helper.bonus.WheelBonus[index - 1]
+    local data = WheelController.wheel.data[index]
+    local button = helper.buttons.WheelButtons[index]
+    WheelController.wheel.data[index].id = index
+    WheelController.wheel.data[index].borderPath = button.borderImageBase .. ".png"
+    WheelController.wheel.data[index].hoverPath = string.format(baseWheelColorPath, data.quadrant, data.color, data
+        .index)
+    WheelController.wheel.data[index].bgPath = string.format(baseWheelColorPath, data.quadrant, data.color, data.index)
+
+    if points > 0 then
+        if points >= bonus.maxPoints then
+            local maxcolor = 20
+            if button.radius == helper.buttons.BIG_LARGE_CIRCLE then
+                maxcolor = 20
+            elseif button.radius == helper.buttons.LARGE_CIRCLE then
+                maxcolor = 15
+            elseif button.radius == helper.buttons.BIG_MEDIUM_CIRCLE then
+                maxcolor = 10
+            elseif button.radius == helper.buttons.MEDIUM_CIRCLE then
+                maxcolor = 8
+            elseif button.radius == helper.buttons.SMALL_CIRCLE then
+                maxcolor = 5
+            end
+
+            local path = button.colorImageBase .. maxcolor
+            WheelController.wheel.data[index].colorPath = path .. ".png"
+            WheelController.wheel:insertUnlockedThe(index)
+        else
+            local _maxcolor = math.floor(points / 10) + 1
+            _maxcolor = math.min(quadrantFramesByMaxPoints[bonus.maxPoints], _maxcolor)
+            if _maxcolor > 0 then
+                WheelController.wheel.data[index].colorPath = button.colorImageBase .. _maxcolor .. ".png"
+            end
+        end
+    elseif index ~= 15 and index ~= 16 and index ~= 21 and index ~= 22 then
+        WheelController.wheel.data[index].colorPath = ""
+        WheelController.wheel.data[index].adjacentPath = ""
+    end
+end
+
+function onWheelOfDestinyOpenWindow(data)
+    WheelController.wheel.options = data.options
+    WheelController.wheel.vocationId = data.vocationId or 0
+    WheelController.wheel.points = data.points or 0
+    WheelController.wheel.extraGemPoints = 0
+    WheelController.wheel.usedPoints = 0
+    data.points = data.points or 0
+    data.extraPoints = data.extraPoints or 0
+    WheelController.wheel.pointInvested = {}
+    WheelController.wheel.passivePoints = {}
+    WheelController.wheel.currentPoints = data.points
+    WheelController.wheel.promotionScrollPoints = data.extraPoints
+    WheelController.wheel.data = helper.wheel.WheelSlotsParser
+    data.wheelPoints = data.wheelPoints or {}
+
+    -- order
+    local orderned = {
+        15, 9, 14, 3, 8, 13, 2, 7, 1, 16, 10, 17, 4, 11, 18, 5, 12, 6, 22, 23, 28, 24, 29, 34, 30, 35, 36, 21, 20, 27, 19, 26, 33, 25, 32, 31
+    }
+
+    for _, tier in pairs(data.basicGrades) do
+        if tier == 3 then
+            WheelController.wheel.extraGemPoints = WheelController.wheel.extraGemPoints + 1
+        end
+    end
+
+    for _, tier in pairs(data.supremeGrades) do
+        if tier == 3 then
+            WheelController.wheel.extraGemPoints = WheelController.wheel.extraGemPoints + 1
+        end
+    end
+
+
+    local currentPoints = 0
+    for k, v in pairs(data.wheelPoints) do
+        currentPoints = currentPoints + v
+    end
+
 
     -- for k, v in pairs(data) do
     --     g_logger.info("WOD DATA key: " .. k .. " value: " .. tostring(v))
     -- end
 
-    data.points = data.points or 0
-    data.extraPoints = data.extraPoints or 0
+
+    for _, id in pairs(orderned) do
+        local points = data.wheelPoints[id]
+        local bonus = helper.bonus.WheelBonus[id - 1]
+        WheelController.wheel.pointInvested[id] = 0
+        for __ = 1, points do
+            WheelController.wheel.usedPoints = WheelController.wheel.usedPoints + 1
+            WheelController.wheel.passivePoints[bonus.domain] = (WheelController.wheel.passivePoints[bonus.domain] or 0) +
+                1
+            WheelController.wheel.pointInvested[id] = WheelController.wheel.pointInvested[id] + 1
+        end
+    end
+
+    local _currentPoints = 0
+    for k, v in pairs(WheelController.wheel.pointInvested) do
+        _currentPoints = _currentPoints + v
+    end
+
+    -- check slot integrity
+    for id, points in pairs(WheelController.wheel.pointInvested) do
+        if not WheelController.wheel:canAddPoints(id, true) and points > 0 then
+            local bonus = helper.bonus.WheelBonus[id - 1]
+            WheelController.wheel.usedPoints = WheelController.wheel.usedPoints - points
+            WheelController.wheel.passivePoints[bonus.domain] = WheelController.wheel.passivePoints[bonus.domain] -
+                points
+            points = 0
+        end
+    end
+
+    for id, _points in pairs(WheelController.wheel.pointInvested) do
+        WheelController.wheel:insertPoint(id, _points)
+    end
+
+    for id, _points in pairs(WheelController.wheel.pointInvested) do
+        local bonus = helper.bonus.WheelBonus[id - 1]
+        if bonus.maxPoints <= _points then
+            WheelController.wheel:insertUnlockedThe(id)
+        end
+    end
+
+    WheelController.wheel.atelierGems = data.revealedGems or {}
+
+    local function incrementBonusCount(_bonus, bonusType)
+        if _bonus ~= -1 then
+            local _data = bonusType[tostring(_bonus)]
+            if _data then
+                bonusType[tostring(_bonus)] = _data + 1
+            else
+                bonusType[tostring(_bonus)] = 1
+            end
+        end
+    end
+
+    WheelController.wheel.basicModCount = {}
+    WheelController.wheel.supremeModCount = {}
+    for _, info in pairs(WheelController.wheel.atelierGems) do
+        incrementBonusCount(info.lesserBonus, WheelController.wheel.basicModCount)
+        incrementBonusCount(info.regularBonus, WheelController.wheel.basicModCount)
+        incrementBonusCount(info.supremeBonus, WheelController.wheel.supremeModCount)
+    end
+
+
+    local totalPoints = WheelController.wheel.currentPoints +
+        (WheelController.wheel.extraGemPoints + WheelController.wheel.promotionScrollPoints)
+    WheelController.wheel.summaryPointsLabel = string.format("%d/%d", totalPoints - WheelController.wheel.usedPoints,
+        totalPoints)
+
 
     g_logger.info(string.format(
         "Received WOD data: points=%d, extraPoints=%d, currentPoints=%d, data.promotionScrolls=%d",
         data.points, data.extraPoints, currentPoints, #data.promotionScrolls))
 
-    WheelController.wheel.points = currentPoints
+    WheelController.wheel.currentPoints = currentPoints
     WheelController.wheel.extraPoints = data.extraPoints
     WheelController.wheel.totalPoints = data.points + data.extraPoints
     WheelController.wheel.slots = helper.wheel.WheelSlotsParser
@@ -405,8 +742,6 @@ function onWheelOfDestinyOpenWindow(data)
     end
 
     WheelController.wheel.backdropVocationOverlay = overlayImage .. ".png"
-
-    WheelController.wheel:fillQuadrantsBorders()
 
     if data.vocationId == VocationConfig.KNIGHT then
         WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
@@ -436,9 +771,6 @@ function onWheelOfDestinyOpenWindow(data)
     end
 
     WheelController.wheel.icons = {}
-
-    WheelController.wheel.tempClip = { x = 1050, y = 0, width = 30, height = 30 }
-    WheelController.wheel.tempClip2 = { x = 32, y = 0, width = 16, height = 16 }
 
     for id, iconInfo in pairs(helper.icons.WheelIcons[data.vocationId]) do
         local iconRect = iconInfo.iconRect

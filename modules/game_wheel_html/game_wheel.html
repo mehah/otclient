@@ -231,33 +231,36 @@
                   >
                     reserved
                   </div>
-                  <div style="margin-top: 8px; height: 20px">
+                  <div
+                    style="margin-top: 8px; height: 20px"
+                    *if="not self.wheel:handleChangePointsButton('all')"
+                  >
                     <div style="background-color: blue">
                       <button
                         style="float: right"
-                        onclick="self.wheel:onChangeSlotPoints('+max')"
-                        *disabled="self.wheel.currentSelectSlotData.currentPoints >= self.wheel.currentSelectSlotData.totalPoints"
+                        onclick="self.wheel:onAddAllPoints()"
+                        *disabled="not self.wheel:handleChangePointsButton('add')"
                       >
                         +Max
                       </button>
                       <button
-                        *disabled="self.wheel.currentSelectSlotData.currentPoints >= self.wheel.currentSelectSlotData.totalPoints"
+                        *disabled="not self.wheel:handleChangePointsButton('add')"
                         style="float: right"
-                        onclick="self.wheel:onChangeSlotPoints(1)"
+                        onclick="self.wheel:onAddOnePoint()"
                       >
                         +1
                       </button>
                     </div>
                     <div>
                       <button
-                        *disabled="self.wheel.currentSelectSlotData.currentPoints <= 0"
-                        onclick="self.wheel:onChangeSlotPoints('-max')"
+                        *disabled="not self.wheel:handleChangePointsButton('remove')"
+                        onclick="self.wheel:onRemoveAllPoints()"
                       >
                         -Max
                       </button>
                       <button
-                        *disabled="self.wheel.currentSelectSlotData.currentPoints <= 0"
-                        onclick="self.wheel:onChangeSlotPoints(-1)"
+                        *disabled="not self.wheel:handleChangePointsButton('remove')"
+                        onclick="self.wheel:onRemoveOnePoint()"
                       >
                         -1
                       </button>
@@ -270,8 +273,7 @@
                   Available Promotion Points
                 </p>
                 <p style="text-align: center; width: 205px">
-                  <span> {{self.wheel.points}} </span>
-                  <span>/{{self.wheel.totalPoints}}</span>
+                  <span> {{self.wheel.summaryPointsLabel}} </span>
                 </p>
               </div>
             </div>
@@ -287,7 +289,7 @@
                   *image-source="data.colorPath"
                   *height="data.height"
                   *width="data.width"
-                  *opacity="data.isComplete and 0.65 or (data.isAdjacent and 0.2 or 0.01) or 0.01"
+                  *opacity="0.6"
                   image-draw-order="1"
                   *ignore-transparent-pixel="true"
                 />
@@ -296,7 +298,7 @@
                   *image-source="data.adjacentPath"
                   *height="data.height"
                   *width="data.width"
-                  *opacity="data.adjacentPath ~= '' and 0.2 or 0.01"
+                  *opacity="0.2"
                   *ignore-transparent-pixel="true"
                   image-draw-order="1"
                 />
@@ -329,6 +331,7 @@
                   *margin-left="data.left"
                   image-draw-order="1"
                   class="mediumperks"
+                  onhover="self.wheel:handleOnHover(data.id)"
                   style="display: block"
                 />
                 <img
@@ -353,8 +356,8 @@
                 class="wheel-center-cells"
                 *if="self.wheel.currentSelectSlotData ~= nil and self.wheel.currentSelectSlotData.borderPath ~= nil"
                 *image-source="self.wheel.currentSelectSlotData.borderPath"
-                *height="self.wheel.currentSelectSlotData.height"
-                *width="self.wheel.currentSelectSlotData.width"
+                height="522"
+                width="522"
                 image-draw-order="3"
                 *ignore-transparent-pixel="true"
               />
