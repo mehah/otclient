@@ -6,11 +6,11 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "src/**"
-      - ".github/workflows/build-emscripten.yml"
+      - ".github/workflows/build-browser.yml"
   push:
     paths:
       - "src/**"
-      - ".github/workflows/build-emscripten.yml"
+      - ".github/workflows/build-browser.yml"
     branches:
       - main
 
@@ -34,9 +34,6 @@ jobs:
   build:
     name: ${{ matrix.buildtype }}
     runs-on: ubuntu-latest
-    env:
-      ACTIONS_RUNTIME_TOKEN: ${{ secrets.ACTIONS_RUNTIME_TOKEN }}
-      ACTIONS_CACHE_URL: ${{ secrets.ACTIONS_CACHE_URL }}
 
     concurrency:
       group: otclient-emscripten-${{ github.workflow }}-${{ github.ref }}-${{ matrix.buildtype }}
@@ -53,15 +50,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
         with:
           repository: ${{ github.event_name == 'push' && github.repository || (github.event.pull_request.head.repo.fork && github.repository || github.event.pull_request.head.repo.full_name) }}
           ref: ${{ github.event_name == 'push' && github.ref || (github.event.pull_request.head.repo.fork && github.event.pull_request.base.ref || github.event.pull_request.head.ref) }}
           fetch-depth: 0
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'   # Use an LTS version compatible with Emscripten
 
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
@@ -82,7 +74,7 @@ jobs:
             ${{ github.workspace }}/vcpkg/installed
             ${{ github.workspace }}/vcpkg/buildtrees
             ${{ github.workspace }}/vcpkg/downloads
-          key: vcpkg-${{ matrix.buildtype }}-${{ steps.hash.outputs.hash }}
+          key: vcpkg-${{ matrix.buildtype }}-${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
           restore-keys: |
             vcpkg-${{ matrix.buildtype }}-
       - name: Ensure run-vcpkg action is pinned by full commit SHA
@@ -117,10 +109,6 @@ jobs:
           }
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@v3.31.6
-
-      - name: Compute vcpkg hash
-        id: hash
-        run: echo "hash=$(sha256sum vcpkg.json | cut -d' ' -f1)" >> $GITHUB_OUTPUT
 
       - name: Configure CMake
         run: |
