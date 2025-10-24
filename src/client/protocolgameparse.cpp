@@ -35,11 +35,11 @@
 #include "outfit.h"
 #include "thingtypemanager.h"
 #include "tile.h"
-#include <ctime>
 #include <framework/core/eventdispatcher.h>
 
 #include "animatedtext.h"
 #include "attachedeffect.h"
+#include "game.h"
 #include "gameconfig.h"
 #include "mapview.h"
 #include "thingtype.h"

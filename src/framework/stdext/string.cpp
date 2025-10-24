@@ -20,13 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include <algorithm>
-#include <charconv>
-#include <ranges>
-#include <vector>
-
-#include "types.h"
-
 #ifdef _MSC_VER
 #pragma warning(disable:4267) // '?' : conversion from 'A' to 'B', possible loss of data
 #endif

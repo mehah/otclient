@@ -20,10 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include <algorithm>
-#include <filesystem>
-#include <ranges>
-
 #include "filestream.h"
 #include "resourcemanager.h"
 #include <client/game.h>

@@ -27,8 +27,6 @@
 
 #include <framework/core/resourcemanager.h>
 
-#include <pugixml.hpp>
-
 HouseManager g_houses;
 
 House::House(uint32_t hId, const std::string_view name, const Position& pos)

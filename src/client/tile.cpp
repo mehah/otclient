@@ -26,8 +26,6 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/ui/uiwidget.h>
 
-#include <ranges>
-
 #include "client.h"
 #include "effect.h"
 #include "game.h"
@@ -35,7 +33,6 @@
 #include "localplayer.h"
 #include "map.h"
 #include "uimap.h"
-#include <algorithm>
 
 #include "gameconfig.h"
 #include "mapview.h"

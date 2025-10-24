@@ -26,7 +26,6 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
 
-#include <algorithm>
 #include <framework/core/asyncdispatcher.h>
 #include <nlohmann/json.hpp>
 

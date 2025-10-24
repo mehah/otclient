@@ -32,8 +32,6 @@
 #else
 
 #include <cxxabi.h>
-#include <cstring>
-#include <cstdlib>
 
 #endif
 

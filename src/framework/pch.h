@@ -61,6 +61,7 @@
 #include <numbers>
 #include <future>
 #include <atomic>
+#include <random>
 
 // ===== Third-Party Libraries =====
 // zlib

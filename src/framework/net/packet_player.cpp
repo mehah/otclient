@@ -20,7 +20,6 @@
 * THE SOFTWARE.
 */
 
-#include <filesystem>
 #include <framework/core/clock.h>
 #include <framework/global.h>
 

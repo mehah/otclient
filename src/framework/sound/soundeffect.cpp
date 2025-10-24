@@ -28,8 +28,6 @@
 #include <AL/efx-presets.h>
 #include <AL/efx.h>
 
-#include <unordered_map>
-
  /* Effect object functions */
 static LPALGENEFFECTS alGenEffects;
 static LPALDELETEEFFECTS alDeleteEffects;

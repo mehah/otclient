@@ -21,9 +21,7 @@
  */
 
 #include "protocol.h"
-#include <algorithm>
 #include <framework/core/application.h>
-#include <random>
 
 #include "client/game.h"
 #include "framework/core/graphicalapplication.h"

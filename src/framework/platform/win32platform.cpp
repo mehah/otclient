@@ -26,7 +26,6 @@
 
 #include <framework/core/eventdispatcher.h>
 #include <framework/stdext/stdext.h>
-#include <tchar.h>
 
 #include <shellapi.h>
 

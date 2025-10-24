@@ -38,8 +38,6 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
 
-#include <algorithm>
-
 #include "gameconfig.h"
 
 MapView::MapView() : m_lightView(std::make_unique<LightView>(Size())), m_pool(g_drawPool.get(DrawPoolType::MAP))

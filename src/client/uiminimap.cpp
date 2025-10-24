@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include "game.h"
 #include "luavaluecasts_client.h"
 #include "uiminimap.h"
 

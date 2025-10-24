@@ -22,13 +22,9 @@
 
 #include "httplogin.h"
 
-#include <atomic>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
-#include <httplib.h>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <string>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/fetch.h>

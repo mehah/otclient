@@ -60,13 +60,17 @@
 #include <framework/net/protocol.h>
 #include <framework/net/protocolhttp.h>
 #include <framework/net/server.h>
+
+#ifdef __EMSCRIPTEN__
+#include <framework/net/webconnection.h>
+#else
+#include <framework/net/connection.h>
 #endif
 
-#include <regex>
+#endif
 
 #include "core/clock.h"
 #include "core/graphicalapplication.h"
-#include "net/connection.h"
 #include "net/inputmessage.h"
 #include "net/outputmessage.h"
 

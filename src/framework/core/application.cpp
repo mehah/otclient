@@ -33,13 +33,12 @@
 #include <framework/platform/platform.h>
 #include <framework/proxy/proxy.h>
 
-#include <csignal>
 #include <gitinfo.h>
 
 #define ADD_QUOTES_HELPER(s) #s
 #define ADD_QUOTES(s) ADD_QUOTES_HELPER(s)
 
-#include <locale>
+#include <csignal>
 
 #include "clock.h"
 

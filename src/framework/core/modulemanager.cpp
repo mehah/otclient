@@ -29,8 +29,6 @@
 #include <framework/otml/otml.h>
 #include <framework/platform/platformwindow.h>
 
-#include <algorithm>
-
 ModuleManager g_modules;
 
 void ModuleManager::clear()

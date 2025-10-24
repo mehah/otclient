@@ -35,7 +35,6 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/ui/uiwidget.h>
-#include <queue>
 
 #include "animatedtext.h"
 #include "framework/graphics/drawpoolmanager.h"
