@@ -25,7 +25,8 @@ WheelController.wheel = {
         TR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png",
         BL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png",
         BR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png"
-    }
+    },
+    slotProgressLabel = "0/50"
 }
 WheelController.gem = {
     clip = baseButtonClip
@@ -144,6 +145,19 @@ function WheelController.wheel:handleMousePress(event, id)
             WheelController.wheel:onAddAllPoints()
         end
     end
+end
+
+function WheelController.wheel:getSlotProgressWidth(index, barWidth)
+    index = index or WheelController.wheel.currentSelectSlotId
+    if not index or index == -1 then
+        return 0
+    end
+    barWidth = barWidth or 205
+    local pointInvested = WheelController.wheel.pointInvested[index] or 0
+    local bonus = helper.bonus.WheelBonus[index - 1]
+    WheelController.wheel.slotProgressLabel = string.format("%d/%d", pointInvested, bonus.maxPoints)
+    local progress = pointInvested / bonus.maxPoints
+    return progress * barWidth
 end
 
 function WheelController.wheel:isSlotInvested(index)

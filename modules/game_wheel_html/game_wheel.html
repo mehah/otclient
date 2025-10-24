@@ -208,17 +208,10 @@
                     <img
                       class="section-progress"
                       src="/images/game/wheel/progressBar.png"
-                      *width="((self.wheel.currentSelectSlotData.currentPoints / self.wheel.currentSelectSlotData.totalPoints) * 205)"
+                      *width="self.wheel:getSlotProgressWidth()"
                     />
                     <div>
-                      <p>
-                        <span
-                          >{{self.wheel.currentSelectSlotData.currentPoints}}/</span
-                        >
-                        <span
-                          >{{self.wheel.currentSelectSlotData.totalPoints}}</span
-                        >
-                      </p>
+                      <p>{{self.wheel.slotProgressLabel}}</p>
                     </div>
                   </div>
                   <div
