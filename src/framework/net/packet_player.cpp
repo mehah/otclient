@@ -25,6 +25,8 @@
 
 #include "packet_player.h"
 
+#include "framework/core/eventdispatcher.h"
+
 PacketPlayer::~PacketPlayer()
 {
     if (m_event)
