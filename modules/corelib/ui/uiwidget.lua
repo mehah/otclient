@@ -100,8 +100,24 @@ end
 function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
-    if attr == 'image-source' and not value:starts('/') and not value:starts('\\') then
-        value = '/modules/' .. controller.name .. '/' .. value
+    if attr == 'image-source' then
+        if value:starts('http://') or value:starts('https://') then
+            HTTP.downloadImage(value, function(path, err)
+                if err then
+                    g_logger.warning('HTTP error: ' .. err .. ' - ' .. value)
+                    return
+                end
+
+                if self:isDestroyed() then
+                    return
+                end
+
+                self:setImageSource(path)
+            end)
+            return
+        elseif not value:starts('/') and not value:starts('\\') then
+            value = '/modules/' .. controller.name .. '/' .. value
+        end
     end
 
     local setterName = ''
