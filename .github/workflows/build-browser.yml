@@ -34,6 +34,9 @@ jobs:
   build:
     name: ${{ matrix.buildtype }}
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_RUNTIME_TOKEN: ${{ secrets.ACTIONS_RUNTIME_TOKEN }}
+      ACTIONS_CACHE_URL: ${{ secrets.ACTIONS_CACHE_URL }}
 
     concurrency:
       group: otclient-emscripten-${{ github.workflow }}-${{ github.ref }}-${{ matrix.buildtype }}
