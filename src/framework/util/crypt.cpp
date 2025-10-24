@@ -21,21 +21,17 @@
  */
 
 #include "crypt.h"
-#include "framework/core/application.h"
-#include <framework/core/logger.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/platform/platform.h>
-#include <framework/stdext/math.h>
+#include <cppcodec/base64_rfc4648.hpp>
+
+#include "framework/core/graphicalapplication.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/platform/platform.h"
+#include "framework/stdext/math.h"
 
 #ifndef USE_GMP
 #include <openssl/bn.h>
 #include <openssl/rsa.h>
 #endif
-
-#include <cppcodec/base64_rfc4648.hpp>
-
-#include "framework/core/graphicalapplication.h"
-#include <openssl/sha.h>
 
 constexpr std::size_t CHECKSUM_BYTES = sizeof(uint32_t);
 

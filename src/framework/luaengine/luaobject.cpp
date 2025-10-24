@@ -20,13 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "luainterface.h"
 #include "luaobject.h"
 
 #include "framework/core/graphicalapplication.h"
-#include <framework/core/application.h>
-
-#include <typeinfo>
 
 int16_t g_luaThreadId = -1;
 

@@ -21,16 +21,14 @@
  */
 
 #include "uitextedit.h"
-#include <framework/core/clock.h>
-#include <framework/graphics/bitmapfont.h>
-#include <framework/input/mouse.h>
-#include <framework/otml/otmlnode.h>
-#include <framework/platform/platformwindow.h>
 
-#include "framework/graphics/drawpoolmanager.h"
 #include "uitranslator.h"
-#include <framework/graphics/fontmanager.h>
-#include <framework/graphics/textureatlas.h>
+#include "framework/core/clock.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/fontmanager.h"
+#include "framework/graphics/textureatlas.h"
+#include "framework/input/mouse.h"
+#include "framework/otml/otmlnode.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>

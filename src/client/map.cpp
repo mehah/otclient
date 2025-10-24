@@ -20,25 +20,20 @@
  * THE SOFTWARE.
  */
 
-#include "game.h"
-#include "item.h"
-#include "localplayer.h"
 #include "map.h"
-#include "mapview.h"
-#include "minimap.h"
-#include "missile.h"
-#include "statictext.h"
-#include "tile.h"
-
-#include <algorithm>
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/ui/uiwidget.h>
 
 #include "animatedtext.h"
-#include "framework/graphics/drawpoolmanager.h"
+#include "game.h"
 #include "gameconfig.h"
+#include "item.h"
+#include "localplayer.h"
+#include "mapview.h"
+#include "minimap.h"
+#include "thing.h"
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/ui/uiwidget.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"

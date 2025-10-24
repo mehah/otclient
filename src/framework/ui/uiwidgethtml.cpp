@@ -22,12 +22,9 @@
 #include "uilayoutflexbox.h"
 #include "uimanager.h"
 #include "uiwidget.h"
-#include <algorithm>
 #include <framework/core/eventdispatcher.h>
 #include <framework/html/htmlmanager.h>
 #include <framework/html/htmlnode.h>
-#include <functional>
-#include <vector>
 
 namespace {
     inline uint32_t SIZE_VERSION_COUNTER = 1;

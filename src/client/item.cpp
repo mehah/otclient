@@ -20,24 +20,19 @@
  * THE SOFTWARE.
  */
 
-#include "container.h"
-#include "game.h"
 #include "item.h"
-#include "spritemanager.h"
-#include "thing.h"
-#include "thingtypemanager.h"
-#include "tile.h"
-
-#include <framework/core/clock.h>
-#include <framework/core/filestream.h>
-#include <framework/graphics/shadermanager.h>
 
 #include "animator.h"
-#include "framework/graphics/drawpool.h"
-#include "framework/graphics/drawpoolmanager.h"
-#include "framework/graphics/painter.h"
+#include "game.h"
 #include "gameconfig.h"
 #include "thingtype.h"
+#include "thingtypemanager.h"
+#include "tile.h"
+#include "framework/core/clock.h"
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/shadermanager.h"
+
 #ifdef FRAMEWORK_EDITOR
 #include <framework/core/binarytree.h>
 #endif

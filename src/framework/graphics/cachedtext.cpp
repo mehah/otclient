@@ -21,8 +21,10 @@
  */
 
 #include "cachedtext.h"
-#include "fontmanager.h"
-#include <framework/graphics/drawpoolmanager.h>
+
+#include "bitmapfont.h"
+#include "coordsbuffer.h"
+#include "drawpoolmanager.h"
 
 CachedText::CachedText() : m_align(Fw::AlignCenter), m_coordsBuffer(std::make_shared<CoordsBuffer>()) {}
 

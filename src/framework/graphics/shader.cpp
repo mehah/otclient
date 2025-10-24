@@ -20,14 +20,12 @@
  * THE SOFTWARE.
  */
 
-#include "graphics.h"
 #include "shader.h"
 
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/resourcemanager.h>
-
+#include "graphics.h"
+#include "framework/core/eventdispatcher.h"
 #include "framework/core/graphicalapplication.h"
+#include "framework/core/resourcemanager.h"
 
 Shader::Shader(ShaderType shaderType) : m_shaderId(glCreateShader(static_cast<GLenum>(shaderType))), m_shaderType(shaderType)
 {

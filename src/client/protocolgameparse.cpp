@@ -20,29 +20,24 @@
 * THE SOFTWARE.
 */
 
-#include "protocolcodes.h"
-#include "protocolgame.h"
-
-#include "effect.h"
-#include "framework/net/inputmessage.h"
-
-#include "attachedeffectmanager.h"
-#include "item.h"
-#include "localplayer.h"
-#include "luavaluecasts_client.h"
-#include "map.h"
-#include "missile.h"
-#include "outfit.h"
-#include "thingtypemanager.h"
-#include "tile.h"
-#include <framework/core/eventdispatcher.h>
-
 #include "animatedtext.h"
 #include "attachedeffect.h"
+#include "attachedeffectmanager.h"
+#include "effect.h"
 #include "game.h"
 #include "gameconfig.h"
+#include "item.h"
+#include "localplayer.h"
+#include "protocolgame.h"
+#include "protocolcodes.h"
+#include "luavaluecasts_client.h"
+#include "map.h"
 #include "mapview.h"
+#include "missile.h"
 #include "thingtype.h"
+#include "thingtypemanager.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/net/inputmessage.h"
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {

@@ -1,8 +1,5 @@
 #include "uigraph.h"
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/platform/platformwindow.h>
-
-#include <algorithm>
 
 #include "framework/graphics/bitmapfont.h"
 #include "framework/otml/otmlnode.h"

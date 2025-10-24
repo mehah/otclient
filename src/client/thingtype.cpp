@@ -20,22 +20,20 @@
  * THE SOFTWARE.
  */
 
+#include "thingtype.h"
+
+#include "animator.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "lightview.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
-#include "thingtype.h"
-
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/filestream.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/image.h>
-#include <framework/graphics/texture.h>
-#include <framework/otml/otml.h>
-
-#include "animator.h"
-#include "gameconfig.h"
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/filestream.h"
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/image.h"
+#include "framework/otml/otmlnode.h"
 
 const static TexturePtr m_textureNull;
 

@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include "game.h"
 #include "player.h"
 
 bool Player::isMage() const {

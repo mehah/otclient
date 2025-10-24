@@ -25,8 +25,6 @@
 
 #include <framework/core/eventdispatcher.h>
 
-#include <utility>
-
 #include "framework/otml/otmlnode.h"
 
 UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}

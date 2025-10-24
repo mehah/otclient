@@ -21,7 +21,6 @@
  */
 
 #include "otmldocument.h"
-#include "otmlexception.h"
 #include "otmlparser.h"
 
 OTMLParser::OTMLParser(const OTMLDocumentPtr& doc, std::istream& in) :

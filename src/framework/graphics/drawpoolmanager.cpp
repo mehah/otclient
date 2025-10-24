@@ -20,9 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "declarations.h"
-#include "drawpool.h"
 #include "drawpoolmanager.h"
+
 #include "graphics.h"
 #include "textureatlas.h"
 

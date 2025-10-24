@@ -20,23 +20,21 @@
  * THE SOFTWARE.
  */
 
-#include "container.h"
-#include "creature.h"
 #include "game.h"
+
+#include "attachedeffect.h"
+#include "container.h"
+#include "gameconfig.h"
+#include "item.h"
 #include "localplayer.h"
 #include "map.h"
-#include "protocolcodes.h"
 #include "protocolgame.h"
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
-
+#include "protocolcodes.h"
+#include "framework/core/eventdispatcher.h"
 #include "framework/core/graphicalapplication.h"
-#include "tile.h"
-
-#include <framework/net/packet_player.h>
-#include <framework/net/packet_recorder.h>
-
-#include "gameconfig.h"
+#include "framework/luaengine/luainterface.h"
+#include "framework/net/packet_player.h"
+#include "framework/net/packet_recorder.h"
 
 Game g_game;
 

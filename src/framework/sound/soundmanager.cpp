@@ -20,22 +20,21 @@
  * THE SOFTWARE.
  */
 
-#include "combinedsoundsource.h"
+#include "soundmanager.h"
+#include <nlohmann/json.hpp>
+#include <sounds.pb.h>
+
 #include "soundbuffer.h"
 #include "soundchannel.h"
 #include "soundeffect.h"
 #include "soundfile.h"
-#include "soundmanager.h"
+#include "soundsource.h"
 #include "streamsoundsource.h"
-
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/clock.h>
-#include <framework/core/garbagecollection.h>
-#include <framework/core/resourcemanager.h>
-#include <nlohmann/json.hpp>
-#include <sounds.pb.h>
-
 #include "client/game.h"
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/clock.h"
+#include "framework/core/garbagecollection.h"
+#include "framework/core/resourcemanager.h"
 
 using namespace otclient::protobuf;
 

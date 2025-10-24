@@ -20,13 +20,12 @@
  * THE SOFTWARE.
  */
 
-#include "game.h"
 #include "localplayer.h"
-#include "map.h"
-#include "tile.h"
-#include <framework/core/eventdispatcher.h>
 
+#include "game.h"
+#include "map.h"
 #include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
 
 void LocalPlayer::lockWalk(const uint16_t millis)
 {

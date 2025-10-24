@@ -22,9 +22,8 @@
 
 #include "uisprite.h"
 #include <client/spritemanager.h>
-
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include "framework/otml/otmlnode.h"
 
 void UISprite::drawSelf(const DrawPoolType drawPane)
 {

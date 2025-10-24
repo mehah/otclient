@@ -20,12 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include <framework/core/eventdispatcher.h>
-#include <framework/util/crypt.h>
-
-#include <openssl/ssl.h>
-
 #include "protocolhttp.h"
+
+#include "framework/core/eventdispatcher.h"
+#include "framework/util/crypt.h"
 
 Http g_http;
 

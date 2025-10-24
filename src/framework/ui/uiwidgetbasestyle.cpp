@@ -19,23 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#include <framework/graphics/drawpoolmanager.h>
 
 #include "uianchorlayout.h"
 #include "uigridlayout.h"
 #include "uihorizontallayout.h"
+#include "uilayout.h"
 #include "uitranslator.h"
 #include "uiverticallayout.h"
 #include "uiwidget.h"
-#include <framework/html/htmlnode.h>
-
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/texture.h>
-#include <framework/graphics/texturemanager.h>
-
-#include <framework/core/eventdispatcher.h>
-
-#include <atomic>
-#include <framework/html/htmlmanager.h>
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/texturemanager.h"
+#include "framework/html/htmlmanager.h"
+#include "framework/html/htmlnode.h"
+#include "framework/otml/otmlnode.h"
 
 namespace {
     inline std::string toLower(std::string value)

@@ -20,14 +20,10 @@
 * THE SOFTWARE.
 */
 
-#include <framework/core/clock.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/global.h>
-
 #include "packet_recorder.h"
 
 #include "inputmessage.h"
-
+#include "framework/core/clock.h"
 PacketRecorder::PacketRecorder(const std::string_view& file)
 {
     m_start = g_clock.millis();

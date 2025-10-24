@@ -21,23 +21,21 @@
  */
 
 #include "tile.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/ui/uiwidget.h>
 
 #include "client.h"
+#include "localplayer.h"
 #include "effect.h"
 #include "game.h"
-#include "item.h"
-#include "localplayer.h"
-#include "map.h"
-#include "uimap.h"
-
 #include "gameconfig.h"
+#include "item.h"
+#include "map.h"
 #include "mapview.h"
-#include "statictext.h"
+#include "thing.h"
+#include "uimap.h"
 #include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 Tile::Tile(const Position& position) : m_position(position) {}
 

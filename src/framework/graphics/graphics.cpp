@@ -20,12 +20,11 @@
  * THE SOFTWARE.
  */
 
-#include "fontmanager.h"
 #include "graphics.h"
 
+#include "fontmanager.h"
 #include "painter.h"
 #include "texturemanager.h"
-#include <framework/platform/platformwindow.h>
 
 Graphics g_graphics;
 

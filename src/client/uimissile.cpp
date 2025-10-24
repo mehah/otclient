@@ -22,11 +22,12 @@
 
 #include "uimissile.h"
 
+#include "gameconfig.h"
+#include "missile.h"
+#include "lightview.h"
+#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/otml/otmlnode.h"
-#include "gameconfig.h"
-#include "lightview.h"
-#include "missile.h"
 
 UIMissile::UIMissile() { setProp(PropDraggable, true, false); }
 

@@ -20,10 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "lightview.h"
 #include "uiitem.h"
 
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/otml/otmlnode.h"
 #include "gameconfig.h"

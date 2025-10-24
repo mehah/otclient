@@ -20,11 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "soundbuffer.h"
-#include "soundeffect.h"
 #include "soundsource.h"
 
-#include "framework/stdext/time.h"
+#include "soundbuffer.h"
+#include "soundeffect.h"
 
 SoundSource::SoundSource()
 {

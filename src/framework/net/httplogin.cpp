@@ -21,7 +21,6 @@
  */
 
 #include "httplogin.h"
-
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
 #include <nlohmann/json.hpp>

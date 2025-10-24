@@ -20,14 +20,13 @@
  * THE SOFTWARE.
  */
 
-#include "graphicalapplication.h"
 #include "modulemanager.h"
+
+#include "asyncdispatcher.h"
+#include "eventdispatcher.h"
+#include "graphicalapplication.h"
 #include "resourcemanager.h"
-#include <framework/core/application.h>
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/otml/otml.h>
-#include <framework/platform/platformwindow.h>
+#include "framework/otml/otmldocument.h"
 
 ModuleManager g_modules;
 

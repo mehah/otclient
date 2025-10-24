@@ -20,27 +20,24 @@
  * THE SOFTWARE.
  */
 
-#include "creature.h"
-#include "game.h"
-#include "thingtype.h"
 #include "thingtypemanager.h"
+
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
+
+#include "game.h"
+#include "spriteappearances.h"
+#include "thingtype.h"
+#include "framework/core/filestream.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/otml/otmldocument.h"
+#include <staticdata.pb.h>
 
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"
 #include "creatures.h"
 #include <framework/core/binarytree.h>
 #endif
-
-#include <framework/core/filestream.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/otml/otml.h>
-
-#include <client/spriteappearances.h>
-
-#include <appearances.pb.h>
-#include <staticdata.pb.h>
-
-#include <nlohmann/json.hpp>
 
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"

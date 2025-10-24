@@ -23,9 +23,10 @@
 #include "luavaluecasts_client.h"
 #include "uiminimap.h"
 
-#include "framework/otml/otmlnode.h"
 #include "minimap.h"
 #include "uimapanchorlayout.h"
+#include "framework/otml/otmlnode.h"
+#include "framework/ui/uilayout.h"
 
 void UIMinimap::drawSelf(const DrawPoolType drawPane)
 {

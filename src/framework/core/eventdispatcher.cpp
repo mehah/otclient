@@ -23,8 +23,6 @@
 #include "asyncdispatcher.h"
 #include "eventdispatcher.h"
 
-#include "timer.h"
-
 thread_local DispatcherContext EventDispatcher::dispacherContext;
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;

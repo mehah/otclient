@@ -20,10 +20,11 @@
  * THE SOFTWARE.
  */
 
-#include "drawpoolmanager.h"
 #include "particle.h"
 
-#include <framework/graphics/animatedtexture.h>
+#include "animatedtexture.h"
+#include "drawpool.h"
+#include "drawpoolmanager.h"
 
 void Particle::render() const
 {

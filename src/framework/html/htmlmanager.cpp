@@ -21,15 +21,13 @@
  */
 
 #include "htmlmanager.h"
-#include "htmlnode.h"
 #include "htmlparser.h"
-#include <framework/ui/ui.h>
-#include <framework/ui/uimanager.h>
-
-#include <framework/core/modulemanager.h>
-#include <framework/core/resourcemanager.h>
-
+#include "htmlnode.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/luaengine/luainterface.h"
 #include "framework/otml/otmlnode.h"
+#include "framework/ui/uimanager.h"
+#include "framework/ui/uiwidget.h"
 
 HtmlManager g_html;
 

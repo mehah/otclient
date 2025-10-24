@@ -31,8 +31,6 @@
 
 #else
 
-#include <cxxabi.h>
-
 #endif
 
 namespace stdext

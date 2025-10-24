@@ -20,13 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "eventdispatcher.h"
 #include "logger.h"
 
-#include <framework/core/asyncdispatcher.h>
-
-#include <framework/luaengine/luainterface.h>
-#include <framework/platform/platform.h>
+#include "eventdispatcher.h"
 
 #ifdef FRAMEWORK_GRAPHICS
 #include <framework/platform/platformwindow.h>

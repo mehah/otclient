@@ -25,7 +25,6 @@
 #include "platform.h"
 
 #include <framework/core/eventdispatcher.h>
-#include <framework/stdext/stdext.h>
 
 #include <shellapi.h>
 

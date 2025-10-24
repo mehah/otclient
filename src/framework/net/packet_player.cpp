@@ -20,11 +20,9 @@
 * THE SOFTWARE.
 */
 
-#include <framework/core/clock.h>
-#include <framework/global.h>
-
 #include "packet_player.h"
 
+#include "framework/core/clock.h"
 #include "framework/core/eventdispatcher.h"
 
 PacketPlayer::~PacketPlayer()

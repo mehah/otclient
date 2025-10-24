@@ -20,10 +20,11 @@
  * THE SOFTWARE.
  */
 
-#include "framework/core/resourcemanager.h"
+#include "streamsoundsource.h"
+
 #include "soundbuffer.h"
 #include "soundfile.h"
-#include "streamsoundsource.h"
+#include "framework/core/resourcemanager.h"
 
 StreamSoundSource::StreamSoundSource()
 {

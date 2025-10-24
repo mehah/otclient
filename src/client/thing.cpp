@@ -20,16 +20,15 @@
  * THE SOFTWARE.
  */
 
-#include "game.h"
-#include "map.h"
 #include "thing.h"
 
-#include <framework/graphics/shadermanager.h>
-
 #include "attachedeffect.h"
-#include "framework/core/clock.h"
+#include "game.h"
+#include "map.h"
 #include "thingtype.h"
+#include "framework/core/clock.h"
 #include "framework/graphics/paintershaderprogram.h"
+#include "framework/graphics/shadermanager.h"
 
 void Thing::setPosition(const Position& position, uint8_t /*stackPos*/)
 {

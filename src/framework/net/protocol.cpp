@@ -21,7 +21,6 @@
  */
 
 #include "protocol.h"
-#include <framework/core/application.h>
 
 #include "client/game.h"
 #include "framework/core/graphicalapplication.h"

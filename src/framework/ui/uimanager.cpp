@@ -19,19 +19,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-#include "ui.h"
 #include "uimanager.h"
-
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/modulemanager.h>
-#include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/otml/otml.h>
-#include <framework/platform/platformwindow.h>
 
+#include "uiwidget.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/modulemanager.h"
+#include "framework/core/resourcemanager.h"
 #include "framework/graphics/graphics.h"
-#include <framework/html/htmlmanager.h>
+#include "framework/otml/otmldocument.h"
+#include "framework/otml/otmlexception.h"
+#include "framework/otml/otmlnode.h"
 
 UIManager g_ui;
 

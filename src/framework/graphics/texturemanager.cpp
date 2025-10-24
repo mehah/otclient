@@ -20,16 +20,16 @@
  * THE SOFTWARE.
  */
 
-#include "animatedtexture.h"
-#include "graphics.h"
-#include "image.h"
 #include "texturemanager.h"
 
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/apngloader.h>
-#include <framework/graphics/drawpool.h>
+#include "animatedtexture.h"
+#include "apngloader.h"
+#include "drawpool.h"
+#include "image.h"
+#include "texture.h"
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/resourcemanager.h"
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocolhttp.h>

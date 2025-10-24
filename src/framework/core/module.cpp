@@ -21,11 +21,10 @@
  */
 
 #include "module.h"
+
 #include "modulemanager.h"
 #include "resourcemanager.h"
-
-#include <framework/luaengine/luainterface.h>
-#include <framework/otml/otml.h>
+#include "framework/otml/otmlnode.h"
 
 Module::Module(const std::string_view name) : m_sandboxEnv(g_lua.newSandboxEnv()), m_name(name.data()) {}
 
@@ -86,8 +85,8 @@ bool Module::load()
 
         m_loaded = true;
 
-        g_logger.debug( "Loaded module '{}' ({:.2f}s)", m_name, (stdext::millis() - startTime) / 1000.0
-);
+        g_logger.debug("Loaded module '{}' ({:.2f}s)", m_name, (stdext::millis() - startTime) / 1000.0
+        );
     } catch (const stdext::exception& e) {
         // remove from package.loaded
         g_lua.getGlobalField("package", "loaded");

@@ -20,13 +20,12 @@
  * THE SOFTWARE.
  */
 
-#include "graphics.h"
 #include "shaderprogram.h"
 
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/stdext/hash.h>
-
+#include "graphics.h"
+#include "shader.h"
+#include "client/creature.h"
+#include "framework/core/eventdispatcher.h"
 #include "framework/core/graphicalapplication.h"
 
 uint32_t ShaderProgram::m_currentProgram = 0;

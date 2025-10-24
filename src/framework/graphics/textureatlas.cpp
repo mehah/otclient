@@ -1,5 +1,4 @@
 #include "framebuffer.h"
-#include "graphics.h"
 #include "textureatlas.h"
 
 constexpr uint8_t SMOOTH_PADDING = 2;

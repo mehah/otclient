@@ -20,8 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "uitranslator.h"
 #include "uiwidget.h"
+#include "uitranslator.h"
+
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
 #include <framework/html/htmlnode.h>

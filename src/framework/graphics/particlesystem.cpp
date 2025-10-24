@@ -20,11 +20,13 @@
  * THE SOFTWARE.
  */
 
+#include "particlesystem.h"
+
+#include "drawpool.h"
+#include "drawpoolmanager.h"
 #include "particle.h"
 #include "particleaffector.h"
-#include "particlesystem.h"
-#include <framework/core/clock.h>
-#include <framework/graphics/drawpoolmanager.h>
+#include "framework/core/clock.h"
 
 ParticleSystem::ParticleSystem() :m_lastUpdateTime(g_clock.seconds()) {}
 
