@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "declarations.h"
-
 class Position
 {
 public:

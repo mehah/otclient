@@ -462,7 +462,6 @@ void Protocol::playRecord(PacketPlayerPtr player)
     return onConnect();
 }
 
-void Protocol::setRecorder(PacketRecorderPtr recorder)
-{
-    m_recorder = recorder;
-}
+void Protocol::setRecorder(PacketRecorderPtr recorder) { m_recorder = recorder; }
+
+ticks_t Protocol::getElapsedTicksSinceLastRead() const { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }

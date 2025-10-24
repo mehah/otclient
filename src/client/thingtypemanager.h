@@ -23,7 +23,6 @@
 #pragma once
 
 #include "staticdata.h"
-#include <framework/global.h>
 
 using RaceList = std::vector<RaceType>;
 static const RaceType emptyRaceType{};

@@ -30,6 +30,7 @@
 #include <framework/core/asyncdispatcher.h>
 #include <nlohmann/json.hpp>
 
+#include "gameconfig.h"
 #include "lzma.h"
 
  // warnings related to protobuf
@@ -48,6 +49,21 @@ void SpriteAppearances::init()
 void SpriteAppearances::terminate()
 {
     unload();
+}
+
+Size SpriteSheet::getSpriteSize() const
+{
+    Size size(g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
+
+    switch (spriteLayout) {
+        case SpriteLayout::ONE_BY_ONE: break;
+        case SpriteLayout::ONE_BY_TWO: size.setHeight(64); break;
+        case SpriteLayout::TWO_BY_ONE: size.setWidth(64); break;
+        case SpriteLayout::TWO_BY_TWO: size.resize(64, 64); break;
+        default: break;
+    }
+
+    return size;
 }
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const

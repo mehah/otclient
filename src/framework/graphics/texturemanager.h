@@ -24,8 +24,6 @@
 
 #include <framework/core/declarations.h>
 
-#include "declarations.h"
-
 class TextureManager
 {
 public:

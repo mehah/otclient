@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <appearances.pb.h>
 #include <framework/core/declarations.h>
 #include <framework/luaengine/luaobject.h>

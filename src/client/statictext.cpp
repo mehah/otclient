@@ -27,6 +27,8 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/fontmanager.h>
 
+#include "gameconfig.h"
+
 StaticText::StaticText()
 {
     m_cachedText.setFont(g_gameConfig.getStaticTextFont());

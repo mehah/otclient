@@ -32,6 +32,13 @@
 
 SpriteManager g_sprites;
 
+FileMetadata::FileMetadata(const FileStreamPtr& file) {
+    offset = file->getU32();
+    fileSize = file->getU32();
+    fileName = file->getString();
+    spriteId = std::stoi(fileName);
+}
+
 void SpriteManager::init() {}
 void SpriteManager::terminate() { unload(); }
 

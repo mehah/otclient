@@ -22,8 +22,11 @@
 
 #include "oggsoundfile.h"
 #include "soundfile.h"
+#include "framework/core/filestream.h"
 #include <framework/core/resourcemanager.h>
 
+std::string SoundFile::getName() const { return m_file ? m_file->name() : std::string(); }
+bool SoundFile::eof() const { return m_file->eof(); }
 SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
     const auto& file = g_resources.openFile(filename);

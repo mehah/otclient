@@ -22,10 +22,7 @@
 
 #pragma once
 
-#include "glutil.h"
 #include <framework/luaengine/luaobject.h>
-
-#include "shader.h"
 
  // @bindclass
 class ShaderProgram : public LuaObject

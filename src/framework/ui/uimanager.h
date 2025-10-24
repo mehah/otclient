@@ -23,11 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include <framework/core/inputevent.h>
-#include <framework/otml/declarations.h>
-#include <framework/platform/platform.h>
-
-#include "framework/core/declarations.h"
 
  //@bindsingleton g_ui
 class UIManager

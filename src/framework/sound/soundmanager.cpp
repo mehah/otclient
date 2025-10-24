@@ -35,6 +35,8 @@
 #include <nlohmann/json.hpp>
 #include <sounds.pb.h>
 
+#include "client/game.h"
+
 using namespace otclient::protobuf;
 
 using json = nlohmann::json;

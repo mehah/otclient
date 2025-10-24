@@ -35,6 +35,7 @@
 #include <framework/otml/otml.h>
 
 #include "animator.h"
+#include "gameconfig.h"
 
 const static TexturePtr m_textureNull;
 

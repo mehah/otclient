@@ -66,6 +66,7 @@
 
 #include "core/clock.h"
 #include "core/graphicalapplication.h"
+#include "net/connection.h"
 #include "net/inputmessage.h"
 #include "net/outputmessage.h"
 

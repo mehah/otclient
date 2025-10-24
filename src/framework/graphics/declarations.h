@@ -45,6 +45,12 @@ enum DrawOrder : uint8_t
     LAST
 };
 
+enum class ShaderType
+{
+    VERTEX = GL_VERTEX_SHADER,
+    FRAGMENT = GL_FRAGMENT_SHADER
+};
+
 class Texture;
 class TextureManager;
 class Image;

@@ -23,9 +23,8 @@
 #pragma once
 
 #include "attachableobject.h"
-#include <framework/core/timer.h>
-
 #include "staticdata.h"
+#include <framework/core/timer.h>
 
  // @bindclass
 #pragma pack(push,1) // disable memory alignment

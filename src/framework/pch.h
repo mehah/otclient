@@ -58,6 +58,9 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <numbers>
+#include <future>
+#include <atomic>
 
 // ===== Third-Party Libraries =====
 // zlib
