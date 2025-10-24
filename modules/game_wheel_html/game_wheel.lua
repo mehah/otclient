@@ -301,14 +301,6 @@ function WheelController.wheel:onAddAllPoints()
     WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
     WheelController.wheel:insertUnlockedThe(index)
     handleUpdatePoints()
-    -- WheelController.wheel.checkManagerPointsButtons(index)
-    -- WheelController.wheel.configureDedicationPerk()
-    -- WheelController.wheel.configureConvictionPerk()
-    -- WheelController.wheel.configureVessels()
-    -- WheelController.wheel.configureSummary()
-    -- WheelController.wheel.configurePassives()
-
-    -- WheelController.wheel.checkApplyButton()
 end
 
 function WheelController.wheel:onAddOnePoint()
