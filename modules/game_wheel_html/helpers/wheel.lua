@@ -63,6 +63,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = {},
@@ -82,6 +84,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_GREEN_200, WheelSlots.SLOT_GREEN_BOTTOM_150 },
@@ -101,6 +105,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_GREEN_200, WheelSlots.SLOT_GREEN_TOP_150 },
@@ -121,6 +127,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 120,
@@ -140,6 +148,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 155,
@@ -159,6 +169,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 215,
@@ -178,6 +190,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 175,
@@ -197,6 +211,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 220,
@@ -216,6 +232,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 225,
@@ -234,6 +252,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = {},
@@ -253,6 +273,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_RED_200, WheelSlots.SLOT_RED_BOTTOM_150 },
@@ -272,6 +294,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_RED_200, WheelSlots.SLOT_RED_TOP_150 },
@@ -292,6 +316,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 120,
@@ -311,6 +337,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 155,
@@ -330,6 +358,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 215,
@@ -349,6 +379,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 175,
@@ -368,6 +400,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 215,
@@ -387,6 +421,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 225,
@@ -405,6 +441,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = {},
@@ -424,6 +462,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_BLUE_200, WheelSlots.SLOT_BLUE_BOTTOM_150 },
@@ -443,6 +483,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_BLUE_200, WheelSlots.SLOT_BLUE_TOP_150 },
@@ -463,6 +505,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 280,
@@ -482,6 +526,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 335,
@@ -501,6 +547,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 370,
@@ -520,6 +568,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 275,
@@ -539,6 +589,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 315,
@@ -558,6 +610,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 265,
@@ -576,6 +630,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = {},
@@ -595,6 +651,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_PURPLE_200, WheelSlots.SLOT_PURPLE_BOTTOM_150 },
@@ -614,6 +672,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         adjacents = { WheelSlots.SLOT_PURPLE_200, WheelSlots.SLOT_PURPLE_TOP_150 },
@@ -634,6 +694,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 280,
@@ -653,6 +715,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 340,
@@ -672,6 +736,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 370,
@@ -691,6 +757,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 275,
@@ -710,6 +778,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 315,
@@ -729,6 +799,8 @@ local WheelSlotsParser = {
         isAdjacent = false,
         colorPath = "",
         hoverPath = "",
+        height = "522",
+        width = "522",
         adjacentPath = "",
         borderPath = "",
         top = 265,
@@ -736,72 +808,84 @@ local WheelSlotsParser = {
     },
 }
 
-local function propagateAdjacentSelection(slotList, controller)
-    local toPropagate = {}
 
-    for index, slotData in ipairs(slotList) do
-        local definition = controller.wheel.slots[slotData.id] or {}
-        slotData.isComplete = slotData.currentPoints == slotData.totalPoints
-        slotData.isAdjacent = false
-        slotData.adjacentPath = ""
-        slotData.enabledBy = {}
+local VocationConfig = {
+    -- Basic vocation IDs
+    KNIGHT = 1,
+    PALADIN = 2,
+    SORCERER = 3,
+    DRUID = 4,
+    MONK = 5,
 
-        if slotData.isComplete then
-            slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
-            if definition.adjacents and #definition.adjacents > 0 then
-                slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
-            else
-                slotData.adjacentPath = ""
-            end
-            slotData.isAdjacent = true
+    -- Minimum requirements
+    MIN_LEVEL = 51,
+    MIN_PROMOTED_VOCATION = 11,
 
-            for _, slotId in ipairs(definition.adjacents or {}) do
-                table.insert(toPropagate, { target = slotId, source = slotData.id })
-            end
-        elseif slotData.currentPoints > 0 then
-            slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
-            slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
-            slotData.isAdjacent = true
-        else
-            slotData.colorPath = ""
-            if slotData.index == 1 then
-                slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
-                slotData.isAdjacent = true
-            end
-        end
+    -- Mapping from promoted to basic vocations
+    promotedToBasic = {
+        [11] = 1, -- Elite Knight -> Knight
+        [12] = 2, -- Royal Paladin -> Paladin
+        [13] = 3, -- Master Sorcerer -> Sorcerer
+        [14] = 4, -- Elder Druid -> Druid
+        [15] = 5  -- Exalted Monk -> Monk
+    },
 
-        controller.wheel.data[index] = slotData
+    -- Images by vocation
+    images = {
+        [1] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_knight',
+        [2] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_paladin',
+        [3] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_sorcerer',
+        [4] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_druid',
+        [5] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_monk'
+    },
+}
+
+local function getVocationImage(basicVocationId)
+    if basicVocationId == VocationConfig.MONK and g_game.getClientVersion() < 1500 then
+        return nil
     end
+    return VocationConfig.images[basicVocationId]
+end
 
-    for _, propagation in ipairs(toPropagate) do
-        local slotId = propagation.target
-        local sourceId = propagation.source
-        for index, slotData in ipairs(controller.wheel.data) do
-            if slotData.id == slotId then
-                slotData.isAdjacent = true
-                slotData.enabledBy = slotData.enabledBy or {}
-                slotData.enabledBy[sourceId] = true
+local function getBasicVocation(vocationId)
+    return VocationConfig.promotedToBasic[vocationId] or vocationId
+end
 
-                if slotData.currentPoints > 0 then
-                    slotData.colorPath = controller.wheel.getSlotFramePercentage(slotData)
-                    slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
-                else
-                    slotData.colorPath = ""
-                    slotData.adjacentPath = controller.wheel.getSlotFinalFramePath(slotData)
-                end
-
-                controller.wheel.data[index] = slotData
-                break
-            end
-        end
+local function handleLargePerkClip(vocationId, controller)
+    if vocationId == VocationConfig.KNIGHT then
+        controller.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        controller.wheel.trLargePerkClip = { x = 34, y = 0, width = 34, height = 34 }
+        controller.wheel.blLargePerkClip = { x = 68, y = 0, width = 34, height = 34 }
+        controller.wheel.brLargePerkClip = { x = 102, y = 0, width = 34, height = 34 }
+    elseif vocationId == VocationConfig.PALADIN then
+        controller.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        controller.wheel.trLargePerkClip = { x = 136, y = 0, width = 34, height = 34 }
+        controller.wheel.blLargePerkClip = { x = 170, y = 0, width = 34, height = 34 }
+        controller.wheel.brLargePerkClip = { x = 204, y = 0, width = 34, height = 34 }
+    elseif vocationId == VocationConfig.SORCERER then
+        controller.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        controller.wheel.trLargePerkClip = { x = 238, y = 0, width = 34, height = 34 }
+        controller.wheel.blLargePerkClip = { x = 272, y = 0, width = 34, height = 34 }
+        controller.wheel.brLargePerkClip = { x = 306, y = 0, width = 34, height = 34 }
+    elseif vocationId == VocationConfig.DRUID then
+        controller.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        controller.wheel.trLargePerkClip = { x = 374, y = 0, width = 34, height = 34 }
+        controller.wheel.blLargePerkClip = { x = 340, y = 0, width = 34, height = 34 }
+        controller.wheel.brLargePerkClip = { x = 408, y = 0, width = 34, height = 34 }
+    elseif vocationId == VocationConfig.MONK then
+        controller.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
+        controller.wheel.trLargePerkClip = { x = 442, y = 0, width = 34, height = 34 }
+        controller.wheel.blLargePerkClip = { x = 476, y = 0, width = 34, height = 34 }
+        controller.wheel.brLargePerkClip = { x = 510, y = 0, width = 34, height = 34 }
     end
 end
 
-
-local wod = {
+local wheel = {
     WheelSlots = WheelSlots,
     WheelSlotsParser = WheelSlotsParser,
-    propagateAdjacentSelection = propagateAdjacentSelection,
-
+    getBasicVocation = getBasicVocation,
+    getVocationImage = getVocationImage,
+    handleLargePerkClip = handleLargePerkClip,
 }
-return wod
+
+return wheel

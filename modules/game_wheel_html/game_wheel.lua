@@ -1,15 +1,10 @@
 local helper = dofile("helpers/helper.lua")
 
-
-
-
 WheelController = Controller:new()
 WheelButton = nil
 
 local baseButtonClip = { x = 0, y = 0, width = 322, height = 34 }
 local baseButtonClipped = { x = 0, y = 34, width = 322, height = 34 }
-
-
 
 WheelController.wheel = {
     clip = baseButtonClipped,
@@ -45,73 +40,6 @@ function WheelController:toggleMenu(menu)
     self[menu].clip = baseButtonClipped
 end
 
-local VocationConfig = {
-    -- Basic vocation IDs
-    KNIGHT = 1,
-    PALADIN = 2,
-    SORCERER = 3,
-    DRUID = 4,
-    MONK = 5,
-
-    -- Minimum requirements
-    MIN_LEVEL = 51,
-    MIN_PROMOTED_VOCATION = 11,
-
-    -- Mapping from promoted to basic vocations
-    promotedToBasic = {
-        [11] = 1, -- Elite Knight -> Knight
-        [12] = 2, -- Royal Paladin -> Paladin
-        [13] = 3, -- Master Sorcerer -> Sorcerer
-        [14] = 4, -- Elder Druid -> Druid
-        [15] = 5  -- Exalted Monk -> Monk
-    },
-
-    -- Images by vocation
-    images = {
-        [1] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_knight',
-        [2] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_paladin',
-        [3] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_sorcerer',
-        [4] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_druid',
-        [5] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_monk'
-    },
-}
-
-local function getVocationImage(basicVocationId)
-    if basicVocationId == VocationConfig.MONK and g_game.getClientVersion() < 1500 then
-        return nil
-    end
-    return VocationConfig.images[basicVocationId]
-end
-
-local function getBasicVocation(vocationId)
-    return VocationConfig.promotedToBasic[vocationId] or vocationId
-end
-
-local quadrants = {
-    "top_left",
-    "top_right",
-    "bottom_right",
-    "bottom_left"
-}
-local colorQuadrants = {
-    "TopLeft",
-    "TopRight",
-    "BottomRight",
-    "BottomLeft"
-}
-
-local quadrantFrames = {
-    [1] = 5,
-    [2] = 8,
-    [3] = 8,
-    [4] = 10,
-    [5] = 10,
-    [6] = 10,
-    [7] = 15,
-    [8] = 15,
-    [9] = 20
-}
-
 local quadrantFramesByMaxPoints = {
     [50] = 5,
     [75] = 8,
@@ -120,68 +48,16 @@ local quadrantFramesByMaxPoints = {
     [200] = 20
 }
 
-
-local baseBorderPath = "/images/game/wheel/wheel-border/%s/%s.png"
 local baseWheelColorPath = "/images/game/wheel/wheel-colors/%s/%s_%s.png"
 local baseColorSlotPath = "/images/game/wheel/wheel-colors/%s/slot%s/%s.png"
-local otherBorders = { "revelationPerk", "vesselGem" }
 
 function WheelController.wheel:handleOnHover(slotId)
     WheelController.wheel.currentHoverSlot = slotId
 end
 
-function WheelController.wheel:getSlotDataById(slotId)
-    for index, slotData in pairs(self.data) do
-        if slotData.id == slotId then
-            return slotData, index
-        end
-    end
-
-    return nil, nil
-end
-
-function WheelController.wheel.getSlotFramePercentage(data)
-    data.totalPoints = helper.wheel.WheelSlotsParser[data.id].totalPoints
-    local numericValue = tonumber(data.currentPoints) or 0
-    local sanitizedValue = math.max(0, numericValue)
-    local clampedValue = math.min(sanitizedValue, data.totalPoints)
-    local progress = clampedValue / data.totalPoints
-    local frames = quadrantFrames[data.index]
-
-    if not frames or frames <= 0 then
-        return ""
-    end
-
-    local clampedProgress = math.max(0, math.min(1, progress))
-    if clampedProgress == 0 then
-        return ""
-    end
-
-    local idx = math.ceil(clampedProgress * frames)
-    if idx < 1 then idx = 1 end
-    if idx > frames then idx = frames end
-    local path = string.format(baseColorSlotPath, data.quadrant, data.index, idx)
-    return path
-end
-
-function WheelController.wheel.getSlotFinalFramePath(data)
-    if not data or not data.index or not data.quadrant then
-        return ""
-    end
-
-    local frames = quadrantFrames[data.index]
-
-    if not frames or frames <= 0 then
-        return ""
-    end
-
-    return string.format(baseColorSlotPath, data.quadrant, data.index, frames)
-end
-
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId
     WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
-
     g_logger.info("Selected slot ID: " .. tostring(slotId)) --- IGNORE ---
 end
 
@@ -735,40 +611,15 @@ function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.extraPoints = data.extraPoints
     WheelController.wheel.totalPoints = data.points + data.extraPoints
     WheelController.wheel.slots = helper.wheel.WheelSlotsParser
-    local basicVocationId = getBasicVocation(data.vocationId)
-    local overlayImage = getVocationImage(basicVocationId)
+    local basicVocationId = helper.wheel.getBasicVocation(data.vocationId)
+    local overlayImage = helper.wheel.getVocationImage(basicVocationId)
     if not overlayImage then
         return WheelController:hide()
     end
 
     WheelController.wheel.backdropVocationOverlay = overlayImage .. ".png"
 
-    if data.vocationId == VocationConfig.KNIGHT then
-        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
-        WheelController.wheel.trLargePerkClip = { x = 34, y = 0, width = 34, height = 34 }
-        WheelController.wheel.blLargePerkClip = { x = 68, y = 0, width = 34, height = 34 }
-        WheelController.wheel.brLargePerkClip = { x = 102, y = 0, width = 34, height = 34 }
-    elseif data.vocationId == VocationConfig.PALADIN then
-        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
-        WheelController.wheel.trLargePerkClip = { x = 136, y = 0, width = 34, height = 34 }
-        WheelController.wheel.blLargePerkClip = { x = 170, y = 0, width = 34, height = 34 }
-        WheelController.wheel.brLargePerkClip = { x = 204, y = 0, width = 34, height = 34 }
-    elseif data.vocationId == VocationConfig.SORCERER then
-        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
-        WheelController.wheel.trLargePerkClip = { x = 238, y = 0, width = 34, height = 34 }
-        WheelController.wheel.blLargePerkClip = { x = 272, y = 0, width = 34, height = 34 }
-        WheelController.wheel.brLargePerkClip = { x = 306, y = 0, width = 34, height = 34 }
-    elseif data.vocationId == VocationConfig.DRUID then
-        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
-        WheelController.wheel.trLargePerkClip = { x = 374, y = 0, width = 34, height = 34 }
-        WheelController.wheel.blLargePerkClip = { x = 340, y = 0, width = 34, height = 34 }
-        WheelController.wheel.brLargePerkClip = { x = 408, y = 0, width = 34, height = 34 }
-    elseif data.vocationId == VocationConfig.MONK then
-        WheelController.wheel.tlLargePerkClip = { x = 0, y = 0, width = 34, height = 34 }
-        WheelController.wheel.trLargePerkClip = { x = 442, y = 0, width = 34, height = 34 }
-        WheelController.wheel.blLargePerkClip = { x = 476, y = 0, width = 34, height = 34 }
-        WheelController.wheel.brLargePerkClip = { x = 510, y = 0, width = 34, height = 34 }
-    end
+    helper.wheel.handleLargePerkClip(data.vocationId, WheelController)
 
     WheelController.wheel.icons = {}
 
