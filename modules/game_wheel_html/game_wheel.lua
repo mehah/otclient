@@ -19,7 +19,13 @@ WheelController.wheel = {
     extraPoints = 0,
     totalPoints = 0,
     currentSelectSlotData = nil,
-    data = {}
+    data = {},
+    passiveBorders = {
+        TL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png",
+        TR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png",
+        BL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png",
+        BR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png"
+    }
 }
 WheelController.gem = {
     clip = baseButtonClip
@@ -237,6 +243,39 @@ function WheelController.wheel:getTotalPoints()
         (WheelController.wheel.extraGemPoints + WheelController.wheel.promotionScrollPoints)
 end
 
+function WheelController.wheel:handlePassiveBorders()
+    -- TODO: get gem atelier points
+
+    local border = "TL"
+    for domain, points in ipairs(WheelController.wheel.passivePoints) do
+        if domain == 1 then
+            border = "TL"
+        elseif domain == 2 then
+            border = "TR"
+        elseif domain == 3 then
+            border = "BL"
+        elseif domain == 4 then
+            border = "BR"
+        end
+
+        if points < 250 then
+            WheelController.wheel.passiveBorders[border] =
+                "/images/game/wheel/backdrop_skillwheel_largebonus_front0_" .. border .. ".png"
+        elseif points < 500 then
+            WheelController.wheel.passiveBorders[border] =
+                "/images/game/wheel/backdrop_skillwheel_largebonus_front1_" .. border .. ".png"
+        elseif points < 1000 then
+            WheelController.wheel.passiveBorders[border] =
+                "/images/game/wheel/backdrop_skillwheel_largebonus_front2_" .. border .. ".png"
+        else
+            WheelController.wheel.passiveBorders[border] =
+                "/images/game/wheel/backdrop_skillwheel_largebonus_front3_" .. border .. ".png"
+        end
+    end
+
+    -- TODO: Lembrar de configurar as relevation perks
+end
+
 local function handleUpdatePoints()
     WheelController.wheel.passivePoints = {}
 
@@ -255,6 +294,8 @@ local function handleUpdatePoints()
     local totalPoints = WheelController.wheel:getTotalPoints()
     WheelController.wheel.summaryPointsLabel = string.format("%d/%d", totalPoints - WheelController.wheel.usedPoints,
         totalPoints)
+
+    WheelController.wheel:handlePassiveBorders()
 end
 
 function WheelController.wheel:onRemoveAllPoints()
@@ -295,7 +336,6 @@ function WheelController.wheel:onAddAllPoints()
     if not WheelController.wheel:canAddPoints(index, true) then
         return
     end
-
 
     WheelController.wheel.pointInvested[index] = math.min((pointInvested + pointToInvest), bonus.maxPoints)
     WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
