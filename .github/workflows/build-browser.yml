@@ -58,6 +58,11 @@ jobs:
           repository: ${{ github.event_name == 'push' && github.repository || (github.event.pull_request.head.repo.fork && github.repository || github.event.pull_request.head.repo.full_name) }}
           ref: ${{ github.event_name == 'push' && github.ref || (github.event.pull_request.head.repo.fork && github.event.pull_request.base.ref || github.event.pull_request.head.ref) }}
           fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'   # Use an LTS version compatible with Emscripten
+
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
         with:
