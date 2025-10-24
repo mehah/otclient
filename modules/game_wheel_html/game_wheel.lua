@@ -26,7 +26,14 @@ WheelController.wheel = {
         BL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png",
         BR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png"
     },
-    slotProgressLabel = "0/50"
+    slotProgressLabel = "0/50",
+    dedicationPerk = {
+        hitPoints = 0,
+        mana = 0,
+        cap = 0,
+        mitigation = "0%"
+    },
+    convictionPerks = {},
 }
 WheelController.gem = {
     clip = baseButtonClip
@@ -310,6 +317,13 @@ local function handleUpdatePoints()
         totalPoints)
 
     WheelController.wheel:handlePassiveBorders()
+    helper.bonus.configureDedicationPerk(WheelController)
+    WheelController.wheel:configureConvictionPerk()
+end
+
+function WheelController.wheel:configureConvictionPerk()
+    local convictions = helper.bonus.getConvictionPerks(WheelController)
+    WheelController.wheel.convictionPerks = convictions
 end
 
 function WheelController.wheel:onRemoveAllPoints()
@@ -698,4 +712,7 @@ function onWheelOfDestinyOpenWindow(data)
             height = tonumber(height)
         }
     end
+
+    helper.bonus.configureDedicationPerk(WheelController)
+    WheelController.wheel:configureConvictionPerk()
 end
