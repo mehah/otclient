@@ -26,6 +26,8 @@
 #include "tile.h"
 #include <framework/core/eventdispatcher.h>
 
+#include "framework/core/clock.h"
+
 void LocalPlayer::lockWalk(const uint16_t millis)
 {
     m_walkLockExpiration = std::max<ticks_t>(m_walkLockExpiration, g_clock.millis() + millis);
