@@ -880,12 +880,22 @@ local function handleLargePerkClip(vocationId, controller)
     end
 end
 
+
+local baseSlotIndex = {
+    15, 16, 21, 22
+}
+
+local function isFirstSlot(index)
+    return table.contains(baseSlotIndex, index)
+end
+
 local wheel = {
     WheelSlots = WheelSlots,
     WheelSlotsParser = WheelSlotsParser,
     getBasicVocation = getBasicVocation,
     getVocationImage = getVocationImage,
     handleLargePerkClip = handleLargePerkClip,
+    isFirstSlot = isFirstSlot,
 }
 
 return wheel

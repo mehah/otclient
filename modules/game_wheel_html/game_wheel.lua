@@ -498,14 +498,16 @@ function WheelController.wheel:insertUnlockedThe(index)
 end
 
 function WheelController.wheel:insertPoint(index, points)
-    local bonus = helper.bonus.WheelBonus[index - 1]
-    local data = WheelController.wheel.data[index]
-    local button = helper.buttons.WheelButtons[index]
-    WheelController.wheel.data[index].id = index
+    local bonus                                  = helper.bonus.WheelBonus[index - 1]
+    local data                                   = WheelController.wheel.data[index]
+    local button                                 = helper.buttons.WheelButtons[index]
+    WheelController.wheel.data[index].id         = index
     WheelController.wheel.data[index].borderPath = button.borderImageBase .. ".png"
-    WheelController.wheel.data[index].hoverPath = string.format(baseWheelColorPath, data.quadrant, data.color, data
-        .index)
-    WheelController.wheel.data[index].bgPath = string.format(baseWheelColorPath, data.quadrant, data.color, data.index)
+    WheelController.wheel.data[index].hoverPath  = button.focusImageBase .. ".png"
+    WheelController.wheel.data[index].bgPath     = string.format(baseWheelColorPath, data.quadrant, data.color,
+        data.index)
+
+    local isBaseSlot                             = helper.wheel.isFirstSlot(index)
 
     if points > 0 then
         if points >= bonus.maxPoints then
@@ -532,9 +534,11 @@ function WheelController.wheel:insertPoint(index, points)
                 WheelController.wheel.data[index].colorPath = button.colorImageBase .. _maxcolor .. ".png"
             end
         end
-    elseif index ~= 15 and index ~= 16 and index ~= 21 and index ~= 22 then
+    elseif not isBaseSlot then
         WheelController.wheel.data[index].colorPath = ""
         WheelController.wheel.data[index].adjacentPath = ""
+    else
+        WheelController.wheel.data[index].adjacentPath = button.colorImageBase .. "5.png"
     end
 end
 
