@@ -29,7 +29,6 @@
 #include "thingtypemanager.h"
 #include "tile.h"
 #include "framework/core/clock.h"
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 

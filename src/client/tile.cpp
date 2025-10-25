@@ -34,7 +34,6 @@
 #include "uimap.h"
 #include "framework/core/clock.h"
 #include "framework/core/eventdispatcher.h"
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 
 Tile::Tile(const Position& position) : m_position(position) {}

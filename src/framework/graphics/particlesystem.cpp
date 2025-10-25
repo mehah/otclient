@@ -21,8 +21,6 @@
  */
 
 #include "particlesystem.h"
-
-#include "drawpool.h"
 #include "drawpoolmanager.h"
 #include "particle.h"
 #include "particleaffector.h"

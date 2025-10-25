@@ -30,7 +30,6 @@
 #include "spritemanager.h"
 #include "framework/core/asyncdispatcher.h"
 #include "framework/core/filestream.h"
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/image.h"
 #include "framework/otml/otmlnode.h"

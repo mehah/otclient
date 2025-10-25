@@ -28,7 +28,6 @@
 #include "thingtype.h"
 #include "thingtypemanager.h"
 #include "framework/core/eventdispatcher.h"
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 

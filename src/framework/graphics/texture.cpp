@@ -22,7 +22,6 @@
 
 #include "texture.h"
 
-#include "drawpool.h"
 #include "drawpoolmanager.h"
 #include "graphics.h"
 #include "image.h"

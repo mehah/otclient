@@ -26,7 +26,6 @@
 
 #include "filestream.h"
 #include "graphicalapplication.h"
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/net/protocolhttp.h"
 #include "framework/platform/platform.h"

@@ -26,7 +26,6 @@
 #include "tile.h"
 #include "framework/core/filestream.h"
 #include "framework/core/resourcemanager.h"
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/image.h"
 #include "framework/graphics/texture.h"

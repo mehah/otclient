@@ -25,7 +25,6 @@
 #include "lightview.h"
 #include "map.h"
 #include "mapview.h"
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/otml/otmlnode.h"
 

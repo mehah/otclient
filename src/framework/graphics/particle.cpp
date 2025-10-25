@@ -23,7 +23,6 @@
 #include "particle.h"
 
 #include "animatedtexture.h"
-#include "drawpool.h"
 #include "drawpoolmanager.h"
 
 void Particle::render() const
