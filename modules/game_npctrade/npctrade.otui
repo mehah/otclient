@@ -1,270 +1,153 @@
-NPCOfferLabel < Label
-  anchors.left: prev.right
-  anchors.top: prev.top
-  margin-left: 5
-  text-auto-resize: true
-
 NPCItemBox < UICheckBox
-  border-width: 1
-  border-color: #000000
-  color: #aaaaaa
-  text-align: center
-  text-offset: 0 20
+  height: 35
+  background-color: #404040
   @onCheckChange: modules.game_npctrade.onItemBoxChecked(self)
+  tooltip-delayed: true
 
-  Item
-    id: item
-    phantom: true
+  UIWidget
+    size: 34 34
+    image-source: /images/ui/item
     anchors.top: parent.top
-    anchors.horizontalCenter: parent.horizontalCenter
-    image-color: #ffffffff
-    margin-top: 5
+    anchors.left: parent.left
+    margin-left: 2
+    phantom: true
+    anchors.verticalCenter: parent.verticalCenter
 
-  $checked on:
-    border-color: #ffffff
+  UIItem
+    id: item
+    size: 32 32
+    virtual: true
+    priceable: false
+    draggable: false
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 3
+    phantom: true
+
+  UIWidget
+    id: nameLabel
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 4
+    text-align: left
+    text-auto-resize: true
+    font: Verdana Bold-11px
+    color: #C0C0C0
+    phantom: true
+
+  $checked:
+    background-color: #585858
 
   $!checked:
-    border-color: #000000
+    background-color: #404040
 
-  $!on:
-    image-color: #ffffff88
-    color: #aaaaaa88
+NpcWindow
+  id: tradeWindow
+  height: 175
+  @onEscape: |
+    function()
+      modules.game_npctrade.hide()
+    end
+  &save: true
 
-MainWindow
-  id: npcWindow
-  !text: tr('NPC Trade')
-  size: 550 515
-  @onEscape: modules.game_npctrade.closeNpcTrade()
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    image-source: /images/icons/icon-trade
+    image-rect: 0 0 12 12
+    image-smooth: false
 
-  TabButton
-    id: buyTab
-    !tooltip: tr("List of items that you're able to buy")
-    !text: tr('Buy')
-    checked: true
-    on: true
-    anchors.left: parent.left
-    anchors.right: parent.horizontalCenter
-    anchors.top: parent.top
-    margin-right: 5
-    margin-top: 5
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    !text: tr('NPC Trade')
+    color: #9d9d9dff
 
-  TabButton
-    id: sellTab
-    !tooltip: tr("List of items that you're able to sell")
-    !text: tr('Sell')
-    anchors.left: parent.horizontalCenter
-    anchors.right: parent.right
-    anchors.top: parent.top
-    margin-left: 5
-    margin-top: 5
-
-  FlatPanel
-    height: 250
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 10
-
-    VerticalScrollBar
-      id: itemsPanelListScrollBar
-      anchors.top: parent.top
-      anchors.bottom: parent.bottom
-      anchors.right: parent.right
-      step: 24
-      pixels-scroll: true
-
-    ScrollablePanel
-      id: itemsPanel
-      height: 250
-      anchors.left: parent.left
-      anchors.right: prev.left
-      anchors.top: parent.top
-      anchors.bottom: parent.bottom
-      vertical-scrollbar: itemsPanelListScrollBar
-      margin-left: 5
-      margin-right: 5
-      layout:
-        type: grid
-        cell-size: 160 95
-        flow: true
-        auto-spacing: true
-
-  FlatPanel
-    id: setupPanel
-    height: 140
-    enabled: false
-    anchors.left: parent.left
-    anchors.right: parent.horizontalCenter
-    anchors.top: prev.bottom
-    margin-top: 10
-    margin-right: 5
-    image-color: #ffffff88
-
-    Label
-      !text: tr('Name') .. ':'
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-top: 5
-      margin-left: 5
-      width: 85
-
-    NPCOfferLabel
-      id: name
-
-    Label
-      !text: tr('Price') .. ':'
-      anchors.left: parent.left
-      anchors.top: prev.bottom
-      margin-top: 5
-      margin-left: 5
-      width: 85
-
-    NPCOfferLabel
-      id: price
-
-    Label
-      !text: tr('Your Money') .. ':'
-      anchors.left: parent.left
-      anchors.top: prev.bottom
-      margin-top: 5
-      margin-left: 5
-      width: 85
-
-    NPCOfferLabel
-      id: money
-
-    Label
-      id: weightDesc
-      !text: tr('Weight') .. ':'
-      anchors.left: parent.left
-      anchors.top: prev.bottom
-      margin-top: 5
-      margin-left: 5
-      width: 85
-
-    NPCOfferLabel
-      id: weight
-
-    Label
-      id: capacityDesc
-      !text: tr('Your Capacity') .. ':'
-      anchors.left: parent.left
-      anchors.top: prev.bottom
-      margin-top: 5
-      margin-left: 5
-      width: 85
-
-    NPCOfferLabel
-      id: capacity
-
-    HorizontalScrollBar
-      id: quantityScroll
-      anchors.left: parent.left
-      anchors.right: parent.right
-      anchors.top: prev.bottom
-      margin-top: 5
-      margin-left: 5
-      margin-right: 5
-      show-value: true
-      minimum: 1
-      maximum: 100
-      step: 1
-      @onValueChange: modules.game_npctrade.onQuantityValueChange(self:getValue())
-
-  FlatPanel
-    id: buyOptions
-    height: 140
-    anchors.top: prev.top
-    anchors.left: parent.horizontalCenter
-    anchors.right: parent.right
-    margin-left: 5
-    image-color: #ffffff88
-
-    Label
-      id: searchLabel
-      !text: tr('Search') .. ':'
-      anchors.left: parent.left
-      anchors.top: parent.top
-      text-auto-resize: true
-      margin-top: 7
-      margin-left: 5
-
-    TextEdit
-      id: searchText
-      anchors.left: prev.right
-      anchors.top: prev.top
-      anchors.right: parent.right
-      margin-top: -2
-      margin-left: 5
-      margin-right: 5
-      @onTextChange: modules.game_npctrade.onSearchTextChange()
-
-    CheckBox
-      id: buyWithBackpack
-      !text: tr('Buy with backpack')
-      anchors.top: searchText.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
-      margin-left: 5
-      margin-top: 5
-      @onCheckChange: modules.game_npctrade.onBuyWithBackpackChange()
-
-    CheckBox
-      id: ignoreCapacity
-      !text: tr('Ignore capacity')
-      anchors.top: prev.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
-      margin-left: 5
-      margin-top: 5
-      @onCheckChange: modules.game_npctrade.onIgnoreCapacityChange()
-
-    CheckBox
-      id: ignoreEquipped
-      !text: tr('Ignore equipped')
-      anchors.top: searchText.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
-      margin-left: 5
-      margin-top: 5
-      visible: false
-      checked: true
-      @onCheckChange: modules.game_npctrade.onIgnoreEquippedChange()
-
-    CheckBox
-      id: showAllItems
-      !text: tr('Show all items')
-      anchors.top: prev.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
-      margin-left: 5
-      margin-top: 5
-      visible: false
-      checked: true
-      @onCheckChange: modules.game_npctrade.onShowAllItemsChange()
-
-  Button
-    id: sellAllButton
-    !text: tr('Sell All')
-    width: 64
-    anchors.right: next.left
+  UIWidget
+    id: miniborder
     anchors.bottom: parent.bottom
-    margin-right: 10
-    visible: false
-    @onClick: modules.game_npctrade.sellAll()
+    anchors.left: parent.left
+    image-source: /images/ui/miniborder
+    size: 14 14
+    margin-left: 2
+    margin-bottom: 2
 
-  Button
-    id: tradeButton
-    !text: tr('Buy')
-    width: 64
-    anchors.right: next.left
-    anchors.bottom: parent.bottom
-    margin-right: 10
-    @onClick: modules.game_npctrade.onTradeClick()
+NPCTradeSubMenuOption < ThickCheckBox
+  text-offset: 18 1
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
 
-  Button
-    !text: tr('Close')
-    width: 64
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
-    @onClick: modules.game_npctrade.closeNpcTrade()
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+NPCTradeListOption < UIButton
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+  margin-left: 5
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+NPCTradeSubMenu < PopupMenu
+  id: npcTradeSubMenu
+  width: 285
+
+  NPCTradeListOption
+    id: sortByName
+    !text: tr('Sort by Name')
+  
+  NPCTradeListOption
+    id: sortByPrice
+    !text: tr('Sort by Price')
+  
+  NPCTradeListOption
+    id: sortByWeight
+    !text: tr('Sort by Weight')
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+
+  NPCTradeSubMenuOption
+    id: buyInShoppingBags
+    !text: tr('Buy in Shopping Bags')
+
+  NPCTradeSubMenuOption
+    id: ignoreCapacity
+    !text: tr('Ignore Capacity')
+
+  NPCTradeSubMenuOption
+    id: sellEquipped
+    !text: tr('Sell Equipped')
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+
+  NPCTradeSubMenuOption
+    id: showSearchField
+    !text: tr('Show Search Field')
