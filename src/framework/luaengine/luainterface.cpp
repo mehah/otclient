@@ -1173,7 +1173,7 @@ void LuaInterface::pushNil()
     checkStack();
 }
 
-void LuaInterface::pushInteger(const long v)
+void LuaInterface::pushInteger(const int64_t v)
 {
     lua_pushinteger(L, v);
     checkStack();
