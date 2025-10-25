@@ -207,6 +207,7 @@ bool Thing::hasExpire() const { return getThingType()->hasExpire(); }
 bool Thing::hasExpireStop() const { return getThingType()->hasExpireStop(); }
 bool Thing::hasAnimationPhases() const { return getThingType()->getAnimationPhases() > 1; }
 bool Thing::isDecoKit() const { return getThingType()->isDecoKit(); }
+bool Thing::isAmmo() { return getThingType()->isAmmo(); }
 
 PLAYER_ACTION Thing::getDefaultAction() { return getThingType()->getDefaultAction(); }
 

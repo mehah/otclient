@@ -1028,7 +1028,8 @@ enum ThingFlagAttr :uint64_t
     ThingFlagAttrTopEffect = static_cast<uint64_t>(1) << 43,
     ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44,
     ThingFlagAttrDecoKit = static_cast<uint64_t>(1) << 45,
-    ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46
+    ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46,
+    ThingFlagAttrAmmo = static_cast<uint64_t>(1) << 47,
 };
 
 enum STACK_PRIORITY : uint8_t

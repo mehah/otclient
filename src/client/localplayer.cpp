@@ -22,7 +22,9 @@
 
 #include "localplayer.h"
 
+#include "container.h"
 #include "game.h"
+#include "item.h"
 #include "map.h"
 #include "framework/core/clock.h"
 #include "framework/core/eventdispatcher.h"
