@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "../stdext/types.h"
-
 class Color
 {
 public:
