@@ -75,7 +75,7 @@ end
 local function onWidgetHoverChange(widget, hovered)
     if hovered then
         if widget.tooltip and not g_mouse.isPressed() then
-            g_tooltip.display(widget.tooltip)
+            g_tooltip.display(widget)
             currentHoveredWidget = widget
         elseif widget.specialtooltip and not g_mouse.isPressed() then
             g_tooltip.displaySpecial(widget.specialtooltip)
@@ -200,17 +200,33 @@ function g_tooltip.display(text)
     })
 end
 
-function g_tooltip.parseColoreDisplay(text)
-    if text == nil or text:len() == 0 then
-        return
+local function pairsToString(tbl)
+    local result = {}
+    for i = 1, #tbl, 2 do
+        local msg = tbl[i]
+        local color = tbl[i + 1]
+        table.insert(result, string.format("{%s, %s}", msg, color))
     end
-    if not toolTipLabel then
-        return
-    end
+    return table.concat(result, " ")
+end
 
-    toolTipLabel:parseColoredText(text)
+function g_tooltip.display(widget)
+    local text = widget.tooltip
+    if (type(text) == 'string' and text:len() == 0) or (type(text) == 'table' and #text == 0) then return end
+    if not toolTipLabel then return end
+    if type(text) == 'string' then
+        toolTipLabel:setText(text)
+        toolTipLabel:setColor("#3f3f3f")
+    elseif type(text) == 'table' then
+        local parsedText = pairsToString(text)
+        toolTipLabel:setColoredText(parsedText)
+    end
+    toolTipLabel:setFont((widget.tooltipFont and widget.tooltipFont or "Verdana Bold-11px"))
     toolTipLabel:resizeToText()
-    toolTipLabel:resize(toolTipLabel:getWidth() + 4, toolTipLabel:getHeight() + 4)
+    toolTipLabel:resize(toolTipLabel:getWidth() + 8, toolTipLabel:getHeight() + 4)
+    toolTipLabel:setBackgroundColor("#c0c0c0")
+    toolTipLabel:setBorderWidth(1)
+    toolTipLabel:setBorderColor("#000000")
     toolTipLabel:show()
     toolTipLabel:raise()
     toolTipLabel:enable()
@@ -218,7 +234,7 @@ function g_tooltip.parseColoreDisplay(text)
     moveToolTip(true)
 
     connect(rootWidget, {
-        onMouseMove = moveToolTip
+        onMouseMove = moveToolTip,
     })
 end
 

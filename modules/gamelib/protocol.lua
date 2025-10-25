@@ -22,6 +22,7 @@ GameServerOpcodes = {
 
     -- original tibia ONLY
     GameServerPassiveCooldown = 94,
+    GameServerWheelOfDestinyOpenWindow = 95,
     GameServerFullMap = 100,
     GameServerMapTopRow = 101,
     GameServerMapRightRow = 102,
