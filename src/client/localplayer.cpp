@@ -450,6 +450,69 @@ void LocalPlayer::setInventoryItem(const Otc::InventorySlot inventory, const Ite
     callLuaField("onInventoryChange", inventory, item, oldItem);
 }
 
+void LocalPlayer::setInventoryCountCache(std::map<std::pair<uint16_t, uint8_t>, uint16_t> counts)
+{
+    m_inventoryCountCache = std::move(counts);
+}
+
+bool LocalPlayer::hasEquippedItemId(const uint16_t itemId, const uint8_t tier)
+{
+    if (itemId == 0)
+        return false;
+
+    for (const auto& item : m_inventoryItems) {
+        if (!item)
+            continue;
+
+        if (item->getId() != itemId)
+            continue;
+
+        if (item->getTier() != tier)
+            continue;
+
+        return true;
+    }
+
+    return false;
+}
+
+uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tier)
+{
+    if (std::cmp_equal(itemId, 0))
+        return 0;
+
+    const auto key = std::make_pair(itemId, tier);
+    const auto it = m_inventoryCountCache.find(key);
+    if (it != m_inventoryCountCache.end()) {
+        return it->second;
+    }
+
+    uint32_t total = 0;
+
+    const auto accumulate = [&](const ItemPtr& item) {
+        if (item && std::cmp_equal(item->getId(), itemId) && item->getTier() == tier) {
+            total += item->getCount();
+        }
+    };
+
+    for (const auto& item : m_inventoryItems)
+        accumulate(item);
+
+    for (const auto& [containerId, container] : g_game.getContainers()) {
+        if (!container)
+            continue;
+
+        for (const auto& item : container->getItems())
+            accumulate(item);
+    }
+
+    constexpr uint32_t maxUint16 = 65535;
+    if (total > maxUint16) {
+        total = maxUint16;
+    }
+    return static_cast<uint16_t>(total);
+}
+
 void LocalPlayer::setPremium(const bool premium)
 {
     if (m_premium == premium)
