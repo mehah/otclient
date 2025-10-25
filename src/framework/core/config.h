@@ -23,9 +23,7 @@
 #pragma once
 
 #include "declarations.h"
-
 #include <framework/luaengine/luaobject.h>
-#include <framework/otml/declarations.h>
 
  // @bindclass
 class Config final : public LuaObject

@@ -22,7 +22,8 @@
 
 #pragma once
 
-#include "soundsource.h"
+#include "declarations.h"
+#include "framework/luaengine/luaobject.h"
 
  // @bindclass
 class SoundChannel final : public LuaObject

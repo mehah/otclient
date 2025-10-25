@@ -23,11 +23,7 @@
 #include "framework/core/application.h"
 #if defined(WIN32) && defined(CRASH_HANDLER)
 
-#include "crashhandler.h"
-#include <framework/global.h>
-
 #include <windows.h>
-#include <winsock2.h>
 
 #ifdef _MSC_VER
 

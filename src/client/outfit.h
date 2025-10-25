@@ -22,8 +22,7 @@
 
 #pragma once
 
-#include "thingtype.h"
-#include <framework/util/color.h>
+#include "declarations.h"
 
 class Outfit
 {

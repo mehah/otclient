@@ -23,7 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include "effect.h"
 #include <framework/ui/uiwidget.h>
 
 class UIEffect final : public UIWidget
@@ -38,7 +37,7 @@ public:
     void setVirtual(const bool virt) { m_virtual = virt; }
     void clearEffect() { setEffectId(0); }
 
-    int getEffectId() { return m_effect ? m_effect->getId() : 0; }
+    int getEffectId();
     auto getEffect() { return m_effect; }
     bool isVirtual() { return m_virtual; }
     bool isEffectVisible() { return m_effectVisible; }

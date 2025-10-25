@@ -21,21 +21,20 @@
  */
 
 #include "game.h"
+
+#include "attachedeffect.h"
 #include "container.h"
-#include "creature.h"
+#include "gameconfig.h"
+#include "item.h"
 #include "localplayer.h"
-#include "luavaluecasts_client.h"
 #include "map.h"
-#include "protocolcodes.h"
 #include "protocolgame.h"
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
-
+#include "protocolcodes.h"
+#include "framework/core/eventdispatcher.h"
 #include "framework/core/graphicalapplication.h"
-#include "tile.h"
-
-#include <framework/net/packet_player.h>
-#include <framework/net/packet_recorder.h>
+#include "framework/luaengine/luainterface.h"
+#include "framework/net/packet_player.h"
+#include "framework/net/packet_recorder.h"
 
 Game g_game;
 
@@ -1531,7 +1530,7 @@ void Game::buyStoreOffer(const uint32_t offerId, const uint8_t action, const std
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendBuyStoreOffer(offerId, action, name, type,location);
+    m_protocolGame->sendBuyStoreOffer(offerId, action, name, type, location);
 }
 
 void Game::requestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage)
@@ -1579,7 +1578,7 @@ void Game::sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortO
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendRequestStoreOfferById(offerId, sortOrder , serviceType);
+    m_protocolGame->sendRequestStoreOfferById(offerId, sortOrder, serviceType);
 }
 
 void Game::sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType)
@@ -1636,6 +1635,10 @@ void Game::changeMapAwareRange(const uint8_t xrange, const uint8_t yrange)
 
     m_protocolGame->sendChangeMapAwareRange(xrange, yrange);
 }
+
+bool Game::isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
+bool Game::isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
+bool Game::isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
 
 bool Game::canPerformGameAction() const
 {
@@ -2044,4 +2047,3 @@ void Game::processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStat
 {
     g_lua.callGlobalField("g_game", "onCyclopediaCharacterMiscStats", data);
 }
-

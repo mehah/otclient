@@ -21,19 +21,16 @@
  */
 
 #include "attachableobject.h"
-#include <framework/graphics/particleeffect.h>
-#include <framework/graphics/particlemanager.h>
 
-#include <framework/core/eventdispatcher.h>
-#include <framework/ui/uimanager.h>
-#include <framework/ui/uiwidget.h>
-
-#include <algorithm>
-
+#include "attachedeffect.h"
 #include "client.h"
-#include "game.h"
 #include "map.h"
 #include "uimap.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/particleeffect.h"
+#include "framework/graphics/particlemanager.h"
+#include "framework/ui/uiwidget.h"
 
 extern ParticleManager g_particles;
 

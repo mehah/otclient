@@ -22,7 +22,6 @@
 
 #include "uiprogressrect.h"
 
-#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 
 void UIProgressRect::drawSelf(const DrawPoolType drawPane)

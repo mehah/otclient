@@ -26,7 +26,17 @@
 #include <framework/net/declarations.h>
 #include <framework/ui/declarations.h>
 
- // core
+enum FrameGroupType : uint8_t;
+enum ThingCategory : uint8_t;
+enum StaticDataCategory : uint8_t;
+enum ThingAttr : uint8_t;
+enum ThingFlagAttr : uint64_t;
+enum STACK_PRIORITY : uint8_t;
+enum PLAYER_ACTION : uint8_t;
+enum ITEM_CATEGORY : uint8_t;
+enum SpriteMask : uint8_t;
+
+// core
 class Map;
 class Game;
 class MapView;
@@ -96,8 +106,6 @@ using ItemTypeList = std::vector<ItemTypePtr>;
 
 using TileList = std::list<TilePtr>;
 using ItemVector = std::vector<ItemPtr>;
-
-using TileMap = stdext::map<Position, TilePtr, Position::Hasher>;
 
 // net
 class ProtocolLogin;

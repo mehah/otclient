@@ -21,9 +21,9 @@
  */
 
 #include <framework/net/outputmessage.h>
-#include <framework/util/crypt.h>
 
 #include "client/game.h"
+#include "framework/util/crypt.h"
 
 OutputMessage::OutputMessage() {
     m_maxHeaderSize = g_game.getClientVersion() >= 1405 ? 7 : 8;

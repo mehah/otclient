@@ -20,10 +20,12 @@
  * THE SOFTWARE.
  */
 
-#include "framework/net/outputmessage.h"
 #include "game.h"
+#include "item.h"
 #include "protocolgame.h"
-#include <framework/util/crypt.h>
+#include "framework/net/outputmessage.h"
+#include "protocolcodes.h"
+#include "framework/util/crypt.h"
 
 void ProtocolGame::onSend() {}
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
@@ -704,7 +706,7 @@ void ProtocolGame::sendPartyAnalyzerAction(const uint8_t action, const std::vect
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientPartyAnalyzerAction); // 43
     msg->addU8(action);
-    
+
     // Only add items data for PARTYANALYZERACTION_PRICEVALUE (action 3)
     if (action == 3) { // PARTYANALYZERACTION_PRICEVALUE
         msg->addU16(static_cast<uint16_t>(items.size()));
@@ -713,7 +715,7 @@ void ProtocolGame::sendPartyAnalyzerAction(const uint8_t action, const std::vect
             msg->addU64(price);
         }
     }
-    
+
     send(msg);
 }
 
@@ -1214,7 +1216,7 @@ void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, c
     send(msg);
 }
 
-void ProtocolGame::sendRequestStoreHome() 
+void ProtocolGame::sendRequestStoreHome()
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestStoreOffers);

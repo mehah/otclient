@@ -21,9 +21,11 @@
  */
 
 #include "gameconfig.h"
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/fontmanager.h>
-#include <framework/otml/otml.h>
+
+#include "framework/core/resourcemanager.h"
+#include "framework/graphics/fontmanager.h"
+#include "framework/otml/otmldocument.h"
+#include "framework/otml/otmlnode.h"
 
 GameConfig g_gameConfig;
 

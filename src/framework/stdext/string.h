@@ -22,9 +22,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "cast.h"
 
 namespace stdext

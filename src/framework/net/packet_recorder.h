@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <framework/net/inputmessage.h>
 #include <framework/net/outputmessage.h>
 
 class PacketRecorder : public LuaObject {

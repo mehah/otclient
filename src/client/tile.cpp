@@ -21,22 +21,20 @@
  */
 
 #include "tile.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/ui/uiwidget.h>
-
-#include <ranges>
 
 #include "client.h"
+#include "localplayer.h"
 #include "effect.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "item.h"
 #include "map.h"
-#include "protocolgame.h"
+#include "mapview.h"
+#include "thing.h"
 #include "uimap.h"
-#include "localplayer.h"
-#include <algorithm>
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpoolmanager.h"
 
 Tile::Tile(const Position& position) : m_position(position) {}
 
@@ -420,6 +418,10 @@ ThingPtr Tile::getTopThing()
 
     return m_things[m_things.size() - 1];
 }
+
+bool Tile::hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & HAS_GROUND_BORDER; };
+bool Tile::hasTopGround(const bool ignoreBorder) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & HAS_TOP_GROUND_BORDER); }
+ItemPtr Tile::getGround() { const auto& ground = getThing(0); return ground && ground->isGround() ? ground->static_self_cast<Item>() : nullptr; }
 
 std::vector<ItemPtr> Tile::getItems()
 {
@@ -958,6 +960,12 @@ void Tile::drawTexts(Point dest)
 
     if (m_text && m_text->hasText()) {
         m_text->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
+    }
+}
+
+void Tile::markHighlightedThing(const Color& color) {
+    if (m_highlightThingStackPos > -1 && m_highlightThingStackPos < static_cast<int8_t>(m_things.size())) {
+        m_things[m_highlightThingStackPos]->setMarked(color);
     }
 }
 

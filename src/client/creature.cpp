@@ -21,23 +21,25 @@
  */
 
 #include "creature.h"
+
+#include "animator.h"
+#include "attachedeffect.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "lightview.h"
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
+#include "framework/graphics/texturemanager.h"
+#include "protocolcodes.h"
+#include "thingtype.h"
 #include "thingtypemanager.h"
-#include "tile.h"
-
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/shadermanager.h>
-#include <framework/graphics/texturemanager.h>
-#include <framework/ui/uiwidget.h>
-
-#include "statictext.h"
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/scheduledevent.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/shadermanager.h"
+#include "framework/ui/uiwidget.h"
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;

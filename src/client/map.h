@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "animatedtext.h"
 #include "tile.h"
 
 #ifdef FRAMEWORK_EDITOR

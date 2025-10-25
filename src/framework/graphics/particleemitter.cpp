@@ -21,6 +21,7 @@
  */
 
 #include "particleemitter.h"
+
 #include "particle.h"
 #include "particlemanager.h"
 #include "particlesystem.h"

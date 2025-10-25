@@ -22,7 +22,6 @@
 
 #include "proxy.h"
 #include "proxy_client.h"
-#include <framework/stdext/time.h>
 
 ProxyManager g_proxy;
 

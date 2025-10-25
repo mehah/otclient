@@ -23,7 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include <unordered_map>
 
  /// LuaObject, all script-able classes have it as base
  // @bindclass

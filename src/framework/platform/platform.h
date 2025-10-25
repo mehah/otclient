@@ -23,9 +23,7 @@
 #pragma once
 
 #include <framework/core/inputevent.h>
-#include <framework/stdext/types.h>
-#include <string>
-#include <vector>
+#include <framework/global.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
@@ -88,7 +86,7 @@ public:
         return m_device.type == Mobile;
 #else
         return MAIN_THREAD_EM_ASM_INT({
-            return (/iphone|ipod|ipad|android/i).test(navigator.userAgent);
+            return (/ iphone | ipod | ipad | android / i).test(navigator.userAgent);
         }) == 1;
 #endif
     }

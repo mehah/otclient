@@ -21,16 +21,24 @@
  */
 
 #include "spritemanager.h"
+
 #include "game.h"
 #include "gameconfig.h"
 #include "spriteappearances.h"
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/filestream.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/image.h>
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/filestream.h"
+#include "framework/core/graphicalapplication.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/graphics/image.h"
 
 SpriteManager g_sprites;
+
+FileMetadata::FileMetadata(const FileStreamPtr& file) {
+    offset = file->getU32();
+    fileSize = file->getU32();
+    fileName = file->getString();
+    spriteId = std::stoi(fileName);
+}
 
 void SpriteManager::init() {}
 void SpriteManager::terminate() { unload(); }

@@ -26,8 +26,7 @@
 
 #include "attachableobject.h"
 #include "declarations.h"
-#include "item.h"
-#include "mapview.h"
+#include "staticdata.h"
 #include "statictext.h"
 
 #ifdef FRAMEWORK_EDITOR
@@ -128,7 +127,7 @@ public:
     std::vector<CreaturePtr> getCreatures();
 
     std::vector<ItemPtr> getItems();
-    ItemPtr getGround() { const auto& ground = getThing(0); return ground && ground->isGround() ? ground->static_self_cast<Item>() : nullptr; }
+    ItemPtr getGround();
     int getGroundSpeed();
     uint8_t getMinimapColorByte();
     int getThingCount() { return m_things.size(); }
@@ -149,8 +148,8 @@ public:
     bool hasBlockingCreature() const;
 
     bool hasEffect() const { return m_effects && !m_effects->empty(); }
-    bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & HAS_GROUND_BORDER; };
-    bool hasTopGround(const bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & HAS_TOP_GROUND_BORDER); }
+    bool hasGround();
+    bool hasTopGround(const bool ignoreBorder = false);
 
     bool hasCreatures() { return m_thingTypeFlag & HAS_CREATURE; }
 
@@ -231,11 +230,7 @@ private:
     }
 
     bool hasThingWithElevation() { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
-    void markHighlightedThing(const Color& color) {
-        if (m_highlightThingStackPos > -1 && m_highlightThingStackPos < static_cast<int8_t>(m_things.size())) {
-            m_things[m_highlightThingStackPos]->setMarked(color);
-        }
-    }
+    void markHighlightedThing(const Color& color);
 
     std::vector<CreaturePtr> m_walkingCreatures;
     std::vector<ThingPtr> m_things;

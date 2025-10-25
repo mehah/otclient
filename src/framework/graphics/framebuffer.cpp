@@ -21,14 +21,11 @@
  */
 
 #include "framebuffer.h"
+
 #include "graphics.h"
-#include "texture.h"
-
-#include <framework/core/application.h>
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/graphics/image.h>
-
+#include "image.h"
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/eventdispatcher.h"
 #include "framework/core/graphicalapplication.h"
 
 uint32_t FrameBuffer::boundFbo = 0;

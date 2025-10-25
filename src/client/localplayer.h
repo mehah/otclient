@@ -30,7 +30,7 @@ class LocalPlayer final : public Player
 public:
     void unlockWalk() { m_walkLockExpiration = 0; }
     void lockWalk(uint16_t millis = 250);
-    bool isWalkLocked() { return m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration; }
+    bool isWalkLocked();
     void stopAutoWalk();
 
     bool autoWalk(const Position& destination, bool retry = false);

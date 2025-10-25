@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "creature.h"
 #include "declarations.h"
+#include "outfit.h"
 #include <framework/ui/uiwidget.h>
 
 class UICreature final : public UIWidget
@@ -31,14 +31,7 @@ class UICreature final : public UIWidget
 public:
     void drawSelf(DrawPoolType drawPane) override;
 
-    void setCreature(const CreaturePtr& creature) {
-        m_creature = creature;
-        if (m_creature) {
-            m_direction = m_creature->getDirection();
-            m_outfit = m_creature->getOutfit();
-        } else
-            m_outfit = {};
-    }
+    void setCreature(const CreaturePtr& creature);
     void setOutfit(const Outfit& outfit);
 
     CreaturePtr getCreature() { return m_creature; }
@@ -51,23 +44,13 @@ public:
     void setShader(std::string_view name) override;
     bool hasShader() override;
 
-    Otc::Direction getDirection() {
-        if (m_creature != nullptr) {
-            return m_creature->getDirection();
-        }
-        return Otc::InvalidDirection;
-    }
-
-    void setDirection(Otc::Direction dir) {
-        m_direction = dir;
-        if (m_creature)
-            m_creature->setDirection(dir);
-    }
+    Otc::Direction getDirection();
+    void setDirection(Otc::Direction dir);
 
     // @
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
-    Outfit getOutfit() { if (!m_creature) setOutfit({}); return m_creature->getOutfit(); }
+    Outfit getOutfit();
 
     std::string m_shaderName;
     CreaturePtr m_creature;

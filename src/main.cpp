@@ -20,13 +20,12 @@
  * THE SOFTWARE.
  */
 
-#include <client/client.h>
-#include <client/game.h>
-#include <client/gameconfig.h>
-#include <client/localplayer.h>
-#include <framework/core/application.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/luaengine/luainterface.h>
+#include "client/client.h"
+#include "client/gameconfig.h"
+#include "framework/core/graphicalapplication.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/luaengine/luainterface.h"
+#include "framework/platform/platform.h"
 
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1

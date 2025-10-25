@@ -25,6 +25,19 @@
 #include <framework/global.h>
 
 enum class DrawPoolType : uint8_t;
+enum FlagProp : uint64_t;
+enum class DisplayType : uint8_t;
+enum class FloatType : uint8_t;
+enum class ClearType : uint8_t;
+enum class JustifyItemsType : uint8_t;
+enum class FlexDirection : uint8_t;
+enum class FlexWrap : uint8_t;
+enum class JustifyContent : uint8_t;
+enum class AlignItems : uint8_t;
+enum class AlignContent : uint8_t;
+enum class AlignSelf : uint8_t;
+enum class Unit : uint8_t;
+enum class OverflowType : uint8_t;
 
 class UIManager;
 class UIWidget;

@@ -21,10 +21,10 @@
  */
 
 #include "otmldocument.h"
+
 #include "otmlemitter.h"
 #include "otmlparser.h"
-
-#include <framework/core/resourcemanager.h>
+#include "framework/core/resourcemanager.h"
 
 OTMLDocumentPtr OTMLDocument::create()
 {

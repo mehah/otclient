@@ -21,15 +21,12 @@
  */
 
 #include "soundeffect.h"
-#include "soundfile.h"
 #include "soundmanager.h"
 
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/efx-presets.h>
 #include <AL/efx.h>
-
-#include <unordered_map>
 
  /* Effect object functions */
 static LPALGENEFFECTS alGenEffects;

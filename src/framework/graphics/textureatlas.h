@@ -1,16 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-#include <vector>
-#include <chrono>
-#include <set>
-#include <optional>
-#include <functional>
-#include <stdexcept>
-#include <iostream>
-#include <map>
-#include <algorithm>
-
 #include "declarations.h"
 
 class AtlasRegion

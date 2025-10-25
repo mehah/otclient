@@ -21,14 +21,9 @@
  */
 
 #include "httplogin.h"
-
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
-#include <httplib.h>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <string>
-#include <atomic>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/fetch.h>

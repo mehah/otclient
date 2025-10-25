@@ -21,14 +21,18 @@
  */
 
 #include "attachedeffect.h"
+
+#include "animator.h"
 #include "gameconfig.h"
 #include "lightview.h"
+#include "thingtype.h"
 #include "thingtypemanager.h"
-
-#include <framework/core/clock.h>
-#include <framework/graphics/animatedtexture.h>
-#include <framework/graphics/shadermanager.h>
-#include <framework/graphics/texturemanager.h>
+#include "framework/core/clock.h"
+#include "framework/graphics/animatedtexture.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/shadermanager.h"
+#include "framework/graphics/texture.h"
+#include "framework/graphics/texturemanager.h"
 
 AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {

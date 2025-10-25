@@ -22,7 +22,6 @@
 
 #pragma once
 #include "declarations.h"
-#include <cstdint>
 
 namespace css {
     struct PseudoInfo

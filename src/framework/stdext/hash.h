@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include <parallel_hashmap/phmap.h>
-
 namespace stdext
 {
     // Robin Hood lib

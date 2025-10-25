@@ -22,13 +22,7 @@
 
 #pragma once
 
-#include "thingtype.h"
 #include "staticdata.h"
-#include <framework/global.h>
-
-#ifdef FRAMEWORK_EDITOR
-#include "itemtype.h"
-#endif
 
 using RaceList = std::vector<RaceType>;
 static const RaceType emptyRaceType{};

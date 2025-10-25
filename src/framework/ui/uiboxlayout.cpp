@@ -22,8 +22,7 @@
 
 #include "uiboxlayout.h"
 
-#include "uiwidget.h"
-#include <utility>
+#include "framework/otml/otmlnode.h"
 
 UIBoxLayout::UIBoxLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
