@@ -3350,10 +3350,34 @@ void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
 void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 {
     const uint16_t size = msg->getU16();
-    for (auto i = 0; i < size; ++i) {
-        msg->getU16(); // id
-        msg->getU8(); // subtype
-        msg->getU16(); // count
+    constexpr uint16_t MAX_INVENTORY_TYPES = 10000;
+    if (size > MAX_INVENTORY_TYPES) {
+        g_logger.warning("[game_actionBar][parsePlayerInventory]: inventory size {} exceeds maximum allowed {}", size, MAX_INVENTORY_TYPES);
+        return;
+    }
+    std::map<std::pair<uint16_t, uint8_t>, uint16_t> inventoryCounts;
+
+    for (uint16_t i = 0; std::cmp_less(i, size); ++i) {
+        const uint16_t itemId = msg->getU16();
+        const uint8_t attribute = msg->getU8();
+        const uint16_t amount = msg->getU16();
+
+        uint8_t tier = 0;
+        if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem)) {
+            if (std::cmp_greater(thingType->getClassification(), 0)) {
+                tier = attribute;
+            }
+        }
+
+        const auto key = std::make_pair(itemId, tier);
+        auto& entry = inventoryCounts[key];
+        const uint32_t sum = static_cast<uint32_t>(entry) + amount;
+        entry = static_cast<uint16_t>(std::min<uint32_t>(sum, (std::numeric_limits<uint16_t>::max)()));
+    }
+
+    if (const auto& localPlayer = g_game.getLocalPlayer()) {
+        localPlayer->setInventoryCountCache(std::move(inventoryCounts));
+        g_lua.callGlobalField("g_game", "updateInventoryItems");
     }
 }
 
@@ -4397,13 +4421,13 @@ void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePassiveCooldown(const InputMessagePtr& msg)
 {
-    msg->getU8(); // passive id
-
+    msg->getU8();
     const uint8_t unknownType = msg->getU8();
     if (unknownType == 0) {
-        msg->getU32(); // timestamp (partial)
-        msg->getU32(); // timestamp (total)
-        msg->getU8(); // (bool) timer is running?
+        uint32_t currentCooldown = msg->getU32(); // timestamp (partial) - current cooldown
+        uint32_t maxCooldown = msg->getU32();     // timestamp (total) - max cooldown
+        bool canDecay = msg->getU8();             // (bool) timer is running? => used as canDecay
+        g_lua.callGlobalField("g_game", "onPassiveData", currentCooldown, maxCooldown, canDecay);
     } else if (unknownType == 1) {
         msg->getU8(); // unknown
         msg->getU8(); // unknown

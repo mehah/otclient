@@ -170,7 +170,8 @@ enum ThingFlagAttr :uint64_t
     ThingFlagAttrTopEffect = static_cast<uint64_t>(1) << 43,
     ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44,
     ThingFlagAttrDecoKit = static_cast<uint64_t>(1) << 45,
-    ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46
+    ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46,
+    ThingFlagAttrAmmo = static_cast<uint64_t>(1) << 47,
 };
 
 enum STACK_PRIORITY : uint8_t
@@ -444,6 +445,7 @@ public:
     bool isOpaque() { return m_opaque == 1; }
     bool isDecoKit() { return (m_flags & ThingFlagAttrDecoKit); }
     bool isLoading() const { return m_loading.load(std::memory_order_acquire); }
+    bool isAmmo() { return (m_flags & ThingFlagAttrAmmo); }
 
     bool isItem() const { return m_category == ThingCategoryItem; }
     bool isEffect() const { return m_category == ThingCategoryEffect; }

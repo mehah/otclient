@@ -25,6 +25,14 @@ leftIncreaseSidePanels = nil
 leftDecreaseSidePanels = nil
 rightIncreaseSidePanels = nil
 rightDecreaseSidePanels = nil
+
+gameBottomActionPanel = nil
+gameLeftActionPanel = nil
+gameRightActionPanel = nil
+gameBottomLockPanel = nil
+gameRightLockPanel = nil
+gameLeftLockPanel = nil
+
 hookedMenuOptions = {}
 focusReason = {}
 local lastStopAction = 0
@@ -86,6 +94,13 @@ function init()
     rightIncreaseSidePanels = gameRootPanel:getChildById('rightIncreaseSidePanels')
     rightDecreaseSidePanels = gameRootPanel:getChildById('rightDecreaseSidePanels')
 
+    gameBottomActionPanel = gameRootPanel:getChildById('gameBottomActionPanel')
+    gameRightActionPanel = gameRootPanel:getChildById('gameRightActionPanel')
+    gameLeftActionPanel = gameRootPanel:getChildById('gameLeftActionPanel')
+    gameBottomLockPanel = gameRootPanel:recursiveGetChildById('bottomLock')
+    gameRightLockPanel = gameRootPanel:recursiveGetChildById('rightLock')
+    gameLeftLockPanel = gameRootPanel:recursiveGetChildById('leftLock')
+  
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)
@@ -1481,6 +1496,34 @@ function getGameMapPanel()
     return gameMapPanel
 end
 
+function getBottomActionPanel()
+    return gameBottomActionPanel
+  end
+  
+  function getLeftActionPanel()
+    return gameLeftActionPanel
+  end
+  
+  function getRightActionPanel()
+    return gameRightActionPanel
+  end
+  
+  function getBottomLockPanel()
+    return gameBottomLockPanel
+  end
+  
+  function getRightLockPanel()
+    return gameRightLockPanel
+  end
+  
+  function getLeftLockPanel()
+    return gameLeftLockPanel
+  end
+
+  function getBottomSplitter()
+    return bottomSplitter
+  end
+  
 function findContentPanelAvailable(child, minContentHeight)
     if gameSelectedPanel and gameSelectedPanel:isVisible() and gameSelectedPanel:fits(child, minContentHeight, 0) >= 0 then
         return gameSelectedPanel
@@ -1715,11 +1758,10 @@ function testExtendedView(mode)
         gameBottomPanel:getChildById('rightResizeBorder'):setMaximum(gameBottomPanel:getWidth())
         gameBottomPanel:getChildById('bottomResizeBorder'):enable()
         gameBottomPanel:getChildById('rightResizeBorder'):enable()
-        bottomSplitter:setVisible(false)
-
         gameMainRightPanel:setHeight(0)
         gameMainRightPanel:setImageColor('alpha')
-
+        gameBottomPanel:addAnchor(AnchorTop, 'gameBottomActionPanel', AnchorBottom)
+        gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
     else
         -- Reset to normal view
         gameMainRightPanel:setHeight(200)
@@ -1737,14 +1779,12 @@ function testExtendedView(mode)
         -- Reset bottom panel
         gameBottomPanel:setDraggable(false)
 
-        bottomSplitter:setVisible(true)
-
         -- Set anchors
         if not g_platform.isMobile() then
             gameBottomPanel:breakAnchors()
             gameBottomPanel:addAnchor(AnchorLeft, 'gameLeftExtraPanel', AnchorRight)
             gameBottomPanel:addAnchor(AnchorRight, 'gameRightExtraPanel', AnchorLeft)
-            gameBottomPanel:addAnchor(AnchorTop, 'gameBottomStatsBarPanel', AnchorBottom)
+            gameBottomPanel:addAnchor(AnchorTop, 'gameBottomCooldownPanel', AnchorBottom)
             gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
         end
         gameBottomPanel:getChildById('bottomResizeBorder'):disable()

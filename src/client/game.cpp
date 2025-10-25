@@ -1486,6 +1486,21 @@ void Game::equipItem(const ItemPtr& item)
     }
 }
 
+void Game::equipItemId(const uint16_t itemId, const uint8_t tier)
+{
+    if (!canPerformGameAction())
+        return;
+
+    if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        if (thing && thing->getClassification() > 0) {
+            m_protocolGame->sendEquipItemWithTier(itemId, tier);
+            return;
+        }
+    }
+    m_protocolGame->sendEquipItemWithCountOrSubType(itemId, tier);
+}
+
 void Game::mount(const bool mount)
 {
     if (!canPerformGameAction())
