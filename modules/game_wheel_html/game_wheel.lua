@@ -6,35 +6,7 @@ WheelButton = nil
 local baseButtonClip = { x = 0, y = 0, width = 322, height = 34 }
 local baseButtonClipped = { x = 0, y = 34, width = 322, height = 34 }
 
-WheelController.wheel = {
-    clip = baseButtonClipped,
-    backdropVocationOverlay = nil,
-    borders = {},
-    colors = {},
-    slots = {},
-    currentSelectSlotId = -1,
-    hovers = {},
-    currentHoverSlot = -1,
-    currentPoints = 0,
-    extraPoints = 0,
-    totalPoints = 0,
-    currentSelectSlotData = nil,
-    data = {},
-    passiveBorders = {
-        TL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png",
-        TR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png",
-        BL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png",
-        BR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png"
-    },
-    slotProgressLabel = "0/50",
-    dedicationPerk = {
-        hitPoints = 0,
-        mana = 0,
-        cap = 0,
-        mitigation = "0%"
-    },
-    convictionPerks = {},
-}
+WheelController.wheel = helper.wheel.baseWheelValues
 WheelController.gem = {
     clip = baseButtonClip
 }
@@ -318,6 +290,7 @@ local function handleUpdatePoints()
 
     WheelController.wheel:handlePassiveBorders()
     helper.bonus.configureDedicationPerk(WheelController)
+    helper.bonus.configureRevelationPerks(WheelController)
     WheelController.wheel:configureConvictionPerk()
 end
 
@@ -714,5 +687,6 @@ function onWheelOfDestinyOpenWindow(data)
     end
 
     helper.bonus.configureDedicationPerk(WheelController)
+    helper.bonus.configureRevelationPerks(WheelController)
     WheelController.wheel:configureConvictionPerk()
 end

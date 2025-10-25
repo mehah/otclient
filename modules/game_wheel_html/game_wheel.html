@@ -595,6 +595,90 @@
               style="width: 213px; height: 120px; margin-top: 8px"
             >
               <p class="panel-title">Revelation Perks</p>
+              <div
+                style="
+                  margin-left: 8px;
+                  margin-top: 10px;
+                  width: 200px;
+                  height: 70px;
+                "
+              >
+                <div
+                  style="width: 200px; margin-top: 4; position: relative"
+                  *if="self.wheel.revelationPerks.damage ~= nil"
+                >
+                  <div style="width: 185px">
+                    <span>{{self.wheel.revelationPerks.damage.name}}</span>
+                    <span style="float: right"
+                      >{{self.wheel.revelationPerks.damage.text}}
+                    </span>
+                  </div>
+                  <span
+                    class="tooltip"
+                    *tooltip="self.wheel.revelationPerks.damage.tooltip"
+                  ></span>
+                </div>
+                <div
+                  style="width: 200px; margin-top: 4; position: relative"
+                  *if="self.wheel.revelationPerks.avatar ~= nil"
+                >
+                  <div style="width: 185px">
+                    <span>{{self.wheel.revelationPerks.avatar.name}}</span>
+                    <span style="float: right"
+                      >{{self.wheel.revelationPerks.avatar.text}}
+                    </span>
+                  </div>
+                  <span
+                    class="tooltip"
+                    *tooltip="self.wheel.revelationPerks.avatar.tooltip"
+                  ></span>
+                </div>
+                <div
+                  style="width: 200px; margin-top: 4; position: relative"
+                  *if="self.wheel.revelationPerks.spellTR ~= nil"
+                >
+                  <div style="width: 185px">
+                    <span>{{self.wheel.revelationPerks.spellTR.name}}</span>
+                    <span style="float: right"
+                      >{{self.wheel.revelationPerks.spellTR.text}}
+                    </span>
+                  </div>
+                  <span
+                    class="tooltip"
+                    *tooltip="self.wheel.revelationPerks.spellTR.tooltip"
+                  ></span>
+                </div>
+                <div
+                  style="width: 200px; margin-top: 4; position: relative"
+                  *if="self.wheel.revelationPerks.spellBL ~= nil"
+                >
+                  <div style="width: 185px">
+                    <span>{{self.wheel.revelationPerks.spellBL.name}}</span>
+                    <span style="float: right"
+                      >{{self.wheel.revelationPerks.spellBL.text}}
+                    </span>
+                  </div>
+                  <span
+                    class="tooltip"
+                    *tooltip="self.wheel.revelationPerks.spellBL.tooltip"
+                  ></span>
+                </div>
+                <div
+                  style="width: 200px; margin-top: 4; position: relative"
+                  *if="self.wheel.revelationPerks.giftOfLife ~= nil"
+                >
+                  <div style="width: 185px">
+                    <span>{{self.wheel.revelationPerks.giftOfLife.name}}</span>
+                    <span style="float: right"
+                      >{{self.wheel.revelationPerks.giftOfLife.text}}
+                    </span>
+                  </div>
+                  <span
+                    class="tooltip"
+                    *tooltip="self.wheel.revelationPerks.giftOfLife.tooltip"
+                  ></span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

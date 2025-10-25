@@ -889,6 +889,64 @@ local function isFirstSlot(index)
     return table.contains(baseSlotIndex, index)
 end
 
+local baseWheelValues = {
+    clip = { x = 0, y = 34, width = 322, height = 34 },
+    backdropVocationOverlay = nil,
+    currentSelectSlotId = -1,
+    currentHoverSlot = -1,
+    currentPoints = 0,
+    extraPoints = 0,
+    totalPoints = 0,
+    currentSelectSlotData = nil,
+    data = {},
+    passiveBorders = {
+        TL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png",
+        TR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png",
+        BL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png",
+        BR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png"
+    },
+    slotProgressLabel = "0/50",
+    dedicationPerk = {
+        hitPoints = 0,
+        mana = 0,
+        cap = 0,
+        mitigation = "0%"
+    },
+    convictionPerks = {},
+    revelationPerks = {
+        damage = {
+            name = "Damage and Healing",
+            text = "0",
+            tooltip = "",
+        },
+        avatar = {
+            name = "Avatar Of Nature",
+            text = "Locked",
+            tooltip = "",
+            message = ""
+        },
+        spellTR = {
+            name = "Blessing of the Gr...",
+            text = "Locked",
+            tooltip = "Blessing of the Grave",
+            message = "",
+        },
+        spellBL = {
+            name = "Blessing of the Gr...",
+            text = "Locked",
+            tooltip = "Blessing of the Grave",
+            message = "",
+        },
+        giftOfLife = {
+            name = "Gift of Life",
+            text = "Locked",
+            tooltip = "Blessing of the Grave",
+            message = "",
+        }
+    },
+    extraPassivePoints = {},
+}
+
 local wheel = {
     WheelSlots = WheelSlots,
     WheelSlotsParser = WheelSlotsParser,
@@ -896,6 +954,7 @@ local wheel = {
     getVocationImage = getVocationImage,
     handleLargePerkClip = handleLargePerkClip,
     isFirstSlot = isFirstSlot,
+    baseWheelValues = baseWheelValues,
 }
 
 return wheel

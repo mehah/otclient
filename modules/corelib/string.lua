@@ -74,3 +74,8 @@ function string:wrap(width)
     end
     return wrapped
 end
+
+function setStringColor(t, text, color)
+    table.insert(t, text)
+    table.insert(t, color)
+end
