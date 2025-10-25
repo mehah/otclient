@@ -182,7 +182,6 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(phmap REQUIRED)
 find_package(absl CONFIG REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
@@ -194,8 +193,24 @@ find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(CppCodec REQUIRED)
+find_package(ParallelHashmap REQUIRED)
+find_package(Obfuscate REQUIRED)
+find_package(BSThreadPool REQUIRED)
 
-find_path(CPPCODEC_INCLUDE_DIRS "cppcodec/base32_crockford.hpp")
+# fix nhlohmann_json to include actual target exported
+if(TARGET nlohmann_json::nlohmann_json)
+    get_target_property(NLOHMANN_JSON_INCLUDE_DIR nlohmann_json::nlohmann_json INTERFACE_INCLUDE_DIRECTORIES)
+endif()
+
+# fix `stduuid/lib/cmake/stduuid/stuuid-config.cmake` to include actual target exported
+if(TARGET stduuid)
+    get_target_property(_stduuid_includes stduuid INTERFACE_INCLUDE_DIRECTORIES)
+    set(STDUUID_INCLUDE_DIR "${_stduuid_includes}" CACHE PATH "STDUUID include directory")
+    message(STATUS "STDUUID include directory: ${STDUUID_INCLUDE_DIR}")
+else()
+    message(FATAL_ERROR "stduuid target not found, cannot derive include directory")
+endif()
 
 if(APPLE)
   # Required for Physfs
@@ -684,6 +699,9 @@ else() # Linux
           ${NLOHMANN_JSON_INCLUDE_DIR}
           ${OPENSSL_INCLUDE_DIR}
           ${CPPCODEC_INCLUDE_DIRS}
+          ${Obfuscate_INCLUDE_DIR}
+          ${STDUUID_INCLUDE_DIR}
+          ${BSTHREADPOOL_INCLUDE_DIR}
   )
   target_link_libraries(${PROJECT_NAME}
           PRIVATE
@@ -711,7 +729,7 @@ else() # Linux
           Threads::Threads
           X11::X11
           asio::asio
-          OpenAL::OpenAL
+          #OpenAL::OpenAL
           LibLZMA::LibLZMA
           pugixml::pugixml
           ZLIB::ZLIB
@@ -719,9 +737,9 @@ else() # Linux
           OpenSSL::Crypto
           httplib::httplib
           fmt::fmt-header-only
-          Ogg::ogg
-          Vorbis::vorbisfile
-          Vorbis::vorbis
+          #Ogg::ogg
+          #Vorbis::vorbisfile
+          #Vorbis::vorbis
   )
 
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")

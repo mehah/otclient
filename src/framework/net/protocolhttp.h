@@ -60,7 +60,7 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
 {
 public:
 
-    HttpSession(asio::io_service& service, std::string url, std::string agent,
+    HttpSession(asio::io_context& service, std::string url, std::string agent,
                 const bool& enable_time_out_on_read_write,
                 const std::unordered_map<std::string, std::string>& custom_header,
                 const int timeout, const bool isJson, const bool checkContentLength, HttpResult_ptr result, HttpResult_cb callback) :
@@ -94,7 +94,7 @@ public:
     void close();
 
 private:
-    asio::io_service& m_service;
+    asio::io_context& m_service;
     std::string m_url;
     std::string m_agent;
     bool m_enable_time_out_on_read_write;
@@ -118,7 +118,7 @@ private:
     int sum_bytes_speed_response = 0;
     ticks_t m_last_progress_update = stdext::millis();
 
-    void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator);
+    void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::results_type results);
     void on_connect(const std::error_code& ec);
 
     void on_request_sent(const std::error_code& ec, size_t bytes_transferred);
@@ -138,7 +138,7 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 {
 public:
 
-    WebsocketSession(asio::io_service& service, std::string url, std::string agent,
+    WebsocketSession(asio::io_context& service, std::string url, std::string agent,
                      const bool& enable_time_out_on_read_write, const int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
         m_service(service),
         m_url(std::move(url)),
@@ -160,7 +160,7 @@ public:
     void close();
 
 private:
-    asio::io_service& m_service;
+    asio::io_context& m_service;
     std::string m_url;
     std::string m_agent;
     std::string m_read_buffer;
@@ -184,7 +184,7 @@ private:
     std::string m_request;
     asio::streambuf m_response;
 
-    void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator);
+    void on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::results_type results);
     void on_connect(const std::error_code& ec);
     void on_request_sent(const std::error_code& ec, size_t bytes_transferred);
 

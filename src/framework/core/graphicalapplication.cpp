@@ -182,7 +182,7 @@ void GraphicalApplication::run()
     };
 #endif
     // THREAD - POOL & MAP
-    const auto& mapThread = g_asyncDispatcher.submit_task([this] {
+    const auto& mapThread = g_asyncDispatcher->submit_task([this] {
         BS::multi_future<void> tasks;
 
         g_luaThreadId = g_eventThreadId = stdext::getThreadId();
@@ -199,7 +199,7 @@ void GraphicalApplication::run()
 
                 for (const auto type : { DrawPoolType::LIGHT , DrawPoolType::FOREGROUND, DrawPoolType::FOREGROUND_MAP }) {
                     if (m_drawEvents->canDraw(type)) {
-                        tasks.emplace_back(g_asyncDispatcher.submit_task([this, type] {
+                        tasks.emplace_back(g_asyncDispatcher->submit_task([this, type] {
                             m_drawEvents->draw(type);
                         }));
                     }
@@ -330,7 +330,7 @@ void GraphicalApplication::doScreenshot(std::string file)
         auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
         glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels->data());
 
-        g_asyncDispatcher.detach_task([resolution, pixels, file] {
+        g_asyncDispatcher->detach_task([resolution, pixels, file] {
             try {
                 Image image(resolution, 4, pixels->data());
                 image.flipVertically();
