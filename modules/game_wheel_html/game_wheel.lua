@@ -120,10 +120,12 @@ function WheelController:onInit()
 end
 
 function WheelController.wheel:handleMousePress(event, id)
+    local totalPoints = WheelController.wheel:getTotalPoints()
+    local pointToInvest = math.max(totalPoints - WheelController.wheel.usedPoints, 0)
     if event.mouseButton == MouseRightButton then
         local data = WheelController.wheel.data[id]
         WheelController.wheel.currentSelectSlotId = id
-        if WheelController.wheel.pointInvested[id] >= data.totalPoints then
+        if WheelController.wheel.pointInvested[id] >= data.totalPoints or pointToInvest == 0 then
             WheelController.wheel:onRemoveAllPoints()
         elseif WheelController.wheel.pointInvested[id] >= 0 then
             WheelController.wheel:onAddAllPoints()
