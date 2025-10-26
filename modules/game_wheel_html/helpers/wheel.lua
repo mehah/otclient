@@ -959,6 +959,7 @@ local wheel = {
     handleLargePerkClip = handleLargePerkClip,
     isFirstSlot = isFirstSlot,
     baseWheelValues = baseWheelValues,
+    baseSlotIndex = baseSlotIndex,
 }
 
 return wheel

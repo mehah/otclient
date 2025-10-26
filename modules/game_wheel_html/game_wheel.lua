@@ -336,6 +336,13 @@ local function handleUpdatePoints()
     helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:configureEquippedGems()
+
+    for _, slot in pairs(helper.wheel.baseSlotIndex) do
+        if WheelController.wheel.pointInvested[slot] == 0 then
+            local button = helper.buttons.WheelButtons[slot]
+            WheelController.wheel.data[slot].adjacentPath = button.colorImageBase .. "5.png"
+        end
+    end
 end
 
 function WheelController.wheel:configureConvictionPerk()
@@ -661,8 +668,9 @@ function WheelController.wheel:insertPoint(id, points)
         end
     elseif not isBaseSlot then
         WheelController.wheel.data[id].colorPath = ""
-        WheelController.wheel.data[id].adjacentPath = ""
-    else
+    end
+
+    if isBaseSlot and points == 0 then
         WheelController.wheel.data[id].adjacentPath = button.colorImageBase .. "5.png"
     end
 
