@@ -893,6 +893,7 @@ local baseWheelValues = {
     clip = { x = 0, y = 34, width = 322, height = 34 },
     backdropVocationOverlay = nil,
     currentSelectSlotId = -1,
+    currentSelectedDomain = -1,
     currentHoverSlot = -1,
     currentPoints = 0,
     extraPoints = 0,
@@ -905,7 +906,6 @@ local baseWheelValues = {
         BL = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png",
         BR = "/images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png"
     },
-    slotProgressLabel = "0/50",
     dedicationPerk = {
         hitPoints = 0,
         mana = 0,
@@ -961,8 +961,34 @@ local baseWheelValues = {
             color = "#c0c0c0",
             tooltip = nil,
         },
+        revelation = {
+            text = nil,
+            data = {},
+            color = "#c0c0c0",
+            tooltip = nil,
+            moreDetailsTooltip = nil
+        }
     },
+    slotProgressLabel = "0/50",
+    slotProgressCurrent = 0,
+    slotProgressTotal = 0,
+    slotProgressWidth = 205
 }
+
+local function translateVocation(id)
+    if id == 1 or id == 11 then
+        return 8 -- ek
+    elseif id == 2 or id == 12 then
+        return 7 -- rp
+    elseif id == 3 or id == 13 then
+        return 5 -- ms
+    elseif id == 4 or id == 14 then
+        return 6 -- ed
+    elseif id == 5 or id == 15 then
+        return 9 -- em
+    end
+    return 0
+end
 
 local wheel = {
     WheelSlots = WheelSlots,
@@ -973,6 +999,7 @@ local wheel = {
     isFirstSlot = isFirstSlot,
     baseWheelValues = baseWheelValues,
     baseSlotIndex = baseSlotIndex,
+    translateVocation = translateVocation,
 }
 
 return wheel

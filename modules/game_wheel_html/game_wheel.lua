@@ -50,6 +50,8 @@ function WheelController.wheel:handleOnHover(slotId)
 end
 
 function WheelController.wheel:configureDedication()
+    WheelController.wheel.selectionBonus.revelation = nil
+    WheelController.wheel.currentSelectedDomain = -1
     local index = WheelController.wheel.currentSelectSlotId or -1
     if index == -1 then
         WheelController.wheel.selectionBonus.dedication = nil
@@ -67,7 +69,9 @@ function WheelController.wheel:configureDedication()
     end
 end
 
-function WheelController.wheel.configureConviction()
+function WheelController.wheel:configureConviction()
+    WheelController.wheel.selectionBonus.revelation = nil
+    WheelController.wheel.currentSelectedDomain = -1
     local index = WheelController.wheel.currentSelectSlotId or -1
     if index == -1 then
         WheelController.wheel.selectionBonus.conviction = nil
@@ -114,11 +118,71 @@ function WheelController.wheel.configureConviction()
     WheelController.wheel.selectionBonus.conviction.text = conviction
 end
 
+function WheelController.wheel:largePerkClick(domain)
+    WheelController.wheel.currentSelectSlotData = nil
+
+    local domainToSpells = {
+        [1] = "giftOfLife",
+        [2] = "spellTR",
+        [3] = "spellBL",
+        [4] = "avatar"
+    }
+
+    local passive = WheelController.wheel.passivePoints[domain]
+    local maximum = 250
+
+    local extraPoints = WheelController.wheel.extraPassivePoints[domain] or 0
+    passive = passive + extraPoints
+
+    if passive >= 1000 then
+        maximum = 1000
+    elseif passive >= 500 then
+        maximum = 1000
+    elseif passive >= 250 then
+        maximum = 500
+    end
+
+    if passive < 0 then
+        passive = 0
+    end
+
+    WheelController.wheel.slotProgressCurrent = passive
+    WheelController.wheel.slotProgressTotal = maximum
+    WheelController.wheel:getSlotProgressWidth()
+
+    WheelController.wheel.selectionBonus.revelation = {
+        tooltip =
+        "To unlock a Revelation Perk, you need to distribute promotion \npoints in the corresponding domain.\nTo unlock stage 1 of a Revelation Perk, you need 250 promotion \npoints. Stage 2 requires 500 promotion points. As soon as you have \ndistributed 1000 promotion points, stage 3 is unlocked.\nRevelation Mastery, which can be found on some gems, provides \nadditional points to unlock Revelation Perks.\n\nUnlocked Revelation Perks grant a bonus to all damage and \nhealing:\n* Stage 1 grants a bonus of +4 damage and healing\n* Stage 2 increases this bonus to +9\n* Stage 3 increases this bonus to +20",
+        text = "",
+        moreTooltip = nil,
+        value = "Locked",
+        color = passive >= 250 and activeColor or inactiveColor
+    }
+
+    local spell = domainToSpells[domain]
+    if WheelController.wheel.revelationPerks[spell] then
+        WheelController.wheel.selectionBonus.revelation.text = WheelController.wheel.revelationPerks[spell].message
+        WheelController.wheel.selectionBonus.revelation.moreTooltip = WheelController.wheel.revelationPerks[spell]
+            .tooltip
+        WheelController.wheel.selectionBonus.revelation.value = WheelController.wheel.revelationPerks[spell].text
+    end
+
+    WheelController.wheel.currentSelectedDomain = domain
+end
+
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId
     WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
     WheelController.wheel:configureDedication()
     WheelController.wheel:configureConviction()
+
+
+    local pointInvested = WheelController.wheel.pointInvested[slotId] or 0
+    local bonus = helper.bonus.WheelBonus[slotId - 1]
+    WheelController.wheel.slotProgressCurrent = pointInvested
+    WheelController.wheel.slotProgressTotal = bonus.maxPoints
+    WheelController.wheel.slotProgressLabel = string.format("%d/%d", pointInvested, bonus.maxPoints)
+    WheelController.wheel:getSlotProgressWidth()
     g_logger.info("Selected slot ID: " .. tostring(slotId)) --- IGNORE ---
 end
 
@@ -150,7 +214,22 @@ function WheelController:show(skipRequest)
     end
 end
 
+local function resetValues()
+    WheelController.wheel.currentSelectSlotId = -1
+    WheelController.wheel.currentSelectSlotData = nil
+    WheelController.wheel.currentSelectedDomain = -1
+    if WheelController.wheel.selectionBonus then
+        WheelController.wheel.selectionBonus.revelation = nil
+    end
+
+    WheelController.wheel.slotProgressCurrent = 0
+    WheelController.wheel.slotProgressTotal = 0
+    WheelController.wheel.slotProgressWidth = 205
+    WheelController.wheel.slotProgressLabel = "0/50"
+end
+
 function WheelController:hide()
+    resetValues()
     if not self.ui then
         return
     end
@@ -163,6 +242,7 @@ function WheelController:hide()
 end
 
 function WheelController:toggle()
+    resetValues()
     if not self.ui or self.ui:isDestroyed() then
         self:show()
         return
@@ -204,17 +284,12 @@ function WheelController.wheel:handleMousePress(event, id)
     end
 end
 
-function WheelController.wheel:getSlotProgressWidth(index, barWidth)
-    index = index or WheelController.wheel.currentSelectSlotId
-    if not index or index == -1 then
-        return 0
-    end
+function WheelController.wheel:getSlotProgressWidth(barWidth)
     barWidth = barWidth or 205
-    local pointInvested = WheelController.wheel.pointInvested[index] or 0
-    local bonus = helper.bonus.WheelBonus[index - 1]
-    WheelController.wheel.slotProgressLabel = string.format("%d/%d", pointInvested, bonus.maxPoints)
-    local progress = pointInvested / bonus.maxPoints
-    return progress * barWidth
+    WheelController.wheel.slotProgressLabel = string.format("%d/%d", WheelController.wheel.slotProgressCurrent,
+        WheelController.wheel.slotProgressTotal)
+    local progress = WheelController.wheel.slotProgressCurrent / WheelController.wheel.slotProgressTotal
+    WheelController.wheel.slotProgressWidth = progress * barWidth
 end
 
 function WheelController.wheel:isSlotInvested(index)
@@ -352,7 +427,24 @@ function WheelController.wheel:getTotalPoints()
 end
 
 function WheelController.wheel:handlePassiveBorders()
-    -- TODO: get gem atelier points
+    for i = 0, 3 do
+        local data = GemAtelier.getEquipedGem(i)
+        local filledCount = GemAtelier.getFilledVesselCount(i)
+        if data and data.supremeBonus > 0 and filledCount == 3 then
+            local vocationId = helper.wheel.translateVocation(WheelController.wheel.vocationId)
+            local supremeList = data.supremeBonus > 5 and helper.gems.VocationSupremeMods[vocationId] or
+                helper.gems.FlatSupremeMods
+            if supremeList then
+                local bonus = supremeList[data.supremeBonus]
+                if bonus and bonus.domain then
+                    local gemValue = helper.bonus.getBonusValueUpgrade(data.supremeBonus, data.gemID, true, true)
+                    local currentValue = WheelController.wheel.extraPassivePoints[bonus.domain + 1] or 0
+                    WheelController.wheel.extraPassivePoints[bonus.domain + 1] = gemValue + currentValue
+                end
+            end
+        end
+    end
+
 
     local border = "TL"
     for domain, points in ipairs(WheelController.wheel.passivePoints) do
@@ -380,8 +472,6 @@ function WheelController.wheel:handlePassiveBorders()
                 "/images/game/wheel/backdrop_skillwheel_largebonus_front3_" .. border .. ".png"
         end
     end
-
-    -- TODO: Lembrar de configurar as relevation perks
 end
 
 local function handleUpdatePoints()
@@ -410,7 +500,7 @@ local function handleUpdatePoints()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:configureEquippedGems()
     WheelController.wheel:configureDedication()
-    WheelController.wheel.configureConviction()
+    WheelController.wheel:configureConviction()
 
     for _, slot in pairs(helper.wheel.baseSlotIndex) do
         if WheelController.wheel.pointInvested[slot] == 0 then

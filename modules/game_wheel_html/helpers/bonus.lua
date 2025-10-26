@@ -2197,8 +2197,6 @@ local function configureRevelationPerks(controller)
 		end
 	end
 
-
-
 	local data = {
 		damage = {
 			name = "Damage and Healing",
@@ -2339,6 +2337,7 @@ local bonus = {
 	getDedicationTooltip = getDedicationTooltip,
 	getConvictionBonus = getConvictionBonus,
 	getConvictionBonusTooltip = getConvictionBonusTooltip,
+	getBonusValueUpgrade = getBonusValueUpgrade,
 }
 
 return bonus

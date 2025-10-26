@@ -129,9 +129,22 @@
       width: 34px;
     }
     .revelationBg {
-      height: 178px;
-      width: 178px;
+      height: 46px;
+      width: 46px;
       position: absolute;
+      opacity: 0.8;
+    }
+    .revelationBg-bl {
+      --image-clip: 138 0 46 46;
+    }
+    .revelationBg-br {
+      --image-clip: 92 0 46 46;
+    }
+    .revelationBg-tr {
+      --image-clip: 46 0 46 46;
+    }
+    .revelationBg-tl {
+      --image-clip: 0 0 46 46;
     }
     .largeperks-tl {
       top: 24;
@@ -220,21 +233,29 @@
                   margin-left: 4px;
                 "
               >
-                <div *if="self.wheel.currentSelectSlotData ~= nil">
-                  <div class="section-progress-bg">
+                <div
+                  *if="self.wheel.currentSelectSlotData ~= nil or self.wheel.selectionBonus.revelation ~= nil"
+                >
+                  <div
+                    class="section-progress-bg"
+                    *if="self.wheel.currentSelectSlotData ~= nil or self.wheel.selectionBonus.revelation ~= nil"
+                  >
                     <img
                       class="section-progress"
                       src="/images/game/wheel/progressBar.png"
-                      *width="self.wheel:getSlotProgressWidth()"
+                      *width="self.wheel.slotProgressWidth or 0"
                     />
                     <div>
                       <p>{{self.wheel.slotProgressLabel}}</p>
                     </div>
                   </div>
-                  <div style="margin-top: 4px; height: 130px; width: 205px">
+                  <div
+                    *if="self.wheel.currentSelectSlotData ~= nil or self.wheel.selectionBonus.revelation ~= nil"
+                    style="margin-top: 4px; height: 130px; width: 205px"
+                  >
                     <div
                       style="width: 205px; height: 45px; position: relative"
-                      *if="self.wheel.selectionBonus.dedication ~= nil"
+                      *if="self.wheel.selectionBonus.dedication ~= nil and self.wheel.selectionBonus.revelation == nil"
                     >
                       <p style="text-align: center">Dedication Perk</p>
                       <img
@@ -251,7 +272,7 @@
                     </div>
                     <div
                       style="width: 205px; height: 100px; position: relative"
-                      *if="self.wheel.selectionBonus.conviction ~= nil"
+                      *if="self.wheel.selectionBonus.conviction ~= nil and self.wheel.selectionBonus.revelation == nil"
                     >
                       <p style="text-align: center">Conviction Perk</p>
                       <img
@@ -272,12 +293,49 @@
                         />{{data.text}}
                       </span>
                     </div>
+                    <div
+                      *if="self.wheel.selectionBonus.revelation ~= nil"
+                      style="width: 205px; height: 150px; position: relative"
+                      *color="self.wheel.selectionBonus.revelation.color"
+                    >
+                      <p style="text-align: center">Revelation Perk</p>
+                      <img
+                        class="tooltip"
+                        *if="self.wheel.selectionBonus.revelation ~= nil and self.wheel.selectionBonus.revelation.tooltip ~= nil"
+                        *tooltip="self.wheel.selectionBonus.revelation.tooltip"
+                      />
+                      <div
+                        style="
+                          height: 100%;
+                          max-height: 80px;
+                          white-space: pre-line;
+                        "
+                        *if="self.wheel.selectionBonus.revelation ~= nil and self.wheel.selectionBonus.revelation.text ~= nil"
+                        *color="self.wheel.selectionBonus.revelation.color"
+                      >
+                        {{self.wheel.selectionBonus.revelation.text}}
+                      </div>
+                      <div>
+                        <span style="width: 100%">
+                          More details:
+                          <span
+                            class="tooltip"
+                            *tooltip="self.wheel.selectionBonus.revelation.moreTooltip"
+                            style="position: relative; margin-left: 8px"
+                          ></span>
+                        </span>
+
+                        <p style="margin-top: 8px">
+                          {{self.wheel.selectionBonus.revelation.value}}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   <div
                     style="margin-top: 8px; height: 20px"
-                    *if="not self.wheel:handleChangePointsButton('all')"
+                    *if="not self.wheel:handleChangePointsButton('all') and self.wheel.selectionBonus.revelation == nil"
                   >
-                    <div style="background-color: blue">
+                    <div>
                       <button
                         style="float: right"
                         onclick="self.wheel:onAddAllPoints()"
@@ -611,63 +669,126 @@
                   bottom: 0;
                 "
               />
-
-              <img
-                class="largeperks largeperks-tl"
-                src="/images/game/wheel/icons-skillwheel-largeperks.png"
-                height="34"
-                width="34"
-                *image-clip="self.wheel.tlLargePerkClip"
-              />
-              <img
-                class="revelationBg"
-                src="/images/game/wheel/wheel-colors/top_left/perkCircle/revelationBg.png"
-                height="178"
-                width="178"
-                style="top: 0; left: 0"
-              />
-              <img
-                class="largeperks largeperks-tr"
-                src="/images/game/wheel/icons-skillwheel-largeperks.png"
-                height="34"
-                width="34"
-                *image-clip="self.wheel.trLargePerkClip"
-              />
-              <img
-                class="revelationBg"
-                src="/images/game/wheel/wheel-colors/top_right/perkCircle/revelationBg.png"
-                height="178"
-                width="178"
-                style="top: 0; right: 0"
-              />
-              <img
-                class="largeperks largeperks-bl"
-                src="/images/game/wheel/icons-skillwheel-largeperks.png"
-                height="34"
-                width="34"
-                *image-clip="self.wheel.blLargePerkClip"
-              />
-              <img
-                class="revelationBg"
-                src="/images/game/wheel/wheel-colors/bottom_left/perkCircle/revelationBg.png"
-                height="178"
-                width="178"
-                style="bottom: 0; left: 0"
-              />
-              <img
-                class="largeperks largeperks-br"
-                src="/images/game/wheel/icons-skillwheel-largeperks.png"
-                height="34"
-                width="34"
-                *image-clip="self.wheel.brLargePerkClip"
-              />
-              <img
-                class="revelationBg"
-                src="/images/game/wheel/wheel-colors/bottom_right/perkCircle/revelationBg.png"
-                height="178"
-                width="178"
-                style="bottom: 0; right: 0"
-              />
+              <div
+                class="largeperks"
+                style="top: 16; left: 18; width: 48px; height: 48px"
+                onclick="self.wheel:largePerkClick(1)"
+              >
+                <img
+                  class="largeperks"
+                  src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                  height="34"
+                  width="34"
+                  *image-clip="self.wheel.tlLargePerkClip"
+                  style="margin-top: 8px; margin-left: 6px"
+                />
+                <img
+                  class="revelationBg revelationBg-tl"
+                  src="/images/game/wheel/revelation-bg-perk-circles.png"
+                  style="bottom: 0; left: 0"
+                />
+                <img
+                  *if="self.wheel.currentSelectedDomain == 1"
+                  src="/images/game/wheel/marker_largeperk.png"
+                  style="
+                    position: absolute;
+                    top: 1;
+                    right: 1;
+                    width: 48px;
+                    height: 48px;
+                  "
+                />
+              </div>
+              <div
+                class="largeperks"
+                style="top: 18; right: 18; width: 48px; height: 48px"
+                onclick="self.wheel:largePerkClick(2)"
+              >
+                <img
+                  class="largeperks"
+                  src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                  height="34"
+                  width="34"
+                  *image-clip="self.wheel.trLargePerkClip"
+                  style="margin-top: 6px; margin-left: 8px"
+                />
+                <img
+                  class="revelationBg revelationBg-tr"
+                  src="/images/game/wheel/revelation-bg-perk-circles.png"
+                  style="top: 0; right: 0"
+                />
+                <img
+                  *if="self.wheel.currentSelectedDomain == 2"
+                  src="/images/game/wheel/marker_largeperk.png"
+                  style="
+                    position: absolute;
+                    bottom: 1;
+                    left: 1;
+                    width: 48px;
+                    height: 48px;
+                  "
+                />
+              </div>
+              <div
+                class="largeperks"
+                style="bottom: 18; left: 18; width: 48px; height: 48px"
+                onclick="self.wheel:largePerkClick(3)"
+              >
+                <img
+                  class="largeperks"
+                  src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                  height="34"
+                  width="34"
+                  *image-clip="self.wheel.blLargePerkClip"
+                  style="margin-top: 8px; margin-left: 6px"
+                />
+                <img
+                  class="revelationBg revelationBg-bl"
+                  src="/images/game/wheel/revelation-bg-perk-circles.png"
+                  style="bottom: 0; left: 0"
+                />
+                <img
+                  *if="self.wheel.currentSelectedDomain == 3"
+                  src="/images/game/wheel/marker_largeperk.png"
+                  style="
+                    position: absolute;
+                    top: 1;
+                    right: 1;
+                    width: 48px;
+                    height: 48px;
+                  "
+                />
+              </div>
+              <div
+                class="largeperks"
+                style="bottom: 18; right: 16; width: 48px; height: 48px"
+                onclick="self.wheel:largePerkClick(4)"
+              >
+                <img
+                  class="largeperks"
+                  src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                  height="34"
+                  width="34"
+                  *image-clip="self.wheel.brLargePerkClip"
+                  style="margin-top: 8px; margin-left: 6px"
+                />
+                <img
+                  class="revelationBg revelationBg-br"
+                  src="/images/game/wheel/revelation-bg-perk-circles.png"
+                  style="bottom: 0; left: 0"
+                />
+                <img
+                  *if="self.wheel.currentSelectedDomain == 4"
+                  src="/images/game/wheel/marker_largeperk.png"
+                  style="
+                    position: absolute;
+                    top: 1;
+                    right: 1;
+                    width: 48px;
+                    height: 48px;
+                  "
+                />
+              </div>
             </div>
           </div>
           <div class="panel">
