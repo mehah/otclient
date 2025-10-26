@@ -1,5 +1,4 @@
 name: Build - Emscripten
-run: emsdk install latest
 
 on:
   workflow_dispatch:
