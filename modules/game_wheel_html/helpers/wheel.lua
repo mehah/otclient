@@ -949,6 +949,11 @@ local baseWheelValues = {
     equipedGemBonuses = {},
     vesselEnabled = {},
     activeGems = {},
+    selectedDedicationPerk = {
+        text = nil,
+        tooltip = nil,
+        color = "#c0c0c0"
+    },
 }
 
 local wheel = {

@@ -142,10 +142,10 @@ local function secondSpellIsUnlocked(attribute)
 	return WheelController.wheel:isSlotFull(attribute[1]) and WheelController.wheel:isSlotFull(attribute[2])
 end
 
-local function getDedicationBonus(index, controller)
+local function getDedicationBonus(index)
 	local bonus = WheelBonus[index - 1]
-	local vocation = controller.wheel.vocationId
-	local points = controller.wheel.pointInvested[index]
+	local vocation = WheelController.wheel.vocationId
+	local points = WheelController.wheel.pointInvested[index]
 	if not vocation or vocation == 0 then
 		return
 	end
@@ -172,10 +172,10 @@ local function getDedicationBonus(index, controller)
 	return ""
 end
 
-local function getDedicationTooltip(index, controller)
+local function getDedicationTooltip(index)
 	local bonus = WheelBonus[index - 1]
-	local vocation = controller.wheel.vocationId
-	local points = controller.wheel.pointInvested[index]
+	local vocation = WheelController.wheel.vocationId
+	local points = WheelController.wheel.pointInvested[index]
 	if not vocation or vocation == 0 then
 		return ""
 	end
@@ -1370,20 +1370,20 @@ local function getVesselBonus()
 	return bonuses
 end
 
-local function configureDedicationPerk(controller)
+local function configureDedicationPerk()
 	local health = 0
 	local mana = 0
 	local cap = 0
 	local mitigation = 0
 
-	local vocation = controller.wheel.vocationId
+	local vocation = WheelController.wheel.vocationId
 
 	for id, bonus in pairs(WheelBonus) do
 		local index = id + 1
-		if not controller.wheel:isSlotInvested(index) then
+		if not WheelController.wheel:isSlotInvested(index) then
 			goto label
 		end
-		local points = controller.wheel.pointInvested[index]
+		local points = WheelController.wheel.pointInvested[index]
 		local attribute = WheelConsts[bonus.dedication]
 
 		if bonus.dedication == "capacity" then
@@ -1402,10 +1402,10 @@ local function configureDedicationPerk(controller)
 		::label::
 	end
 
-	controller.wheel.dedicationPerk.hitpoints = health > 0 and "+ " .. health or "0"
-	controller.wheel.dedicationPerk.manapoints = mana > 0 and "+ " .. mana or "0"
-	controller.wheel.dedicationPerk.cap = cap > 0 and "+ " .. cap or "0"
-	controller.wheel.dedicationPerk.mitigation = string.format("%.2f%%", mitigation)
+	WheelController.wheel.dedicationPerk.hitpoints = health > 0 and "+ " .. health or "0"
+	WheelController.wheel.dedicationPerk.manapoints = mana > 0 and "+ " .. mana or "0"
+	WheelController.wheel.dedicationPerk.cap = cap > 0 and "+ " .. cap or "0"
+	WheelController.wheel.dedicationPerk.mitigation = string.format("%.2f%%", mitigation)
 end
 
 local function getConvictionPerks(controller)
@@ -2343,6 +2343,8 @@ local bonus = {
 	getConvictionPerks = getConvictionPerks,
 	configureRevelationPerks = configureRevelationPerks,
 	WheelDomainOrder = WheelDomainOrder,
+	getDedicationBonus = getDedicationBonus,
+	getDedicationTooltip = getDedicationTooltip,
 }
 
 return bonus

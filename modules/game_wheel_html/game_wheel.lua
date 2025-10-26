@@ -46,9 +46,28 @@ function WheelController.wheel:handleOnHover(slotId)
     WheelController.wheel.currentHoverSlot = slotId
 end
 
+function WheelController.wheel:configureDedication()
+    local index = WheelController.wheel.currentSelectSlotId or -1
+    if index == -1 then
+        WheelController.wheel.selectedDedicationPerk = nil
+        return
+    end
+
+    WheelController.wheel.selectedDedicationPerk = {
+        text = helper.bonus.getDedicationBonus(index),
+        tooltip = helper.bonus.getDedicationTooltip(index),
+        color = "#c0c0c0"
+    }
+
+    if WheelController.wheel.pointInvested[index] <= 0 then
+        WheelController.wheel.selectedDedicationPerk.color = "#707070"
+    end
+end
+
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId
     WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
+    WheelController.wheel:configureDedication()
     g_logger.info("Selected slot ID: " .. tostring(slotId)) --- IGNORE ---
 end
 
@@ -338,6 +357,7 @@ local function handleUpdatePoints()
     helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:configureEquippedGems()
+    WheelController.wheel:configureDedication()
 
     for _, slot in pairs(helper.wheel.baseSlotIndex) do
         if WheelController.wheel.pointInvested[slot] == 0 then
