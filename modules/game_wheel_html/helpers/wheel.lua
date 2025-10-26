@@ -949,10 +949,18 @@ local baseWheelValues = {
     equipedGemBonuses = {},
     vesselEnabled = {},
     activeGems = {},
-    selectedDedicationPerk = {
-        text = nil,
-        tooltip = nil,
-        color = "#c0c0c0"
+    selectionBonus = {
+        dedication = {
+            text = nil,
+            tooltip = nil,
+            color = "#c0c0c0"
+        },
+        conviction = {
+            text = nil,
+            data = {},
+            color = "#c0c0c0",
+            tooltip = nil,
+        },
     },
 }
 

@@ -11,6 +11,9 @@ WheelButton = nil
 local baseButtonClip = { x = 0, y = 0, width = 322, height = 34 }
 local baseButtonClipped = { x = 0, y = 34, width = 322, height = 34 }
 
+local activeColor = "#c0c0c0"
+local inactiveColor = "#707070"
+
 WheelController.wheel = helper.wheel.baseWheelValues
 WheelController.gem = {
     clip = baseButtonClip
@@ -49,25 +52,73 @@ end
 function WheelController.wheel:configureDedication()
     local index = WheelController.wheel.currentSelectSlotId or -1
     if index == -1 then
-        WheelController.wheel.selectedDedicationPerk = nil
+        WheelController.wheel.selectionBonus.dedication = nil
         return
     end
 
-    WheelController.wheel.selectedDedicationPerk = {
+    WheelController.wheel.selectionBonus.dedication = {
         text = helper.bonus.getDedicationBonus(index),
         tooltip = helper.bonus.getDedicationTooltip(index),
-        color = "#c0c0c0"
+        color = activeColor
     }
 
     if WheelController.wheel.pointInvested[index] <= 0 then
-        WheelController.wheel.selectedDedicationPerk.color = "#707070"
+        WheelController.wheel.selectionBonus.dedication.color = inactiveColor
     end
+end
+
+function WheelController.wheel.configureConviction()
+    local index = WheelController.wheel.currentSelectSlotId or -1
+    if index == -1 then
+        WheelController.wheel.selectionBonus.conviction = nil
+        return
+    end
+
+    WheelController.wheel.selectionBonus.conviction.data = {}
+
+    local bonus = helper.bonus.WheelBonus[index - 1]
+    local conviction = helper.bonus.getConvictionBonus(index)
+    WheelController.wheel.selectionBonus.conviction.tooltip = helper.bonus.getConvictionBonusTooltip(index)
+
+    if type(conviction) == "table" then
+        local firstIcon = true
+        for i = 1, #conviction, 2 do
+            local msg = conviction[i]
+            msg = msg:gsub("\n+$", "")
+            if #msg > 3 then
+                local color = conviction[i + 1]
+                local hasIcon = msg:find(":") ~= nil
+                local iconPath = nil
+                local activePath = color:lower() == activeColor and "active" or
+                    "inactive"
+                if hasIcon then
+                    local iconNumber = firstIcon and 1 or 2
+                    iconPath = string.format("/images/game/wheel/icon-augmentation%s-%s.png", iconNumber,
+                        activePath)
+                    firstIcon = false
+                end
+                table.insert(WheelController.wheel.selectionBonus.conviction.data, {
+                    text = msg,
+                    color = color,
+                    icon = iconPath,
+                })
+            end
+        end
+    else
+        table.insert(WheelController.wheel.selectionBonus.conviction.data, {
+            text = conviction,
+            color = WheelController.wheel.pointInvested[index] >= bonus.maxPoints and activeColor or inactiveColor,
+        })
+    end
+
+    WheelController.wheel.selectionBonus.conviction.text = conviction
 end
 
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId
     WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
     WheelController.wheel:configureDedication()
+    WheelController.wheel:configureConviction()
     g_logger.info("Selected slot ID: " .. tostring(slotId)) --- IGNORE ---
 end
 
@@ -141,6 +192,7 @@ end
 function WheelController.wheel:handleMousePress(event, id)
     local totalPoints = WheelController.wheel:getTotalPoints()
     local pointToInvest = math.max(totalPoints - WheelController.wheel.usedPoints, 0)
+    WheelController.wheel:handleSelectSlot(id)
     if event.mouseButton == MouseRightButton then
         local data = WheelController.wheel.data[id]
         WheelController.wheel.currentSelectSlotId = id
@@ -358,6 +410,7 @@ local function handleUpdatePoints()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:configureEquippedGems()
     WheelController.wheel:configureDedication()
+    WheelController.wheel.configureConviction()
 
     for _, slot in pairs(helper.wheel.baseSlotIndex) do
         if WheelController.wheel.pointInvested[slot] == 0 then

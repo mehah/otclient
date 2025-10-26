@@ -234,23 +234,43 @@
                   <div style="margin-top: 4px; height: 130px; width: 205px">
                     <div
                       style="width: 205px; height: 45px; position: relative"
-                      *if="self.wheel.selectedDedicationPerk ~= nil"
+                      *if="self.wheel.selectionBonus.dedication ~= nil"
                     >
                       <p style="text-align: center">Dedication Perk</p>
                       <img
                         class="tooltip"
-                        *if="self.wheel.selectedDedicationPerk.tooltip ~= nil"
-                        *tooltip="self.wheel.selectedDedicationPerk.tooltip"
+                        *if="self.wheel.selectionBonus.dedication.tooltip ~= nil"
+                        *tooltip="self.wheel.selectionBonus.dedication.tooltip"
                       />
                       <p
                         style="white-space: pre-line"
-                        *color="self.wheel.selectedDedicationPerk.color"
+                        *color="self.wheel.selectionBonus.dedication.color"
                       >
-                        {{self.wheel.selectedDedicationPerk.text}}
+                        {{self.wheel.selectionBonus.dedication.text}}
                       </p>
                     </div>
-                    <div style="width: 205px; height: 100px; border: 1px green">
+                    <div
+                      style="width: 205px; height: 100px; position: relative"
+                      *if="self.wheel.selectionBonus.conviction ~= nil"
+                    >
                       <p style="text-align: center">Conviction Perk</p>
+                      <img
+                        class="tooltip"
+                        *if="self.wheel.selectionBonus.conviction.tooltip ~= nil"
+                        *tooltip="self.wheel.selectionBonus.conviction.tooltip"
+                      />
+                      <span
+                        *for="local data in self.wheel.selectionBonus.conviction.data;"
+                        *color="data.color"
+                        style="white-space: pre-line"
+                      >
+                        <img
+                          *if="data.icon ~= nil"
+                          *image-source="data.icon"
+                          height="11"
+                          width="11"
+                        />{{data.text}}
+                      </span>
                     </div>
                   </div>
                   <div

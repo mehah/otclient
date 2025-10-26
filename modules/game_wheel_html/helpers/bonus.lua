@@ -201,28 +201,17 @@ local function getDedicationTooltip(index)
 	return ""
 end
 
-function getConvictionBonusTooltip(index)
+local function getConvictionBonusTooltip(index)
 	local bonus = WheelBonus[index - 1]
 	local vocation = WheelController.wheel.vocationId
-	local points = WheelController.wheel.pointInvested[index]
-
 	local attribute = WheelConsts[bonus.conviction]
-
+	local augmentGeneralInfo =
+	"The Conviction Perk is unlocked when the maximum number of\npromotion points for this slice has been assigned.\n\nThere are always two identical Augmentations within the Wheel\nof Destiny. Regardless of the order of unlocking, bonus I will always\nbe available before bonus II."
+	local baseConvictions = {
+		"manaleech", "lifeleech", "skill"
+	}
 	if bonus.conviction == "vessel" then
-		local domain = bonus.domain
-		if domain == 1 then
-			return
-			"Each level of Vessel Resonance unlocks equivalent Gem Mods in its\ndomain. If the Vessel Resonance matches the gem quality, a\ndamage and healing bonus is granted."
-		elseif domain == 2 then
-			return
-			"Each level of Vessel Resonance unlocks equivalent Gem Mods in its\ndomain. If the Vessel Resonance matches the gem quality, a\ndamage and healing bonus is granted."
-		elseif domain == 3 then
-			return
-			"Each level of Vessel Resonance unlocks equivalent Gem Mods in its\ndomain. If the Vessel Resonance matches the gem quality, a\ndamage and healing bonus is granted."
-		elseif domain == 4 then
-			return
-			"Each level of Vessel Resonance unlocks equivalent Gem Mods in its\ndomain. If the Vessel Resonance matches the gem quality, a\ndamage and healing bonus is granted."
-		end
+		return ConvictionTooltip
 	elseif bonus.conviction == "special_1" then
 		if vocation == KNIGHT then
 			return
@@ -255,31 +244,34 @@ function getConvictionBonusTooltip(index)
 			return
 			"Consuming Harmony creates a field lasting 5 seconds, increasing\nyour damage and healing done by 2% for each Harmony\nconsumed."
 		end
-	elseif bonus.conviction == "spell_1" then
-		if vocation == KNIGHT then
-			return ""
+	elseif bonus.conviction:find("spell_") ~= nil then
+		if vocation ~= PALADIN then
+			return augmentGeneralInfo
 		elseif vocation == PALADIN then
 			local t = {}
 			if not firstSpellIsUnlocked(attribute) then
-				setStringColor(t, "�", "white")
+				setStringColor(t, "I.", "white")
 			else
-				setStringColor(t, "�", "white")
+				setStringColor(t, "II.", "white")
 			end
 			setStringColor(t,
 				" Enables the casting of support spells while active and Focus secondary group cooldown -8s\n", "#707070")
 			if not secondSpellIsUnlocked(attribute) then
-				setStringColor(t, "�", "white")
+				setStringColor(t, "I.", "white")
 			else
-				setStringColor(t, "�", "white")
+				setStringColor(t, "II", "white")
 			end
 			setStringColor(t, " -6s Cooldown; distance skill bonus increased by +5%", "#707070")
 			return t
 		end
+	elseif table.contains(baseConvictions, bonus.conviction) then
+		return ConvictionTooltip
 	end
+
 	return ""
 end
 
-function getConvictionBonus(index, fullMessage)
+local function getConvictionBonus(index, fullMessage)
 	local bonus = WheelBonus[index - 1]
 	local vocation = WheelController.wheel.vocationId
 	local points = WheelController.wheel.pointInvested[index]
@@ -340,16 +332,16 @@ function getConvictionBonus(index, fullMessage)
 			local t = {}
 			setStringColor(t, "Augmented Front Sweep\n", (points >= bonus.maxPoints and "#C0C0C0" or "#707070"))
 			if not firstSpellIsUnlocked(attribute) then
-				setStringColor(t, "�", "white")
+				setStringColor(t, " ", "white")
 			else
-				setStringColor(t, "�", "white")
+				setStringColor(t, " ", "white")
 			end
-			setStringColor(t, ": Adds 5% life leech to this\nspell\n",
+			setStringColor(t, ": Adds 5% life leech to this spell\n",
 				(firstSpellIsUnlocked(attribute) and "#C0C0C0" or "#707070"))
 			if not secondSpellIsUnlocked(attribute) then
-				setStringColor(t, "�", "white")
+				setStringColor(t, " ", "white")
 			else
-				setStringColor(t, "�", "white")
+				setStringColor(t, " ", "white")
 			end
 			setStringColor(t, ": +14% Base Damage", (secondSpellIsUnlocked(attribute) and "#C0C0C0" or "#707070"))
 			return t
@@ -2345,6 +2337,8 @@ local bonus = {
 	WheelDomainOrder = WheelDomainOrder,
 	getDedicationBonus = getDedicationBonus,
 	getDedicationTooltip = getDedicationTooltip,
+	getConvictionBonus = getConvictionBonus,
+	getConvictionBonusTooltip = getConvictionBonusTooltip,
 }
 
 return bonus
