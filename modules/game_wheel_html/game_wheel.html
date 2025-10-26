@@ -374,6 +374,131 @@
                 image-draw-order="3"
                 *ignore-transparent-pixel="true"
               />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 0"
+                *image-source="self.wheel.activeGems[1].backgroundPath"
+                height="85"
+                width="118"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 0 and self.wheel.activeGems[1].socketPath ~= nil"
+                *image-source="self.wheel.activeGems[1].socketPath"
+                height="34"
+                width="34"
+                *image-clip="self.wheel.activeGems[1].socketClip"
+                style="top: 5; left: 84; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 0 and self.wheel.activeGems[1].gemPath ~= nil"
+                *image-source="self.wheel.activeGems[1].gemPath"
+                height="32"
+                width="32"
+                *image-clip="self.wheel.activeGems[1].gemClip"
+                style="top: 6; left: 84; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 1"
+                *image-source="self.wheel.activeGems[2].backgroundPath"
+                height="85"
+                width="118"
+                style="top: 0; right: 84; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 1 and self.wheel.activeGems[2].socketPath ~= nil"
+                *image-source="self.wheel.activeGems[2].socketPath"
+                height="34"
+                width="34"
+                *image-clip="self.wheel.activeGems[2].socketClip"
+                style="top: 5; right: 84; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 1 and self.wheel.activeGems[2].gemPath ~= nil"
+                *image-source="self.wheel.activeGems[2].gemPath"
+                height="32"
+                width="32"
+                *image-clip="self.wheel.activeGems[2].gemClip"
+                style="top: 6; right: 83; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 2"
+                *image-source="self.wheel.activeGems[3].backgroundPath"
+                height="85"
+                width="118"
+                style="bottom: 50; left: 0; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 2 and self.wheel.activeGems[3].socketPath ~= nil"
+                *image-source="self.wheel.activeGems[3].socketPath"
+                height="34"
+                width="34"
+                *image-clip="self.wheel.activeGems[3].socketClip"
+                style="bottom: 4; left: 84; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 2 and self.wheel.activeGems[3].gemPath ~= nil"
+                *image-source="self.wheel.activeGems[3].gemPath"
+                height="32"
+                width="32"
+                *image-clip="self.wheel.activeGems[3].gemClip"
+                style="bottom: 4; left: 85; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 3"
+                *image-source="self.wheel.activeGems[4].backgroundPath"
+                height="85"
+                width="118"
+                style="bottom: 50; right: 84; display: block"
+              />
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 3 and self.wheel.activeGems[4].socketPath ~= nil"
+                *image-source="self.wheel.activeGems[4].socketPath"
+                height="34"
+                width="34"
+                *image-clip="self.wheel.activeGems[4].socketClip"
+                style="bottom: 4; right: 84; display: block"
+              />
+
+              <div class="largeperks" style="bottom: 50; right: 42">
+                <img
+                  *if="#self.wheel.activeGems > 3"
+                  *image-source="self.wheel.activeGems[4].backgroundPath"
+                  height="85"
+                  width="118"
+                />
+              </div>
+
+              <img
+                class="largeperks"
+                *if="#self.wheel.activeGems > 3 and self.wheel.activeGems[4].gemPath ~= nil"
+                *image-source="self.wheel.activeGems[4].gemPath"
+                height="32"
+                width="32"
+                *image-clip="self.wheel.activeGems[4].gemClip"
+                style="bottom: 4; right: 83; display: block"
+              />
+
               <img
                 src="/images/game/wheel/backdrop_skillwheel_largebonus_light_TL.png"
                 style="

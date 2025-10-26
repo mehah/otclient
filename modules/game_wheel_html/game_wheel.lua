@@ -336,6 +336,7 @@ local function handleUpdatePoints()
     helper.bonus.configureRevelationPerks(WheelController)
     helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
+    WheelController.wheel:configureEquippedGems()
 end
 
 function WheelController.wheel:configureConvictionPerk()
@@ -651,9 +652,6 @@ function WheelController.wheel:insertPoint(index, points)
                     end
                 else
                     setPerk(index)
-                    --   widget:setImageSource("/images/game/destiny_wheel/icons-skillwheel-mediumperks")
-                    --   widget:setImageClip(iconInfo.iconRect)
-                    --   modIcon:setVisible(false)
                 end
             end
         else
@@ -671,6 +669,46 @@ function WheelController.wheel:insertPoint(index, points)
     end
 
     WheelController.wheel:checkFilledVessels(index)
+end
+
+function WheelController.wheel:configureEquippedGems()
+    WheelController.wheel.activeGems = {}
+    for i = 0, 3 do
+        local data = GemAtelier.getEquipedGem(i)
+        local filledCount = GemAtelier.getFilledVesselCount(i)
+        local backgroundImage = (filledCount == 0 and "backdrop_skillwheel_largebonus_socketdisabled_" .. i or "backdrop_skillwheel_largebonus_socketenabled_" .. i)
+        local current = {
+            backgroundPath = "/images/game/wheel/" .. backgroundImage .. ".png",
+            socketPath = "/images/game/wheel/icons-skillwheel-sockets.png",
+            socketClip = { x = 0, y = 0, width = 34, height = 34 },
+            gemPath = nil,
+            gemClip = nil,
+        }
+
+        local showSocket = filledCount > 0
+        if showSocket then
+            local startPos = 442
+            if data and filledCount == (data.gemType + 1) then
+                startPos = 34
+            end
+
+            local domainOffset = startPos + (102 * i)
+            local modOffset = 34 * math.max(0, filledCount - 1)
+            current.socketClip = { x = domainOffset + modOffset, y = 0, width = 34, height = 34 }
+        end
+        if data then
+            local typeOffset = data.gemType * 32
+            local domainOffet = data.gemDomain * 96
+            local vocationOffset = (WheelController.wheel.vocationId - 1) * 384
+            local gemOffset = vocationOffset + domainOffet + typeOffset
+            current.gemClip = { x = gemOffset, y = 0, width = 32, height = 32 }
+            current.gemPath = "/images/game/wheel/icons-gematelier-gemvariants.png"
+        else
+            current.gemPath = nil
+            current.gemClip = nil
+        end
+        table.insert(WheelController.wheel.activeGems, current)
+    end
 end
 
 function onWheelOfDestinyOpenWindow(data)
@@ -836,4 +874,5 @@ function onWheelOfDestinyOpenWindow(data)
     helper.bonus.configureRevelationPerks(WheelController)
     helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
+    WheelController.wheel:configureEquippedGems()
 end
