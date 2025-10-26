@@ -219,7 +219,6 @@ function WheelController.wheel:removePoint(index, points)
         else
             if table.contains(helper.gems.VesselIndex[bonus.domain - 1], index - 1) then
                 setPerk(index)
-
                 WheelController.wheel.equipedGemBonuses[index] = { bonusID = -1, supreme = false, id = 0 }
                 local removeIndex = 0
                 for k, id in pairs(WheelController.wheel.vesselEnabled[bonus.domain - 1]) do
@@ -385,7 +384,6 @@ function WheelController.wheel:onAddAllPoints()
 
     WheelController.wheel.pointInvested[index] = math.min((pointInvested + pointToInvest), bonus.maxPoints)
     WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
-    WheelController.wheel:insertUnlockedThe(index)
     handleUpdatePoints()
 end
 
@@ -586,17 +584,17 @@ function WheelController.wheel:checkFilledVessels(index)
     end
 end
 
-function WheelController.wheel:insertPoint(index, points)
-    local bonus                                  = helper.bonus.WheelBonus[index - 1]
-    local data                                   = WheelController.wheel.data[index]
-    local button                                 = helper.buttons.WheelButtons[index]
-    WheelController.wheel.data[index].id         = index
-    WheelController.wheel.data[index].borderPath = button.borderImageBase .. ".png"
-    WheelController.wheel.data[index].hoverPath  = button.focusImageBase .. ".png"
-    WheelController.wheel.data[index].bgPath     = string.format(baseWheelColorPath, data.quadrant, data.color,
+function WheelController.wheel:insertPoint(id, points)
+    local bonus                               = helper.bonus.WheelBonus[id - 1]
+    local data                                = WheelController.wheel.data[id]
+    local button                              = helper.buttons.WheelButtons[id]
+    WheelController.wheel.data[id].id         = id
+    WheelController.wheel.data[id].borderPath = button.borderImageBase .. ".png"
+    WheelController.wheel.data[id].hoverPath  = button.focusImageBase .. ".png"
+    WheelController.wheel.data[id].bgPath     = string.format(baseWheelColorPath, data.quadrant, data.color,
         data.index)
 
-    local isBaseSlot                             = helper.wheel.isFirstSlot(index)
+    local isBaseSlot                          = helper.wheel.isFirstSlot(id)
 
     if points > 0 then
         if points >= bonus.maxPoints then
@@ -614,61 +612,61 @@ function WheelController.wheel:insertPoint(index, points)
             end
 
             local path = button.colorImageBase .. maxcolor
-            WheelController.wheel.data[index].colorPath = path .. ".png"
-            WheelController.wheel:insertUnlockedThe(index)
+            WheelController.wheel.data[id].colorPath = path .. ".png"
+            WheelController.wheel:insertUnlockedThe(id)
 
-            if table.contains(helper.gems.VesselIndex[bonus.domain - 1], index - 1) then
+            if table.contains(helper.gems.VesselIndex[bonus.domain - 1], id - 1) then
                 local gem = GemAtelier.getEquipedGem(bonus.domain - 1, WheelController)
                 if gem then
                     local enabled = WheelController.wheel.vesselEnabled[bonus.domain - 1]
                     if #enabled == 0 and gem.lesserBonus > -1 then
-                        setPerk(index, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.lesserBonus, 0,
+                        setPerk(id, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.lesserBonus, 0,
                             30, 30)
-                        WheelController.wheel.equipedGemBonuses[index] = {
+                        WheelController.wheel.equipedGemBonuses[id] = {
                             bonusID = gem.lesserBonus,
                             supreme = false,
                             gemID = gem.gemID
                         }
-                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], index)
+                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], id)
                     elseif #enabled == 1 and gem.regularBonus > -1 then
-                        setPerk(index, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.regularBonus,
+                        setPerk(id, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.regularBonus,
                             0, 30, 30)
 
-                        WheelController.wheel.equipedGemBonuses[index] = {
+                        WheelController.wheel.equipedGemBonuses[id] = {
                             bonusID = gem.regularBonus,
                             supreme = false,
                             gemID = gem.gemID
                         }
-                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], index)
+                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], id)
                     elseif #enabled == 2 and gem.supremeBonus > -1 then
-                        setPerk(index, "/images/game/wheel/icons-skillwheel-suprememods.png", 35 * gem
+                        setPerk(id, "/images/game/wheel/icons-skillwheel-suprememods.png", 35 * gem
                             .supremeBonus, 0, 35, 35)
-                        WheelController.wheel.equipedGemBonuses[index] = {
+                        WheelController.wheel.equipedGemBonuses[id] = {
                             bonusID = gem.supremeBonus,
                             supreme = false,
                             gemID = gem.gemID
                         }
-                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], index)
+                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], id)
                     end
                 else
-                    setPerk(index)
+                    -- setPerk(index)
                 end
             end
         else
             local _maxcolor = math.floor(points / 10) + 1
             _maxcolor = math.min(quadrantFramesByMaxPoints[bonus.maxPoints], _maxcolor)
             if _maxcolor > 0 then
-                WheelController.wheel.data[index].colorPath = button.colorImageBase .. _maxcolor .. ".png"
+                WheelController.wheel.data[id].colorPath = button.colorImageBase .. _maxcolor .. ".png"
             end
         end
     elseif not isBaseSlot then
-        WheelController.wheel.data[index].colorPath = ""
-        WheelController.wheel.data[index].adjacentPath = ""
+        WheelController.wheel.data[id].colorPath = ""
+        WheelController.wheel.data[id].adjacentPath = ""
     else
-        WheelController.wheel.data[index].adjacentPath = button.colorImageBase .. "5.png"
+        WheelController.wheel.data[id].adjacentPath = button.colorImageBase .. "5.png"
     end
 
-    WheelController.wheel:checkFilledVessels(index)
+    WheelController.wheel:checkFilledVessels(id)
 end
 
 function WheelController.wheel:configureEquippedGems()
@@ -768,20 +766,16 @@ function onWheelOfDestinyOpenWindow(data)
     for _, id in pairs(orderned) do
         local points = data.wheelPoints[id]
         local bonus = helper.bonus.WheelBonus[id - 1]
-        WheelController.wheel.pointInvested[id] = 0
-        for __ = 1, points do
-            WheelController.wheel.usedPoints = WheelController.wheel.usedPoints + 1
-            WheelController.wheel.passivePoints[bonus.domain] = (WheelController.wheel.passivePoints[bonus.domain] or 0) +
-                1
-            WheelController.wheel.pointInvested[id] = WheelController.wheel.pointInvested[id] + 1
-        end
+        WheelController.wheel.usedPoints = WheelController.wheel.usedPoints + points
+        WheelController.wheel.passivePoints[bonus.domain] = (WheelController.wheel.passivePoints[bonus.domain] or 0) +
+            points
+        WheelController.wheel.pointInvested[id] = points
     end
 
     local _currentPoints = 0
     for k, v in pairs(WheelController.wheel.pointInvested) do
         _currentPoints = _currentPoints + v
     end
-
 
     for id, iconInfo in pairs(helper.gems.WheelIcons[data.vocationId]) do
         local miniIconRect = iconInfo.miniIconRect
@@ -797,7 +791,6 @@ function onWheelOfDestinyOpenWindow(data)
             height = tonumber(height)
         }
     end
-
 
     for i = 1, 4 do
         WheelController.wheel.vesselEnabled[i - 1] = {}
@@ -824,13 +817,6 @@ function onWheelOfDestinyOpenWindow(data)
 
     for id, _points in pairs(WheelController.wheel.pointInvested) do
         WheelController.wheel:insertPoint(id, _points)
-    end
-
-    for id, _points in pairs(WheelController.wheel.pointInvested) do
-        local bonus = helper.bonus.WheelBonus[id - 1]
-        if bonus.maxPoints <= _points then
-            WheelController.wheel:insertUnlockedThe(id)
-        end
     end
 
     local function incrementBonusCount(_bonus, bonusType)
@@ -874,5 +860,6 @@ function onWheelOfDestinyOpenWindow(data)
     helper.bonus.configureRevelationPerks(WheelController)
     helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
+    WheelController.wheel:handlePassiveBorders()
     WheelController.wheel:configureEquippedGems()
 end

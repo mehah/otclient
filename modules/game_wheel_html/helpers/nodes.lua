@@ -120,10 +120,10 @@ WheelNodes[27].connections = { 28, 20, 26, 33 }
 -- 3 - 100
 WheelNodes[19].connections = { 13, 20, 26, 32 }
 WheelNodes[26].connections = { 27, 20, 19, 25, 32, 33 }
-WheelNodes[33].connections = { 25, 27, 34, 26, }
+WheelNodes[33].connections = { 32, 27, 34, 26, }
 -- 4 - 150
-WheelNodes[25].connections = { 26, 32, 31, 32, 33 }
-WheelNodes[32].connections = { 26, 25, 19, 31 }
+WheelNodes[25].connections = { 26, 19, 31, 32, }
+WheelNodes[32].connections = { 26, 25, 31 }
 -- 5 - 200
 WheelNodes[31].connections = {}
 -- Blue Connected
@@ -137,7 +137,7 @@ WheelNodes[19].connecteds = { 13, 20, 26, 25, 32 }
 WheelNodes[26].connecteds = { 27, 20, 19, 25, 32, 33 }
 WheelNodes[33].connecteds = { 27, 34, 26, 32 }
 -- 4 - 150
-WheelNodes[25].connecteds = { 26, 32, 31, 33 }
+WheelNodes[25].connecteds = { 26, 32, 31, 19 }
 WheelNodes[32].connecteds = { 19, 26, 25, 33, 31 }
 -- 5 - 200
 WheelNodes[31].connecteds = { 25, 32 }

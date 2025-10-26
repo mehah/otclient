@@ -104,7 +104,7 @@ local WheelIcons = {
             miniIconRect = "48 0 16 16",
         },
         [25] = {
-            iconRect = "1170 0 30 30",
+            iconRect = "180 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [26] = {
@@ -132,7 +132,7 @@ local WheelIcons = {
             miniIconRect = "32 0 16 16",
         },
         [32] = {
-            iconRect = "180 0 30 30",
+            iconRect = "1170 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [33] = {
@@ -250,7 +250,7 @@ local WheelIcons = {
             miniIconRect = "48 0 16 16",
         },
         [25] = {
-            iconRect = "1170 0 30 30",
+            iconRect = "180 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [26] = {
@@ -278,7 +278,7 @@ local WheelIcons = {
             miniIconRect = "32 0 16 16",
         },
         [32] = {
-            iconRect = "180 0 30 30",
+            iconRect = "1170 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [33] = {
@@ -396,7 +396,7 @@ local WheelIcons = {
             miniIconRect = "48 0 16 16",
         },
         [25] = {
-            iconRect = "1170 0 30 30",
+            iconRect = "180 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [26] = {
@@ -424,7 +424,7 @@ local WheelIcons = {
             miniIconRect = "32 0 16 16",
         },
         [32] = {
-            iconRect = "180 0 30 30",
+            iconRect = "1170 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [33] = {
@@ -542,7 +542,7 @@ local WheelIcons = {
             miniIconRect = "48 0 16 16",
         },
         [25] = {
-            iconRect = "1170 0 30 30",
+            iconRect = "180 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [26] = {
@@ -570,7 +570,7 @@ local WheelIcons = {
             miniIconRect = "32 0 16 16",
         },
         [32] = {
-            iconRect = "180 0 30 30",
+            iconRect = "1170 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [33] = {
@@ -688,7 +688,7 @@ local WheelIcons = {
             miniIconRect = "48 0 16 16",
         },
         [25] = {
-            iconRect = "1170 0 30 30",
+            iconRect = "180 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [26] = {
@@ -716,7 +716,7 @@ local WheelIcons = {
             miniIconRect = "32 0 16 16",
         },
         [32] = {
-            iconRect = "180 0 30 30",
+            iconRect = "1170 0 30 30",
             miniIconRect = "48 0 16 16",
         },
         [33] = {
