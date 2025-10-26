@@ -1,6 +1,11 @@
 local helper = dofile("helpers/helper.lua")
+local GemAtelier = dofile("gematelier.lua")
+local Workshop = dofile("workshop.lua")
 
 WheelController = Controller:new()
+
+WheelController.GemAtelier = GemAtelier
+WheelController.Workshop = Workshop
 WheelButton = nil
 
 local baseButtonClip = { x = 0, y = 0, width = 322, height = 34 }
@@ -179,6 +184,18 @@ function WheelController.wheel:canRemovePoints(index)
     return true
 end
 
+local function setPerk(index, path, _x, _y, _width, _height)
+    path = path or "/images/game/wheel/icons-skillwheel-mediumperks.png"
+    local iconInfo = helper.gems.WheelIcons[WheelController.wheel.vocationId][index]
+    local x, y, width, height = iconInfo.iconRect:match("(%d+) (%d+) (%d+) (%d+)")
+    WheelController.wheel.data[index].perkImage = path
+    WheelController.wheel.data[index].iconClip = {
+        x = _x or tonumber(x),
+        y = _y or tonumber(y),
+        width = _width or tonumber(width),
+        height = _height or tonumber(height)
+    }
+end
 function WheelController.wheel:removePoint(index, points)
     local bonus = helper.bonus.WheelBonus[index - 1]
     if points > 0 then
@@ -200,6 +217,19 @@ function WheelController.wheel:removePoint(index, points)
             WheelController.wheel.data[index].colorPath = path .. ".png"
             WheelController.wheel.insertUnlockedThe(index)
         else
+            if table.contains(helper.gems.VesselIndex[bonus.domain - 1], index - 1) then
+                setPerk(index)
+
+                WheelController.wheel.equipedGemBonuses[index] = { bonusID = -1, supreme = false, id = 0 }
+                local removeIndex = 0
+                for k, id in pairs(WheelController.wheel.vesselEnabled[bonus.domain - 1]) do
+                    if id == index then
+                        removeIndex = k;
+                    end
+                end
+                table.remove(WheelController.wheel.vesselEnabled[bonus.domain - 1], removeIndex)
+                WheelController.wheel:checkFilledVessels(index)
+            end
             local _maxcolor = math.floor(points / 10) + 1
             _maxcolor = math.min(quadrantFramesByMaxPoints[bonus.maxPoints], _maxcolor)
             if _maxcolor > 0 then
@@ -207,6 +237,19 @@ function WheelController.wheel:removePoint(index, points)
             end
         end
     else
+        if table.contains(helper.gems.VesselIndex[bonus.domain - 1], index - 1) then
+            setPerk(index)
+            WheelController.wheel.equipedGemBonuses[index] = { bonusID = -1, supreme = false, id = 0 }
+            local removeIndex = 0
+            for k, id in pairs(WheelController.wheel.vesselEnabled[bonus.domain - 1]) do
+                if id == index then
+                    removeIndex = k;
+                end
+            end
+            table.remove(WheelController.wheel.vesselEnabled[bonus.domain - 1], removeIndex)
+            WheelController.wheel:checkFilledVessels(index)
+        end
+
         WheelController.wheel.data[index].colorPath = ""
     end
 end
@@ -291,6 +334,7 @@ local function handleUpdatePoints()
     WheelController.wheel:handlePassiveBorders()
     helper.bonus.configureDedicationPerk(WheelController)
     helper.bonus.configureRevelationPerks(WheelController)
+    helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
 end
 
@@ -360,13 +404,11 @@ function WheelController.wheel:onAddOnePoint()
     if pointInvested >= bonus.maxPoints then
         return
     end
-    g_logger.info("pointInvested>" .. pointInvested .. " bonus.maxPoints>" .. bonus.maxPoints)
 
     if not WheelController.wheel:canAddPoints(index, true) then
         return
     end
 
-    g_logger.info("can add")
     WheelController.wheel.pointInvested[index] = pointInvested + 1
     WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
     WheelController.wheel:insertUnlockedThe(index)
@@ -484,6 +526,65 @@ function WheelController.wheel:insertUnlockedThe(index)
     end
 end
 
+function WheelController.wheel:checkFilledVessels(index)
+    local bonus = helper.bonus.WheelBonus[index - 1]
+    local order = helper.bonus.WheelDomainOrder[bonus.domain - 1]
+    local function findIndex(value)
+        for i, v in ipairs(order) do
+            if v == value then
+                return i
+            end
+        end
+        return nil
+    end
+
+    local function customSort(a, b)
+        local indexA = findIndex(a)
+        local indexB = findIndex(b)
+        return indexA < indexB
+    end
+
+    WheelController.wheel.vesselEnabled[bonus.domain - 1] = WheelController.wheel.vesselEnabled[bonus.domain - 1] or {}
+
+    table.sort(WheelController.wheel.vesselEnabled[bonus.domain - 1], customSort)
+
+    local lastModInserted = 0
+    for _, id in pairs(WheelController.wheel.vesselEnabled[bonus.domain - 1]) do
+        bonus = helper.bonus.WheelBonus[id - 1]
+        local gem = GemAtelier.getEquipedGem(bonus.domain - 1, WheelController)
+        if not gem then
+            goto continue
+        end
+
+        if lastModInserted == 0 and gem.lesserBonus > -1 then
+            setPerk(id, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.lesserBonus, 0, 30, 30)
+            WheelController.wheel.equipedGemBonuses[id] = {
+                bonusID = gem.lesserBonus,
+                supreme = false,
+                gemID = gem.gemID
+            }
+            lastModInserted = 1
+        elseif lastModInserted == 1 and gem.regularBonus > -1 then
+            setPerk(id, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.regularBonus, 0, 30, 30)
+            WheelController.wheel.equipedGemBonuses[id] = {
+                bonusID = gem.regularBonus,
+                supreme = false,
+                gemID = gem.gemID
+            }
+            lastModInserted = 2
+        elseif lastModInserted == 2 and gem.supremeBonus > -1 then
+            setPerk(id, "/images/game/wheel/icons-skillwheel-suprememods.png", 35 * gem.supremeBonus, 0, 35, 35)
+            WheelController.wheel.equipedGemBonuses[id] = {
+                bonusID = gem.supremeBonus,
+                supreme = true,
+                gemID = gem.gemID
+            }
+            lastModInserted = 3
+        end
+        :: continue ::
+    end
+end
+
 function WheelController.wheel:insertPoint(index, points)
     local bonus                                  = helper.bonus.WheelBonus[index - 1]
     local data                                   = WheelController.wheel.data[index]
@@ -514,6 +615,47 @@ function WheelController.wheel:insertPoint(index, points)
             local path = button.colorImageBase .. maxcolor
             WheelController.wheel.data[index].colorPath = path .. ".png"
             WheelController.wheel:insertUnlockedThe(index)
+
+            if table.contains(helper.gems.VesselIndex[bonus.domain - 1], index - 1) then
+                local gem = GemAtelier.getEquipedGem(bonus.domain - 1, WheelController)
+                if gem then
+                    local enabled = WheelController.wheel.vesselEnabled[bonus.domain - 1]
+                    if #enabled == 0 and gem.lesserBonus > -1 then
+                        setPerk(index, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.lesserBonus, 0,
+                            30, 30)
+                        WheelController.wheel.equipedGemBonuses[index] = {
+                            bonusID = gem.lesserBonus,
+                            supreme = false,
+                            gemID = gem.gemID
+                        }
+                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], index)
+                    elseif #enabled == 1 and gem.regularBonus > -1 then
+                        setPerk(index, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.regularBonus,
+                            0, 30, 30)
+
+                        WheelController.wheel.equipedGemBonuses[index] = {
+                            bonusID = gem.regularBonus,
+                            supreme = false,
+                            gemID = gem.gemID
+                        }
+                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], index)
+                    elseif #enabled == 2 and gem.supremeBonus > -1 then
+                        setPerk(index, "/images/game/wheel/icons-skillwheel-suprememods.png", 35 * gem
+                            .supremeBonus, 0, 35, 35)
+                        WheelController.wheel.equipedGemBonuses[index] = {
+                            bonusID = gem.supremeBonus,
+                            supreme = false,
+                            gemID = gem.gemID
+                        }
+                        table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], index)
+                    end
+                else
+                    setPerk(index)
+                    --   widget:setImageSource("/images/game/destiny_wheel/icons-skillwheel-mediumperks")
+                    --   widget:setImageClip(iconInfo.iconRect)
+                    --   modIcon:setVisible(false)
+                end
+            end
         else
             local _maxcolor = math.floor(points / 10) + 1
             _maxcolor = math.min(quadrantFramesByMaxPoints[bonus.maxPoints], _maxcolor)
@@ -527,6 +669,8 @@ function WheelController.wheel:insertPoint(index, points)
     else
         WheelController.wheel.data[index].adjacentPath = button.colorImageBase .. "5.png"
     end
+
+    WheelController.wheel:checkFilledVessels(index)
 end
 
 function onWheelOfDestinyOpenWindow(data)
@@ -541,21 +685,37 @@ function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.passivePoints = {}
     WheelController.wheel.currentPoints = data.points
     WheelController.wheel.promotionScrollPoints = data.extraPoints
+    WheelController.wheel.equipedGems = data.activeGems or {}
     WheelController.wheel.data = helper.wheel.WheelSlotsParser
     data.wheelPoints = data.wheelPoints or {}
+    WheelController.wheel.vesselEnabled = {}
+    WheelController.wheel.atelierGems = data.revealedGems or {}
+    WheelController.wheel.basicModsUpgrade = data.basicGrades or {}
+    WheelController.wheel.supremeModsUpgrade = data.supremeGrades or {}
+    Workshop.createFragments()
+    for id, gem in pairs(WheelController.wheel.atelierGems) do
+        gem.lesserBonus = gem.basicModifier1 > 0 and gem.basicModifier1 or -1
+        gem.regularBonus = gem.basicModifier2 > 0 and gem.basicModifier2 or -1
+        gem.supremeBonus = gem.supremeModifier > 0 and gem.supremeModifier or -1
+        gem.gemType = gem.quality
+        gem.gemDomain = gem.affinity
+        gem.gemID = id
+    end
+
+    WheelController.wheel.equipedGemBonuses = {}
 
     -- order
     local orderned = {
         15, 9, 14, 3, 8, 13, 2, 7, 1, 16, 10, 17, 4, 11, 18, 5, 12, 6, 22, 23, 28, 24, 29, 34, 30, 35, 36, 21, 20, 27, 19, 26, 33, 25, 32, 31
     }
 
-    for _, tier in pairs(data.basicGrades) do
+    for _, tier in pairs(WheelController.wheel.basicModsUpgrade) do
         if tier == 3 then
             WheelController.wheel.extraGemPoints = WheelController.wheel.extraGemPoints + 1
         end
     end
 
-    for _, tier in pairs(data.supremeGrades) do
+    for _, tier in pairs(WheelController.wheel.supremeModsUpgrade) do
         if tier == 3 then
             WheelController.wheel.extraGemPoints = WheelController.wheel.extraGemPoints + 1
         end
@@ -566,12 +726,6 @@ function onWheelOfDestinyOpenWindow(data)
     for k, v in pairs(data.wheelPoints) do
         currentPoints = currentPoints + v
     end
-
-
-    -- for k, v in pairs(data) do
-    --     g_logger.info("WOD DATA key: " .. k .. " value: " .. tostring(v))
-    -- end
-
 
     for _, id in pairs(orderned) do
         local points = data.wheelPoints[id]
@@ -588,6 +742,35 @@ function onWheelOfDestinyOpenWindow(data)
     local _currentPoints = 0
     for k, v in pairs(WheelController.wheel.pointInvested) do
         _currentPoints = _currentPoints + v
+    end
+
+
+    for id, iconInfo in pairs(helper.gems.WheelIcons[data.vocationId]) do
+        local miniIconRect = iconInfo.miniIconRect
+        setPerk(id)
+        WheelController.wheel.data[id].left = WheelController.wheel.data[id].left or 0
+        WheelController.wheel.data[id].top = WheelController.wheel.data[id].top or 0
+
+        local x, y, width, height = miniIconRect:match("(%d+) (%d+) (%d+) (%d+)")
+        WheelController.wheel.data[id].miniIconClip = {
+            x = tonumber(x),
+            y = tonumber(y),
+            width = tonumber(width),
+            height = tonumber(height)
+        }
+    end
+
+
+    for i = 1, 4 do
+        WheelController.wheel.vesselEnabled[i - 1] = {}
+        for _, index in pairs(helper.bonus.WheelDomainOrder[i - 1]) do
+            local bonus = helper.bonus.WheelBonus[index - 1]
+            local pointInvested = WheelController.wheel.pointInvested[index]
+            if pointInvested >= bonus.maxPoints and bonus.conviction == "vessel" then
+                table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], index)
+                WheelController.wheel:checkFilledVessels(index)
+            end
+        end
     end
 
     -- check slot integrity
@@ -612,8 +795,6 @@ function onWheelOfDestinyOpenWindow(data)
         end
     end
 
-    WheelController.wheel.atelierGems = data.revealedGems or {}
-
     local function incrementBonusCount(_bonus, bonusType)
         if _bonus ~= -1 then
             local _data = bonusType[tostring(_bonus)]
@@ -633,16 +814,10 @@ function onWheelOfDestinyOpenWindow(data)
         incrementBonusCount(info.supremeBonus, WheelController.wheel.supremeModCount)
     end
 
-
     local totalPoints = WheelController.wheel.currentPoints +
         (WheelController.wheel.extraGemPoints + WheelController.wheel.promotionScrollPoints)
     WheelController.wheel.summaryPointsLabel = string.format("%d/%d", totalPoints - WheelController.wheel.usedPoints,
         totalPoints)
-
-
-    g_logger.info(string.format(
-        "Received WOD data: points=%d, extraPoints=%d, currentPoints=%d, data.promotionScrolls=%d",
-        data.points, data.extraPoints, currentPoints, #data.promotionScrolls))
 
     WheelController.wheel.currentPoints = currentPoints
     WheelController.wheel.extraPoints = data.extraPoints
@@ -657,36 +832,8 @@ function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.backdropVocationOverlay = overlayImage .. ".png"
 
     helper.wheel.handleLargePerkClip(data.vocationId, WheelController)
-
-    WheelController.wheel.icons = {}
-
-    for id, iconInfo in pairs(helper.icons.WheelIcons[data.vocationId]) do
-        local iconRect = iconInfo.iconRect
-        local miniIconRect = iconInfo.miniIconRect
-
-        local x, y, width, height = iconRect:match("(%d+) (%d+) (%d+) (%d+)")
-
-        WheelController.wheel.data[id].iconClip = {
-            x = tonumber(x),
-            y = tonumber(y),
-            width = tonumber(width),
-            height = tonumber(height)
-        }
-
-        WheelController.wheel.data[id].left = WheelController.wheel.data[id].left or 0
-        WheelController.wheel.data[id].top = WheelController.wheel.data[id].top or 0
-
-        x, y, width, height = miniIconRect:match("(%d+) (%d+) (%d+) (%d+)")
-
-        WheelController.wheel.data[id].miniIconClip = {
-            x = tonumber(x),
-            y = tonumber(y),
-            width = tonumber(width),
-            height = tonumber(height)
-        }
-    end
-
     helper.bonus.configureDedicationPerk(WheelController)
     helper.bonus.configureRevelationPerks(WheelController)
+    helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
 end

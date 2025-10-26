@@ -913,6 +913,7 @@ local baseWheelValues = {
         mitigation = "0%"
     },
     convictionPerks = {},
+    vessels = {},
     revelationPerks = {
         damage = {
             name = "Damage and Healing",
@@ -945,6 +946,8 @@ local baseWheelValues = {
         }
     },
     extraPassivePoints = {},
+    equipedGemBonuses = {},
+    vesselEnabled = {},
 }
 
 local wheel = {

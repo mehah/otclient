@@ -153,7 +153,6 @@
       position: absolute;
       height: 30px;
       width: 30px;
-      --image-source: "/images/game/wheel/icons-skillwheel-mediumperks.png";
     }
     .smallperks {
       position: absolute;
@@ -344,6 +343,9 @@
                   class="mediumperks"
                   onhover="self.wheel:handleOnHover(data.id)"
                   style="display: block"
+                  *image-source="data.perkImage"
+                  *height="data.iconClip.height"
+                  *width="data.iconClip.width"
                 />
                 <img
                   *if="data.miniIconClip ~= nil"
@@ -586,9 +588,39 @@
             </div>
             <div
               class="panel-window"
-              style="width: 213px; height: 150px; margin-top: 8px"
+              style="width: 213px; height: 160px; margin-top: 8px"
             >
               <p class="panel-title">Vessels</p>
+              <div class="conviction-perks">
+                <div
+                  style="
+                    width: 190px;
+                    height: 15px;
+                    margin-top: 4px;
+                    position: relative;
+                  "
+                  *if="#self.wheel.vessels > 0"
+                  *for="local vessel in self.wheel.vessels; local i = index"
+                >
+                  <div style="width: 175px; height: 15px">
+                    <span
+                      *if="vessel.perk"
+                      *margin-left="vessel.left and vessel.left or 0"
+                      >{{vessel.text}}</span
+                    >
+                    <span
+                      *if="vessel.value and vessel.text ~= 'Resistances:'"
+                      style="float: right"
+                      >{{vessel.value}}
+                    </span>
+                  </div>
+                  <span
+                    class="tooltip"
+                    *if="vessel.tooltip ~= nil"
+                    *tooltip="vessel.tooltip"
+                  ></span>
+                </div>
+              </div>
             </div>
             <div
               class="panel-window"
