@@ -91,6 +91,7 @@ end
 
 function WheelController.wheel:configureDedication(currentTable, currentType, index)
     index = index or WheelController.wheel.currentSelectSlotId or -1
+    currentType = currentType or "click"
     currentTable = currentTable or WheelController.wheel.selectionBonus.data
     if index == -1 then
         resetSelection()
@@ -102,7 +103,7 @@ function WheelController.wheel:configureDedication(currentTable, currentType, in
         color = inactiveColor
     end
 
-    if currentType ~= "click" then
+    if currentType == "click" then
         WheelController.wheel.selectionBonus.showButtons = true
     end
     table.insert(currentTable,
@@ -118,6 +119,7 @@ end
 function WheelController.wheel:configureConviction(currentTable, currentType, index)
     index = index or WheelController.wheel.currentSelectSlotId or -1
     currentTable = currentTable or WheelController.wheel.selectionBonus.data
+    currentType = currentType or "click"
     if index == -1 then
         resetSelection()
         return
@@ -125,7 +127,7 @@ function WheelController.wheel:configureConviction(currentTable, currentType, in
 
     local bonus = helper.bonus.WheelBonus[index - 1]
     local conviction = helper.bonus.getConvictionBonus(index)
-    if currentType ~= "click" then
+    if currentType == "click" then
         WheelController.wheel.selectionBonus.showButtons = true
     end
     local tooltip = helper.bonus.getConvictionBonusTooltip(index)
@@ -456,8 +458,8 @@ end
 
 function WheelController.wheel:getSlotProgressWidth(tab, barWidth)
     barWidth = barWidth or 205
-    tab = tab or "selection"
-    if tab == "selection" then
+    tab = tab or "click"
+    if tab == "click" then
         WheelController.wheel.slotProgressLabel = string.format("%d/%d", WheelController.wheel.slotProgressCurrent,
             WheelController.wheel.slotProgressTotal)
         local progress = WheelController.wheel.slotProgressCurrent / WheelController.wheel.slotProgressTotal
