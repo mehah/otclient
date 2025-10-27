@@ -178,26 +178,40 @@ function g_tooltip.terminate()
     g_tooltip = nil
 end
 
-function g_tooltip.display(text)
-    if text == nil or text:len() == 0 then
-        return
-    end
-    if not toolTipLabel then
-        return
+local TOOLTIP_LIST_BULLET = string.char(149)
+local function normalizeListMarkup(text)
+    if type(text) ~= 'string' then
+        return text
     end
 
-    toolTipLabel:setText(text)
-    toolTipLabel:resizeToText()
-    toolTipLabel:resize(toolTipLabel:getWidth() + 4, toolTipLabel:getHeight() + 4)
-    toolTipLabel:show()
-    toolTipLabel:raise()
-    toolTipLabel:enable()
-    g_effects.fadeIn(toolTipLabel, 100)
-    moveToolTip(true)
+    if not text:find('<%s*[uU][lL]') and not text:find('<%s*[lL][iI]') then
+        return text
+    end
 
-    connect(rootWidget, {
-        onMouseMove = moveToolTip
-    })
+    local hasListItem = false
+
+    local normalized = text
+    normalized = normalized:gsub('<%s*[uU][lL][^>]*>', '')
+    normalized = normalized:gsub('</%s*[uU][lL]%s*>', '')
+    normalized = normalized:gsub('<br%s*/?>', '\n')
+    normalized = normalized:gsub('<%s*[lL][iI][^>]*>', function()
+        hasListItem = true
+        return '\n' .. TOOLTIP_LIST_BULLET .. ' '
+    end)
+    normalized = normalized:gsub('</%s*[lL][iI]%s*>', '')
+    normalized = normalized:gsub('<[^>]+>', '')
+    normalized = normalized:gsub('\r\n', '\n'):gsub('\r', '\n')
+    normalized = normalized:gsub(' *\n *', '\n')
+    normalized = normalized:gsub('\n+', '\n')
+    normalized = normalized:gsub('^%s+', '')
+    normalized = normalized:gsub('%s+$', '')
+
+    if hasListItem then
+        normalized = normalized:gsub('^' .. TOOLTIP_LIST_BULLET .. '%s*', TOOLTIP_LIST_BULLET .. ' ')
+        normalized = normalized:gsub('\n' .. TOOLTIP_LIST_BULLET .. '%s*', '\n' .. TOOLTIP_LIST_BULLET .. ' ')
+    end
+
+    return normalized
 end
 
 local function pairsToString(tbl)
@@ -215,13 +229,14 @@ function g_tooltip.display(widget)
     if (type(text) == 'string' and text:len() == 0) or (type(text) == 'table' and #text == 0) then return end
     if not toolTipLabel then return end
     if type(text) == 'string' then
+        text = normalizeListMarkup(text)
         toolTipLabel:setText(text)
         toolTipLabel:setColor("#3f3f3f")
     elseif type(text) == 'table' then
         local parsedText = pairsToString(text)
         toolTipLabel:setColoredText(parsedText)
     end
-    toolTipLabel:setFont((widget.tooltipFont and widget.tooltipFont or "Verdana Bold-11px"))
+    toolTipLabel:setFont(widget.tooltipFont and widget.tooltipFont or "Verdana Bold-11px")
     toolTipLabel:resizeToText()
     toolTipLabel:resize(toolTipLabel:getWidth() + 8, toolTipLabel:getHeight() + 4)
     toolTipLabel:setBackgroundColor("#c0c0c0")
