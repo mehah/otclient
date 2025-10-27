@@ -33,6 +33,7 @@
 #include <framework/platform/platformwindow.h>
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
+#include <framework/graphics/texturemanager.h>
 #include <framework/html/htmlmanager.h>
 
 UIWidget::UIWidget()
@@ -1482,12 +1483,17 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool w
     if (isClipping() && !containsPaddingPoint(childPos))
         return nullptr;
 
+    if (isPixelTesting() && isPixelTransparent(childPos))
+        return nullptr;
+
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible()) {
             if (const auto& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
                 return subChild;
 
-            if (child->containsPoint(childPos) && (wantsPhantom || !child->isPhantom()))
+            if (child->containsPoint(childPos)
+                && (wantsPhantom
+                || (!child->isPhantom() && (!child->isPixelTesting() || !child->isPixelTransparent(childPos)))))
                 return child;
         }
     }
@@ -2077,10 +2083,11 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
     }
 
     if (!checkContainsPoint || containsPoint(mousePos)) {
-        widgetList.emplace_back(static_self_cast<UIWidget>());
+        if (!isPixelTesting() || !isPixelTransparent(mousePos))
+            widgetList.emplace_back(static_self_cast<UIWidget>());
 
-        if (!isPhantom() && !isOnHtml() || isDraggable())
-            ret = true;
+        if ((!isPhantom() && !isOnHtml()) || isDraggable())
+            return true;
     }
 
     return ret;
@@ -2361,4 +2368,33 @@ void UIWidget::setAlignSelf(AlignSelf align)
 void UIWidget::setPlacement(const std::string& placement) {
     m_placement = Fw::translatePlacement(placement);
     scheduleHtmlTask(PropApplyAnchorAlignment);
+}
+
+void UIWidget::setIsPixelTesting(const bool isPixelTesting)
+{
+    if (m_isPixelTesting == isPixelTesting)
+        return;
+
+    m_isPixelTesting = isPixelTesting;
+}
+
+bool UIWidget::isPixelTransparent(const Point& mousePos)
+{
+    if (!m_imageTexture || m_imageTexture->isEmpty())
+        return true;
+
+    const int x = mousePos.x - m_rect.x();
+    const int y = mousePos.y - m_rect.y();
+
+    if (x < 0 || y < 0 || x >= m_imageTexture->getWidth() || y >= m_imageTexture->getHeight())
+        return true;
+
+    if (!m_imageTexture->hasTransparentPixels() && !m_imageSource.empty())
+        g_textures.loadTextureTransparentPixels(m_imageSource);
+
+    if (!m_imageTexture->hasTransparentPixels())
+        return false;
+
+    const uint32_t index = static_cast<uint32_t>(y * m_imageTexture->getWidth() + x);
+    return m_imageTexture->isPixelTransparent(index);
 }

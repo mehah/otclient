@@ -342,6 +342,7 @@ protected:
     UIWidgetPtr m_focusedChild;
 
     bool m_anchorable{ true };
+    bool m_isPixelTesting{ false };
 
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
     std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
@@ -423,6 +424,7 @@ public:
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
     void setAutoRepeatDelay(const int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
+    void setIsPixelTesting(bool isPixelTesting);
     void setDisplay(DisplayType type);
     void setFloat(FloatType type) { m_floatType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setClear(ClearType type) { m_clearType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
@@ -679,6 +681,8 @@ public:
     bool intersects(const Rect rect) { return m_rect.intersects(rect); }
     bool intersectsMargin(const Rect rect) { return getMarginRect().intersects(rect); }
     bool intersectsPadding(const Rect rect) { return getPaddingRect().intersects(rect); }
+    bool isPixelTesting() const { return m_isPixelTesting; }
+    bool isPixelTransparent(const Point& mousePos);
 
     std::string getId() { return m_id; }
     std::string getSource() { return m_source; }
@@ -735,9 +739,9 @@ public:
     void setY(const int y) { move(getX(), y); }
 
     void setTop(int v) { m_positions.top.unit = Unit::Px; m_positions.top.value = v; scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
-    void setBottom(int v) { m_positions.top.unit = Unit::Px; m_positions.bottom.value = v; scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
-    void setLeft(int v) { m_positions.top.unit = Unit::Px; m_positions.left.value = v;  scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
-    void setRight(int v) { m_positions.top.unit = Unit::Px; m_positions.right.value = v;  scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setBottom(int v) { m_positions.bottom.unit = Unit::Px; m_positions.bottom.value = v; scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setLeft(int v) { m_positions.left.unit = Unit::Px; m_positions.left.value = v;  scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setRight(int v) { m_positions.right.unit = Unit::Px; m_positions.right.value = v;  scheduleHtmlTask(PropUpdateSize); scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
 
     void setHeight(std::string heightStr) { applyDimension(false, std::move(heightStr)); }
     void setWidth(std::string widthStr) { applyDimension(true, std::move(widthStr)); }

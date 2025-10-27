@@ -63,7 +63,7 @@ function string:wrap(width)
     local wrapped = ""
     local lineWidth = 0
     for word in self:gmatch("%S+") do
-        local wordWidth = #word * 10  -- Assuming each character is 10 pixels wide
+        local wordWidth = #word * 10 -- Assuming each character is 10 pixels wide
         if lineWidth + wordWidth > width then
             wrapped = wrapped .. "\n" .. word .. " "
             lineWidth = wordWidth + 1
