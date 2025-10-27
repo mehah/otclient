@@ -390,7 +390,10 @@
                   onclick="self.wheel:selectInformationTab(2)"
                 />
               </div>
-              <div style="width: 205px; height: 200px; margin-left: 4px">
+              <div
+                *if="self.wheel.information.firstButton.active == true"
+                style="width: 205px; height: 200px; margin-left: 4px"
+              >
                 <div
                   class="section-progress-bg"
                   *if="self.wheel.information.hoveredSlotData ~= nil"
