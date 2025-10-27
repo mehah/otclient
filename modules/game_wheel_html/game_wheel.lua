@@ -50,14 +50,18 @@ function WheelController.wheel:handleOnHover(slotId)
 end
 
 local function resetSelection()
-    WheelController.wheel.currentSelectedDomain = -1
+    WheelController.wheel.selectedPerkDomain = -1
+    WheelController.wheel.selectedGemVesselDomain = -1
     WheelController.wheel.selectionBonus.showButtons = false
     WheelController.wheel.selectionBonus.canAdd = false
     WheelController.wheel.selectionBonus.canRemove = false
     WheelController.wheel.selectionBonus.showMoreDetails = false
+    WheelController.wheel.selectionBonus.moreDetailsTitle = nil
     WheelController.wheel.selectionBonus.moreDetails = nil
     WheelController.wheel.selectionBonus.moreDetailsTooltip = nil
+    WheelController.wheel.selectionBonus.moreDetailsColor = activeColor
     WheelController.wheel.selectionBonus.data = {}
+    WheelController.wheel.selectionBonus.showChangeGemButton = false
 end
 
 
@@ -78,10 +82,10 @@ function WheelController.wheel:configureDedication()
     table.insert(WheelController.wheel.selectionBonus.data,
         {
             title = "Dedication Perk",
-        text = helper.bonus.getDedicationBonus(index),
+            text = helper.bonus.getDedicationBonus(index),
             color = color,
             tooltip = helper.bonus.getDedicationTooltip(index)
-    }
+        }
     )
 end
 
@@ -91,7 +95,6 @@ function WheelController.wheel:configureConviction()
         resetSelection()
         return
     end
-
 
     local bonus = helper.bonus.WheelBonus[index - 1]
     local conviction = helper.bonus.getConvictionBonus(index)
@@ -171,6 +174,7 @@ function WheelController.wheel:largePerkClick(domain)
     local spell = domainToSpells[domain]
     if WheelController.wheel.revelationPerks[spell] then
         WheelController.wheel.selectionBonus.showMoreDetails = true
+        WheelController.wheel.selectionBonus.moreDetailsTitle = "More Details:"
         WheelController.wheel.selectionBonus.moreDetails = WheelController.wheel.revelationPerks[spell].text
         WheelController.wheel.selectionBonus.moreDetailsTooltip = WheelController.wheel.revelationPerks[spell].tooltip
         table.insert(WheelController.wheel.selectionBonus.data, {
@@ -181,9 +185,117 @@ function WheelController.wheel:largePerkClick(domain)
         })
     end
 
-    WheelController.wheel.currentSelectedDomain = domain
+    WheelController.wheel.selectedPerkDomain = domain
 end
 
+function WheelController.wheel:onGemVesselClick(domain)
+    WheelController.wheel.currentSelectSlotId = -1
+    resetSelection()
+    local filledCount = GemAtelier.getFilledVesselCount(domain)
+    local data = GemAtelier.getEquipedGem(domain)
+
+    local romanLetter = { "I", "II", "III" }
+    local vesselStatus = "Sealed"
+    if filledCount == 1 then
+        vesselStatus = "Dormant"
+    elseif filledCount == 2 then
+        vesselStatus = "Awakened"
+    elseif filledCount == 3 then
+        vesselStatus = "Radiant"
+    end
+
+    WheelController.wheel.selectionBonus.showMoreDetails = true
+    local filled = filledCount == 0 and "0" or romanLetter[filledCount]
+    WheelController.wheel.selectionBonus.moreDetailsTitle = string.format("%s Vessel (VR %s)", vesselStatus, filled)
+    WheelController.wheel.selectionBonus.moreDetailsTooltip =
+    "If the Vessel Resonance matches the gem quality in this domain,a\nbonus of +1 to all damage and healing is granted. This bonus is\nincreased by 1 for greater gems.\n\nRegardless of the match, gems will always grant mod bonuses based on the Vessel Resonance.\n<ul><li style='margin-left:-26px'>Lesser gems match Dormant Vessels (VR I)</li>\n<li style='margin-left:-26px'>Regular gems match Awakened Vessels (VR II)</li>\n<li style='margin-left:-26px'>Greater gems match Radiant Vessels (VR III)</li></ul>"
+
+    local tooltip =
+    "Gems can be revealed within the Gem Atelier. Different gem qualities yield different amounts of mods:\n<ul><li style='margin-left:-26px'>Lesser gem: one basic mod</li>\n<li style='margin-left:-26px'>Regular gem: two basic mods</li>\n<li style='margin-left:-26px'>Greater gem: two basic mods and one supreme mod</li></ul>\nYou can enhance the effects of a mod by increasing its grade in the Fragment Workshop."
+
+    WheelController.wheel.selectionBonus.showChangeGemButton = true
+
+    local title = "Vessel contains no gem"
+    local insertedTitle = false
+    if data then
+        title = helper.gems.GemVocations[WheelController.wheel.vocationId][data.gemType].name:gsub(
+            " %(x 0%)", "")
+        local decription = "(Unkown)"
+
+        if data.gemType == 0 then
+            decription = Workshop.getGemInformationByBonus(data.lesserBonus, false, data.gemID, 0)
+            table.insert(WheelController.wheel.selectionBonus.data, {
+                title = title,
+                tooltip = tooltip,
+                text = decription,
+                color = (filledCount >= 1 and activeColor or inactiveColor)
+            })
+            insertedTitle = true
+        elseif data.gemType == 1 then
+            decription = Workshop.getGemInformationByBonus(data.lesserBonus, false, data.gemID, 0)
+            table.insert(WheelController.wheel.selectionBonus.data, {
+                title = not insertedTitle and title or nil,
+                tooltip = not insertedTitle and tooltip or nil,
+                text = decription,
+                color = (filledCount >= 1 and activeColor or inactiveColor)
+            })
+            insertedTitle = true
+            decription = Workshop.getGemInformationByBonus(data.regularBonus, false, data.gemID, 1)
+
+            table.insert(WheelController.wheel.selectionBonus.data, {
+                title = not insertedTitle and title or nil,
+                tooltip = not insertedTitle and tooltip or nil,
+                text = decription,
+                color = (filledCount >= 2 and activeColor or inactiveColor)
+            })
+        elseif data.gemType == 2 then
+            decription = Workshop.getGemInformationByBonus(data.lesserBonus, false, data.gemID, 0)
+
+            table.insert(WheelController.wheel.selectionBonus.data, {
+                title = not insertedTitle and title or nil,
+                tooltip = not insertedTitle and tooltip or nil,
+                text = decription,
+                color = (filledCount >= 1 and activeColor or inactiveColor)
+            })
+            insertedTitle = true
+            decription, gemSlot2 = Workshop.getGemInformationByBonus(data.regularBonus, false, data.gemID, 1)
+
+            table.insert(WheelController.wheel.selectionBonus.data, {
+                title = not insertedTitle and title or nil,
+                tooltip = not insertedTitle and tooltip or nil,
+                text = decription,
+                color = (filledCount >= 2 and activeColor or inactiveColor)
+            })
+
+            decription = Workshop.getGemInformationByBonus(data.supremeBonus, true, data.gemID, 2)
+
+            table.insert(WheelController.wheel.selectionBonus.data, {
+                title = not insertedTitle and title or nil,
+                tooltip = not insertedTitle and tooltip or nil,
+                text = decription,
+                color = (filledCount >= 3 and activeColor or inactiveColor)
+            })
+        end
+
+        WheelController.wheel.selectionBonus.moreDetails = string.format("+%s Damage and Healing",
+            (data.gemType == 2 and 2 or 1))
+        WheelController.wheel.selectionBonus.moreDetailsColor = (filledCount == 3 and activeColor or inactiveColor)
+
+        -- local replaceStr = { [0] = "�", [1] = "�", [2] = "�", [3] = "�" }
+        -- TODO: adicionar ícones ao lado do tooltip do titulo baseado no nivel da gema
+    end
+
+    if not insertedTitle then
+        WheelController.wheel.selectionBonus.moreDetails = " "
+        table.insert(WheelController.wheel.selectionBonus.data, {
+            title = title,
+            color = activeColor,
+            tooltip = tooltip
+        })
+    end
+
+    WheelController.wheel.selectedGemVesselDomain = domain
+end
 
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId

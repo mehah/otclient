@@ -899,14 +899,27 @@ local selectionBonus = {
     showMoreDetails = false,
     moreDetailsTooltip = nil,
     moreDetails = nil,
-    
+    moreDetailsColor = "#c0c0c0",
+    moreDetailsTitle = nil,
+    gemVessel = {
+        title = "Vessel contains no gem",
+        data = {},
+        color = "#c0c0c0",
+        tooltip = nil,
+        moreDetailsTooltip = nil,
+        footer = nil,
+        VRBonus = {
+            text = nil,
+            color = "#707070"
+        }
+    },
 }
 
 local baseWheelValues = {
     clip = { x = 0, y = 34, width = 322, height = 34 },
     backdropVocationOverlay = nil,
     currentSelectSlotId = -1,
-    currentSelectedDomain = -1,
+    selectedPerkDomain = -1,
     currentHoverSlot = -1,
     currentPoints = 0,
     extraPoints = 0,
@@ -962,26 +975,8 @@ local baseWheelValues = {
     equipedGemBonuses = {},
     vesselEnabled = {},
     activeGems = {},
-    selectionBonus = {
-        dedication = {
-            text = nil,
-            tooltip = nil,
-            color = "#c0c0c0"
-        },
-        conviction = {
-            text = nil,
-            data = {},
-            color = "#c0c0c0",
-            tooltip = nil,
-        },
-        revelation = {
-            text = nil,
-            data = {},
-            color = "#c0c0c0",
-            tooltip = nil,
-            moreDetailsTooltip = nil
-        }
-    },
+    selectedBonus = "<selected_bonus>",
+    selectionBonus = selectionBonus,
     slotProgressLabel = "0/50",
     slotProgressCurrent = 0,
     slotProgressTotal = 0,
@@ -1013,6 +1008,7 @@ local wheel = {
     baseWheelValues = baseWheelValues,
     baseSlotIndex = baseSlotIndex,
     translateVocation = translateVocation,
+    selectionBonus = selectionBonus
 }
 
 return wheel
