@@ -139,6 +139,8 @@ end
 function WheelController.wheel:largePerkClick(domain)
     resetSelection()
     WheelController.wheel.currentSelectSlotId = -1
+    WheelController.wheel.currentSelectSlotData = nil
+
     local domainToSpells = {
         [1] = "giftOfLife",
         [2] = "spellTR",
@@ -190,6 +192,7 @@ end
 
 function WheelController.wheel:onGemVesselClick(domain)
     WheelController.wheel.currentSelectSlotId = -1
+    WheelController.wheel.currentSelectSlotData = nil
     resetSelection()
     local filledCount = GemAtelier.getFilledVesselCount(domain)
     local data = GemAtelier.getEquipedGem(domain)
