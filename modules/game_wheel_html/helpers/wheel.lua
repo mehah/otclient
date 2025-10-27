@@ -890,8 +890,6 @@ local function isFirstSlot(index)
 end
 
 local selectionBonus = {
-    title = nil,
-    tooltip = nil,
     data = {},
     showButtons = false,
     canAdd = false,
@@ -901,18 +899,26 @@ local selectionBonus = {
     moreDetails = nil,
     moreDetailsColor = "#c0c0c0",
     moreDetailsTitle = nil,
-    gemVessel = {
-        title = "Vessel contains no gem",
-        data = {},
-        color = "#c0c0c0",
-        tooltip = nil,
-        moreDetailsTooltip = nil,
-        footer = nil,
-        VRBonus = {
-            text = nil,
-            color = "#707070"
-        }
+}
+
+local informationButtonClips = {
+    firstButton = {
+        selected = "/images/game/wheel/informationSelection.png",
+        unselected = "/images/game/wheel/small_information_button.png",
+        unselectedClip = { x = 0, y = 0, width = 34, height = 34 },
+        selectedClip = { x = 0, y = 0, width = 173, height = 34 },
+        selectedWidth = 173,
+        unselectedWidth = 34,
     },
+    secondButton = {
+        selected = "/images/game/wheel/manageSelect.png",
+        unselected = "/images/game/wheel/small_manage_button.png",
+        unselectedClip = { x = 0, y = 0, width = 34, height = 34 },
+        selectedClip = { x = 0, y = 0, width = 173, height = 34 },
+        disabledClip = { x = 0, y = 68, width = 34, height = 34 },
+        selectedWidth = 173,
+        unselectedWidth = 34,
+    }
 }
 
 local baseWheelValues = {
@@ -920,7 +926,7 @@ local baseWheelValues = {
     backdropVocationOverlay = nil,
     currentSelectSlotId = -1,
     selectedPerkDomain = -1,
-    currentHoverSlot = -1,
+    currentHoverSlotId = -1,
     currentPoints = 0,
     extraPoints = 0,
     totalPoints = 0,
@@ -975,13 +981,34 @@ local baseWheelValues = {
     equipedGemBonuses = {},
     vesselEnabled = {},
     activeGems = {},
-    selectedBonus = "<selected_bonus>",
     selectionBonus = selectionBonus,
     slotProgressLabel = "0/50",
     slotProgressCurrent = 0,
     slotProgressTotal = 0,
-    slotProgressWidth = 205
+    slotProgressWidth = 205,
+    information = {
+        hoveredSlotData = nil,
+        data = {},
+        slotProgressCurrent = 0,
+        slotProgressTotal = 0,
+        slotProgressLabel = "0/50",
+        slotProgressWidth = 205,
+        firstButton = {
+            active = true,
+            path = informationButtonClips.firstButton.selected,
+            clip = informationButtonClips.firstButton.selectedClip,
+            width = informationButtonClips.firstButton.selectedWidth
+        },
+        secondButton = {
+            active = false,
+            path = informationButtonClips.secondButton.unselected,
+            clip = informationButtonClips.secondButton.unselectedClip,
+            width = informationButtonClips.secondButton.unselectedWidth,
+            disabled = true,
+        }
+    }
 }
+
 
 local function translateVocation(id)
     if id == 1 or id == 11 then
@@ -1008,7 +1035,8 @@ local wheel = {
     baseWheelValues = baseWheelValues,
     baseSlotIndex = baseSlotIndex,
     translateVocation = translateVocation,
-    selectionBonus = selectionBonus
+    selectionBonus = selectionBonus,
+    informationButtonClips = informationButtonClips,
 }
 
 return wheel

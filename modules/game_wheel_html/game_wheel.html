@@ -109,6 +109,17 @@
       --image-border: 30;
       position: relative;
     }
+    .panel-information-window {
+      --image-source: "/images/ui/2pixel_up_frame_borderimage.png";
+      --image-border: 30;
+      height: 285px;
+      margin-top: 8px;
+      width: 213px;
+      position: relative;
+    }
+    .information-button-img {
+      height: 34px;
+    }
     .panel-title {
       position: relative;
       top: 5;
@@ -360,6 +371,74 @@
                 </div>
               </div>
             </div>
+            <div class="panel-information-window">
+              <div
+                style="inline-block;height:34px;width:213px;margin-left: 3px;margin-top:3px"
+              >
+                <img
+                  class="information-button-img"
+                  *image-source="self.wheel.information.firstButton.path"
+                  *width="self.wheel.information.firstButton.width"
+                  *image-clip="self.wheel.information.firstButton.clip"
+                  onclick="self.wheel:selectInformationTab(1)"
+                />
+                <img
+                  class="information-button-img"
+                  *image-source="self.wheel.information.secondButton.path"
+                  *width="self.wheel.information.secondButton.width"
+                  *image-clip="self.wheel.information.secondButton.clip"
+                  onclick="self.wheel:selectInformationTab(2)"
+                />
+              </div>
+              <div style="width: 205px; height: 200px; margin-left: 4px">
+                <div
+                  class="section-progress-bg"
+                  *if="self.wheel.information.hoveredSlotData ~= nil"
+                >
+                  <img
+                    class="section-progress"
+                    src="/images/game/wheel/progressBar.png"
+                    *width="self.wheel.information.slotProgressWidth or 0"
+                  />
+                  <div style="height: 20px">
+                    <p style="margin-top: 2px">
+                      {{self.wheel.information.slotProgressLabel}}
+                    </p>
+                  </div>
+                </div>
+                <div
+                  style="width: 205px"
+                  *if="#self.wheel.information.data > 0"
+                  *for="local data in self.wheel.information.data; local i = index"
+                >
+                  <div
+                    style="width: 205px; height: 12px; position: relative"
+                    *if="data.title ~= nil"
+                  >
+                    <p
+                      *if="data.title ~= nil"
+                      style="text-align: center; color: #c0c0c0"
+                    >
+                      {{data.title}}
+                    </p>
+                  </div>
+
+                  <span
+                    *if="data.text ~= nil"
+                    style="height: 15px; white-space: pre-line"
+                    *color="data.color"
+                  >
+                    <img
+                      *if="data.icon ~= nil"
+                      *image-source="data.icon"
+                      height="11"
+                      width="11"
+                    />
+                    {{data.text}}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="panel-center" onhover="self.wheel:handleOnHover(-1)">
             <div class="backdrop-wheel">
@@ -400,7 +479,7 @@
                 <img
                   class="wheel-center-cells"
                   *image-source="data.hoverPath"
-                  *opacity="self.wheel.currentHoverSlot == data.id and 0.2 or 0.01"
+                  *opacity="self.wheel.currentHoverSlotId == data.id and 0.2 or 0.01"
                   *height="data.height"
                   *width="data.width"
                   onhover="self.wheel:handleOnHover(data.id)"

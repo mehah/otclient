@@ -45,8 +45,32 @@ local quadrantFramesByMaxPoints = {
 local baseWheelColorPath = "/images/game/wheel/wheel-colors/%s/%s_%s.png"
 local baseColorSlotPath = "/images/game/wheel/wheel-colors/%s/slot%s/%s.png"
 
-function WheelController.wheel:handleOnHover(slotId)
-    WheelController.wheel.currentHoverSlot = slotId
+local baseInfoData = {
+    title = nil,
+    text = "\n\nFill or empty a slice with a\nright-click.",
+}
+
+function WheelController.wheel:handleOnHover(slotId, forceUpdate)
+    if slotId == WheelController.wheel.currentHoverSlotId and not forceUpdate then
+        return
+    end
+    WheelController.wheel.information.data = {}
+    WheelController.wheel.information.hoveredSlotData = nil
+    WheelController.wheel.currentHoverSlotId = slotId
+
+    local data = WheelController.wheel.data[slotId]
+    if data then
+        WheelController.wheel.information.hoveredSlotData = data
+        local pointInvested = WheelController.wheel.pointInvested[slotId] or 0
+        local bonus = helper.bonus.WheelBonus[slotId - 1]
+        WheelController.wheel.information.slotProgressCurrent = pointInvested
+        WheelController.wheel.information.slotProgressTotal = bonus.maxPoints
+        WheelController.wheel.information.slotProgressLabel = string.format("%d/%d", pointInvested, bonus.maxPoints)
+        WheelController.wheel:getSlotProgressWidth("information")
+        WheelController.wheel:configureDedication(WheelController.wheel.information.data, "hover", slotId)
+        WheelController.wheel:configureConviction(WheelController.wheel.information.data, "hover", slotId)
+    end
+    table.insert(WheelController.wheel.information.data, baseInfoData)
 end
 
 local function resetSelection()
@@ -62,11 +86,12 @@ local function resetSelection()
     WheelController.wheel.selectionBonus.moreDetailsColor = activeColor
     WheelController.wheel.selectionBonus.data = {}
     WheelController.wheel.selectionBonus.showChangeGemButton = false
+    WheelController.wheel.information.data = baseInfoData
 end
 
-
-function WheelController.wheel:configureDedication()
-    local index = WheelController.wheel.currentSelectSlotId or -1
+function WheelController.wheel:configureDedication(currentTable, currentType, index)
+    index = index or WheelController.wheel.currentSelectSlotId or -1
+    currentTable = currentTable or WheelController.wheel.selectionBonus.data
     if index == -1 then
         resetSelection()
         return
@@ -77,9 +102,10 @@ function WheelController.wheel:configureDedication()
         color = inactiveColor
     end
 
-    WheelController.wheel.selectionBonus.showButtons = true
-
-    table.insert(WheelController.wheel.selectionBonus.data,
+    if currentType ~= "click" then
+        WheelController.wheel.selectionBonus.showButtons = true
+    end
+    table.insert(currentTable,
         {
             title = "Dedication Perk",
             text = helper.bonus.getDedicationBonus(index),
@@ -89,8 +115,9 @@ function WheelController.wheel:configureDedication()
     )
 end
 
-function WheelController.wheel:configureConviction()
-    local index = WheelController.wheel.currentSelectSlotId or -1
+function WheelController.wheel:configureConviction(currentTable, currentType, index)
+    index = index or WheelController.wheel.currentSelectSlotId or -1
+    currentTable = currentTable or WheelController.wheel.selectionBonus.data
     if index == -1 then
         resetSelection()
         return
@@ -98,7 +125,9 @@ function WheelController.wheel:configureConviction()
 
     local bonus = helper.bonus.WheelBonus[index - 1]
     local conviction = helper.bonus.getConvictionBonus(index)
-    WheelController.wheel.selectionBonus.showButtons = true
+    if currentType ~= "click" then
+        WheelController.wheel.selectionBonus.showButtons = true
+    end
     local tooltip = helper.bonus.getConvictionBonusTooltip(index)
     if type(conviction) == "table" then
         local firstIcon = true
@@ -117,7 +146,7 @@ function WheelController.wheel:configureConviction()
                         activePath)
                     firstIcon = false
                 end
-                table.insert(WheelController.wheel.selectionBonus.data, {
+                table.insert(currentTable, {
                     title = i == 1 and "Conviction Perk" or nil,
                     tooltip = i == 1 and tooltip or nil,
                     text = msg,
@@ -127,7 +156,7 @@ function WheelController.wheel:configureConviction()
             end
         end
     else
-        table.insert(WheelController.wheel.selectionBonus.data, {
+        table.insert(currentTable, {
             title = "Conviction Perk",
             tooltip = tooltip,
             text = conviction,
@@ -317,6 +346,7 @@ function WheelController.wheel:handleSelectSlot(slotId)
 
     WheelController.wheel:configureDedication()
     WheelController.wheel:configureConviction()
+    WheelController.wheel:handleOnHover(slotId, true)
 
     g_logger.info("Selected slot ID: " .. tostring(slotId)) --- IGNORE ---
 end
@@ -356,6 +386,12 @@ local function resetValues()
     WheelController.wheel.slotProgressTotal = 0
     WheelController.wheel.slotProgressWidth = 205
     WheelController.wheel.slotProgressLabel = "0/50"
+
+    WheelController.wheel.information.slotProgressCurrent = 0
+    WheelController.wheel.information.slotProgressTotal = 0
+    WheelController.wheel.information.slotProgressLabel = "0/50"
+    WheelController.wheel.information.slotProgressWidth = 205
+
     resetSelection()
 end
 
@@ -373,6 +409,7 @@ function WheelController:hide()
 end
 
 function WheelController:toggle()
+    WheelController.wheel.information.data = baseInfoData
     resetValues()
     if not self.ui or self.ui:isDestroyed() then
         self:show()
@@ -405,6 +442,7 @@ function WheelController.wheel:handleMousePress(event, id)
     local pointToInvest = math.max(totalPoints - WheelController.wheel.usedPoints, 0)
     resetSelection()
     WheelController.wheel:handleSelectSlot(id)
+    WheelController.wheel:handleOnHover(id, true)
     if event.mouseButton == MouseRightButton then
         local data = WheelController.wheel.data[id]
         WheelController.wheel.currentSelectSlotId = id
@@ -416,12 +454,22 @@ function WheelController.wheel:handleMousePress(event, id)
     end
 end
 
-function WheelController.wheel:getSlotProgressWidth(barWidth)
+function WheelController.wheel:getSlotProgressWidth(tab, barWidth)
     barWidth = barWidth or 205
-    WheelController.wheel.slotProgressLabel = string.format("%d/%d", WheelController.wheel.slotProgressCurrent,
-        WheelController.wheel.slotProgressTotal)
-    local progress = WheelController.wheel.slotProgressCurrent / WheelController.wheel.slotProgressTotal
-    WheelController.wheel.slotProgressWidth = progress * barWidth
+    tab = tab or "selection"
+    if tab == "selection" then
+        WheelController.wheel.slotProgressLabel = string.format("%d/%d", WheelController.wheel.slotProgressCurrent,
+            WheelController.wheel.slotProgressTotal)
+        local progress = WheelController.wheel.slotProgressCurrent / WheelController.wheel.slotProgressTotal
+        WheelController.wheel.slotProgressWidth = progress * barWidth
+    else
+        WheelController.wheel.information.slotProgressLabel = string.format("%d/%d",
+            WheelController.wheel.information.slotProgressCurrent,
+            WheelController.wheel.information.slotProgressTotal)
+        local progress = WheelController.wheel.information.slotProgressCurrent /
+            WheelController.wheel.information.slotProgressTotal
+        WheelController.wheel.information.slotProgressWidth = progress * barWidth
+    end
 end
 
 function WheelController.wheel:isSlotInvested(index)
@@ -1011,6 +1059,31 @@ function WheelController.wheel:configureEquippedGems()
             current.gemClip = nil
         end
         table.insert(WheelController.wheel.activeGems, current)
+    end
+end
+
+function WheelController.wheel:selectInformationTab(tabOrder)
+    local buttons = helper.wheel.informationButtonClips
+    if tabOrder == 1 then
+        WheelController.wheel.information.secondButton.path = buttons.secondButton.unselected
+        WheelController.wheel.information.secondButton.clip = buttons.secondButton.unselectedClip
+        WheelController.wheel.information.secondButton.width = buttons.secondButton.unselectedWidth
+        WheelController.wheel.information.secondButton.active = false
+
+        WheelController.wheel.information.firstButton.path = buttons.firstButton.selected
+        WheelController.wheel.information.firstButton.clip = buttons.firstButton.selectedClip
+        WheelController.wheel.information.firstButton.width = buttons.firstButton.selectedWidth
+        WheelController.wheel.information.firstButton.active = true
+    elseif tabOrder == 2 then
+        WheelController.wheel.information.firstButton.path = buttons.firstButton.unselected
+        WheelController.wheel.information.firstButton.clip = buttons.firstButton.unselectedClip
+        WheelController.wheel.information.firstButton.width = buttons.firstButton.unselectedWidth
+        WheelController.wheel.information.firstButton.active = false
+
+        WheelController.wheel.information.secondButton.path = buttons.secondButton.selected
+        WheelController.wheel.information.secondButton.clip = buttons.secondButton.selectedClip
+        WheelController.wheel.information.secondButton.width = buttons.secondButton.selectedWidth
+        WheelController.wheel.information.secondButton.active = true
     end
 end
 
