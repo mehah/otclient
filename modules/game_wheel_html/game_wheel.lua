@@ -49,41 +49,54 @@ function WheelController.wheel:handleOnHover(slotId)
     WheelController.wheel.currentHoverSlot = slotId
 end
 
-function WheelController.wheel:configureDedication()
-    WheelController.wheel.selectionBonus.revelation = nil
+local function resetSelection()
     WheelController.wheel.currentSelectedDomain = -1
+    WheelController.wheel.selectionBonus.showButtons = false
+    WheelController.wheel.selectionBonus.canAdd = false
+    WheelController.wheel.selectionBonus.canRemove = false
+    WheelController.wheel.selectionBonus.showMoreDetails = false
+    WheelController.wheel.selectionBonus.moreDetails = nil
+    WheelController.wheel.selectionBonus.moreDetailsTooltip = nil
+    WheelController.wheel.selectionBonus.data = {}
+end
+
+
+function WheelController.wheel:configureDedication()
     local index = WheelController.wheel.currentSelectSlotId or -1
     if index == -1 then
-        WheelController.wheel.selectionBonus.dedication = nil
+        resetSelection()
         return
     end
-
-    WheelController.wheel.selectionBonus.dedication = {
-        text = helper.bonus.getDedicationBonus(index),
-        tooltip = helper.bonus.getDedicationTooltip(index),
-        color = activeColor
-    }
+    local color = activeColor
 
     if WheelController.wheel.pointInvested[index] <= 0 then
-        WheelController.wheel.selectionBonus.dedication.color = inactiveColor
+        color = inactiveColor
     end
+
+    WheelController.wheel.selectionBonus.showButtons = true
+
+    table.insert(WheelController.wheel.selectionBonus.data,
+        {
+            title = "Dedication Perk",
+        text = helper.bonus.getDedicationBonus(index),
+            color = color,
+            tooltip = helper.bonus.getDedicationTooltip(index)
+    }
+    )
 end
 
 function WheelController.wheel:configureConviction()
-    WheelController.wheel.selectionBonus.revelation = nil
-    WheelController.wheel.currentSelectedDomain = -1
     local index = WheelController.wheel.currentSelectSlotId or -1
     if index == -1 then
-        WheelController.wheel.selectionBonus.conviction = nil
+        resetSelection()
         return
     end
 
-    WheelController.wheel.selectionBonus.conviction.data = {}
 
     local bonus = helper.bonus.WheelBonus[index - 1]
     local conviction = helper.bonus.getConvictionBonus(index)
-    WheelController.wheel.selectionBonus.conviction.tooltip = helper.bonus.getConvictionBonusTooltip(index)
-
+    WheelController.wheel.selectionBonus.showButtons = true
+    local tooltip = helper.bonus.getConvictionBonusTooltip(index)
     if type(conviction) == "table" then
         local firstIcon = true
         for i = 1, #conviction, 2 do
@@ -101,7 +114,9 @@ function WheelController.wheel:configureConviction()
                         activePath)
                     firstIcon = false
                 end
-                table.insert(WheelController.wheel.selectionBonus.conviction.data, {
+                table.insert(WheelController.wheel.selectionBonus.data, {
+                    title = i == 1 and "Conviction Perk" or nil,
+                    tooltip = i == 1 and tooltip or nil,
                     text = msg,
                     color = color,
                     icon = iconPath,
@@ -109,18 +124,18 @@ function WheelController.wheel:configureConviction()
             end
         end
     else
-        table.insert(WheelController.wheel.selectionBonus.conviction.data, {
+        table.insert(WheelController.wheel.selectionBonus.data, {
+            title = "Conviction Perk",
+            tooltip = tooltip,
             text = conviction,
             color = WheelController.wheel.pointInvested[index] >= bonus.maxPoints and activeColor or inactiveColor,
         })
     end
-
-    WheelController.wheel.selectionBonus.conviction.text = conviction
 end
 
 function WheelController.wheel:largePerkClick(domain)
-    WheelController.wheel.currentSelectSlotData = nil
-
+    resetSelection()
+    WheelController.wheel.currentSelectSlotId = -1
     local domainToSpells = {
         [1] = "giftOfLife",
         [2] = "spellTR",
@@ -150,32 +165,30 @@ function WheelController.wheel:largePerkClick(domain)
     WheelController.wheel.slotProgressTotal = maximum
     WheelController.wheel:getSlotProgressWidth()
 
-    WheelController.wheel.selectionBonus.revelation = {
-        tooltip =
-        "To unlock a Revelation Perk, you need to distribute promotion \npoints in the corresponding domain.\nTo unlock stage 1 of a Revelation Perk, you need 250 promotion \npoints. Stage 2 requires 500 promotion points. As soon as you have \ndistributed 1000 promotion points, stage 3 is unlocked.\nRevelation Mastery, which can be found on some gems, provides \nadditional points to unlock Revelation Perks.\n\nUnlocked Revelation Perks grant a bonus to all damage and \nhealing:\n* Stage 1 grants a bonus of +4 damage and healing\n* Stage 2 increases this bonus to +9\n* Stage 3 increases this bonus to +20",
-        text = "",
-        moreTooltip = nil,
-        value = "Locked",
-        color = passive >= 250 and activeColor or inactiveColor
-    }
+    local tooltip =
+    "To unlock a Revelation Perk, you need to distribute promotion \npoints in the corresponding domain.\nTo unlock stage 1 of a Revelation Perk, you need 250 promotion \npoints. Stage 2 requires 500 promotion points. As soon as you have \ndistributed 1000 promotion points, stage 3 is unlocked.\nRevelation Mastery, which can be found on some gems, provides \nadditional points to unlock Revelation Perks.\n\nUnlocked Revelation Perks grant a bonus to all damage and \nhealing:\n* Stage 1 grants a bonus of +4 damage and healing\n* Stage 2 increases this bonus to +9\n* Stage 3 increases this bonus to +20"
 
     local spell = domainToSpells[domain]
     if WheelController.wheel.revelationPerks[spell] then
-        WheelController.wheel.selectionBonus.revelation.text = WheelController.wheel.revelationPerks[spell].message
-        WheelController.wheel.selectionBonus.revelation.moreTooltip = WheelController.wheel.revelationPerks[spell]
-            .tooltip
-        WheelController.wheel.selectionBonus.revelation.value = WheelController.wheel.revelationPerks[spell].text
+        WheelController.wheel.selectionBonus.showMoreDetails = true
+        WheelController.wheel.selectionBonus.moreDetails = WheelController.wheel.revelationPerks[spell].text
+        WheelController.wheel.selectionBonus.moreDetailsTooltip = WheelController.wheel.revelationPerks[spell].tooltip
+        table.insert(WheelController.wheel.selectionBonus.data, {
+            title = "Revelation Perk",
+            text = WheelController.wheel.revelationPerks[spell].message,
+            color = passive >= 250 and activeColor or inactiveColor,
+            tooltip = tooltip,
+        })
     end
 
     WheelController.wheel.currentSelectedDomain = domain
 end
 
+
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId
     WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
-    WheelController.wheel:configureDedication()
-    WheelController.wheel:configureConviction()
-
+    resetSelection()
 
     local pointInvested = WheelController.wheel.pointInvested[slotId] or 0
     local bonus = helper.bonus.WheelBonus[slotId - 1]
@@ -183,6 +196,13 @@ function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.slotProgressTotal = bonus.maxPoints
     WheelController.wheel.slotProgressLabel = string.format("%d/%d", pointInvested, bonus.maxPoints)
     WheelController.wheel:getSlotProgressWidth()
+
+    WheelController.wheel.selectionBonus.canAdd = WheelController.wheel:canAddPoints(slotId)
+    WheelController.wheel.selectionBonus.canRemove = WheelController.wheel:canRemovePoints(slotId)
+
+    WheelController.wheel:configureDedication()
+    WheelController.wheel:configureConviction()
+
     g_logger.info("Selected slot ID: " .. tostring(slotId)) --- IGNORE ---
 end
 
@@ -216,16 +236,12 @@ end
 
 local function resetValues()
     WheelController.wheel.currentSelectSlotId = -1
-    WheelController.wheel.currentSelectSlotData = nil
-    WheelController.wheel.currentSelectedDomain = -1
-    if WheelController.wheel.selectionBonus then
-        WheelController.wheel.selectionBonus.revelation = nil
-    end
-
+    WheelController.wheel.currentSelectedData = nil
     WheelController.wheel.slotProgressCurrent = 0
     WheelController.wheel.slotProgressTotal = 0
     WheelController.wheel.slotProgressWidth = 205
     WheelController.wheel.slotProgressLabel = "0/50"
+    resetSelection()
 end
 
 function WheelController:hide()
@@ -272,6 +288,7 @@ end
 function WheelController.wheel:handleMousePress(event, id)
     local totalPoints = WheelController.wheel:getTotalPoints()
     local pointToInvest = math.max(totalPoints - WheelController.wheel.usedPoints, 0)
+    resetSelection()
     WheelController.wheel:handleSelectSlot(id)
     if event.mouseButton == MouseRightButton then
         local data = WheelController.wheel.data[id]
@@ -499,8 +516,8 @@ local function handleUpdatePoints()
     helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:configureEquippedGems()
-    WheelController.wheel:configureDedication()
-    WheelController.wheel:configureConviction()
+
+    WheelController.wheel:handleSelectSlot(WheelController.wheel.currentSelectSlotId)
 
     for _, slot in pairs(helper.wheel.baseSlotIndex) do
         if WheelController.wheel.pointInvested[slot] == 0 then

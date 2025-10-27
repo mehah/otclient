@@ -106,7 +106,7 @@
     }
     .panel-window {
       --image-source: "/images/ui/window.png";
-      --image-border: 3;
+      --image-border: 30;
       position: relative;
     }
     .panel-title {
@@ -223,22 +223,15 @@
       <div *if="self.currentTab == 'wheel'">
         <div class="panel-container" onhover="self.wheel:handleOnHover(-1)">
           <div class="panel">
-            <div class="panel-window" style="width: 213px; height: 248px">
+            <div class="panel-window" style="width: 213px; height: 260px">
               <p class="panel-title">Section</p>
               <div
-                style="
-                  height: 190px;
-                  width: 205px;
-                  margin-top: 10px;
-                  margin-left: 4px;
-                "
-              >
-                <div
-                  *if="self.wheel.currentSelectSlotData ~= nil or self.wheel.selectionBonus.revelation ~= nil"
+                style="width: 205px; margin-top: 8px; margin-left: 4px"
+                *height="self.wheel.selectionBonus.showButtons and 152 or 180"
                 >
                   <div
                     class="section-progress-bg"
-                    *if="self.wheel.currentSelectSlotData ~= nil or self.wheel.selectionBonus.revelation ~= nil"
+                  *if="self.wheel.currentSelectSlotData ~= nil"
                   >
                     <img
                       class="section-progress"
@@ -250,101 +243,81 @@
                     </div>
                   </div>
                   <div
-                    *if="self.wheel.currentSelectSlotData ~= nil or self.wheel.selectionBonus.revelation ~= nil"
-                    style="margin-top: 4px; height: 130px; width: 205px"
+                  style="width: 205px"
+                  *if="#self.wheel.selectionBonus.data > 0"
+                  *for="local data in self.wheel.selectionBonus.data; local i = index"
                   >
                     <div
-                      style="width: 205px; height: 45px; position: relative"
-                      *if="self.wheel.selectionBonus.dedication ~= nil and self.wheel.selectionBonus.revelation == nil"
+                    style="width: 205px; height: 12px; position: relative"
+                    *if="data.title ~= nil"
                     >
-                      <p style="text-align: center">Dedication Perk</p>
-                      <img
-                        class="tooltip"
-                        *if="self.wheel.selectionBonus.dedication.tooltip ~= nil"
-                        *tooltip="self.wheel.selectionBonus.dedication.tooltip"
-                      />
-                      <p
-                        style="white-space: pre-line"
-                        *color="self.wheel.selectionBonus.dedication.color"
+                    <p
+                      *if="data.title ~= nil"
+                      style="text-align: center; color: #c0c0c0"
                       >
-                        {{self.wheel.selectionBonus.dedication.text}}
-                      </p>
-                    </div>
-                    <div
-                      style="width: 205px; height: 100px; position: relative"
-                      *if="self.wheel.selectionBonus.conviction ~= nil and self.wheel.selectionBonus.revelation == nil"
-                    >
-                      <p style="text-align: center">Conviction Perk</p>
+                      {{data.title}}
+                    </p>
                       <img
                         class="tooltip"
-                        *if="self.wheel.selectionBonus.conviction.tooltip ~= nil"
-                        *tooltip="self.wheel.selectionBonus.conviction.tooltip"
+                      *if="data.tooltip  ~= nil"
+                      *tooltip="data.tooltip"
                       />
+                  </div>
+
                       <span
-                        *for="local data in self.wheel.selectionBonus.conviction.data;"
+                    *if="data.text"
+                    style="height: 15px; white-space: pre-line"
                         *color="data.color"
-                        style="white-space: pre-line"
                       >
                         <img
                           *if="data.icon ~= nil"
                           *image-source="data.icon"
                           height="11"
                           width="11"
-                        />{{data.text}}
+                    />
+                    {{data.text}}
                       </span>
                     </div>
                     <div
-                      *if="self.wheel.selectionBonus.revelation ~= nil"
-                      style="width: 205px; height: 150px; position: relative"
-                      *color="self.wheel.selectionBonus.revelation.color"
-                    >
-                      <p style="text-align: center">Revelation Perk</p>
-                      <img
-                        class="tooltip"
-                        *if="self.wheel.selectionBonus.revelation ~= nil and self.wheel.selectionBonus.revelation.tooltip ~= nil"
-                        *tooltip="self.wheel.selectionBonus.revelation.tooltip"
-                      />
-                      <div
-                        style="
-                          height: 100%;
-                          max-height: 80px;
-                          white-space: pre-line;
-                        "
-                        *if="self.wheel.selectionBonus.revelation ~= nil and self.wheel.selectionBonus.revelation.text ~= nil"
-                        *color="self.wheel.selectionBonus.revelation.color"
+                  *if="self.wheel.selectionBonus.showMoreDetails == true"
+                  style="margin-top: 20px"
+                >
+                  <span
+                    style="width: 100%"
+                    *if="self.wheel.selectionBonus.showMoreDetails == true"
                       >
-                        {{self.wheel.selectionBonus.revelation.text}}
-                      </div>
-                      <div>
-                        <span style="width: 100%">
                           More details:
                           <span
                             class="tooltip"
-                            *tooltip="self.wheel.selectionBonus.revelation.moreTooltip"
+                      *tooltip="self.wheel.selectionBonus.moreDetailsTooltip"
                             style="position: relative; margin-left: 8px"
                           ></span>
                         </span>
 
-                        <p style="margin-top: 8px">
-                          {{self.wheel.selectionBonus.revelation.value}}
+                  <p
+                    *if="self.wheel.selectionBonus.showMoreDetails ~= nil and self.wheel.selectionBonus.moreDetails ~= nil"
+                    style="margin-top: 8px"
+                  >
+                    {{self.wheel.selectionBonus.moreDetails}}
                         </p>
                       </div>
                     </div>
                   </div>
+              <div style="width: 205px; margin-left: 4px">
                   <div
-                    style="margin-top: 8px; height: 20px"
-                    *if="not self.wheel:handleChangePointsButton('all') and self.wheel.selectionBonus.revelation == nil"
+                  style="margin-top: 8px; height: 20px; width: 205px"
+                  *if="self.wheel.selectionBonus.showButtons"
                   >
                     <div>
                       <button
                         style="float: right"
                         onclick="self.wheel:onAddAllPoints()"
-                        *disabled="not self.wheel:handleChangePointsButton('add')"
+                      *disabled="not self.wheel.selectionBonus.canAdd"
                       >
                         +Max
                       </button>
                       <button
-                        *disabled="not self.wheel:handleChangePointsButton('add')"
+                      *disabled="not self.wheel.selectionBonus.canAdd"
                         style="float: right"
                         onclick="self.wheel:onAddOnePoint()"
                       >
@@ -353,21 +326,23 @@
                     </div>
                     <div>
                       <button
-                        *disabled="not self.wheel:handleChangePointsButton('remove')"
+                      *disabled="not self.wheel.selectionBonus.canRemove"
                         onclick="self.wheel:onRemoveAllPoints()"
                       >
                         -Max
                       </button>
                       <button
-                        *disabled="not self.wheel:handleChangePointsButton('remove')"
+                      *disabled="not self.wheel.selectionBonus.canRemove"
                         onclick="self.wheel:onRemoveOnePoint()"
                       >
                         -1
                       </button>
                     </div>
                   </div>
-                </div>
-              </div>
+                <hr
+                  class="separator HorizontalSeparator"
+                  style="width: 205px"
+                />
               <div style="width: 205px; margin-left: 4px; color: #c0c0c0">
                 <p style="text-align: center; width: 205px">
                   Available Promotion Points
@@ -375,6 +350,7 @@
                 <p style="text-align: center; width: 205px">
                   <span> {{self.wheel.summaryPointsLabel}} </span>
                 </p>
+                </div>
               </div>
             </div>
           </div>

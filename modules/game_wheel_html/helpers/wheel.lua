@@ -889,6 +889,19 @@ local function isFirstSlot(index)
     return table.contains(baseSlotIndex, index)
 end
 
+local selectionBonus = {
+    title = nil,
+    tooltip = nil,
+    data = {},
+    showButtons = false,
+    canAdd = false,
+    canRemove = false,
+    showMoreDetails = false,
+    moreDetailsTooltip = nil,
+    moreDetails = nil,
+    
+}
+
 local baseWheelValues = {
     clip = { x = 0, y = 34, width = 322, height = 34 },
     backdropVocationOverlay = nil,
