@@ -870,6 +870,7 @@ public:
 
     // 870 only
     void equipItem(const ItemPtr& item);
+    void equipItemId(const uint16_t itemId, const uint8_t tier);
     void mount(bool mount);
 
     // 910 only
