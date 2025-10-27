@@ -771,7 +771,7 @@ void ProtocolGame::parseWheelOfDestinyOpenWindow(const InputMessagePtr& msg)
     for (uint8_t i = 0; i < revealedGemsSize; ++i) {
         const uint16_t index = msg->getU16();
         const uint8_t  locked = msg->getU8();
-        const uint8_t  affinity = msg->getU8();
+        const uint8_t  affinity = msg->getU8(); // 0=TL, 1=TR, 2=BL, 3=BR
         const uint8_t  quality = msg->getU8(); // 0=Lesser, 1=Regular, 2=Greater
         const uint8_t  basicModifier1 = msg->getU8();
         const uint8_t  basicModifier2 = (quality >= 1) ? msg->getU8() : 0;
