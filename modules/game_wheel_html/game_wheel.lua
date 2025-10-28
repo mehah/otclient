@@ -89,6 +89,47 @@ local function resetSelection()
     WheelController.wheel.information.data = baseInfoData
 end
 
+local function setPerk(index, path, _x, _y, _width, _height)
+    path = path or "/images/game/wheel/icons-skillwheel-mediumperks.png"
+    local iconInfo = helper.gems.WheelIcons[WheelController.wheel.vocationId][index]
+    local x, y, width, height = iconInfo.iconRect:match("(%d+) (%d+) (%d+) (%d+)")
+    WheelController.wheel.data[index].perkImage = path
+    WheelController.wheel.data[index].iconClip = {
+        x = _x or tonumber(x),
+        y = _y or tonumber(y),
+        width = _width or tonumber(width),
+        height = _height or tonumber(height)
+    }
+end
+
+function WheelController.wheel:resetWheel()
+    WheelController.wheel.passivePoints = {}
+    for slotId in pairs(helper.wheel.WheelSlotsParser) do
+        WheelController.wheel.pointInvested[slotId] = 0
+        WheelController.wheel:removePoint(slotId, WheelController.wheel.pointInvested[slotId])
+        WheelController.wheel:removeUnlockedThe(slotId)
+        WheelController.wheel:handleUpdatePoints()
+    end
+
+    for id, iconInfo in pairs(helper.gems.WheelIcons[WheelController.wheel.vocationId]) do
+        setPerk(id)
+        WheelController.wheel.data[id].left = WheelController.wheel.data[id].left or 0
+        WheelController.wheel.data[id].top = WheelController.wheel.data[id].top or 0
+    end
+
+    for i = 0, 3 do
+        WheelController.wheel.vesselEnabled[i] = {}
+    end
+
+    WheelController.wheel.equipedGemBonuses = {}
+    helper.bonus.configureDedicationPerk()
+    helper.bonus.configureRevelationPerks()
+    helper.bonus.configureVessels()
+    WheelController.wheel:configureConvictionPerk()
+    WheelController.wheel:handlePassiveBorders()
+    WheelController.wheel:configureEquippedGems()
+end
+
 function WheelController.wheel:configureDedication(currentTable, currentType, index)
     index = index or WheelController.wheel.currentSelectSlotId or -1
     currentType = currentType or "click"
@@ -333,6 +374,7 @@ end
 
 function WheelController.wheel:handleSelectSlot(slotId)
     WheelController.wheel.currentSelectSlotId = slotId
+    if WheelController.wheel.currentSelectSlotId == -1 then return end
     WheelController.wheel.currentSelectSlotData = WheelController.wheel.data[slotId]
     resetSelection()
 
@@ -514,18 +556,6 @@ function WheelController.wheel:canRemovePoints(index)
     return true
 end
 
-local function setPerk(index, path, _x, _y, _width, _height)
-    path = path or "/images/game/wheel/icons-skillwheel-mediumperks.png"
-    local iconInfo = helper.gems.WheelIcons[WheelController.wheel.vocationId][index]
-    local x, y, width, height = iconInfo.iconRect:match("(%d+) (%d+) (%d+) (%d+)")
-    WheelController.wheel.data[index].perkImage = path
-    WheelController.wheel.data[index].iconClip = {
-        x = _x or tonumber(x),
-        y = _y or tonumber(y),
-        width = _width or tonumber(width),
-        height = _height or tonumber(height)
-    }
-end
 function WheelController.wheel:removePoint(index, points)
     local bonus = helper.bonus.WheelBonus[index - 1]
     if points > 0 then
@@ -656,7 +686,7 @@ function WheelController.wheel:handlePassiveBorders()
     end
 end
 
-local function handleUpdatePoints()
+function WheelController.wheel:handleUpdatePoints()
     WheelController.wheel.passivePoints = {}
 
     local usedPoints = 0
@@ -693,7 +723,7 @@ local function handleUpdatePoints()
 end
 
 function WheelController.wheel:configureConvictionPerk()
-    local convictions = helper.bonus.getConvictionPerks(WheelController)
+    local convictions = helper.bonus.getConvictionPerks()
     WheelController.wheel.convictionPerks = convictions
 end
 
@@ -707,7 +737,7 @@ function WheelController.wheel:onRemoveAllPoints()
     WheelController.wheel.pointInvested[index] = 0
     WheelController.wheel:removePoint(index, WheelController.wheel.pointInvested[index])
     WheelController.wheel:removeUnlockedThe(index)
-    handleUpdatePoints()
+    WheelController.wheel:handleUpdatePoints()
 end
 
 function WheelController.wheel:onAddAllPoints()
@@ -738,7 +768,7 @@ function WheelController.wheel:onAddAllPoints()
 
     WheelController.wheel.pointInvested[index] = math.min((pointInvested + pointToInvest), bonus.maxPoints)
     WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
-    handleUpdatePoints()
+    WheelController.wheel:handleUpdatePoints()
 end
 
 function WheelController.wheel:onAddOnePoint()
@@ -766,7 +796,7 @@ function WheelController.wheel:onAddOnePoint()
     WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
     WheelController.wheel:insertUnlockedThe(index)
 
-    handleUpdatePoints()
+    WheelController.wheel:handleUpdatePoints()
 end
 
 function WheelController.wheel:onRemoveOnePoint()
@@ -789,7 +819,7 @@ function WheelController.wheel:onRemoveOnePoint()
 
     WheelController.wheel.pointInvested[index] = pointInvested - 1
     WheelController.wheel:removePoint(index, WheelController.wheel.pointInvested[index])
-    handleUpdatePoints()
+    WheelController.wheel:handleUpdatePoints()
 end
 
 function WheelController.wheel:canAddPoints(index, ignoreMaxPoint)
@@ -1218,8 +1248,7 @@ function onWheelOfDestinyOpenWindow(data)
         incrementBonusCount(info.supremeBonus, WheelController.wheel.supremeModCount)
     end
 
-    local totalPoints = WheelController.wheel.currentPoints +
-        (WheelController.wheel.extraGemPoints + WheelController.wheel.promotionScrollPoints)
+    local totalPoints = WheelController.wheel:getTotalPoints()
     WheelController.wheel.summaryPointsLabel = string.format("%d/%d", totalPoints - WheelController.wheel.usedPoints,
         totalPoints)
 

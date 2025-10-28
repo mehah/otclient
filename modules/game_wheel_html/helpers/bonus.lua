@@ -1400,10 +1400,10 @@ local function configureDedicationPerk()
 	WheelController.wheel.dedicationPerk.mitigation = string.format("%.2f%%", mitigation)
 end
 
-local function getConvictionPerks(controller)
+local function getConvictionPerks()
 	local convictions = {}
 
-	local vocation = controller.wheel.vocationId
+	local vocation = WheelController.wheel.vocationId
 	local order = {
 		["special_1"] = 1,
 		["special_2"] = 2,
@@ -1425,13 +1425,13 @@ local function getConvictionPerks(controller)
 
 	for id, bonus in pairs(WheelBonus) do
 		local index = id + 1
-		if not controller.wheel:isSlotInvested(index) then
+		if not WheelController.wheel:isSlotInvested(index) then
 			goto label
 		end
 
 		local t = order[bonus.conviction] or table.size(order) + 1
 		local attribute = WheelConsts[bonus.conviction]
-		local pointsInvested = controller.wheel.pointInvested[index] or 0
+		local pointsInvested = WheelController.wheel.pointInvested[index] or 0
 
 		if pointsInvested ~= bonus.maxPoints then
 			goto label
@@ -2181,11 +2181,11 @@ local function getStage(points)
 	end
 end
 
-local function configureRevelationPerks(controller)
+local function configureRevelationPerks()
 	-- damage and healing
 	local damage = 0
-	for domain, points in ipairs(controller.wheel.passivePoints) do
-		local extraPoints = controller.wheel.extraPassivePoints[domain] or 0
+	for domain, points in ipairs(WheelController.wheel.passivePoints) do
+		local extraPoints = WheelController.wheel.extraPassivePoints[domain] or 0
 		points = points + extraPoints
 
 		if points >= 1000 then
@@ -2233,8 +2233,8 @@ local function configureRevelationPerks(controller)
 	"Unlocked Revelation Perks grant a bonus to all damage and \nhealing:\n* Stage 1 grants a bonus of +4 damage and healing\n* Stage 2 increases this bonus to +9\n* Stage 3 increases this bonus to +20"
 
 	data.giftOfLife.message, data.giftOfLife.tooltip = getPassiveInfo(1)
-	local passive = (controller.wheel.passivePoints[1] or 0)
-	local extraPoints = controller.wheel.extraPassivePoints[1] or 0
+	local passive = (WheelController.wheel.passivePoints[1] or 0)
+	local extraPoints = WheelController.wheel.extraPassivePoints[1] or 0
 	passive = passive + extraPoints
 	data.giftOfLife.text = getStage(passive)
 
@@ -2272,14 +2272,14 @@ local function configureRevelationPerks(controller)
 	end
 
 	data.spellTR.message, data.spellTR.tooltip = getPassiveInfo(2)
-	passive = controller.wheel.passivePoints[2] or 0
-	extraPoints = controller.wheel.extraPassivePoints[2] or 0
+	passive = WheelController.wheel.passivePoints[2] or 0
+	extraPoints = WheelController.wheel.extraPassivePoints[2] or 0
 	passive = passive + extraPoints
 	data.spellTR.text = getStage(passive)
 
 	data.spellBL.message, data.spellBL.tooltip = getPassiveInfo(3)
-	passive = controller.wheel.passivePoints[3] or 0
-	extraPoints = controller.wheel.extraPassivePoints[3] or 0
+	passive = WheelController.wheel.passivePoints[3] or 0
+	extraPoints = WheelController.wheel.extraPassivePoints[3] or 0
 	passive = passive + extraPoints
 	data.spellBL.text = getStage(passive)
 
@@ -2289,7 +2289,7 @@ local function configureRevelationPerks(controller)
 	passive = passive + extraPoints
 	data.avatar.text = getStage(passive)
 
-	controller.wheel.revelationPerks = data
+	WheelController.wheel.revelationPerks = data
 end
 
 local function configureVessels()
