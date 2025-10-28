@@ -21,10 +21,13 @@
  */
 
 #include "localplayer.h"
+
+#include "container.h"
 #include "game.h"
+#include "item.h"
 #include "map.h"
-#include "tile.h"
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
 
 void LocalPlayer::lockWalk(const uint16_t millis)
 {
@@ -212,6 +215,8 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
 
     return true;
 }
+
+bool LocalPlayer::isWalkLocked() { return m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration; }
 
 void LocalPlayer::stopAutoWalk()
 {

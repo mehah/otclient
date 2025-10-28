@@ -21,13 +21,9 @@
  */
 
 #include "logger.h"
+
 #include "eventdispatcher.h"
-
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/resourcemanager.h>
-
-#include <framework/luaengine/luainterface.h>
-#include <framework/platform/platform.h>
+#include "framework/platform/platform.h"
 
 #ifdef FRAMEWORK_GRAPHICS
 #include <framework/platform/platformwindow.h>

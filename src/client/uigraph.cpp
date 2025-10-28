@@ -1,8 +1,9 @@
 #include "uigraph.h"
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/platform/platformwindow.h>
 
-#include <algorithm>
+#include "framework/graphics/bitmapfont.h"
+#include "framework/graphics/painter.h"
+#include "framework/otml/otmlnode.h"
 
 void UIGraph::drawSelf(const DrawPoolType drawPane)
 {
@@ -89,7 +90,7 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
             m_font->drawText(m_title, dest, Color::lightGray, Fw::AlignTopCenter);
         if (m_showLabes) {
             const float rotationAngle = -1.5707963267948966f;
-            
+
             g_drawPool.pushTransformMatrix();
             Point maxPoint(dest.left() - 10, dest.top() + 0);
             g_drawPool.rotate(maxPoint, rotationAngle);
@@ -104,7 +105,7 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
             m_font->drawText(m_maxValue, Rect(maxRect.x() + 1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
             m_font->drawText(m_maxValue, maxRect, Color::lightGray, Fw::AlignCenter);
             g_drawPool.popTransformMatrix();
-            
+
             g_drawPool.pushTransformMatrix();
             Point minPoint(dest.left() - 10, dest.bottom() - 0);
             g_drawPool.rotate(minPoint, rotationAngle);
@@ -119,7 +120,7 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
             m_font->drawText(m_minValue, Rect(minRect.x() + 1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
             m_font->drawText(m_minValue, minRect, Color::lightGray, Fw::AlignCenter);
             g_drawPool.popTransformMatrix();
-            
+
             g_drawPool.pushTransformMatrix();
             Point avgPoint(dest.left() - 10, dest.verticalCenter());
             g_drawPool.rotate(avgPoint, rotationAngle);
@@ -295,7 +296,7 @@ void UIGraph::cacheGraphs()
             float minValue = 0.0f;
             float maxValue = 1.0f;
             bool hasValues = false;
-            
+
             for (auto& graph : m_graphs) {
                 if (graph.values.empty())
                     continue;
@@ -327,7 +328,7 @@ void UIGraph::cacheGraphs()
             }
             if (!m_graphs[0].values.empty()) {
                 m_lastValue = formatNumber(m_graphs[0].values.back());
-                
+
                 // Calculate average from all values in the first graph
                 float sum = 0.0f;
                 for (const auto& value : m_graphs[0].values) {
@@ -503,7 +504,7 @@ std::string UIGraph::formatNumber(const int value)
     const int absValue = std::abs(value);
     const bool isNegative = value < 0;
     const std::string prefix = isNegative ? "-" : "";
-    
+
     if (absValue >= 1000000) {
         // Values 1,000,000+ use KK notation with max 1 decimal for maximum compactness
         // Example: 1,500,000 = 1.5KK, 5,000,000 = 5KK, 28,424,000 = 28.4KK

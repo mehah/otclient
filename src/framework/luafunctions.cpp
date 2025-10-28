@@ -33,6 +33,8 @@
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
 
+#include "graphics/paintershaderprogram.h"
+
 #ifdef FRAMEWORK_GRAPHICS
 #include "framework/graphics/fontmanager.h"
 #include "framework/graphics/graphics.h"
@@ -40,10 +42,10 @@
 #include "framework/graphics/particlemanager.h"
 #include "framework/graphics/shadermanager.h"
 #include "framework/graphics/texturemanager.h"
+#include "framework/html/htmlmanager.h"
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
-#include "framework/html/htmlmanager.h"
 #endif
 
 #ifdef FRAMEWORK_SOUND
@@ -60,10 +62,17 @@
 #include <framework/net/protocol.h>
 #include <framework/net/protocolhttp.h>
 #include <framework/net/server.h>
+
+#ifdef __EMSCRIPTEN__
+#include <framework/net/webconnection.h>
+#else
+#include <framework/net/connection.h>
 #endif
 
-#include <regex>
+#endif
 
+#include "core/clock.h"
+#include "core/graphicalapplication.h"
 #include "net/inputmessage.h"
 #include "net/outputmessage.h"
 

@@ -23,7 +23,7 @@
 #pragma once
 
 #include "thing.h"
-#include <framework/global.h>
+#include "framework/core/declarations.h"
 
 enum ItemAttr : uint8_t
 {

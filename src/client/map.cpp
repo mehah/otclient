@@ -21,21 +21,22 @@
  */
 
 #include "map.h"
+
+#include "animatedtext.h"
+#include "creatures.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "item.h"
 #include "localplayer.h"
 #include "mapview.h"
 #include "minimap.h"
-#include "missile.h"
-#include "statictext.h"
+#include "thing.h"
 #include "tile.h"
-
-#include <algorithm>
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/ui/uiwidget.h>
-#include <queue>
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
+#include "framework/ui/uiwidget.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
@@ -1479,4 +1480,18 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
         }
     }
     return creatures;
+}
+
+const TilePtr& TileBlock::create(const Position& pos)
+{
+    auto& tile = m_tiles[getTileIndex(pos)];
+    tile = std::make_shared<Tile>(pos);
+    return tile;
+}
+const TilePtr& TileBlock::getOrCreate(const Position& pos)
+{
+    auto& tile = m_tiles[getTileIndex(pos)];
+    if (!tile)
+        tile = std::make_shared<Tile>(pos);
+    return tile;
 }

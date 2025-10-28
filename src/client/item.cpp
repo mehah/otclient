@@ -21,18 +21,22 @@
  */
 
 #include "item.h"
-#include "container.h"
+
+#include "animator.h"
 #include "game.h"
-#include "spritemanager.h"
-#include "thing.h"
+#include "gameconfig.h"
+
+#include "thingtype.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "framework/core/clock.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
+#include "framework/graphics/shadermanager.h"
 
-#include <framework/core/clock.h>
-#include <framework/core/filestream.h>
-#include <framework/graphics/shadermanager.h>
 #ifdef FRAMEWORK_EDITOR
 #include <framework/core/binarytree.h>
+#include "itemtype.h"
 #endif
 
 ItemPtr Item::create(const int id)

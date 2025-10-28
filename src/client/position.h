@@ -22,19 +22,6 @@
 
 #pragma once
 
-#include "const.h"
-#include <framework/const.h>
-#include <framework/util/point.h>
-
-#include <array>
-#include <istream>
-#include <math.h>
-#include <ostream>
-#include <string>
-#include <vector>
-
-#include <fmt/format.h>
-
 class Position
 {
 public:
@@ -192,7 +179,7 @@ public:
 
     bool isMapPosition() const;
     bool isValid() const { return !(x == UINT16_MAX && y == UINT16_MAX && z == UINT8_MAX); }
-    double distance(const Position& pos) const { return sqrt(pow<int32_t>(pos.x - x, 2) + pow<int32_t>(pos.y - y, 2)); }
+    double distance(const Position& pos) const { return sqrt(std::pow<int32_t>(pos.x - x, 2) + std::pow<int32_t>(pos.y - y, 2)); }
     uint16_t manhattanDistance(const Position& pos) const { return static_cast<uint16_t>(std::abs(pos.x - x) + std::abs(pos.y - y)); }
 
     void translate(const int32_t dx, const int32_t dy, const int8_t dz = 0) { x += dx; y += dy; z += dz; }
@@ -296,7 +283,8 @@ inline std::istream& operator>>(std::istream& in, Position& pos)
 
 // Auto format Position
 template <>
-struct fmt::formatter<Position> : fmt::formatter<std::string> {
+struct fmt::formatter<Position> : fmt::formatter<std::string>
+{
     auto format(const Position& pos, fmt::format_context& ctx) const {
         return fmt::formatter<std::string>::format(pos.toString(), ctx);
     }

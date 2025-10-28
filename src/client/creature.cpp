@@ -21,23 +21,28 @@
  */
 
 #include "creature.h"
+
+#include "animator.h"
+#include "attachedeffect.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "lightview.h"
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
+#include "framework/graphics/texturemanager.h"
+#include "protocolcodes.h"
+#include "statictext.h"
+#include "thingtype.h"
 #include "thingtypemanager.h"
 #include "tile.h"
-
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/shadermanager.h>
-#include <framework/graphics/texturemanager.h>
-#include <framework/ui/uiwidget.h>
-
-#include "statictext.h"
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/scheduledevent.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
+#include "framework/graphics/shadermanager.h"
+#include "framework/ui/uiwidget.h"
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -183,7 +188,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     const int cropSizeText = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? getExactSize() : 12;
     const int cropSizeBackGround = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? cropSizeText - nameSize.height() : 0;
 
-    const bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
+    const bool isScaled = g_app.getCreatureInformationScale() != DEFAULT_DISPLAY_DENSITY;
     if (isScaled) {
         p.scale(g_app.getCreatureInformationScale());
     }

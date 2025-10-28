@@ -21,12 +21,8 @@
  */
 
 #pragma once
-
-#include "global.h"
-
-#include "uimap.h"
-
-#include <framework/core/graphicalapplication.h>
+#include "declarations.h"
+#include "framework/core/graphicalapplication.h"
 
 class Client : public ApplicationDrawEvents
 {

@@ -50,8 +50,6 @@ class PlatformWindow
     using OnInputEventCallback = std::function<void(const InputEvent&)>;
 
 public:
-    static constexpr float DEFAULT_DISPLAY_DENSITY = 1.f;
-
     virtual void init() = 0;
     virtual void terminate() = 0;
 
