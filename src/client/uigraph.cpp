@@ -2,6 +2,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 
 #include "framework/graphics/bitmapfont.h"
+#include "framework/graphics/painter.h"
 #include "framework/otml/otmlnode.h"
 
 void UIGraph::drawSelf(const DrawPoolType drawPane)

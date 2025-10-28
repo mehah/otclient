@@ -1,6 +1,8 @@
 #include "framebuffer.h"
 #include "textureatlas.h"
 
+#include "painter.h"
+
 constexpr uint8_t SMOOTH_PADDING = 2;
 
 TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :

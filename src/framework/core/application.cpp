@@ -36,6 +36,7 @@
 #include "modulemanager.h"
 #include "resourcemanager.h"
 #include "framework/platform/crashhandler.h"
+#include "framework/platform/platform.h"
 #include "framework/proxy/proxy.h"
 
 #ifdef FRAMEWORK_NET
@@ -93,7 +94,7 @@ void Application::init(std::vector<std::string>& args, ApplicationContext* conte
 
     // mobile testing
     if (startupOptions.find("-mobile") != std::string::npos) {
-        g_platform.setDevice({ Platform::Mobile, Platform::Android });
+        g_platform.setDevice({ Mobile, Android });
     }
 
     // initialize configs

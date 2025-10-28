@@ -25,6 +25,7 @@
 #include "modulemanager.h"
 #include "resourcemanager.h"
 #include "framework/otml/otmlnode.h"
+#include "framework/platform/platform.h"
 
 Module::Module(const std::string_view name) : m_sandboxEnv(g_lua.newSandboxEnv()), m_name(name.data()) {}
 
@@ -189,11 +190,11 @@ bool Module::hasDependency(const std::string_view name, const bool recursive)
     return false;
 }
 
-bool Module::hasSupportedDevice(const Platform::Device device)
+bool Module::hasSupportedDevice(const Device device)
 {
     for (const auto& sd : m_supportedDevices) {
-        if (sd.type == device.type || sd.type == Platform::DeviceUnknown) {
-            if (sd.os == device.os || sd.os == Platform::OsUnknown)
+        if (sd.type == device.type || sd.type == DeviceUnknown) {
+            if (sd.os == device.os || sd.os == OsUnknown)
                 return true;
         }
     }
@@ -225,7 +226,7 @@ void Module::discover(const OTMLNodePtr& moduleNode)
             if (deviceInfo.empty())
                 continue;
 
-            auto device = Platform::Device();
+            auto device = Device();
             device.type = Platform::getDeviceTypeByName(deviceInfo.at(0));
             if (deviceInfo.size() > 1) device.os = Platform::getOsByName(deviceInfo.at(1));
             m_supportedDevices.emplace_back(device);

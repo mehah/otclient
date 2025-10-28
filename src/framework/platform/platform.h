@@ -25,6 +25,8 @@
 #include <framework/core/inputevent.h>
 #include <framework/global.h>
 
+#include "staticdata.h"
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #endif
@@ -32,34 +34,6 @@
 class Platform
 {
 public:
-    enum OperatingSystem
-    {
-        OsUnknown,
-        Windows,
-        Linux,
-        macOS,
-        Android,
-        iOS
-    };
-
-    enum DeviceType
-    {
-        DeviceUnknown,
-        Desktop,
-        Mobile,
-        Browser,
-        Console
-    };
-
-    struct Device
-    {
-        Device() = default;
-        Device(const DeviceType t, const OperatingSystem o) : type(t), os(o) {}
-        DeviceType type{ DeviceUnknown };
-        OperatingSystem os{ OsUnknown };
-
-        bool operator==(const Device& rhs) const { return type == rhs.type && os == rhs.os; }
-    };
 
     void init(std::vector<std::string>& args);
     void processArgs(std::vector<std::string>& args);

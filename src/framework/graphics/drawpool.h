@@ -123,60 +123,7 @@ public:
         return m_shouldRepaint.load(std::memory_order_acquire);
     }
 
-    void release() {
-        SpinLock::Guard guard(m_threadLock);
-
-        if (!canRepaint()) {
-            for (auto& objs : m_objects)
-                objs.clear();
-            m_objectsFlushed.clear();
-            return;
-        }
-
-        m_shouldRepaint.store(true, std::memory_order_release);
-
-        m_refreshTimer.restart();
-
-        m_objectsDraw[0].clear();
-
-        if (!m_objectsFlushed.empty()) {
-            if (m_objectsDraw[0].size() < m_objectsFlushed.size())
-                m_objectsDraw[0].swap(m_objectsFlushed);
-
-            if (!m_objectsFlushed.empty()) {
-                m_objectsDraw[0].insert(
-                    m_objectsDraw[0].end(),
-                    std::make_move_iterator(m_objectsFlushed.begin()),
-                    std::make_move_iterator(m_objectsFlushed.end()));
-            }
-            m_objectsFlushed.clear();
-        }
-
-        for (auto& objs : m_objects) {
-            if (m_objectsDraw[0].size() < objs.size())
-                m_objectsDraw[0].swap(objs);
-
-            bool addFirst = true;
-
-            if (!m_objectsDraw[0].empty() && !objs.empty()) {
-                auto& last = m_objectsDraw[0].back();
-                auto& first = objs.front();
-
-                if (last.state == first.state && last.coords && first.coords) {
-                    last.coords->append(first.coords.get());
-                    addFirst = false;
-                }
-            }
-
-            if (!objs.empty()) {
-                m_objectsDraw[0].insert(
-                    m_objectsDraw[0].end(),
-                    std::make_move_iterator(objs.begin() + (addFirst ? 0 : 1)),
-                    std::make_move_iterator(objs.end()));
-                objs.clear();
-            }
-        }
-    }
+    void release();
 
     auto& getThreadLock() { return m_threadLock; }
 
@@ -316,30 +263,7 @@ private:
             m_parameters.erase(it);
     }
 
-    void flush()
-    {
-        m_coords.clear();
-
-        for (auto& objs : m_objects) {
-            bool addFirst = true;
-            if (!objs.empty() && !m_objectsFlushed.empty()) {
-                auto& last = m_objectsFlushed.back();
-                auto& first = objs.front();
-
-                if (last.state == first.state && last.coords && first.coords) {
-                    last.coords->append(first.coords.get());
-                    addFirst = false;
-                }
-            }
-
-            m_objectsFlushed.insert(
-                m_objectsFlushed.end(),
-                std::make_move_iterator(objs.begin() + (addFirst ? 0 : 1)),
-                std::make_move_iterator(objs.end())
-            );
-            objs.clear();
-        }
-    }
+    void flush();
 
     void resetOnlyOnceParameters() {
         if (m_onlyOnceStateFlag > 0) { // Only Once State

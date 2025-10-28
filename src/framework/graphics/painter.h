@@ -24,6 +24,7 @@
 
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/paintershaderprogram.h>
+#include "coordsbuffer.h"
 
 class Painter
 {

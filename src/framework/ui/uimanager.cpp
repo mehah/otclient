@@ -553,7 +553,7 @@ OTMLNodePtr UIManager::findMainWidgetNode(const OTMLDocumentPtr& doc)
     return mainNode;
 }
 
-OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::OperatingSystem os)
+OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const OperatingSystem os)
 {
     const auto rawName = file.substr(0, file.find("."));
     const auto osName = g_platform.getOsShortName(os);
@@ -567,7 +567,7 @@ OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::Ope
     return nullptr;
 }
 
-OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::DeviceType deviceType)
+OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const DeviceType deviceType)
 {
     const auto rawName = file.substr(0, file.find("."));
     const auto deviceName = g_platform.getDeviceShortName(deviceType);

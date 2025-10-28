@@ -25,6 +25,8 @@
 #include "particle.h"
 #include "particlemanager.h"
 #include "particlesystem.h"
+#include "particletype.h"
+#include "framework/otml/otmlnode.h"
 
 void ParticleEmitter::load(const OTMLNodePtr& node)
 {

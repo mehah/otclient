@@ -27,6 +27,7 @@
 
 #include "staticdata.h"
 #include "const.h"
+#include "framework/core/declarations.h"
 #include "framework/core/timer.h"
 #include "framework/graphics/declarations.h"
 #include "framework/luaengine/luaobject.h"

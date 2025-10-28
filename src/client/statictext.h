@@ -24,6 +24,8 @@
 
 #include <framework/graphics/cachedtext.h>
 
+#include "framework/luaengine/luaobject.h"
+
  // @bindclass
 class StaticText final : public LuaObject
 {

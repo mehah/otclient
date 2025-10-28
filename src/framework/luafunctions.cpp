@@ -33,6 +33,8 @@
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
 
+#include "graphics/paintershaderprogram.h"
+
 #ifdef FRAMEWORK_GRAPHICS
 #include "framework/graphics/fontmanager.h"
 #include "framework/graphics/graphics.h"

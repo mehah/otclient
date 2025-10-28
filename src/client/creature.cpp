@@ -40,6 +40,7 @@
 #include "framework/core/eventdispatcher.h"
 #include "framework/core/scheduledevent.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
 #include "framework/graphics/shadermanager.h"
 #include "framework/ui/uiwidget.h"
 

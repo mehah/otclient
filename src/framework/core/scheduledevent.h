@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "declarations.h"
 #include "event.h"
 
  // @bindclass

@@ -27,6 +27,8 @@
 #include "declarations.h"
 #include <framework/otml/declarations.h>
 
+#include "framework/platform/staticdata.h"
+
 template<typename T>
 int push_internal_luavalue(T v);
 
@@ -164,8 +166,8 @@ int push_luavalue(const Size& size);
 bool luavalue_cast(int index, Size& size);
 
 // device
-int push_luavalue(const Platform::Device& device);
-bool luavalue_cast(int index, Platform::Device& device);
+int push_luavalue(const Device& device);
+bool luavalue_cast(int index, Device& device);
 
 // otml nodes
 int push_luavalue(const OTMLNodePtr& node);
