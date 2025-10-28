@@ -205,469 +205,475 @@
   <window
     placement="center"
     title="Wheel of Destiny"
-    onescape="self:hide()"
-    style="height: 654px; width: 968px"
+    onescape="self:handleClose()"
     onhover="self.wheel:handleOnHover(-1)"
+    *width="self.currentWindow ~= 'main-window' and 415 or 968"
+    *height="self.currentWindow ~= 'main-window' and 65 or 654"
+    onenter="self:handlePressEnter()"
   >
-    <div>
-      <img
-        class="tabs-img"
-        src="/images/game/wheel/wheelMenu.png"
-        *image-clip="self.wheel.clip"
-        onclick="self:toggleMenu('wheel')"
-      />
-      <img
-        class="tabs-img"
-        src="/images/game/wheel/gemMenu.png"
-        *image-clip="self.gem.clip"
-        onclick="self:toggleMenu('gem')"
-      />
-      <img
-        class="tabs-img"
-        src="/images/game/wheel/fragmentMenu.png"
-        *image-clip="self.fragment.clip"
-        onclick="self:toggleMenu('fragment')"
-      />
-    </div>
+    <div
+      *if="self.currentWindow == 'main-window'"
+      style="height: 654px; width: 968px"
+    >
+      <div>
+        <img
+          class="tabs-img"
+          src="/images/game/wheel/wheelMenu.png"
+          *image-clip="self.wheel.clip"
+          onclick="self:toggleMenu('wheel')"
+        />
+        <img
+          class="tabs-img"
+          src="/images/game/wheel/gemMenu.png"
+          *image-clip="self.gem.clip"
+          onclick="self:toggleMenu('gem')"
+        />
+        <img
+          class="tabs-img"
+          src="/images/game/wheel/fragmentMenu.png"
+          *image-clip="self.fragment.clip"
+          onclick="self:toggleMenu('fragment')"
+        />
+      </div>
 
-    <div class="content" onhover="self.wheel:handleOnHover(-1)">
-      <div *if="self.currentTab == 'wheel'">
-        <div class="panel-container" onhover="self.wheel:handleOnHover(-1)">
-          <div class="panel">
-            <div class="panel-window" style="width: 213px; height: 260px">
-              <p class="panel-title">Section</p>
-              <div
-                style="width: 205px; margin-top: 8px; margin-left: 4px"
-                *height="self.wheel.selectionBonus.showButtons == true and 152 or 180"
-              >
+      <div class="content" onhover="self.wheel:handleOnHover(-1)">
+        <div *if="self.currentTab == 'wheel'">
+          <div class="panel-container" onhover="self.wheel:handleOnHover(-1)">
+            <div class="panel">
+              <div class="panel-window" style="width: 213px; height: 260px">
+                <p class="panel-title">Section</p>
                 <div
-                  class="section-progress-bg"
-                  *if="self.wheel.currentSelectSlotData ~= nil"
-                >
-                  <img
-                    class="section-progress"
-                    src="/images/game/wheel/progressBar.png"
-                    *width="self.wheel.slotProgressWidth or 0"
-                  />
-                  <div>
-                    <p>{{self.wheel.slotProgressLabel}}</p>
-                  </div>
-                </div>
-                <div
-                  style="width: 205px"
-                  *if="#self.wheel.selectionBonus.data > 0"
-                  *for="local data in self.wheel.selectionBonus.data; local i = index"
+                  style="width: 205px; margin-top: 8px; margin-left: 4px"
+                  *height="self.wheel.selectionBonus.showButtons == true and 152 or 180"
                 >
                   <div
-                    style="width: 205px; height: 12px; position: relative"
-                    *if="data.title ~= nil"
+                    class="section-progress-bg"
+                    *if="self.wheel.currentSelectSlotData ~= nil"
                   >
-                    <p
-                      *if="data.title ~= nil"
-                      style="text-align: center; color: #c0c0c0"
-                    >
-                      {{data.title}}
-                    </p>
                     <img
-                      class="tooltip"
-                      *if="data.tooltip  ~= nil"
-                      *tooltip="data.tooltip"
+                      class="section-progress"
+                      src="/images/game/wheel/progressBar.png"
+                      *width="self.wheel.slotProgressWidth or 0"
                     />
+                    <div>
+                      <p>{{self.wheel.slotProgressLabel}}</p>
+                    </div>
                   </div>
+                  <div
+                    style="width: 205px"
+                    *if="#self.wheel.selectionBonus.data > 0"
+                    *for="local data in self.wheel.selectionBonus.data; local i = index"
+                  >
+                    <div
+                      style="width: 205px; height: 12px; position: relative"
+                      *if="data.title ~= nil"
+                    >
+                      <p
+                        *if="data.title ~= nil"
+                        style="text-align: center; color: #c0c0c0"
+                      >
+                        {{data.title}}
+                      </p>
+                      <img
+                        class="tooltip"
+                        *if="data.tooltip  ~= nil"
+                        *tooltip="data.tooltip"
+                      />
+                    </div>
 
-                  <span
-                    *if="data.text ~= nil"
-                    style="height: 15px; white-space: pre-line"
-                    *color="data.color"
-                  >
-                    <img
-                      *if="data.icon ~= nil"
-                      *image-source="data.icon"
-                      height="11"
-                      width="11"
-                    />
-                    {{data.text}}
-                  </span>
-                </div>
-                <div
-                  *if="self.wheel.selectionBonus.showMoreDetails == true"
-                  style="margin-top: 20px"
-                >
-                  <span
-                    style="width: 100%"
-                    *if="self.wheel.selectionBonus.showMoreDetails == true"
-                  >
-                    {{self.wheel.selectionBonus.moreDetailsTitle}}
                     <span
-                      class="tooltip"
-                      *tooltip="self.wheel.selectionBonus.moreDetailsTooltip"
-                      style="position: relative; margin-left: 8px"
-                    ></span>
-                  </span>
-
-                  <p
-                    *if="self.wheel.selectionBonus.moreDetails ~= nil"
-                    style="margin-top: 8px; height: 20px"
-                    *color="self.wheel.selectionBonus.moreDetailsColor"
+                      *if="data.text ~= nil"
+                      style="height: 15px; white-space: pre-line"
+                      *color="data.color"
+                    >
+                      <img
+                        *if="data.icon ~= nil"
+                        *image-source="data.icon"
+                        height="11"
+                        width="11"
+                      />
+                      {{data.text}}
+                    </span>
+                  </div>
+                  <div
+                    *if="self.wheel.selectionBonus.showMoreDetails == true"
+                    style="margin-top: 20px"
                   >
-                    {{self.wheel.selectionBonus.moreDetails}}
-                  </p>
-                </div>
-                <button
-                  *if="self.wheel.selectionBonus.showChangeGemButton == true"
-                  style="margin-left: 55px; margin-top: 8px"
-                  onclick="alert('under construction')"
-                >
-                  Change Gem
-                </button>
-              </div>
-              <div style="width: 205px; margin-left: 4px">
-                <div
-                  style="margin-top: 8px; height: 20px; width: 205px"
-                  *if="self.wheel.selectionBonus.showButtons"
-                >
-                  <div>
-                    <button
-                      style="float: right"
-                      onclick="self.wheel:onAddAllPoints()"
-                      *disabled="not self.wheel.selectionBonus.canAdd"
+                    <span
+                      style="width: 100%"
+                      *if="self.wheel.selectionBonus.showMoreDetails == true"
                     >
-                      +Max
-                    </button>
-                    <button
-                      *disabled="not self.wheel.selectionBonus.canAdd"
-                      style="float: right"
-                      onclick="self.wheel:onAddOnePoint()"
+                      {{self.wheel.selectionBonus.moreDetailsTitle}}
+                      <span
+                        class="tooltip"
+                        *tooltip="self.wheel.selectionBonus.moreDetailsTooltip"
+                        style="position: relative; margin-left: 8px"
+                      ></span>
+                    </span>
+
+                    <p
+                      *if="self.wheel.selectionBonus.moreDetails ~= nil"
+                      style="margin-top: 8px; height: 20px"
+                      *color="self.wheel.selectionBonus.moreDetailsColor"
                     >
-                      +1
-                    </button>
+                      {{self.wheel.selectionBonus.moreDetails}}
+                    </p>
                   </div>
-                  <div>
-                    <button
-                      *disabled="not self.wheel.selectionBonus.canRemove"
-                      onclick="self.wheel:onRemoveAllPoints()"
-                    >
-                      -Max
-                    </button>
-                    <button
-                      *disabled="not self.wheel.selectionBonus.canRemove"
-                      onclick="self.wheel:onRemoveOnePoint()"
-                    >
-                      -1
-                    </button>
+                  <button
+                    *if="self.wheel.selectionBonus.showChangeGemButton == true"
+                    style="margin-left: 55px; margin-top: 8px"
+                    onclick="alert('under construction')"
+                  >
+                    Change Gem
+                  </button>
+                </div>
+                <div style="width: 205px; margin-left: 4px">
+                  <div
+                    style="margin-top: 8px; height: 20px; width: 205px"
+                    *if="self.wheel.selectionBonus.showButtons"
+                  >
+                    <div>
+                      <button
+                        style="float: right"
+                        onclick="self.wheel:onAddAllPoints()"
+                        *disabled="not self.wheel.selectionBonus.canAdd"
+                      >
+                        +Max
+                      </button>
+                      <button
+                        *disabled="not self.wheel.selectionBonus.canAdd"
+                        style="float: right"
+                        onclick="self.wheel:onAddOnePoint()"
+                      >
+                        +1
+                      </button>
+                    </div>
+                    <div>
+                      <button
+                        *disabled="not self.wheel.selectionBonus.canRemove"
+                        onclick="self.wheel:onRemoveAllPoints()"
+                      >
+                        -Max
+                      </button>
+                      <button
+                        *disabled="not self.wheel.selectionBonus.canRemove"
+                        onclick="self.wheel:onRemoveOnePoint()"
+                      >
+                        -1
+                      </button>
+                    </div>
+                  </div>
+                  <hr
+                    class="separator HorizontalSeparator"
+                    style="width: 205px"
+                  />
+                  <div style="width: 205px; margin-left: 4px; color: #c0c0c0">
+                    <p style="text-align: center; width: 205px">
+                      Available Promotion Points
+                    </p>
+                    <p style="text-align: center; width: 205px">
+                      <span> {{self.wheel.summaryPointsLabel}} </span>
+                    </p>
                   </div>
                 </div>
-                <hr
-                  class="separator HorizontalSeparator"
-                  style="width: 205px"
-                />
-                <div style="width: 205px; margin-left: 4px; color: #c0c0c0">
-                  <p style="text-align: center; width: 205px">
-                    Available Promotion Points
-                  </p>
-                  <p style="text-align: center; width: 205px">
-                    <span> {{self.wheel.summaryPointsLabel}} </span>
-                  </p>
-                </div>
               </div>
-            </div>
-            <div class="panel-information-window">
-              <div
-                style="inline-block;height:34px;width:213px;margin-left: 3px;margin-top:3px"
-              >
-                <img
-                  class="information-button-img"
-                  *image-source="self.wheel.information.firstButton.path"
-                  *width="self.wheel.information.firstButton.width"
-                  *image-clip="self.wheel.information.firstButton.clip"
-                  onclick="self.wheel:selectInformationTab(1)"
-                />
-                <img
-                  class="information-button-img"
-                  *image-source="self.wheel.information.secondButton.path"
-                  *width="self.wheel.information.secondButton.width"
-                  *image-clip="self.wheel.information.secondButton.clip"
-                  onclick="self.wheel:selectInformationTab(2)"
-                />
-              </div>
-              <div
-                *if="self.wheel.information.firstButton.active == true"
-                style="width: 205px; height: 200px; margin-left: 4px"
-              >
+              <div class="panel-information-window">
                 <div
-                  class="section-progress-bg"
-                  *if="self.wheel.information.hoveredSlotData ~= nil"
+                  style="inline-block;height:34px;width:213px;margin-left: 3px;margin-top:3px"
                 >
                   <img
-                    class="section-progress"
-                    src="/images/game/wheel/progressBar.png"
-                    *width="self.wheel.information.slotProgressWidth or 0"
+                    class="information-button-img"
+                    *image-source="self.wheel.information.firstButton.path"
+                    *width="self.wheel.information.firstButton.width"
+                    *image-clip="self.wheel.information.firstButton.clip"
+                    onclick="self.wheel:selectInformationTab(1)"
                   />
-                  <div style="height: 20px">
-                    <p style="margin-top: 2px">
-                      {{self.wheel.information.slotProgressLabel}}
-                    </p>
-                  </div>
+                  <img
+                    class="information-button-img"
+                    *image-source="self.wheel.information.secondButton.path"
+                    *width="self.wheel.information.secondButton.width"
+                    *image-clip="self.wheel.information.secondButton.clip"
+                    onclick="self.wheel:selectInformationTab(2)"
+                  />
                 </div>
                 <div
-                  style="width: 205px"
-                  *if="#self.wheel.information.data > 0"
-                  *for="local data in self.wheel.information.data; local i = index"
+                  *if="self.wheel.information.firstButton.active == true"
+                  style="width: 205px; height: 200px; margin-left: 4px"
                 >
                   <div
-                    style="width: 205px; height: 12px; position: relative"
-                    *if="data.title ~= nil"
-                  >
-                    <p
-                      *if="data.title ~= nil"
-                      style="text-align: center; color: #c0c0c0"
-                    >
-                      {{data.title}}
-                    </p>
-                  </div>
-
-                  <span
-                    *if="data.text ~= nil"
-                    style="height: 15px; white-space: pre-line"
-                    *color="data.color"
+                    class="section-progress-bg"
+                    *if="self.wheel.information.hoveredSlotData ~= nil"
                   >
                     <img
-                      *if="data.icon ~= nil"
-                      *image-source="data.icon"
-                      height="11"
-                      width="11"
+                      class="section-progress"
+                      src="/images/game/wheel/progressBar.png"
+                      *width="self.wheel.information.slotProgressWidth or 0"
                     />
-                    {{data.text}}
-                  </span>
+                    <div style="height: 20px">
+                      <p style="margin-top: 2px">
+                        {{self.wheel.information.slotProgressLabel}}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style="width: 205px"
+                    *if="#self.wheel.information.data > 0"
+                    *for="local data in self.wheel.information.data; local i = index"
+                  >
+                    <div
+                      style="width: 205px; height: 12px; position: relative"
+                      *if="data.title ~= nil"
+                    >
+                      <p
+                        *if="data.title ~= nil"
+                        style="text-align: center; color: #c0c0c0"
+                      >
+                        {{data.title}}
+                      </p>
+                    </div>
+
+                    <span
+                      *if="data.text ~= nil"
+                      style="height: 15px; white-space: pre-line"
+                      *color="data.color"
+                    >
+                      <img
+                        *if="data.icon ~= nil"
+                        *image-source="data.icon"
+                        height="11"
+                        width="11"
+                      />
+                      {{data.text}}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="panel-center" onhover="self.wheel:handleOnHover(-1)">
-            <div class="backdrop-wheel">
-              <span
-                style="position: absolute"
-                *for="local data in self.wheel.data"
-              >
+            <div class="panel-center" onhover="self.wheel:handleOnHover(-1)">
+              <div class="backdrop-wheel">
+                <span
+                  style="position: absolute"
+                  *for="local data in self.wheel.data"
+                >
+                  <img
+                    class="wheel-center-cells"
+                    *image-source="data.colorPath"
+                    *height="data.height"
+                    *width="data.width"
+                    *opacity="0.6"
+                    image-draw-order="1"
+                    *ignore-transparent-pixel="true"
+                  />
+                  <img
+                    class="wheel-center-cells"
+                    *image-source="data.adjacentPath"
+                    *height="data.height"
+                    *width="data.width"
+                    *opacity="0.2"
+                    *ignore-transparent-pixel="true"
+                    image-draw-order="1"
+                  />
+                  <img
+                    class="wheel-center-cells"
+                    *image-source="data.bgPath"
+                    *height="data.height"
+                    *width="data.width"
+                    onclick="self.wheel:handleSelectSlot(data.id)"
+                    onMousePress="self.wheel:handleMousePress(event, data.id)"
+                    opacity="0.001"
+                    *ignore-transparent-pixel="true"
+                    image-draw-order="0"
+                  />
+
+                  <img
+                    class="wheel-center-cells"
+                    *image-source="data.hoverPath"
+                    *opacity="self.wheel.currentHoverSlotId == data.id and 0.2 or 0.01"
+                    *height="data.height"
+                    *width="data.width"
+                    onhover="self.wheel:handleOnHover(data.id)"
+                    *ignore-transparent-pixel="true"
+                  />
+
+                  <img
+                    *if="data.iconClip ~= nil"
+                    *image-clip="data.iconClip"
+                    *margin-top="data.top"
+                    *margin-left="data.left"
+                    image-draw-order="1"
+                    class="mediumperks"
+                    onhover="self.wheel:handleOnHover(data.id)"
+                    style="display: block"
+                    *image-source="data.perkImage"
+                    *height="data.iconClip.height"
+                    *width="data.iconClip.width"
+                  />
+                  <img
+                    *if="data.miniIconClip ~= nil"
+                    class="smallperks"
+                    *image-clip="data.miniIconClip"
+                    style="display: block"
+                    *margin-top="data.top + 16"
+                    *margin-left="data.left - 3"
+                    image-draw-order="1"
+                  />
+                </span>
                 <img
-                  class="wheel-center-cells"
-                  *image-source="data.colorPath"
-                  *height="data.height"
-                  *width="data.width"
-                  *opacity="0.6"
-                  image-draw-order="1"
-                  *ignore-transparent-pixel="true"
-                />
-                <img
-                  class="wheel-center-cells"
-                  *image-source="data.adjacentPath"
-                  *height="data.height"
-                  *width="data.width"
-                  *opacity="0.2"
-                  *ignore-transparent-pixel="true"
-                  image-draw-order="1"
-                />
-                <img
-                  class="wheel-center-cells"
-                  *image-source="data.bgPath"
-                  *height="data.height"
-                  *width="data.width"
-                  onclick="self.wheel:handleSelectSlot(data.id)"
-                  onMousePress="self.wheel:handleMousePress(event, data.id)"
-                  opacity="0.001"
-                  *ignore-transparent-pixel="true"
-                  image-draw-order="0"
+                  *image-source="self.wheel.backdropVocationOverlay"
+                  class="backdrop-wheel-vocation-overlay"
+                  height="522"
+                  width="522"
+                  image-draw-order="2"
                 />
 
                 <img
                   class="wheel-center-cells"
-                  *image-source="data.hoverPath"
-                  *opacity="self.wheel.currentHoverSlotId == data.id and 0.2 or 0.01"
-                  *height="data.height"
-                  *width="data.width"
-                  onhover="self.wheel:handleOnHover(data.id)"
+                  *if="self.wheel.currentSelectSlotData ~= nil and self.wheel.currentSelectSlotData.borderPath ~= nil"
+                  *image-source="self.wheel.currentSelectSlotData.borderPath"
+                  height="522"
+                  width="522"
+                  image-draw-order="3"
                   *ignore-transparent-pixel="true"
                 />
 
-                <img
-                  *if="data.iconClip ~= nil"
-                  *image-clip="data.iconClip"
-                  *margin-top="data.top"
-                  *margin-left="data.left"
-                  image-draw-order="1"
-                  class="mediumperks"
-                  onhover="self.wheel:handleOnHover(data.id)"
-                  style="display: block"
-                  *image-source="data.perkImage"
-                  *height="data.iconClip.height"
-                  *width="data.iconClip.width"
-                />
-                <img
-                  *if="data.miniIconClip ~= nil"
-                  class="smallperks"
-                  *image-clip="data.miniIconClip"
-                  style="display: block"
-                  *margin-top="data.top + 16"
-                  *margin-left="data.left - 3"
-                  image-draw-order="1"
-                />
-              </span>
-              <img
-                *image-source="self.wheel.backdropVocationOverlay"
-                class="backdrop-wheel-vocation-overlay"
-                height="522"
-                width="522"
-                image-draw-order="2"
-              />
-
-              <img
-                class="wheel-center-cells"
-                *if="self.wheel.currentSelectSlotData ~= nil and self.wheel.currentSelectSlotData.borderPath ~= nil"
-                *image-source="self.wheel.currentSelectSlotData.borderPath"
-                height="522"
-                width="522"
-                image-draw-order="3"
-                *ignore-transparent-pixel="true"
-              />
-
-              <img
-                class="largeperks"
-                *if="#self.wheel.activeGems > 0"
-                *image-source="self.wheel.activeGems[1].backgroundPath"
-                height="85"
-                width="118"
-              />
-
-              <div
-                style="
-                  position: absolute;
-                  height: 36px;
-                  width: 36px;
-                  top: 5;
-                  left: 84;
-                  display: block;
-                "
-                image-draw-order="1"
-                *image-source="self.wheel.selectedGemVesselDomain == 0 and '/images/game/wheel/marker_skillwheelsocket.png' or nil"
-              >
                 <img
                   class="largeperks"
-                  *if="#self.wheel.activeGems > 0 and self.wheel.activeGems[1].socketPath ~= nil"
-                  *image-source="self.wheel.activeGems[1].socketPath"
-                  height="34"
-                  width="34"
-                  *image-clip="self.wheel.activeGems[1].socketClip"
-                  style="display: block"
-                  onclick="self.wheel:onGemVesselClick(0)"
+                  *if="#self.wheel.activeGems > 0"
+                  *image-source="self.wheel.activeGems[1].backgroundPath"
+                  height="85"
+                  width="118"
                 />
-              </div>
 
-              <img
-                class="largeperks"
-                *if="#self.wheel.activeGems > 0 and self.wheel.activeGems[1].gemPath ~= nil"
-                *image-source="self.wheel.activeGems[1].gemPath"
-                height="32"
-                width="32"
-                *image-clip="self.wheel.activeGems[1].gemClip"
-                style="top: 6; left: 84; display: block"
-              />
+                <div
+                  style="
+                    position: absolute;
+                    height: 36px;
+                    width: 36px;
+                    top: 5;
+                    left: 84;
+                    display: block;
+                  "
+                  image-draw-order="1"
+                  *image-source="self.wheel.selectedGemVesselDomain == 0 and '/images/game/wheel/marker_skillwheelsocket.png' or nil"
+                >
+                  <img
+                    class="largeperks"
+                    *if="#self.wheel.activeGems > 0 and self.wheel.activeGems[1].socketPath ~= nil"
+                    *image-source="self.wheel.activeGems[1].socketPath"
+                    height="34"
+                    width="34"
+                    *image-clip="self.wheel.activeGems[1].socketClip"
+                    style="display: block"
+                    onclick="self.wheel:onGemVesselClick(0)"
+                  />
+                </div>
 
-              <img
-                class="largeperks"
-                *if="#self.wheel.activeGems > 1"
-                *image-source="self.wheel.activeGems[2].backgroundPath"
-                height="85"
-                width="118"
-                style="top: 0; right: 84; display: block"
-              />
-
-              <div
-                style="
-                  position: absolute;
-                  height: 36px;
-                  width: 36px;
-                  top: 5;
-                  right: 82;
-                  display: block;
-                "
-                image-draw-order="1"
-                *image-source="self.wheel.selectedGemVesselDomain == 1 and '/images/game/wheel/marker_skillwheelsocket.png' or nil"
-              >
                 <img
                   class="largeperks"
-                  *if="#self.wheel.activeGems > 1 and self.wheel.activeGems[2].socketPath ~= nil"
-                  *image-source="self.wheel.activeGems[2].socketPath"
-                  height="34"
-                  width="34"
-                  *image-clip="self.wheel.activeGems[2].socketClip"
-                  style="display: block"
-                  onclick="self.wheel:onGemVesselClick(1)"
+                  *if="#self.wheel.activeGems > 0 and self.wheel.activeGems[1].gemPath ~= nil"
+                  *image-source="self.wheel.activeGems[1].gemPath"
+                  height="32"
+                  width="32"
+                  *image-clip="self.wheel.activeGems[1].gemClip"
+                  style="top: 6; left: 84; display: block"
                 />
-              </div>
 
-              <img
-                class="largeperks"
-                *if="#self.wheel.activeGems > 1 and self.wheel.activeGems[2].gemPath ~= nil"
-                *image-source="self.wheel.activeGems[2].gemPath"
-                height="32"
-                width="32"
-                *image-clip="self.wheel.activeGems[2].gemClip"
-                style="top: 6; right: 83; display: block"
-              />
-
-              <img
-                class="largeperks"
-                *if="#self.wheel.activeGems > 2"
-                *image-source="self.wheel.activeGems[3].backgroundPath"
-                height="85"
-                width="118"
-                style="bottom: 50; left: 0; display: block"
-              />
-
-              <div
-                style="
-                  position: absolute;
-                  height: 36px;
-                  width: 36px;
-                  bottom: 2;
-                  left: 82.5;
-                  display: block;
-                "
-                image-draw-order="1"
-                *image-source="self.wheel.selectedGemVesselDomain == 2 and '/images/game/wheel/marker_skillwheelsocket.png' or nil"
-              >
                 <img
                   class="largeperks"
-                  *if="#self.wheel.activeGems > 2 and self.wheel.activeGems[3].socketPath ~= nil"
-                  *image-source="self.wheel.activeGems[3].socketPath"
-                  height="34"
-                  width="34"
-                  *image-clip="self.wheel.activeGems[3].socketClip"
-                  style="display: block"
-                  onclick="self.wheel:onGemVesselClick(2)"
+                  *if="#self.wheel.activeGems > 1"
+                  *image-source="self.wheel.activeGems[2].backgroundPath"
+                  height="85"
+                  width="118"
+                  style="top: 0; right: 84; display: block"
                 />
-              </div>
 
-              <img
-                class="largeperks"
-                *if="#self.wheel.activeGems > 2 and self.wheel.activeGems[3].gemPath ~= nil"
-                *image-source="self.wheel.activeGems[3].gemPath"
-                height="32"
-                width="32"
-                *image-clip="self.wheel.activeGems[3].gemClip"
-                style="bottom: 4; left: 85; display: block"
-              />
+                <div
+                  style="
+                    position: absolute;
+                    height: 36px;
+                    width: 36px;
+                    top: 5;
+                    right: 82;
+                    display: block;
+                  "
+                  image-draw-order="1"
+                  *image-source="self.wheel.selectedGemVesselDomain == 1 and '/images/game/wheel/marker_skillwheelsocket.png' or nil"
+                >
+                  <img
+                    class="largeperks"
+                    *if="#self.wheel.activeGems > 1 and self.wheel.activeGems[2].socketPath ~= nil"
+                    *image-source="self.wheel.activeGems[2].socketPath"
+                    height="34"
+                    width="34"
+                    *image-clip="self.wheel.activeGems[2].socketClip"
+                    style="display: block"
+                    onclick="self.wheel:onGemVesselClick(1)"
+                  />
+                </div>
 
-              <img
-                class="largeperks"
-                *if="#self.wheel.activeGems > 3"
-                *image-source="self.wheel.activeGems[4].backgroundPath"
-                height="85"
-                width="118"
-                style="bottom: 50; right: 84; display: block"
-              />
+                <img
+                  class="largeperks"
+                  *if="#self.wheel.activeGems > 1 and self.wheel.activeGems[2].gemPath ~= nil"
+                  *image-source="self.wheel.activeGems[2].gemPath"
+                  height="32"
+                  width="32"
+                  *image-clip="self.wheel.activeGems[2].gemClip"
+                  style="top: 6; right: 83; display: block"
+                />
 
-              <!-- <img
+                <img
+                  class="largeperks"
+                  *if="#self.wheel.activeGems > 2"
+                  *image-source="self.wheel.activeGems[3].backgroundPath"
+                  height="85"
+                  width="118"
+                  style="bottom: 50; left: 0; display: block"
+                />
+
+                <div
+                  style="
+                    position: absolute;
+                    height: 36px;
+                    width: 36px;
+                    bottom: 2;
+                    left: 82.5;
+                    display: block;
+                  "
+                  image-draw-order="1"
+                  *image-source="self.wheel.selectedGemVesselDomain == 2 and '/images/game/wheel/marker_skillwheelsocket.png' or nil"
+                >
+                  <img
+                    class="largeperks"
+                    *if="#self.wheel.activeGems > 2 and self.wheel.activeGems[3].socketPath ~= nil"
+                    *image-source="self.wheel.activeGems[3].socketPath"
+                    height="34"
+                    width="34"
+                    *image-clip="self.wheel.activeGems[3].socketClip"
+                    style="display: block"
+                    onclick="self.wheel:onGemVesselClick(2)"
+                  />
+                </div>
+
+                <img
+                  class="largeperks"
+                  *if="#self.wheel.activeGems > 2 and self.wheel.activeGems[3].gemPath ~= nil"
+                  *image-source="self.wheel.activeGems[3].gemPath"
+                  height="32"
+                  width="32"
+                  *image-clip="self.wheel.activeGems[3].gemClip"
+                  style="bottom: 4; left: 85; display: block"
+                />
+
+                <img
+                  class="largeperks"
+                  *if="#self.wheel.activeGems > 3"
+                  *image-source="self.wheel.activeGems[4].backgroundPath"
+                  height="85"
+                  width="118"
+                  style="bottom: 50; right: 84; display: block"
+                />
+
+                <!-- <img
                 class="largeperks"
                 *if="#self.wheel.activeGems > 3 and self.wheel.activeGems[4].socketPath ~= nil"
                 *image-source="self.wheel.activeGems[4].socketPath"
@@ -678,493 +684,514 @@
                 onclick="self.wheel:onGemVesselClick(3)"
               /> -->
 
-              <div
-                style="
-                  position: absolute;
-                  height: 36px;
-                  width: 36px;
-                  bottom: 2;
-                  right: 84;
-                  display: block;
-                "
-                image-draw-order="1"
-                *image-source="self.wheel.selectedGemVesselDomain ==3 and '/images/game/wheel/marker_skillwheelsocket.png' or nil"
-              >
-                <img
-                  class="largeperks"
-                  *if="#self.wheel.activeGems > 3 and self.wheel.activeGems[4].socketPath ~= nil"
-                  *image-source="self.wheel.activeGems[4].socketPath"
-                  height="34"
-                  width="34"
-                  *image-clip="self.wheel.activeGems[4].socketClip"
-                  style="display: block"
-                  onclick="self.wheel:onGemVesselClick(3)"
-                />
-              </div>
+                <div
+                  style="
+                    position: absolute;
+                    height: 36px;
+                    width: 36px;
+                    bottom: 2;
+                    right: 84;
+                    display: block;
+                  "
+                  image-draw-order="1"
+                  *image-source="self.wheel.selectedGemVesselDomain ==3 and '/images/game/wheel/marker_skillwheelsocket.png' or nil"
+                >
+                  <img
+                    class="largeperks"
+                    *if="#self.wheel.activeGems > 3 and self.wheel.activeGems[4].socketPath ~= nil"
+                    *image-source="self.wheel.activeGems[4].socketPath"
+                    height="34"
+                    width="34"
+                    *image-clip="self.wheel.activeGems[4].socketClip"
+                    style="display: block"
+                    onclick="self.wheel:onGemVesselClick(3)"
+                  />
+                </div>
 
-              <div class="largeperks" style="bottom: 50; right: 42">
-                <img
-                  *if="#self.wheel.activeGems > 3"
-                  *image-source="self.wheel.activeGems[4].backgroundPath"
-                  height="85"
-                  width="118"
-                />
-              </div>
+                <div class="largeperks" style="bottom: 50; right: 42">
+                  <img
+                    *if="#self.wheel.activeGems > 3"
+                    *image-source="self.wheel.activeGems[4].backgroundPath"
+                    height="85"
+                    width="118"
+                  />
+                </div>
 
-              <img
-                class="largeperks"
-                *if="#self.wheel.activeGems > 3 and self.wheel.activeGems[4].gemPath ~= nil"
-                *image-source="self.wheel.activeGems[4].gemPath"
-                height="32"
-                width="32"
-                *image-clip="self.wheel.activeGems[4].gemClip"
-                style="bottom: 4; right: 83; display: block"
-              />
+                <img
+                  class="largeperks"
+                  *if="#self.wheel.activeGems > 3 and self.wheel.activeGems[4].gemPath ~= nil"
+                  *image-source="self.wheel.activeGems[4].gemPath"
+                  height="32"
+                  width="32"
+                  *image-clip="self.wheel.activeGems[4].gemClip"
+                  style="bottom: 4; right: 83; display: block"
+                />
 
-              <img
-                src="/images/game/wheel/backdrop_skillwheel_largebonus_light_TL.png"
-                style="
-                  position: absolute;
-                  height: 85px;
-                  width: 118px;
-                  left: 0;
-                  top: 0;
-                "
-              />
-              <img
-                *image-source="self.wheel.passiveBorders.TL"
-                style="
-                  position: absolute;
-                  height: 178px;
-                  width: 178px;
-                  left: 0;
-                  top: 0;
-                "
-              />
-              <img
-                src="/images/game/wheel/backdrop_skillwheel_largebonus_light_TR.png"
-                style="
-                  position: absolute;
-                  height: 85px;
-                  width: 118px;
-                  right: 0;
-                  top: 0;
-                "
-              />
-              <img
-                *image-source="self.wheel.passiveBorders.TR"
-                style="
-                  position: absolute;
-                  height: 178px;
-                  width: 178px;
-                  right: 0;
-                  top: 0;
-                "
-              />
-              <img
-                src="/images/game/wheel/backdrop_skillwheel_largebonus_light_BL.png"
-                style="
-                  position: absolute;
-                  height: 85px;
-                  width: 118px;
-                  left: 0;
-                  bottom: 0;
-                "
-              />
-              <img
-                *image-source="self.wheel.passiveBorders.BL"
-                style="
-                  position: absolute;
-                  height: 178px;
-                  width: 178px;
-                  left: 0;
-                  bottom: 0;
-                "
-              />
-              <img
-                src="/images/game/wheel/backdrop_skillwheel_largebonus_light_BR.png"
-                style="
-                  position: absolute;
-                  height: 85px;
-                  width: 118px;
-                  right: 0;
-                  bottom: 0;
-                "
-              />
-              <img
-                *image-source="self.wheel.passiveBorders.BR"
-                style="
-                  position: absolute;
-                  height: 178px;
-                  width: 178px;
-                  right: 0;
-                  bottom: 0;
-                "
-              />
-              <div
-                class="largeperks"
-                style="top: 16; left: 18; width: 48px; height: 48px"
-                onclick="self.wheel:largePerkClick(1)"
-              >
                 <img
-                  class="largeperks"
-                  src="/images/game/wheel/icons-skillwheel-largeperks.png"
-                  height="34"
-                  width="34"
-                  *image-clip="self.wheel.tlLargePerkClip"
-                  style="margin-top: 8px; margin-left: 6px"
-                />
-                <img
-                  class="revelationBg revelationBg-tl"
-                  src="/images/game/wheel/revelation-bg-perk-circles.png"
-                  style="bottom: 0; left: 0"
-                />
-                <img
-                  *if="self.wheel.selectedPerkDomain == 1"
-                  src="/images/game/wheel/marker_largeperk.png"
+                  src="/images/game/wheel/backdrop_skillwheel_largebonus_light_TL.png"
                   style="
                     position: absolute;
-                    top: 1;
-                    right: 1;
-                    width: 48px;
-                    height: 48px;
+                    height: 85px;
+                    width: 118px;
+                    left: 0;
+                    top: 0;
                   "
                 />
-              </div>
-              <div
-                class="largeperks"
-                style="top: 18; right: 18; width: 48px; height: 48px"
-                onclick="self.wheel:largePerkClick(2)"
-              >
                 <img
-                  class="largeperks"
-                  src="/images/game/wheel/icons-skillwheel-largeperks.png"
-                  height="34"
-                  width="34"
-                  *image-clip="self.wheel.trLargePerkClip"
-                  style="margin-top: 6px; margin-left: 8px"
-                />
-                <img
-                  class="revelationBg revelationBg-tr"
-                  src="/images/game/wheel/revelation-bg-perk-circles.png"
-                  style="top: 0; right: 0"
-                />
-                <img
-                  *if="self.wheel.selectedPerkDomain == 2"
-                  src="/images/game/wheel/marker_largeperk.png"
+                  *image-source="self.wheel.passiveBorders.TL"
                   style="
                     position: absolute;
-                    bottom: 1;
-                    left: 1;
-                    width: 48px;
-                    height: 48px;
+                    height: 178px;
+                    width: 178px;
+                    left: 0;
+                    top: 0;
                   "
                 />
-              </div>
-              <div
-                class="largeperks"
-                style="bottom: 18; left: 18; width: 48px; height: 48px"
-                onclick="self.wheel:largePerkClick(3)"
-              >
                 <img
-                  class="largeperks"
-                  src="/images/game/wheel/icons-skillwheel-largeperks.png"
-                  height="34"
-                  width="34"
-                  *image-clip="self.wheel.blLargePerkClip"
-                  style="margin-top: 8px; margin-left: 6px"
-                />
-                <img
-                  class="revelationBg revelationBg-bl"
-                  src="/images/game/wheel/revelation-bg-perk-circles.png"
-                  style="bottom: 0; left: 0"
-                />
-                <img
-                  *if="self.wheel.selectedPerkDomain == 3"
-                  src="/images/game/wheel/marker_largeperk.png"
+                  src="/images/game/wheel/backdrop_skillwheel_largebonus_light_TR.png"
                   style="
                     position: absolute;
-                    top: 1;
-                    right: 1;
-                    width: 48px;
-                    height: 48px;
+                    height: 85px;
+                    width: 118px;
+                    right: 0;
+                    top: 0;
                   "
                 />
-              </div>
-              <div
-                class="largeperks"
-                style="bottom: 18; right: 16; width: 48px; height: 48px"
-                onclick="self.wheel:largePerkClick(4)"
-              >
                 <img
-                  class="largeperks"
-                  src="/images/game/wheel/icons-skillwheel-largeperks.png"
-                  height="34"
-                  width="34"
-                  *image-clip="self.wheel.brLargePerkClip"
-                  style="margin-top: 8px; margin-left: 6px"
-                />
-                <img
-                  class="revelationBg revelationBg-br"
-                  src="/images/game/wheel/revelation-bg-perk-circles.png"
-                  style="bottom: 0; left: 0"
-                />
-                <img
-                  *if="self.wheel.selectedPerkDomain == 4"
-                  src="/images/game/wheel/marker_largeperk.png"
+                  *image-source="self.wheel.passiveBorders.TR"
                   style="
                     position: absolute;
-                    top: 1;
-                    right: 1;
-                    width: 48px;
-                    height: 48px;
+                    height: 178px;
+                    width: 178px;
+                    right: 0;
+                    top: 0;
                   "
                 />
+                <img
+                  src="/images/game/wheel/backdrop_skillwheel_largebonus_light_BL.png"
+                  style="
+                    position: absolute;
+                    height: 85px;
+                    width: 118px;
+                    left: 0;
+                    bottom: 0;
+                  "
+                />
+                <img
+                  *image-source="self.wheel.passiveBorders.BL"
+                  style="
+                    position: absolute;
+                    height: 178px;
+                    width: 178px;
+                    left: 0;
+                    bottom: 0;
+                  "
+                />
+                <img
+                  src="/images/game/wheel/backdrop_skillwheel_largebonus_light_BR.png"
+                  style="
+                    position: absolute;
+                    height: 85px;
+                    width: 118px;
+                    right: 0;
+                    bottom: 0;
+                  "
+                />
+                <img
+                  *image-source="self.wheel.passiveBorders.BR"
+                  style="
+                    position: absolute;
+                    height: 178px;
+                    width: 178px;
+                    right: 0;
+                    bottom: 0;
+                  "
+                />
+                <div
+                  class="largeperks"
+                  style="top: 16; left: 18; width: 48px; height: 48px"
+                  onclick="self.wheel:largePerkClick(1)"
+                >
+                  <img
+                    class="largeperks"
+                    src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                    height="34"
+                    width="34"
+                    *image-clip="self.wheel.tlLargePerkClip"
+                    style="margin-top: 8px; margin-left: 6px"
+                  />
+                  <img
+                    class="revelationBg revelationBg-tl"
+                    src="/images/game/wheel/revelation-bg-perk-circles.png"
+                    style="bottom: 0; left: 0"
+                  />
+                  <img
+                    *if="self.wheel.selectedPerkDomain == 1"
+                    src="/images/game/wheel/marker_largeperk.png"
+                    style="
+                      position: absolute;
+                      top: 1;
+                      right: 1;
+                      width: 48px;
+                      height: 48px;
+                    "
+                  />
+                </div>
+                <div
+                  class="largeperks"
+                  style="top: 18; right: 18; width: 48px; height: 48px"
+                  onclick="self.wheel:largePerkClick(2)"
+                >
+                  <img
+                    class="largeperks"
+                    src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                    height="34"
+                    width="34"
+                    *image-clip="self.wheel.trLargePerkClip"
+                    style="margin-top: 6px; margin-left: 8px"
+                  />
+                  <img
+                    class="revelationBg revelationBg-tr"
+                    src="/images/game/wheel/revelation-bg-perk-circles.png"
+                    style="top: 0; right: 0"
+                  />
+                  <img
+                    *if="self.wheel.selectedPerkDomain == 2"
+                    src="/images/game/wheel/marker_largeperk.png"
+                    style="
+                      position: absolute;
+                      bottom: 1;
+                      left: 1;
+                      width: 48px;
+                      height: 48px;
+                    "
+                  />
+                </div>
+                <div
+                  class="largeperks"
+                  style="bottom: 18; left: 18; width: 48px; height: 48px"
+                  onclick="self.wheel:largePerkClick(3)"
+                >
+                  <img
+                    class="largeperks"
+                    src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                    height="34"
+                    width="34"
+                    *image-clip="self.wheel.blLargePerkClip"
+                    style="margin-top: 8px; margin-left: 6px"
+                  />
+                  <img
+                    class="revelationBg revelationBg-bl"
+                    src="/images/game/wheel/revelation-bg-perk-circles.png"
+                    style="bottom: 0; left: 0"
+                  />
+                  <img
+                    *if="self.wheel.selectedPerkDomain == 3"
+                    src="/images/game/wheel/marker_largeperk.png"
+                    style="
+                      position: absolute;
+                      top: 1;
+                      right: 1;
+                      width: 48px;
+                      height: 48px;
+                    "
+                  />
+                </div>
+                <div
+                  class="largeperks"
+                  style="bottom: 18; right: 16; width: 48px; height: 48px"
+                  onclick="self.wheel:largePerkClick(4)"
+                >
+                  <img
+                    class="largeperks"
+                    src="/images/game/wheel/icons-skillwheel-largeperks.png"
+                    height="34"
+                    width="34"
+                    *image-clip="self.wheel.brLargePerkClip"
+                    style="margin-top: 8px; margin-left: 6px"
+                  />
+                  <img
+                    class="revelationBg revelationBg-br"
+                    src="/images/game/wheel/revelation-bg-perk-circles.png"
+                    style="bottom: 0; left: 0"
+                  />
+                  <img
+                    *if="self.wheel.selectedPerkDomain == 4"
+                    src="/images/game/wheel/marker_largeperk.png"
+                    style="
+                      position: absolute;
+                      top: 1;
+                      right: 1;
+                      width: 48px;
+                      height: 48px;
+                    "
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <div class="panel">
-            <div class="panel-window" style="width: 213px; height: 100px">
-              <p class="panel-title">Dedication Perks</p>
-              <div
-                style="
-                  margin-left: 8px;
-                  margin-top: 10px;
-                  width: 200px;
-                  height: 70px;
-                "
-              >
-                <div style="width: 185px">
-                  <span>Hit Points</span>
-                  <span style="float: right"
-                    >{{self.wheel.dedicationPerk.hitpoints}}</span
-                  >
-                </div>
-                <div style="width: 185px; margin-top: 4">
-                  <span>Mana</span>
-                  <span style="float: right"
-                    >{{self.wheel.dedicationPerk.manapoints}}</span
-                  >
-                </div>
-                <div style="width: 185px; margin-top: 4">
-                  <span>Capacity</span>
-                  <span style="float: right"
-                    >{{self.wheel.dedicationPerk.cap}}</span
-                  >
-                </div>
-                <div style="width: 200px; margin-top: 4; position: relative">
+            <div class="panel">
+              <div class="panel-window" style="width: 213px; height: 100px">
+                <p class="panel-title">Dedication Perks</p>
+                <div
+                  style="
+                    margin-left: 8px;
+                    margin-top: 10px;
+                    width: 200px;
+                    height: 70px;
+                  "
+                >
                   <div style="width: 185px">
-                    <span>Mitigation Mult.</span>
+                    <span>Hit Points</span>
                     <span style="float: right"
-                      >{{self.wheel.dedicationPerk.mitigation}}
-                    </span>
-                  </div>
-                  <span
-                    class="tooltip"
-                    tooltip="Increases your mitigation multiplicatively."
-                  ></span>
-                </div>
-              </div>
-            </div>
-            <div
-              class="panel-window"
-              style="width: 213px; height: 160px; margin-top: 8px"
-            >
-              <p class="panel-title">Conviction Perks</p>
-              <div class="conviction-perks">
-                <div
-                  style="
-                    width: 190px;
-                    height: 15px;
-                    margin-top: 4px;
-                    position: relative;
-                  "
-                  *if="#self.wheel.convictionPerks > 0"
-                  *for="local conviction in self.wheel.convictionPerks"
-                >
-                  <div style="width: 175px; height: 15px">
-                    <span *if="conviction.perk">{{conviction.perk}}</span>
-                    <span *if="conviction.stringPoint" style="float: right"
-                      >{{conviction.stringPoint}}
-                    </span>
-                  </div>
-                  <span
-                    class="tooltip"
-                    *if="conviction.tooltip ~= nil"
-                    *tooltip="conviction.tooltip"
-                  ></span>
-                </div>
-              </div>
-            </div>
-            <div
-              class="panel-window"
-              style="width: 213px; height: 160px; margin-top: 8px"
-            >
-              <p class="panel-title">Vessels</p>
-              <div class="conviction-perks">
-                <div
-                  style="
-                    width: 190px;
-                    height: 15px;
-                    margin-top: 4px;
-                    position: relative;
-                  "
-                  *if="#self.wheel.vessels > 0"
-                  *for="local vessel in self.wheel.vessels; local i = index"
-                >
-                  <div style="width: 175px; height: 15px">
-                    <span
-                      *if="vessel.perk"
-                      *margin-left="vessel.left and vessel.left or 0"
-                      >{{vessel.text}}</span
+                      >{{self.wheel.dedicationPerk.hitpoints}}</span
                     >
-                    <span
-                      *if="vessel.value and vessel.text ~= 'Resistances:'"
-                      style="float: right"
-                      >{{vessel.value}}
-                    </span>
                   </div>
-                  <span
-                    class="tooltip"
-                    *if="vessel.tooltip ~= nil"
-                    *tooltip="vessel.tooltip"
-                  ></span>
+                  <div style="width: 185px; margin-top: 4">
+                    <span>Mana</span>
+                    <span style="float: right"
+                      >{{self.wheel.dedicationPerk.manapoints}}</span
+                    >
+                  </div>
+                  <div style="width: 185px; margin-top: 4">
+                    <span>Capacity</span>
+                    <span style="float: right"
+                      >{{self.wheel.dedicationPerk.cap}}</span
+                    >
+                  </div>
+                  <div style="width: 200px; margin-top: 4; position: relative">
+                    <div style="width: 185px">
+                      <span>Mitigation Mult.</span>
+                      <span style="float: right"
+                        >{{self.wheel.dedicationPerk.mitigation}}
+                      </span>
+                    </div>
+                    <span
+                      class="tooltip"
+                      tooltip="Increases your mitigation multiplicatively."
+                    ></span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div
-              class="panel-window"
-              style="width: 213px; height: 120px; margin-top: 8px"
-            >
-              <p class="panel-title">Revelation Perks</p>
               <div
-                style="
-                  margin-left: 8px;
-                  margin-top: 10px;
-                  width: 200px;
-                  height: 70px;
-                "
+                class="panel-window"
+                style="width: 213px; height: 160px; margin-top: 8px"
               >
-                <div
-                  style="width: 200px; margin-top: 4; position: relative"
-                  *if="self.wheel.revelationPerks.damage ~= nil"
-                >
-                  <div style="width: 185px">
-                    <span>{{self.wheel.revelationPerks.damage.name}}</span>
-                    <span style="float: right"
-                      >{{self.wheel.revelationPerks.damage.text}}
-                    </span>
+                <p class="panel-title">Conviction Perks</p>
+                <div class="conviction-perks">
+                  <div
+                    style="
+                      width: 190px;
+                      height: 15px;
+                      margin-top: 4px;
+                      position: relative;
+                    "
+                    *if="#self.wheel.convictionPerks > 0"
+                    *for="local conviction in self.wheel.convictionPerks"
+                  >
+                    <div style="width: 175px; height: 15px">
+                      <span *if="conviction.perk">{{conviction.perk}}</span>
+                      <span *if="conviction.stringPoint" style="float: right"
+                        >{{conviction.stringPoint}}
+                      </span>
+                    </div>
+                    <span
+                      class="tooltip"
+                      *if="conviction.tooltip ~= nil"
+                      *tooltip="conviction.tooltip"
+                    ></span>
                   </div>
-                  <span
-                    class="tooltip"
-                    *tooltip="self.wheel.revelationPerks.damage.tooltip"
-                  ></span>
                 </div>
-                <div
-                  style="width: 200px; margin-top: 4; position: relative"
-                  *if="self.wheel.revelationPerks.avatar ~= nil"
-                >
-                  <div style="width: 185px">
-                    <span>{{self.wheel.revelationPerks.avatar.name}}</span>
-                    <span style="float: right"
-                      >{{self.wheel.revelationPerks.avatar.text}}
-                    </span>
+              </div>
+              <div
+                class="panel-window"
+                style="width: 213px; height: 160px; margin-top: 8px"
+              >
+                <p class="panel-title">Vessels</p>
+                <div class="conviction-perks">
+                  <div
+                    style="
+                      width: 190px;
+                      height: 15px;
+                      margin-top: 4px;
+                      position: relative;
+                    "
+                    *if="#self.wheel.vessels > 0"
+                    *for="local vessel in self.wheel.vessels; local i = index"
+                  >
+                    <div style="width: 175px; height: 15px">
+                      <span
+                        *if="vessel.perk"
+                        *margin-left="vessel.left and vessel.left or 0"
+                        >{{vessel.text}}</span
+                      >
+                      <span
+                        *if="vessel.value and vessel.text ~= 'Resistances:'"
+                        style="float: right"
+                        >{{vessel.value}}
+                      </span>
+                    </div>
+                    <span
+                      class="tooltip"
+                      *if="vessel.tooltip ~= nil"
+                      *tooltip="vessel.tooltip"
+                    ></span>
                   </div>
-                  <span
-                    class="tooltip"
-                    *tooltip="self.wheel.revelationPerks.avatar.tooltip"
-                  ></span>
                 </div>
+              </div>
+              <div
+                class="panel-window"
+                style="width: 213px; height: 120px; margin-top: 8px"
+              >
+                <p class="panel-title">Revelation Perks</p>
                 <div
-                  style="width: 200px; margin-top: 4; position: relative"
-                  *if="self.wheel.revelationPerks.spellTR ~= nil"
+                  style="
+                    margin-left: 8px;
+                    margin-top: 10px;
+                    width: 200px;
+                    height: 70px;
+                  "
                 >
-                  <div style="width: 185px">
-                    <span>{{self.wheel.revelationPerks.spellTR.name}}</span>
-                    <span style="float: right"
-                      >{{self.wheel.revelationPerks.spellTR.text}}
-                    </span>
+                  <div
+                    style="width: 200px; margin-top: 4; position: relative"
+                    *if="self.wheel.revelationPerks.damage ~= nil"
+                  >
+                    <div style="width: 185px">
+                      <span>{{self.wheel.revelationPerks.damage.name}}</span>
+                      <span style="float: right"
+                        >{{self.wheel.revelationPerks.damage.text}}
+                      </span>
+                    </div>
+                    <span
+                      class="tooltip"
+                      *tooltip="self.wheel.revelationPerks.damage.tooltip"
+                    ></span>
                   </div>
-                  <span
-                    class="tooltip"
-                    *tooltip="self.wheel.revelationPerks.spellTR.tooltip"
-                  ></span>
-                </div>
-                <div
-                  style="width: 200px; margin-top: 4; position: relative"
-                  *if="self.wheel.revelationPerks.spellBL ~= nil"
-                >
-                  <div style="width: 185px">
-                    <span>{{self.wheel.revelationPerks.spellBL.name}}</span>
-                    <span style="float: right"
-                      >{{self.wheel.revelationPerks.spellBL.text}}
-                    </span>
+                  <div
+                    style="width: 200px; margin-top: 4; position: relative"
+                    *if="self.wheel.revelationPerks.avatar ~= nil"
+                  >
+                    <div style="width: 185px">
+                      <span>{{self.wheel.revelationPerks.avatar.name}}</span>
+                      <span style="float: right"
+                        >{{self.wheel.revelationPerks.avatar.text}}
+                      </span>
+                    </div>
+                    <span
+                      class="tooltip"
+                      *tooltip="self.wheel.revelationPerks.avatar.tooltip"
+                    ></span>
                   </div>
-                  <span
-                    class="tooltip"
-                    *tooltip="self.wheel.revelationPerks.spellBL.tooltip"
-                  ></span>
-                </div>
-                <div
-                  style="width: 200px; margin-top: 4; position: relative"
-                  *if="self.wheel.revelationPerks.giftOfLife ~= nil"
-                >
-                  <div style="width: 185px">
-                    <span>{{self.wheel.revelationPerks.giftOfLife.name}}</span>
-                    <span style="float: right"
-                      >{{self.wheel.revelationPerks.giftOfLife.text}}
-                    </span>
+                  <div
+                    style="width: 200px; margin-top: 4; position: relative"
+                    *if="self.wheel.revelationPerks.spellTR ~= nil"
+                  >
+                    <div style="width: 185px">
+                      <span>{{self.wheel.revelationPerks.spellTR.name}}</span>
+                      <span style="float: right"
+                        >{{self.wheel.revelationPerks.spellTR.text}}
+                      </span>
+                    </div>
+                    <span
+                      class="tooltip"
+                      *tooltip="self.wheel.revelationPerks.spellTR.tooltip"
+                    ></span>
                   </div>
-                  <span
-                    class="tooltip"
-                    *tooltip="self.wheel.revelationPerks.giftOfLife.tooltip"
-                  ></span>
+                  <div
+                    style="width: 200px; margin-top: 4; position: relative"
+                    *if="self.wheel.revelationPerks.spellBL ~= nil"
+                  >
+                    <div style="width: 185px">
+                      <span>{{self.wheel.revelationPerks.spellBL.name}}</span>
+                      <span style="float: right"
+                        >{{self.wheel.revelationPerks.spellBL.text}}
+                      </span>
+                    </div>
+                    <span
+                      class="tooltip"
+                      *tooltip="self.wheel.revelationPerks.spellBL.tooltip"
+                    ></span>
+                  </div>
+                  <div
+                    style="width: 200px; margin-top: 4; position: relative"
+                    *if="self.wheel.revelationPerks.giftOfLife ~= nil"
+                  >
+                    <div style="width: 185px">
+                      <span
+                        >{{self.wheel.revelationPerks.giftOfLife.name}}</span
+                      >
+                      <span style="float: right"
+                        >{{self.wheel.revelationPerks.giftOfLife.text}}
+                      </span>
+                    </div>
+                    <span
+                      class="tooltip"
+                      *tooltip="self.wheel.revelationPerks.giftOfLife.tooltip"
+                    ></span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="footer" placement="bottom-left">
+        <div class="footer-left">
+          <div><p class="footer-texts">gold</p></div>
+          <div style="margin-left: 4px">
+            <p class="footer-texts">lesser fragments</p>
+          </div>
+          <div style="margin-left: 4px">
+            <p class="footer-texts">greater fragments</p>
+          </div>
+          <span style="margin-left: 4px"
+            ><img
+              class="change-preset-icon"
+              src="/images/game/wheel/change_preset_icon.png"
+            />
+            <span style="padding-top: 2px">
+              Current Preset: Default-Preset
+            </span></span
+          >
+        </div>
+
+        <div class="footer-right">
+          <button onclick="self:handleClose()">Close</button>
+          <button
+            *disabled="self.wheel.options ~= 1"
+            onclick="self.wheel:resetWheel()"
+          >
+            Reset
+          </button>
+          <button
+            *disabled="self.wheel.options == 0 or not self.wheel.hasChanges"
+            onclick="self.wheel:apply()"
+          >
+            Apply
+          </button>
+          <button
+            *disabled="self.wheel.options == 0 or not self.wheel.hasChanges"
+            onclick="self.wheel:apply()"
+          >
+            Ok
+          </button>
         </div>
       </div>
     </div>
-    <div class="footer" placement="bottom-left">
-      <div class="footer-left">
-        <div><p class="footer-texts">gold</p></div>
-        <div style="margin-left: 4px">
-          <p class="footer-texts">lesser fragments</p>
-        </div>
-        <div style="margin-left: 4px">
-          <p class="footer-texts">greater fragments</p>
-        </div>
-        <span style="margin-left: 4px"
-          ><img
-            class="change-preset-icon"
-            src="/images/game/wheel/change_preset_icon.png"
-          />
-          <span style="padding-top: 2px">
-            Current Preset: Default-Preset
-          </span></span
-        >
-      </div>
 
-      <div class="footer-right">
-        <button onclick="self:hide()">Close</button>
+    <div
+      *if="self.currentWindow == 'close-window'"
+      style="height: 65px; width: 415px"
+    >
+      <p>You did not save the changes you have made to the Wheel of Destiny.</p>
+      <p>Would you like to save your Wheel of Destiny Changes?</p>
+      <hr class="separator HorizontalSeparator" style="width: 415px" />
+      <div style="height: 20px; width: 415px">
+        <button style="float: right" onclick="self:hide()">No</button>
         <button
-          *disabled="self.wheel.options ~= 1"
-          onclick="self.wheel:resetWheel()"
+          style="float: right; margin-right: 8px"
+          onclick="self.wheel:apply(); self:hide()"
         >
-          Reset
-        </button>
-        <button
-          *disabled="self.wheel.options == 0 or not self.wheel.hasChanges"
-          onclick="self.wheel:apply()"
-        >
-          Apply
-        </button>
-        <button
-          *disabled="self.wheel.options == 0 or not self.wheel.hasChanges"
-          onclick="self.wheel:apply()"
-        >
-          Ok
+          Yes
         </button>
       </div>
     </div>

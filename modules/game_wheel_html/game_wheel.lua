@@ -13,7 +13,7 @@ local baseButtonClipped = { x = 0, y = 34, width = 322, height = 34 }
 
 local activeColor = "#c0c0c0"
 local inactiveColor = "#707070"
-
+WheelController.currentWindow = "main-window"
 WheelController.wheel = helper.wheel.baseWheelValues
 WheelController.wheel.hasChanges = false
 WheelController.wheel.originalPointInvested = {}
@@ -169,7 +169,6 @@ function WheelController.wheel:apply()
     local activeGems = getGemDomainDistribution()
 
     g_game.applyWheelOfDestiny(WheelController.wheel.pointInvested, activeGems)
-    -- TODO: Criar sistema de confirmação de close para mostrar um modal de confirmação se quer salvar ou não
 
     WheelController.wheel.originalPointInvested = copyWheelPoints(WheelController.wheel.pointInvested)
     WheelController.wheel:updateHasChanges()
@@ -184,7 +183,7 @@ function WheelController.wheel:resetWheel()
         WheelController.wheel:handleUpdatePoints()
     end
 
-    for id, iconInfo in pairs(helper.gems.WheelIcons[WheelController.wheel.vocationId]) do
+    for id in pairs(helper.gems.WheelIcons[WheelController.wheel.vocationId]) do
         setPerk(id)
         WheelController.wheel.data[id].left = WheelController.wheel.data[id].left or 0
         WheelController.wheel.data[id].top = WheelController.wheel.data[id].top or 0
@@ -512,14 +511,33 @@ local function resetValues()
     resetSelection()
 end
 
+function WheelController:handlePressEnter()
+    if not self.wheel.hasChanges then
+        self:hide()
+        return
+    end
+
+    self.wheel:apply()
+    self:hide()
+end
+
+function WheelController:handleClose()
+    if self.wheel.hasChanges and self.currentWindow ~= "close-window" then
+        self.currentWindow = "close-window"
+    else
+        self:hide()
+    end
+end
+
 function WheelController:hide()
     resetValues()
     if not self.ui then
         return
     end
 
+    WheelController.currentWindow = "main-window"
+    WheelController.wheel:resetWheel()
     self.ui:hide()
-
     if WheelButton then
         WheelButton:setOn(false)
     end

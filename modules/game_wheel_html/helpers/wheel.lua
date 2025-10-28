@@ -922,6 +922,7 @@ local informationButtonClips = {
 }
 
 local baseWheelValues = {
+    currentWindow = "main-window",
     clip = { x = 0, y = 34, width = 322, height = 34 },
     backdropVocationOverlay = nil,
     currentSelectSlotId = -1,
