@@ -23,6 +23,7 @@
 #include "logger.h"
 
 #include "eventdispatcher.h"
+#include "framework/platform/platform.h"
 
 #ifdef FRAMEWORK_GRAPHICS
 #include <framework/platform/platformwindow.h>
