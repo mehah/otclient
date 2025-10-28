@@ -102,6 +102,32 @@ local function setPerk(index, path, _x, _y, _width, _height)
     }
 end
 
+local function getGemDomainDistribution()
+    local data = {
+        [helper.gems.GemDomains.GREEN] = 0,
+        [helper.gems.GemDomains.RED] = 0,
+        [helper.gems.GemDomains.ACQUA] = 0,
+        [helper.gems.GemDomains.PURPLE] = 0,
+    }
+
+    local source = WheelController.wheel.equipedGems
+    for _, id in pairs(source) do
+        local domain = GemAtelier.getGemDomainById(id)
+        if domain ~= -1 then
+            data[domain] = id
+        end
+    end
+
+    return data
+end
+
+function WheelController.wheel:apply()
+    local activeGems = getGemDomainDistribution()
+
+    g_game.applyWheelOfDestiny(WheelController.wheel.pointInvested, activeGems)
+    -- TODO: Criar sistema de confirmação de close para mostrar um modal de confirmação se quer salvar ou não
+end
+
 function WheelController.wheel:resetWheel()
     WheelController.wheel.passivePoints = {}
     for slotId in pairs(helper.wheel.WheelSlotsParser) do
@@ -1121,7 +1147,6 @@ end
 
 function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.options = data.options
-    WheelController.wheel.canReset = WheelController.wheel.options == 1
     WheelController.wheel.vocationId = data.vocationId or 0
     WheelController.wheel.points = data.points or 0
     WheelController.wheel.extraGemPoints = 0

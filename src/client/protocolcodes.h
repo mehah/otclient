@@ -253,6 +253,7 @@ namespace Proto
         // original tibia ONLY
         ClientImbuementDurations = 96,
         ClientOpenWheelOfDestiny = 97,
+        ClientApplyWheelOfDestiny = 98,
         ClientAutoWalk = 100,
         ClientWalkNorth = 101,
         ClientWalkEast = 102,

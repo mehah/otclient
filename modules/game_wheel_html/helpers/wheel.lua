@@ -922,7 +922,6 @@ local informationButtonClips = {
 }
 
 local baseWheelValues = {
-    canReset = false,
     clip = { x = 0, y = 34, width = 322, height = 34 },
     backdropVocationOverlay = nil,
     currentSelectSlotId = -1,

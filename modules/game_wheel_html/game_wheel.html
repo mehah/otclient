@@ -1149,13 +1149,24 @@
       <div class="footer-right">
         <button onclick="self:hide()">Close</button>
         <button
-          *disabled="not self.wheel.canReset"
+          *disabled="self.wheel.options ~= 1"
           onclick="self.wheel:resetWheel()"
         >
           Reset
         </button>
-        <button disabled>Apply</button>
-        <button onclick="self:hide()">Ok</button>
+        <button
+          *disabled="self.wheel.options == 0"
+          onclick="self.wheel:apply()"
+        >
+          Apply
+        </button>
+        <button
+          *disabled="self.wheel.options == 0"
+          onclick="self.wheel:apply()"
+          onclick="self:hide()"
+        >
+          Ok
+        </button>
       </div>
     </div>
   </window>
