@@ -40,7 +40,7 @@ void StaticText::drawText(const Point& dest, const Rect& parentRect)
     const auto& textSize = m_cachedText.getTextSize();
 
     auto rect = Rect(dest - Point(textSize.width() / 2, textSize.height()) + (Point(20, 5) / g_app.getStaticTextScale()), textSize);
-    if (g_app.getStaticTextScale() == PlatformWindow::DEFAULT_DISPLAY_DENSITY)
+    if (g_app.getStaticTextScale() == DEFAULT_DISPLAY_DENSITY)
         rect.bind(parentRect);
 
     // draw only if the real center is not too far from the parent center, or its a yell

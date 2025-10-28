@@ -232,7 +232,7 @@ void DrawPool::resetState()
     getCurrentState() = {};
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
-    m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
+    m_scale = DEFAULT_DISPLAY_DENSITY;
 }
 
 bool DrawPool::canRepaint()

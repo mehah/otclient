@@ -26,7 +26,6 @@
 
 #include "declarations.h"
 #include <framework/otml/declarations.h>
-#include <framework/platform/platform.h>
 
 template<typename T>
 int push_internal_luavalue(T v);

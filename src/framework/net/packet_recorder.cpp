@@ -23,6 +23,7 @@
 #include "packet_recorder.h"
 
 #include "inputmessage.h"
+#include "outputmessage.h"
 #include "framework/core/clock.h"
 PacketRecorder::PacketRecorder(const std::string_view& file)
 {

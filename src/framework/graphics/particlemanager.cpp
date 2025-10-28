@@ -23,6 +23,7 @@
 #include "particlemanager.h"
 
 #include "particleeffect.h"
+#include "particletype.h"
 #include "framework/core/resourcemanager.h"
 
 ParticleManager g_particles;

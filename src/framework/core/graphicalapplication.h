@@ -24,10 +24,10 @@
 
 #include "application.h"
 
-#include <framework/core/adaptativeframecounter.h>
 #include <framework/core/inputevent.h>
 #include <framework/graphics/declarations.h>
-#include <framework/platform/platformwindow.h>
+
+#include "adaptativeframecounter.h"
 
 class ApplicationDrawEvents
 {
@@ -119,7 +119,7 @@ public:
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 
-    bool isScaled() { return g_window.getDisplayDensity() != 1.f; }
+    bool isScaled();
 
     bool isEncrypted() {
 #if ENABLE_ENCRYPTION == 1
@@ -147,9 +147,9 @@ private:
     bool m_drawText{ true };
     bool m_loadingAsyncTexture{ false };
 
-    float m_creatureInformationScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
-    float m_animatedTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
-    float m_staticTextScale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
+    float m_creatureInformationScale{ DEFAULT_DISPLAY_DENSITY };
+    float m_animatedTextScale{ DEFAULT_DISPLAY_DENSITY };
+    float m_staticTextScale{ DEFAULT_DISPLAY_DENSITY };
 
     AdaptativeFrameCounter m_mapProcessFrameCounter;
     AdaptativeFrameCounter m_graphicFrameCounter;

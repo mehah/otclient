@@ -300,7 +300,7 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 }
 
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
-
+bool GraphicalApplication::isScaled() { return g_window.getDisplayDensity() != 1.f; }
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     if (m_drawEvents && m_drawEvents->isUsingProtobuf())
         v = true;

@@ -103,7 +103,7 @@ public:
 
     void setScaleFactor(const float scale) { m_scaleFactor = scale; }
     float getScaleFactor() const { return m_scaleFactor; }
-    bool isScaled() const { return m_scaleFactor != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
+    bool isScaled() const { return m_scaleFactor != DEFAULT_DISPLAY_DENSITY; }
 
     void setFramebuffer(const Size& size);
     void removeFramebuffer();
@@ -403,7 +403,7 @@ private:
     stdext::map<std::string_view, std::any> m_parameters;
 
     float m_scaleFactor{ 1.f };
-    float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
+    float m_scale{ DEFAULT_DISPLAY_DENSITY };
 
     FrameBufferPtr m_framebuffer;
 

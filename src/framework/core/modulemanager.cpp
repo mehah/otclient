@@ -25,8 +25,10 @@
 #include "asyncdispatcher.h"
 #include "eventdispatcher.h"
 #include "graphicalapplication.h"
+#include "module.h"
 #include "resourcemanager.h"
 #include "framework/otml/otmldocument.h"
+#include "framework/platform/platformwindow.h"
 
 ModuleManager g_modules;
 
