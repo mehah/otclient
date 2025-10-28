@@ -1121,6 +1121,7 @@ end
 
 function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.options = data.options
+    WheelController.wheel.canReset = WheelController.wheel.options == 1
     WheelController.wheel.vocationId = data.vocationId or 0
     WheelController.wheel.points = data.points or 0
     WheelController.wheel.extraGemPoints = 0
