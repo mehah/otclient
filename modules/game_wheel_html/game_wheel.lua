@@ -15,6 +15,9 @@ local activeColor = "#c0c0c0"
 local inactiveColor = "#707070"
 
 WheelController.wheel = helper.wheel.baseWheelValues
+WheelController.wheel.hasChanges = false
+WheelController.wheel.originalPointInvested = {}
+WheelController.wheel.trackChanges = false
 WheelController.gem = {
     clip = baseButtonClip
 }
@@ -89,6 +92,47 @@ local function resetSelection()
     WheelController.wheel.information.data = baseInfoData
 end
 
+local function copyWheelPoints(source)
+    local copy = {}
+    if not source then
+        return copy
+    end
+
+    for slotId, points in pairs(source) do
+        copy[slotId] = points
+    end
+
+    return copy
+end
+
+local function hasDifferentPoints(original, current)
+    for slotId, points in pairs(current) do
+        if (original[slotId] or 0) ~= (points or 0) then
+            return true
+        end
+    end
+
+    for slotId, points in pairs(original) do
+        if (current[slotId] or 0) ~= (points or 0) then
+            return true
+        end
+    end
+
+    return false
+end
+
+function WheelController.wheel:updateHasChanges()
+    if not self.trackChanges then
+        self.hasChanges = false
+        return
+    end
+
+    local original = self.originalPointInvested or {}
+    local current = self.pointInvested or {}
+
+    self.hasChanges = hasDifferentPoints(original, current)
+end
+
 local function setPerk(index, path, _x, _y, _width, _height)
     path = path or "/images/game/wheel/icons-skillwheel-mediumperks.png"
     local iconInfo = helper.gems.WheelIcons[WheelController.wheel.vocationId][index]
@@ -126,6 +170,9 @@ function WheelController.wheel:apply()
 
     g_game.applyWheelOfDestiny(WheelController.wheel.pointInvested, activeGems)
     -- TODO: Criar sistema de confirmação de close para mostrar um modal de confirmação se quer salvar ou não
+
+    WheelController.wheel.originalPointInvested = copyWheelPoints(WheelController.wheel.pointInvested)
+    WheelController.wheel:updateHasChanges()
 end
 
 function WheelController.wheel:resetWheel()
@@ -746,6 +793,8 @@ function WheelController.wheel:handleUpdatePoints()
             WheelController.wheel.data[slot].adjacentPath = button.colorImageBase .. "5.png"
         end
     end
+
+    WheelController.wheel:updateHasChanges()
 end
 
 function WheelController.wheel:configureConvictionPerk()
@@ -1146,6 +1195,7 @@ function WheelController.wheel:selectInformationTab(tabOrder)
 end
 
 function onWheelOfDestinyOpenWindow(data)
+    WheelController.wheel.trackChanges = false
     WheelController.wheel.options = data.options
     WheelController.wheel.vocationId = data.vocationId or 0
     WheelController.wheel.points = data.points or 0
@@ -1297,4 +1347,8 @@ function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:handlePassiveBorders()
     WheelController.wheel:configureEquippedGems()
+
+    WheelController.wheel.originalPointInvested = copyWheelPoints(WheelController.wheel.pointInvested)
+    WheelController.wheel.trackChanges = true
+    WheelController.wheel:updateHasChanges()
 end
