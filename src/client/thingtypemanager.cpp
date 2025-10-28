@@ -39,10 +39,6 @@
 #include <framework/core/binarytree.h>
 #endif
 
-#ifdef FRAMEWORK_EDITOR
-#include "itemtype.h"
-#endif
-
 using json = nlohmann::json;
 
 ThingTypeManager g_things;

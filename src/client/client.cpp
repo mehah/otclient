@@ -35,6 +35,9 @@
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 #include "framework/ui/uimanager.h"
+#ifdef FRAMEWORK_EDITOR
+#include "creatures.h"
+#endif
 
 Client g_client;
 

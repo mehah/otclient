@@ -27,6 +27,9 @@
 
 #include <framework/core/resourcemanager.h>
 
+#include "item.h"
+#include "tile.h"
+
 HouseManager g_houses;
 
 House::House(uint32_t hId, const std::string_view name, const Position& pos)
@@ -46,7 +49,7 @@ void House::setTile(const TilePtr& tile)
 
 TilePtr House::getTile(const Position& position)
 {
-    const TileMap::const_iterator iter = m_tiles.find(position);
+    const auto iter = m_tiles.find(position);
     if (iter != m_tiles.end())
         return iter->second;
     return nullptr;
@@ -58,6 +61,8 @@ void House::addDoor(const ItemPtr& door)
     door->setDoorId(m_lastDoorId);
     m_doors[++m_lastDoorId] = door;
 }
+
+void House::removeDoor(const ItemPtr& door) { removeDoorById(door->getDoorId()); }
 
 void House::removeDoorById(uint32_t doorId)
 {

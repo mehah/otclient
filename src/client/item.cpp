@@ -25,6 +25,7 @@
 #include "animator.h"
 #include "game.h"
 #include "gameconfig.h"
+
 #include "thingtype.h"
 #include "thingtypemanager.h"
 #include "tile.h"
@@ -34,6 +35,7 @@
 
 #ifdef FRAMEWORK_EDITOR
 #include <framework/core/binarytree.h>
+#include "itemtype.h"
 #endif
 
 ItemPtr Item::create(const int id)

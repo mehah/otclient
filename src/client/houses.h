@@ -24,8 +24,6 @@
 
 #ifdef FRAMEWORK_EDITOR
 #include "declarations.h"
-#include "tile.h"
-
 #include <framework/luaengine/luaobject.h>
 
 class House : public LuaObject
@@ -57,7 +55,7 @@ public:
     Position getEntry() { return m_entry; }
 
     void addDoor(const ItemPtr& door);
-    void removeDoor(const ItemPtr& door) { removeDoorById(door->getDoorId()); }
+    void removeDoor(const ItemPtr& door);
     void removeDoorById(uint32_t doorId);
 
 protected:

@@ -60,6 +60,9 @@
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
+#include "itemtype.h"
+#include "creatures.h"
+
 #endif
 
 #include <framework/luaengine/luainterface.h>

@@ -23,6 +23,7 @@
 #include "map.h"
 
 #include "animatedtext.h"
+#include "creatures.h"
 #include "game.h"
 #include "gameconfig.h"
 #include "item.h"
