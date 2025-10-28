@@ -21,8 +21,8 @@
  */
 
 #pragma once
-
-#include "tile.h"
+#include "declarations.h"
+#include "staticdata.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "creatures.h"
@@ -101,19 +101,8 @@ class TileBlock
 public:
     TileBlock() { m_tiles.fill(nullptr); }
 
-    const TilePtr& create(const Position& pos)
-    {
-        auto& tile = m_tiles[getTileIndex(pos)];
-        tile = std::make_shared<Tile>(pos);
-        return tile;
-    }
-    const TilePtr& getOrCreate(const Position& pos)
-    {
-        auto& tile = m_tiles[getTileIndex(pos)];
-        if (!tile)
-            tile = std::make_shared<Tile>(pos);
-        return tile;
-    }
+    const TilePtr& create(const Position& pos);
+    const TilePtr& getOrCreate(const Position& pos);
     const TilePtr& get(const Position& pos) { return m_tiles[getTileIndex(pos)]; }
     void remove(const Position& pos) { m_tiles[getTileIndex(pos)] = nullptr; }
 

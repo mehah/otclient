@@ -30,6 +30,7 @@
 #include "mapview.h"
 #include "minimap.h"
 #include "thing.h"
+#include "tile.h"
 #include "framework/core/asyncdispatcher.h"
 #include "framework/core/eventdispatcher.h"
 #include "framework/graphics/drawpoolmanager.h"
@@ -1477,4 +1478,18 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
         }
     }
     return creatures;
+}
+
+const TilePtr& TileBlock::create(const Position& pos)
+{
+    auto& tile = m_tiles[getTileIndex(pos)];
+    tile = std::make_shared<Tile>(pos);
+    return tile;
+}
+const TilePtr& TileBlock::getOrCreate(const Position& pos)
+{
+    auto& tile = m_tiles[getTileIndex(pos)];
+    if (!tile)
+        tile = std::make_shared<Tile>(pos);
+    return tile;
 }
