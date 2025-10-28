@@ -243,6 +243,7 @@ local EVENTS_TRANSLATED = {
     onfontchange     = 'onFontChange',
     ontextchange     = 'onTextChange',
     onescape         = 'onEscape',
+    onenter          = 'onEnter',
 }
 
 local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
