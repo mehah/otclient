@@ -9,39 +9,48 @@
       display: inline-block;
     }
     .content {
-      height: 580px;
+      height: 565px;
       width: 100%;
       margin-top: 8px;
     }
     .footer {
       height: 20px;
-      width: 997px;
+      width: 968px;
+      position: relative;
     }
-
+    .lesser-fragment-icon {
+      --image-clip: 0 0 12 12;
+      height: 12px;
+      width: 12px;
+      display: block;
+    }
+    .greater-fragment-icon {
+      --image-clip: 0 12 12 12;
+      height: 12px;
+      width: 12px;
+      display: block;
+    }
     .footer-left {
       display: inline-block;
       width: 630px;
       align-items: center;
+      height: 20px;
     }
-    .footer-left > div {
-      display: inline-block;
+    .footer-balance {
       width: 130px;
       height: 20px;
-    }
-    .footer-left > div > p {
-      height: 20px;
+      position: relative;
+      display: inline-block;
       --image-source: "/modules/game_wheel_html/images/balanceBg.png";
       --image-size: 130 20;
-      align-items: center;
-      height: 20px;
     }
-
     .footer-right {
       display: inline-block;
       width: 340px;
+      position: absolute;
+      right: 0;
     }
     .footer-right > button {
-      display: inline-block;
       margin-right: 4px;
       float: right;
     }
@@ -1134,15 +1143,43 @@
           </div>
         </div>
       </div>
+      <hr class="separator HorizontalSeparator" style="width: 968px" />
       <div class="footer" placement="bottom-left">
         <div class="footer-left">
-          <div><p class="footer-texts">gold</p></div>
-          <div style="margin-left: 4px">
-            <p class="footer-texts">lesser fragments</p>
+          <div class="footer-balance">
+            <p style="position: absolute; right: 8; top: 2">{{self.gold}}</p>
+            <img
+              src="/modules/game_wheel_html/images/gold.png"
+              style="
+                position: absolute;
+                right: 4;
+                top: 6;
+                width: 9px;
+                height: 9px;
+              "
+            />
           </div>
-          <div style="margin-left: 4px">
-            <p class="footer-texts">greater fragments</p>
+          <div class="footer-balance" style="margin-left: 4px">
+            <p style="position: absolute; right: 10; top: 2">
+              {{self.lesserFragment}}
+            </p>
+            <img
+              class="lesser-fragment-icon"
+              src="/images/game/wheel/fragmentIcon.png"
+              style="position: absolute; right: 4; top: 4"
+            />
           </div>
+          <div class="footer-balance" style="margin-left: 4px">
+            <p style="position: absolute; right: 10; top: 2">
+              {{self.greaterFragment}}
+            </p>
+            <img
+              class="greater-fragment-icon"
+              src="/images/game/wheel/fragmentIcon.png"
+              style="position: absolute; right: 4; top: 4"
+            />
+          </div>
+
           <span style="margin-left: 4px"
             ><img
               class="change-preset-icon"

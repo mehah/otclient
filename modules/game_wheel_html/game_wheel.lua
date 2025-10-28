@@ -560,7 +560,8 @@ end
 
 function WheelController:onInit()
     self:registerEvents(g_game, {
-        onWheelOfDestinyOpenWindow = onWheelOfDestinyOpenWindow
+        onWheelOfDestinyOpenWindow = onWheelOfDestinyOpenWindow,
+        onResourcesBalanceChange = onResourcesBalanceChange,
     })
 
     if not WheelButton then
@@ -568,6 +569,7 @@ function WheelController:onInit()
             '/images/options/wheel', function() self:toggle() end)
     end
 
+    WheelController:updateResources()
     self.currentTab = 'wheel'
     WheelController:toggleMenu('wheel')
 end
@@ -1210,6 +1212,23 @@ function WheelController.wheel:selectInformationTab(tabOrder)
         WheelController.wheel.information.secondButton.width = buttons.secondButton.selectedWidth
         WheelController.wheel.information.secondButton.active = true
     end
+end
+
+function WheelController:updateResources()
+    WheelController.gold = WheelController.gold or "0"
+    WheelController.lesserFragment = WheelController.lesserFragment or 0
+    WheelController.greaterFragment = WheelController.greaterFragment or 0
+
+    local player = g_game.getLocalPlayer()
+    if player then
+        WheelController.lesserFragment = player:getResourceBalance(ResourceTypes.LESSER_FRAGMENT)
+        WheelController.greaterFragment = player:getResourceBalance(ResourceTypes.GREATER_FRAGMENT)
+        WheelController.gold = comma_value(player:getTotalMoney())
+    end
+end
+
+function onResourcesBalanceChange(balance, oldBalance, type)
+    WheelController:updateResources()
 end
 
 function onWheelOfDestinyOpenWindow(data)

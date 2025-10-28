@@ -1007,7 +1007,10 @@ local baseWheelValues = {
             width = informationButtonClips.secondButton.unselectedWidth,
             disabled = true,
         }
-    }
+    },
+    gold = "0",
+    lesserFragment = 0,
+    greaterFragment = 0,
 }
 
 
