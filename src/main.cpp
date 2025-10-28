@@ -29,6 +29,8 @@
 
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
+#include "client/game.h"
+#include "client/localplayer.h"
 #include <framework/discord/discord.h>
 #endif
 #endif
