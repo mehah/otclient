@@ -165,13 +165,17 @@ local function getGemDomainDistribution()
     return data
 end
 
-function WheelController.wheel:apply()
+function WheelController.wheel:apply(close)
     local activeGems = getGemDomainDistribution()
 
     g_game.applyWheelOfDestiny(WheelController.wheel.pointInvested, activeGems)
 
     WheelController.wheel.originalPointInvested = copyWheelPoints(WheelController.wheel.pointInvested)
     WheelController.wheel:updateHasChanges()
+
+    if close then
+        WheelController:hide()
+    end
 end
 
 function WheelController.wheel:resetWheel()
