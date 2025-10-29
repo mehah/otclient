@@ -1217,8 +1217,8 @@ local function getVesselBonus()
 							bonusType = bonus.type1,
 							text = "Mitigation Mult.",
 							value = number,
-							tooltip =
-								bonus.tooltip
+							tooltip = bonus.tooltip,
+							icon = bonus.icon
 						}
 					end
 					goto continue
@@ -1242,7 +1242,12 @@ local function getVesselBonus()
 					if bonus.type1 == "defense" then
 						defenses[#defenses + 1] = { bonusType = bonus.type1, text = message, value = number }
 					else
-						bonuses[#bonuses + 1] = { bonusType = bonus.type1, text = message, value = "+" .. number }
+						bonuses[#bonuses + 1] = {
+							bonusType = bonus.type1,
+							text = message,
+							value = "+" .. number,
+							icon = bonus.icon
+						}
 					end
 				end
 			end
@@ -1270,7 +1275,12 @@ local function getVesselBonus()
 					if bonus.type2 == "defense" then
 						defenses[#defenses + 1] = { bonusType = bonus.type2, text = message, value = number }
 					else
-						bonuses[#bonuses + 1] = { bonusType = bonus.type2, text = message, value = "+" .. number }
+						bonuses[#bonuses + 1] = {
+							bonusType = bonus.type2,
+							text = message,
+							value = "+" .. number,
+							icon = bonus.icon
+						}
 					end
 				end
 			end
@@ -1278,6 +1288,7 @@ local function getVesselBonus()
 			if bonus.text:find("RM") then
 				local number = getBonusValueUpgrade(k.bonusID, k.gemID, k.supreme, true)
 				local existingBonus = findBonusByText(short_text(bonus.text, 17))
+
 				if existingBonus then
 					existingBonus.value = existingBonus.value + tonumber(number)
 				else
@@ -1286,7 +1297,8 @@ local function getVesselBonus()
 						text = short_text(bonus.text, 17),
 						value = number,
 						tooltip =
-							bonus.tooltip
+							bonus.tooltip,
+						icon = bonus.icon
 					}
 				end
 			elseif not bonus.text:find("\n") then
@@ -1295,7 +1307,12 @@ local function getVesselBonus()
 				if existingBonus then
 					existingBonus.value = existingBonus.value + tonumber(number)
 				else
-					bonuses[#bonuses + 1] = { bonusType = "special", text = message, value = number }
+					bonuses[#bonuses + 1] = {
+						bonusType = "special",
+						text = message,
+						value = number,
+						icon = bonus.icon
+					}
 				end
 			elseif bonus.text:find("Aug.") then
 				local bonusName = firstString
@@ -1322,8 +1339,8 @@ local function getVesselBonus()
 						bonusType = "augment",
 						text = short_text(bonusName, 15),
 						value = number,
-						tooltip =
-							tooltip
+						tooltip = tooltip,
+						icon = bonus.icon
 					}
 				end
 			end
@@ -1333,7 +1350,11 @@ local function getVesselBonus()
 	end
 
 	if #defenses > 0 then
-		bonuses[#bonuses + 1] = { bonusType = "defense", text = ("Resistances:"), value = -1 }
+		bonuses[#bonuses + 1] = {
+			bonusType = "defense",
+			text = ("Resistances:"),
+			value = -1,
+		}
 	end
 
 	for _, v in pairs(defenses) do
@@ -2320,6 +2341,11 @@ local function configureVessels()
 		if data.text:find("  ") then
 			data.left = 10
 		end
+
+		if data.icon then
+			data.icon = string.format("/images/game/wheel/%s.png", data.icon)
+		end
+
 		table.insert(parsed, data)
 	end
 

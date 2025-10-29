@@ -1028,6 +1028,12 @@
                     *for="local vessel in self.wheel.vessels; local i = index"
                   >
                     <div style="width: 175px; height: 15px">
+                      <img
+                        *if="vessel.icon ~= nil"
+                        *image-source="vessel.icon"
+                        height="12"
+                        width="12"
+                      />
                       <span
                         *if="vessel.perk"
                         *margin-left="vessel.left and vessel.left or 0"

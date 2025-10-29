@@ -1253,9 +1253,9 @@ function onWheelOfDestinyOpenWindow(data)
     WheelController.wheel.supremeModsUpgrade = data.supremeGrades or {}
     Workshop.createFragments()
     for id, gem in pairs(WheelController.wheel.atelierGems) do
-        gem.lesserBonus = gem.basicModifier1 > 0 and gem.basicModifier1 or -1
-        gem.regularBonus = gem.basicModifier2 > 0 and gem.basicModifier2 or -1
-        gem.supremeBonus = gem.supremeModifier > 0 and gem.supremeModifier or -1
+        gem.lesserBonus = gem.basicModifier1 or -1
+        gem.regularBonus = gem.basicModifier2 or -1
+        gem.supremeBonus = gem.supremeModifier or -1
         gem.gemType = gem.quality
         gem.gemDomain = gem.affinity
         gem.gemID = id
