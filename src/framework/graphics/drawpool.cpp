@@ -22,6 +22,7 @@
 
 #include "drawpool.h"
 
+#include "painter.h"
 #include "textureatlas.h"
 
 DrawPool* DrawPool::create(const DrawPoolType type)
