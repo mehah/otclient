@@ -579,9 +579,9 @@ function WheelController.wheel:handleMousePress(event, id)
     local totalPoints = WheelController.wheel:getTotalPoints()
     local pointToInvest = math.max(totalPoints - WheelController.wheel.usedPoints, 0)
     resetSelection()
-    WheelController.wheel:handleSelectSlot(id)
-    WheelController.wheel:handleOnHover(id, true)
     if event.mouseButton == MouseRightButton then
+        WheelController.wheel:handleSelectSlot(id)
+        WheelController.wheel:handleOnHover(id, true)
         local data = WheelController.wheel.data[id]
         WheelController.wheel.currentSelectSlotId = id
         if WheelController.wheel.pointInvested[id] >= data.totalPoints or pointToInvest == 0 then
@@ -892,7 +892,6 @@ function WheelController.wheel:onAddOnePoint()
     WheelController.wheel.pointInvested[index] = pointInvested + 1
     WheelController.wheel:insertPoint(index, WheelController.wheel.pointInvested[index])
     WheelController.wheel:insertUnlockedThe(index)
-
     WheelController.wheel:handleUpdatePoints()
 end
 
@@ -1036,7 +1035,7 @@ function WheelController.wheel:checkFilledVessels(index)
             goto continue
         end
 
-        if lastModInserted == 0 and gem.lesserBonus > -1 then
+        if lastModInserted == 0 and gem.lesserBonus > -1 and bonus.maxPoints <= 75 then
             setPerk(id, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.lesserBonus, 0, 30, 30)
             WheelController.wheel.equipedGemBonuses[id] = {
                 bonusID = gem.lesserBonus,
@@ -1044,7 +1043,7 @@ function WheelController.wheel:checkFilledVessels(index)
                 gemID = gem.gemID
             }
             lastModInserted = 1
-        elseif lastModInserted == 1 and gem.regularBonus > -1 then
+        elseif lastModInserted == 1 and gem.regularBonus > -1 and bonus.maxPoints == 100 then
             setPerk(id, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.regularBonus, 0, 30, 30)
             WheelController.wheel.equipedGemBonuses[id] = {
                 bonusID = gem.regularBonus,
@@ -1052,7 +1051,7 @@ function WheelController.wheel:checkFilledVessels(index)
                 gemID = gem.gemID
             }
             lastModInserted = 2
-        elseif lastModInserted == 2 and gem.supremeBonus > -1 then
+        elseif lastModInserted == 2 and gem.supremeBonus > -1 and bonus.maxPoints == 150 then
             setPerk(id, "/images/game/wheel/icons-skillwheel-suprememods.png", 35 * gem.supremeBonus, 0, 35, 35)
             WheelController.wheel.equipedGemBonuses[id] = {
                 bonusID = gem.supremeBonus,
@@ -1100,7 +1099,7 @@ function WheelController.wheel:insertPoint(id, points)
                 local gem = GemAtelier.getEquipedGem(bonus.domain - 1, WheelController)
                 if gem then
                     local enabled = WheelController.wheel.vesselEnabled[bonus.domain - 1]
-                    if #enabled == 0 and gem.lesserBonus > -1 then
+                    if #enabled == 0 and gem.lesserBonus > -1 and bonus.maxPoints <= 75 then
                         setPerk(id, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.lesserBonus, 0,
                             30, 30)
                         WheelController.wheel.equipedGemBonuses[id] = {
@@ -1109,7 +1108,7 @@ function WheelController.wheel:insertPoint(id, points)
                             gemID = gem.gemID
                         }
                         table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], id)
-                    elseif #enabled == 1 and gem.regularBonus > -1 then
+                    elseif #enabled == 1 and gem.regularBonus > -1 and bonus.maxPoints == 100 then
                         setPerk(id, "/images/game/wheel/icons-skillwheel-basicmods.png", 30 * gem.regularBonus,
                             0, 30, 30)
 
@@ -1119,18 +1118,16 @@ function WheelController.wheel:insertPoint(id, points)
                             gemID = gem.gemID
                         }
                         table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], id)
-                    elseif #enabled == 2 and gem.supremeBonus > -1 then
+                    elseif #enabled == 2 and gem.supremeBonus > -1 and bonus.maxPoints == 150 then
                         setPerk(id, "/images/game/wheel/icons-skillwheel-suprememods.png", 35 * gem
                             .supremeBonus, 0, 35, 35)
                         WheelController.wheel.equipedGemBonuses[id] = {
                             bonusID = gem.supremeBonus,
-                            supreme = false,
+                            supreme = true,
                             gemID = gem.gemID
                         }
                         table.insert(WheelController.wheel.vesselEnabled[bonus.domain - 1], id)
                     end
-                else
-                    -- setPerk(index)
                 end
             end
         else
