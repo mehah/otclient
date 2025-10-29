@@ -219,6 +219,8 @@ local function pairsToString(tbl)
     for i = 1, #tbl, 2 do
         local msg = tbl[i]
         local color = tbl[i + 1]
+        msg = normalizeListMarkup(msg)
+        color = color:lower() == "#c0c0c0" and "#3f3f3f" or color
         table.insert(result, string.format("{%s, %s}", msg, color))
     end
     return table.concat(result, " ")
