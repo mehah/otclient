@@ -1082,18 +1082,18 @@
                       position: relative;
                     "
                     *if="#self.wheel.convictionPerks > 0"
-                    *for="local conviction in self.wheel.convictionPerks"
+                    *for="local data in self.wheel.convictionPerks"
                   >
                     <div style="width: 175px; height: 15px">
-                      <span *if="conviction.perk">{{conviction.perk}}</span>
-                      <span *if="conviction.stringPoint" style="float: right"
-                        >{{conviction.stringPoint}}
+                      <span *if="data.text ~= nil">{{data.text}}</span>
+                      <span *if="data.value ~= nil" style="float: right"
+                        >{{data.value}}
                       </span>
                     </div>
                     <span
                       class="tooltip"
-                      *if="conviction.tooltip ~= nil"
-                      *tooltip="conviction.tooltip"
+                      *if="data.tooltip ~= nil"
+                      *tooltip="data.tooltip"
                     ></span>
                   </div>
                 </div>

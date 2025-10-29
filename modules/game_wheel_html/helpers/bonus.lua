@@ -2181,8 +2181,8 @@ local function getConvictionPerks()
 
 	for _, data in pairs(convictions) do
 		table.insert(parsedConvictions, {
-			perk = data.perk,
-			stringPoint = data.stringPoint,
+			text = data.perk,
+			value = data.stringPoint,
 			tooltip = data.tooltip,
 		})
 	end
