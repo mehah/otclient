@@ -184,7 +184,6 @@ function WheelController.wheel:resetWheel()
         WheelController.wheel.pointInvested[slotId] = 0
         WheelController.wheel:removePoint(slotId, WheelController.wheel.pointInvested[slotId])
         WheelController.wheel:removeUnlockedThe(slotId)
-        WheelController.wheel:handleUpdatePoints()
     end
 
     for id in pairs(helper.gems.WheelIcons[WheelController.wheel.vocationId]) do
@@ -205,6 +204,7 @@ function WheelController.wheel:resetWheel()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:handlePassiveBorders()
     WheelController.wheel:configureEquippedGems()
+    WheelController.wheel:updateHasChanges()
 end
 
 function WheelController.wheel:configureDedication(currentTable, currentType, index)
@@ -541,7 +541,6 @@ function WheelController:hide()
     end
 
     WheelController.currentWindow = "main-window"
-    WheelController.wheel:resetWheel()
     self.ui:hide()
     if WheelButton then
         WheelButton:setOn(false)
