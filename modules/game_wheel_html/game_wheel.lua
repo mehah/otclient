@@ -197,6 +197,7 @@ function WheelController.wheel:resetWheel()
     helper.bonus.configureDedicationPerk()
     helper.bonus.configureRevelationPerks()
     helper.bonus.configureVessels()
+    WheelController.wheel:configureSummary()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:handlePassiveBorders()
     WheelController.wheel:configureEquippedGems()
@@ -801,6 +802,7 @@ function WheelController.wheel:handleUpdatePoints()
     WheelController.wheel:handlePassiveBorders()
     helper.bonus.configureDedicationPerk(WheelController)
     helper.bonus.configureRevelationPerks(WheelController)
+    WheelController.wheel:configureSummary()
     helper.bonus.configureVessels()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:configureEquippedGems()
@@ -1146,7 +1148,602 @@ function WheelController.wheel:insertPoint(id, points)
         WheelController.wheel.data[id].adjacentPath = button.colorImageBase .. "5.png"
     end
 
-    WheelController.wheel:checkFilledVessels(id)
+function WheelController.wheel:configureSummary()
+    local health = 0
+    local mana = 0
+    local cap = 0
+    local mitigation = 0
+
+    local vocation = WheelController.wheel.vocationId
+
+    for id, bonus in pairs(helper.bonus.WheelBonus) do
+        local index = id + 1
+        if not WheelController.wheel:isSlotFull(index) then
+            goto label
+        end
+        local points = WheelController.wheel.pointInvested[index]
+        local attribute = helper.bonus.WheelConsts[bonus.dedication]
+
+        if bonus.dedication == "capacity" then
+            cap = cap + (points * attribute[vocation])
+            -- g_logger.info(">>>>>>cap: " .. cap)
+        elseif bonus.dedication == "mana" then
+            mana = mana + (points * attribute[vocation])
+        elseif bonus.dedication == "health" then
+            health = health + (points * attribute[vocation])
+        elseif bonus.dedication == "mitigation" then
+            mitigation = mitigation + (points * attribute)
+        elseif bonus.dedication == "lifemana" then
+            health = health + (points * attribute["life"][vocation])
+            mana = mana + (points * attribute["mana"][vocation])
+        end
+
+        ::label::
+    end
+
+    -- normal gem bonusses
+    for i, k in pairs(WheelController.wheel.equipedGemBonuses) do
+        if k.bonusID == -1 then
+            goto continue
+        end
+
+        local bonus = k.supreme and helper.gems.SupremeGemDescription[k.bonusID] or
+            helper.gems.RegularGemDescription[k.bonusID]
+        if not k.supreme then
+            if bonus.type1 == "life" or bonus.type2 == "life" then
+                local type1 = helper.bonus.getValueByVocation(bonus.type1, bonus.step)
+                local type2 = helper.bonus.getValueByVocation(bonus.type2, bonus.step)
+                health = health + (type1 + type2)
+            end
+
+            if bonus.type1 == "capacity" or bonus.type2 == "capacity" then
+                local type1 = helper.bonus.getValueByVocation(bonus.type1, bonus.step)
+                local type2 = helper.bonus.getValueByVocation(bonus.type2, bonus.step)
+                cap = cap + (type1 + type2)
+            end
+
+            if bonus.type1 == "mana" or bonus.type2 == "mana" then
+                local type1 = helper.bonus.getValueByVocation(bonus.type1, bonus.step)
+                local type2 = helper.bonus.getValueByVocation(bonus.type2, bonus.step)
+                mana = mana + (type1 + type2)
+            end
+
+            if bonus.type1 == "mitigation" or bonus.type2 == "mitigation" then
+                local type1 = helper.bonus.getValueByVocation(bonus.type1, bonus.step)
+                local type2 = helper.bonus.getValueByVocation(bonus.type2, bonus.step)
+                mitigation = mitigation + (type1 + type2)
+            end
+        end
+        :: continue ::
+    end
+
+    -- damage and healing
+    local damage = 0
+
+    -- wheel damage
+    for _, points in ipairs(WheelController.wheel.passivePoints) do
+        if points >= 1000 then
+            damage = damage + 20
+        elseif points >= 500 then
+            damage = damage + 9
+        elseif points >= 250 then
+            damage = damage + 4
+        end
+    end
+
+    damage = damage + GemAtelier:getDamageAndHealing()
+
+    WheelController.wheel.summary = {}
+
+    if damage > 0 then
+        table.insert(WheelController.wheel.summary, {
+            text = "Damage and Healing",
+            value = "+" .. damage
+        })
+        table.insert(WheelController.wheel.summary, { separator = true })
+    end
+    -- separator
+
+    local f_table = {
+        [1] = "Hit Points",
+        [2] = "Mana",
+        [3] = "Capacity",
+        [4] = "Mitigation Mult.",
+        [5] = "Life Leech",
+        [6] = "Mana Leech",
+    }
+
+    local _, convictions = helper.bonus.getConvictionPerks()
+    for _, t in ipairs(f_table) do
+        -- g_logger.info("BONUS T " .. t .. " _ " .. tostring(_))
+        -- local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+        -- widget.perk:setText(t)
+        -- widget.info:setVisible(false)
+        if t == "Hit Points" then
+            table.insert(WheelController.wheel.summary, {
+                text = "Hit Points",
+                value = (health > 0 and "+" or "") .. health
+            })
+            --   widget.value:setText((health > 0 and "+" or "") .. health)
+        elseif t == "Mana" then
+            table.insert(WheelController.wheel.summary, {
+                text = "Mana",
+                value = (mana > 0 and "+" or "") .. mana
+            })
+            --   widget.value:setText((mana > 0 and "+" or "") .. mana)
+        elseif t == "Capacity" then
+            -- g_logger.info("CAPACITY " .. cap)
+            table.insert(WheelController.wheel.summary, {
+                text = "Capacity",
+                value = (cap > 0 and "+" or "") .. cap
+            })
+            --   widget.value:setText((cap > 0 and "+" or "") .. cap)
+        elseif t == "Mitigation Mult." then
+            table.insert(WheelController.wheel.summary, {
+                text = "Mitigation Mult.",
+                value = string.format("%.2f%%", mitigation),
+                tooltip = 'Increase your mitigation multiplicatively.'
+            })
+            --
+            --   widget.value:setText(string.format("%.2f%%", mitigation))
+            --   widget.info:setTooltip('Increase your mitigation multiplicatively.')
+            --   widget.info:setVisible(true)
+        elseif t == "Life Leech" then
+            local lifeleech = convictions[6]
+            if not lifeleech or lifeleech.points == 0 then
+                -- widget:destroy()
+                goto label
+            end
+
+            table.insert(WheelController.wheel.summary, {
+                text = "Life Leech",
+                value = lifeleech.stringPoint
+            })
+
+            --   widget.value:setText(lifeleech.stringPoint)
+            --   widget.info:setVisible(false)
+        elseif t == "Mana Leech" then
+            local manaleech = convictions[7]
+            if not manaleech or manaleech.points == 0 then
+                -- widget:destroy()
+                goto label
+            end
+
+            table.insert(WheelController.wheel.summary, {
+                text = "Mana Leech",
+                value = manaleech.stringPoint
+            })
+
+            --   widget.value:setText(manaleech.stringPoint)
+            --   widget.info:setVisible(false)
+        else
+            --   widget:destroy()
+        end
+        ::label::
+    end
+
+    -- separator
+    --   g_ui.createWidget("HorizontalSeparator", wheelOfDestinyWindow.summary.tabContent)
+    table.insert(WheelController.wheel.summary, { separator = true })
+
+    -- special and skill
+    local f_table = {
+        [1] = "special_1",
+        [2] = "special_2",
+        [3] = "special_3",
+        [4] = "special_4",
+        [5] = "skill",
+    }
+
+    local hasCreated = false
+    for _, t in pairs(f_table) do
+        -- local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+        local c = convictions[_]
+        if c then
+            table.insert(WheelController.wheel.summary, {
+                text = c.perk,
+                tooltip = c.tooltip,
+                value = c.stringPoint,
+                icon = c.icon,
+            })
+            hasCreated = true
+            -- g_logger.info("special > " .. c.perk .. " > " .. c.stringPoint)
+        end
+
+        -- if t == "special_1" then
+        --     local c = convictions[1]
+        --     if not c then
+        --         -- widget:destroy()
+        --         goto label
+        --     end
+
+        --     table.insert(WheelController.wheel.summary, {
+        --         text = c.perk,
+        --         tooltip = c.tooltip,
+        --         icon = c.icon,
+        --     })
+
+        --     g_logger.info("s1 > " .. c.perk)
+
+        --     --   widget.perk:setText(c.perk)
+        --     --   widget.value:setVisible(false)
+        --     --   widget.info:setVisible(true)
+        --     --   widget.info:setTooltip(c.tooltip)
+        --     hasCreated = true
+        -- elseif t == "special_2" then
+        --     local c = convictions[2]
+        --     if not c then
+        --         -- widget:destroy()
+        --         goto label
+        --     end
+
+        --     table.insert(WheelController.wheel.summary, {
+        --         text = c.perk,
+        --         tooltip = c.tooltip,
+        --         icon = c.icon,
+        --     })
+        --     g_logger.info("s2 > " .. c.perk)
+
+        --     --   widget.perk:setText(c.perk)
+        --     --   widget.value:setVisible(false)
+        --     --   widget.info:setVisible(true)
+        --     --   widget.info:setTooltip(c.tooltip)
+        --     hasCreated = true
+        -- elseif t == "skill" then
+        --     local c = convictions[3]
+        --     if not c then
+        --         -- widget:destroy()
+        --         goto label
+        --     end
+
+        --     table.insert(WheelController.wheel.summary, {
+        --         text = c.perk,
+        --         value = c.stringPoint,
+        --         tooltip = c.tooltip,
+        --         icon = c.icon,
+        --     })
+
+        --     g_logger.info("skill > " .. c.perk)
+
+        --     --   widget.perk:setText(c.perk)
+        --     --   widget.value:setText(c.stringPoint)
+        --     --   widget.info:setVisible(true)
+        --     --   widget.info:setTooltip(c.tooltip)
+        --     hasCreated = true
+        -- end
+        ::label::
+    end
+
+    if hasCreated then
+        -- g_ui.createWidget("HorizontalSeparator", wheelOfDestinyWindow.summary.tabContent)
+        table.insert(WheelController.wheel.summary, { separator = true })
+    end
+
+    local f_table = {
+        [8] = "spell_1",
+        [9] = "spell_2",
+        [10] = "spell_3",
+        [11] = "spell_4",
+        [12] = "spell_5",
+    }
+
+    --- Convictions
+    local hasCreated = false
+    for _, t in pairs(f_table) do
+        -- local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+        local c = convictions[_]
+        if not c then
+            -- widget:destroy()
+            goto label
+        end
+
+        table.insert(WheelController.wheel.summary, {
+            text = c.perk,
+            value = c.stringPoint,
+            tooltip = c.tooltip,
+            icon = c.icon,
+        })
+
+        -- widget.perk:setText(c.perk)
+        -- widget.value:setText(c.stringPoint)
+        -- widget.info:setTooltip(c.tooltip)
+        -- widget.info:setVisible(true)
+        hasCreated = true
+        ::label::
+    end
+
+    local bonus = helper.bonus.getVesselBonus()
+    for _, data in pairs(bonus) do
+        if data.bonusType ~= "augment" then
+            goto continue
+        end
+
+        -- local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+
+        -- widget.perk:setText(data.text)
+        -- if data.value == -1 then
+        --   widget.value:setVisible(false)
+        -- end
+
+        -- if data.tooltip then
+        --   widget.info:setVisible(true)
+        --   widget.info:setTooltip(data.tooltip)
+        -- end
+
+        -- local value = tostring(data.value)
+        -- if not value:match("[+-I]") then
+        --   if tonumber(data.value) < 15 then
+        --     widget.value:setText("+" .. value .. "%")
+        --   else
+        --     widget.value:setText("+" .. value)
+        --   end
+        -- else
+        --   widget.value:setText(data.value)
+        -- end
+
+        table.insert(WheelController.wheel.summary, data)
+
+        hasCreated = true
+        :: continue ::
+    end
+
+    if hasCreated then
+        -- g_ui.createWidget("HorizontalSeparator", wheelOfDestinyWindow.summary.tabContent)
+        table.insert(WheelController.wheel.summary, { separator = true })
+    end
+
+    for _, data in pairs(WheelController.wheel.revelationPerks) do
+        if not data.name:find("Damage") then
+            table.insert(WheelController.wheel.summary, {
+                text = data.name,
+                value = data.text,
+                tooltip = data.tooltip
+            })
+        end
+    end
+
+    --   local avatarName = "Avatar Of Nature"
+    --   local spell1, tooltip1 = "Blessing of the Gr...", "Blessing of the Grave"
+    --   local spell2, tooltip2 = "Blessing of the Gr...", "Blessing of the Grave"
+    --   local vocation = WheelController.wheel.vocationId
+    --   if vocation == KNIGHT then
+    --     avatarName = "Avatar of Steel"
+    --     spell1 = "Executioner's T..."
+    --     tooltip1 = "Executioner's Throw"
+    --     spell2 = "Combat Mastery"
+    --     tooltip2 = "Combat Mastery"
+    --   elseif vocation == PALADIN then
+    --     avatarName = "Avatar of Light"
+    --     spell1 = "Divine Grenade"
+    --     tooltip1 = "Divine Grenade"
+    --     spell2 = "Divine Empowerment"
+    --     tooltip2 = "Divine Empowerment"
+    --   elseif vocation == SORCERER then
+    --     avatarName = "Avatar of Storm"
+    --     spell1 = "Beam Mastery"
+    --     tooltip1 = "Beam Mastery"
+    --     spell2 = "Drain Body"
+    --     tooltip2 = "Drain Body"
+    --   elseif vocation == DRUID then
+    --     avatarName = "Avatar of Nature"
+    --     spell1 = "Blessing of the Gr..."
+    --     tooltip1 = "Blessing of the Grave"
+    --     spell2 = "Twin Bursts"
+    --     tooltip2 = "Twin Bursts"
+    --   elseif vocation == MONK then
+    --     avatarName = "Avatar of Balance"
+    --     spell1 = "Spiritual Outburst"
+    --     tooltip1 = "Spiritual Outburst"
+    --     spell2 = "Ascetic"
+    --     tooltip2 = "Ascetic"
+    --   end
+
+    --   local m1, m2 = getPassiveInfo(4)
+    --   local passive = WheelOfDestiny.passivePoints[4]
+
+    --   local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+    --   widget.perk:setText(avatarName)
+    --   if passive >= 1000 then
+    --     widget.value:setText("Stage 3")
+    --   elseif passive >= 500 then
+    --     widget.value:setText("Stage 2")
+    --   elseif passive >= 250 then
+    --     widget.value:setText("Stage 1")
+    --   else
+    --     widget.value:setText("Locked")
+    --   end
+    --   widget.info:setTooltip(m2)
+
+    --   ------------------
+    --   local m1, m2 = getPassiveInfo(2)
+    --   local passive = WheelOfDestiny.passivePoints[2]
+
+    --   local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+    --   widget.perk:setText(spell1)
+    --   widget.perk:setTooltip(tooltip1)
+    --   if passive >= 1000 then
+    --     widget.value:setText("Stage 3")
+    --   elseif passive >= 500 then
+    --     widget.value:setText("Stage 2")
+    --   elseif passive >= 250 then
+    --     widget.value:setText("Stage 1")
+    --   else
+    --     widget.value:setText("Locked")
+    --   end
+    --   widget.info:setTooltip(m2)
+    --   ------------------
+    --   local m1, m2 = getPassiveInfo(1)
+    --   local passive = WheelOfDestiny.passivePoints[1]
+
+    --   local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+    --   widget.perk:setText("Gift of Life")
+    --   if passive >= 1000 then
+    --     widget.value:setText("Stage 3")
+    --   elseif passive >= 500 then
+    --     widget.value:setText("Stage 2")
+    --   elseif passive >= 250 then
+    --     widget.value:setText("Stage 1")
+    --   else
+    --     widget.value:setText("Locked")
+    --   end
+    --   widget.info:setTooltip(m2)
+    --   ------------------
+    --   local m1, m2 = getPassiveInfo(3)
+    --   local passive = WheelOfDestiny.passivePoints[3]
+
+    --   local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+    --   widget.perk:setText(spell2)
+    --   widget.perk:setTooltip(tooltip2)
+    --   if passive >= 1000 then
+    --     widget.value:setText("Stage 3")
+    --   elseif passive >= 500 then
+    --     widget.value:setText("Stage 2")
+    --   elseif passive >= 250 then
+    --     widget.value:setText("Stage 1")
+    --   else
+    --     widget.value:setText("Locked")
+    --   end
+    --   widget.info:setTooltip(m2)
+
+    bonus = helper.bonus.getVesselBonus()
+    for _, data in pairs(bonus) do
+        if data.bonusType ~= "revelation" then
+            goto continue
+        end
+        -- g_logger.info("1600> Adding revelation bonus to summary: " .. data.text)
+        table.insert(WheelController.wheel.summary, data)
+        :: continue ::
+    end
+
+    --   local bonus = getVesselBonus()
+    --   for _, data in pairs(bonus) do
+    --     if data.bonusType ~= "revelation" then
+    --       goto continue
+    --     end
+
+    --     local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+    --     widget.perk:setText(data.text)
+    --     if data.value == -1 then
+    --       widget.value:setVisible(false)
+    --     end
+
+    --     if data.tooltip then
+    --       widget.info:setVisible(true)
+    --       widget.info:setTooltip(data.tooltip)
+    --     end
+
+    --     local value = tostring(data.value)
+    --     if not value:match("[+-I]") then
+    --       if tonumber(data.value) < 15 then
+    --         widget.value:setText("+" .. value .. "%")
+    --       else
+    --         widget.value:setText("+" .. value)
+    --       end
+    --     else
+    --       widget.value:setText(data.value)
+    --     end
+    --     :: continue ::
+    --   end
+
+    ----------------------------
+    --   g_ui.createWidget("HorizontalSeparator", wheelOfDestinyWindow.summary.tabContent)
+    table.insert(WheelController.wheel.summary, { separator = true })
+
+    -- defenses
+    local hasDefense = false
+    bonus = helper.bonus.getVesselBonus()
+    for _, data in pairs(bonus) do
+        if data.bonusType ~= "defense" then
+            goto continue
+        end
+        table.insert(WheelController.wheel.summary, data)
+        hasDefense = true
+        :: continue ::
+    end
+
+    -- for _, data in pairs(bonus) do
+    --     if data.bonusType ~= "defense" then
+    --         goto continue
+    --     end
+
+    --     local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+    --     widget.perk:setText(data.text)
+    --     if data.value == -1 then
+    --         widget.value:setVisible(false)
+    --     end
+
+    --     if data.tooltip then
+    --         widget.info:setVisible(true)
+    --         widget.info:setTooltip(data.tooltip)
+    --     end
+
+    --     local value = tostring(data.value)
+    --     if not value:match("[+-I]") then
+    --         if tonumber(data.value) < 15 then
+    --             widget.value:setText("+" .. value .. "%")
+    --         else
+    --             widget.value:setText("+" .. value)
+    --         end
+    --     else
+    --         widget.value:setText(data.value)
+    --     end
+
+    --     hasDefense = true
+    --     :: continue ::
+    -- end
+
+    if hasDefense then
+        -- g_ui.createWidget("HorizontalSeparator", wheelOfDestinyWindow.summary.tabContent)
+        table.insert(WheelController.wheel.summary, { separator = true })
+    end
+    -----------------------------------------------------------------------------------
+
+    local f_table = {
+        [13] = "vessel.1",
+        [14] = "vessel.2",
+        [15] = "vessel.3",
+        [16] = "vessel.4",
+    }
+
+    local hasCreated = false
+    for _, t in pairs(f_table) do
+        -- local widget = g_ui.createWidget("PerksPanel", wheelOfDestinyWindow.summary.tabContent)
+        local c = convictions[_]
+        if not c then
+            -- widget:destroy()
+            goto label
+        end
+        table.insert(WheelController.wheel.summary, {
+            text = c.perk,
+            value = c.stringPoint,
+            tooltip = c.tooltip
+        })
+        -- widget.perk:setText(c.perk)
+        -- widget.value:setText(c.stringPoint)
+        -- widget.info:setTooltip(c.tooltip)
+        -- widget.info:setVisible(true)
+        hasCreated = true
+        ::label::
+    end
+
+    if hasCreated then
+        -- g_ui.createWidget("HorizontalSeparator", wheelOfDestinyWindow.summary.tabContent)
+        -- table.insert(WheelController.wheel.summary, { separator = true })
+    end
+
+    for _, data in pairs(WheelController.wheel.summary) do
+        if data.text and data.text:find("  ") then
+            data.left = 10
+        end
+
+        if data.icon then
+            data.icon = "/images/game/wheel/" .. data.icon
+        end
+    end
+end
+
+function WheelController.wheel:toggleSummary()
+    WheelController.wheel.showSummary = not WheelController.wheel.showSummary
 end
 
 function WheelController.wheel:configureEquippedGems()
@@ -1381,6 +1978,7 @@ function onWheelOfDestinyOpenWindow(data)
     helper.bonus.configureDedicationPerk(WheelController)
     helper.bonus.configureRevelationPerks(WheelController)
     helper.bonus.configureVessels()
+    WheelController.wheel:configureSummary()
     WheelController.wheel:configureConvictionPerk()
     WheelController.wheel:handlePassiveBorders()
     WheelController.wheel:configureEquippedGems()

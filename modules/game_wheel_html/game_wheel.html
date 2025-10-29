@@ -135,6 +135,19 @@
       left: 0;
       text-align: center;
     }
+    .show-summary {
+      --image-source: "/images/game/wheel/summary.png";
+      height: 14px;
+      width: 14px;
+      --image-size: 14 14;
+      position: absolute;
+      --image-clip: 0 0 14 14;
+      top: 5;
+      right: 4;
+    }
+    .show-summary:pressed {
+      --image-clip: 0 14 14 14;
+    }
     .change-preset-icon {
       --image-clip: 0 0 20 20;
       width: 20px;
@@ -939,8 +952,70 @@
               </div>
             </div>
             <div class="panel">
-              <div class="panel-window" style="width: 213px; height: 100px">
+              <div
+                class="panel-window"
+                style="width: 213px; height: 560px; position: relative"
+                *if="self.wheel.showSummary == true"
+              >
+                <p class="panel-title">Summary</p>
+                <img
+                  class="show-summary"
+                  onclick="self.wheel:toggleSummary()"
+                />
+                <div class="conviction-perks" style="height: 530px">
+                  <div
+                    style="
+                      width: 190px;
+                      height: 12px;
+                      margin-top: 4px;
+                      position: relative;
+                    "
+                    *if="#self.wheel.summary > 0"
+                    *for="local data in self.wheel.summary; local i = index"
+                  >
+                    <div
+                      *if="data.separator == nil"
+                      style="width: 175px; height: 12px"
+                    >
+                      <img
+                        *if="data.icon ~= nil"
+                        *image-source="data.icon"
+                        height="12"
+                        width="12"
+                      />
+                      <span
+                        *if="data.text ~= nil"
+                        *margin-left="data.left and data.left or 0"
+                        >{{data.text}}</span
+                      >
+                      <span
+                        *if="data.value ~= nil and data.text ~= 'Resistances:'"
+                        style="float: right"
+                        >{{data.value}}
+                      </span>
+                      <span
+                        class="tooltip"
+                        *if="data.tooltip ~= nil"
+                        *tooltip="data.tooltip"
+                      ></span>
+                    </div>
+                    <hr
+                      class="separator HorizontalSeparator"
+                      *if="data.separator == true"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div
+                class="panel-window"
+                style="width: 213px; height: 100px; position: relative"
+                *if="self.wheel.showSummary ~= true"
+              >
                 <p class="panel-title">Dedication Perks</p>
+                <img
+                  class="show-summary"
+                  onclick="self.wheel:toggleSummary()"
+                />
                 <div
                   style="
                     margin-left: 8px;
@@ -982,10 +1057,22 @@
                 </div>
               </div>
               <div
+                *if="self.wheel.showSummary ~= true"
                 class="panel-window"
-                style="width: 213px; height: 160px; margin-top: 8px"
+                style="
+                  width: 213px;
+                  height: 160px;
+                  margin-top: 8px;
+                  position: relative;
+                "
               >
                 <p class="panel-title">Conviction Perks</p>
+                <img
+                  *if="self.wheel.cooldownTooltip ~= nil"
+                  class="tooltip"
+                  *tooltip="self.wheel.cooldownTooltip"
+                  style="top: 5; right: 5"
+                />
                 <div class="conviction-perks">
                   <div
                     style="
@@ -1012,10 +1099,22 @@
                 </div>
               </div>
               <div
+                *if="self.wheel.showSummary ~= true"
                 class="panel-window"
-                style="width: 213px; height: 160px; margin-top: 8px"
+                style="
+                  width: 213px;
+                  height: 160px;
+                  margin-top: 8px;
+                  position: relative;
+                "
               >
                 <p class="panel-title">Vessels</p>
+                <img
+                  *if="self.wheel.cooldownTooltip ~= nil"
+                  class="tooltip"
+                  *tooltip="self.wheel.cooldownTooltip"
+                  style="top: 5; right: 5"
+                />
                 <div class="conviction-perks">
                   <div
                     style="
@@ -1054,6 +1153,7 @@
                 </div>
               </div>
               <div
+                *if="self.wheel.showSummary ~= true"
                 class="panel-window"
                 style="width: 213px; height: 120px; margin-top: 8px"
               >

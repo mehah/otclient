@@ -2364,6 +2364,9 @@ local bonus = {
 	getConvictionBonus = getConvictionBonus,
 	getConvictionBonusTooltip = getConvictionBonusTooltip,
 	getBonusValueUpgrade = getBonusValueUpgrade,
+	WheelConsts = WheelConsts,
+	getValueByVocation = getValueByVocation,
+	getVesselBonus = getVesselBonus,
 }
 
 return bonus

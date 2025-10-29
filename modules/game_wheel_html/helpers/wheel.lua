@@ -923,6 +923,8 @@ local informationButtonClips = {
 
 local baseWheelValues = {
     currentWindow = "main-window",
+    showSummary = false,
+    summary = {},
     clip = { x = 0, y = 34, width = 322, height = 34 },
     backdropVocationOverlay = nil,
     currentSelectSlotId = -1,
@@ -1011,6 +1013,8 @@ local baseWheelValues = {
     gold = "0",
     lesserFragment = 0,
     greaterFragment = 0,
+    cooldownTooltip =
+    "Note: The cooldown of a spell cannot be reduced to less than 50%\nof its base cooldown by any means."
 }
 
 
