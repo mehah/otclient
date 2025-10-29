@@ -1147,6 +1147,7 @@ function WheelController.wheel:insertPoint(id, points)
     if isBaseSlot and points == 0 then
         WheelController.wheel.data[id].adjacentPath = button.colorImageBase .. "5.png"
     end
+end
 
 function WheelController.wheel:configureSummary()
     local health = 0
