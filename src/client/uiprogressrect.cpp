@@ -26,6 +26,8 @@
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 
+#include "framework/otml/otmlnode.h"
+
 namespace
 {
     constexpr int PROGRESS_UPDATE_INTERVAL = 100; // milliseconds

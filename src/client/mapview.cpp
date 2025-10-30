@@ -200,10 +200,10 @@ void MapView::drawLights() {
         }
 
         for (const auto& tile : map.tiles)
-            tile->drawLight(transformPositionTo2D(tile->getPosition()), m_lightView);
+            tile->drawLight(transformPositionTo2D(tile->getPosition()), m_lightView.get());
 
         for (const auto& missile : g_map.getFloorMissiles(z))
-            missile->draw(transformPositionTo2D(missile->getPosition()), false, m_lightView);
+            missile->draw(transformPositionTo2D(missile->getPosition()), false, m_lightView.get());
     }
 }
 

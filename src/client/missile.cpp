@@ -31,7 +31,7 @@
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 
-void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
+void Missile::draw(const Point& dest, const bool drawThings, LightView* lightView)
 {
     if (!canDraw() || isHided())
         return;

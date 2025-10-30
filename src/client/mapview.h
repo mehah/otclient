@@ -21,12 +21,13 @@
  */
 
 #pragma once
-
+#include "declarations.h"
 #include <framework/graphics/declarations.h>
 #include <framework/luaengine/luaobject.h>
 
 #include "framework/core/timer.h"
 #include "staticdata.h"
+#include "framework/core/inputevent.h"
 
  // @bindclass
 class MapView final : public LuaObject

@@ -25,6 +25,7 @@
 #include "protocolgame.h"
 #include "framework/net/outputmessage.h"
 #include "protocolcodes.h"
+#include "thingtypemanager.h"
 #include "framework/util/crypt.h"
 
 void ProtocolGame::onSend() {}

@@ -24,6 +24,8 @@
 
 #include <framework/ui/uiwidget.h>
 
+#include "framework/core/declarations.h"
+
 class UIProgressRect final : public UIWidget
 {
 public:
@@ -40,7 +42,7 @@ public:
     void showTime(bool showTime);
     void showProgress(bool showProgress);
     uint32_t getTimeElapsed();
-    uint32_t getDuration()  { return m_duration; }
+    uint32_t getDuration() { return m_duration; }
 
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;

@@ -30,6 +30,7 @@
 #include "localplayer.h"
 #include "mapview.h"
 #include "minimap.h"
+#include "missile.h"
 #include "thing.h"
 #include "tile.h"
 #include "framework/core/asyncdispatcher.h"

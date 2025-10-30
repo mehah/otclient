@@ -43,7 +43,7 @@ void updateElevation(const ThingPtr& thing, uint8_t& drawElevation) {
         drawElevation = std::min<uint8_t>(drawElevation + thing->getElevation(), g_gameConfig.getTileMaxElevation());
 }
 
-void drawThing(const ThingPtr& thing, const Point& dest, const int flags, uint8_t& drawElevation, const LightViewPtr& lightView = nullptr)
+void drawThing(const ThingPtr& thing, const Point& dest, const int flags, uint8_t& drawElevation, LightView* lightView = nullptr)
 {
     const auto& newDest = dest - drawElevation * g_drawPool.getScaleFactor();
 
@@ -66,7 +66,7 @@ void drawThing(const ThingPtr& thing, const Point& dest, const int flags, uint8_
     }
 }
 
-void Tile::draw(const Point& dest, const int flags, const LightViewPtr& lightView)
+void Tile::draw(const Point& dest, const int flags, LightView* lightView)
 {
     m_lastDrawDest = dest;
 
@@ -107,7 +107,7 @@ void Tile::draw(const Point& dest, const int flags, const LightViewPtr& lightVie
     drawAttachedParticlesEffect(dest);
 }
 
-void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
+void Tile::drawLight(const Point& dest, LightView* lightView) {
     uint8_t drawElevation = 0;
 
     for (const auto& thing : m_things) {
@@ -127,7 +127,7 @@ void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
     drawAttachedLightEffect(dest, lightView);
 }
 
-void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw, uint8_t drawElevation, const LightViewPtr& lightView)
+void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw, uint8_t drawElevation, LightView* lightView)
 {
     if (!forceDraw && !m_drawTopAndCreature)
         return;

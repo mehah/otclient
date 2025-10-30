@@ -26,6 +26,7 @@
 #include "game.h"
 #include "item.h"
 #include "map.h"
+#include "tile.h"
 #include "framework/core/clock.h"
 #include "framework/core/eventdispatcher.h"
 

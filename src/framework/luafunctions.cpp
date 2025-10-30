@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+#include "graphics/paintershaderprogram.h"
 #include <framework/core/application.h>
 #include <framework/core/config.h>
 #include <framework/core/configmanager.h>
@@ -32,8 +32,6 @@
 #include <framework/proxy/proxy.h>
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
-
-#include "graphics/paintershaderprogram.h"
 
 #ifdef FRAMEWORK_GRAPHICS
 #include "framework/graphics/fontmanager.h"

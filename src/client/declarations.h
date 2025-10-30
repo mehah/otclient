@@ -23,8 +23,6 @@
 #pragma once
 
 #include "global.h"
-#include <framework/net/declarations.h>
-#include <framework/ui/declarations.h>
 
 enum FrameGroupType : uint8_t;
 enum ThingCategory : uint8_t;

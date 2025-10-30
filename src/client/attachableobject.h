@@ -24,6 +24,7 @@
 #include "declarations.h"
 #include "framework/graphics/declarations.h"
 #include "framework/luaengine/luaobject.h"
+#include "framework/ui/declarations.h"
 
 static const std::vector<UIWidgetPtr> EMPTY_ATTACHED_WIDGETS;
 static const std::vector<AttachedEffectPtr> EMPTY_ATTACHED_EFFECTS;
@@ -79,8 +80,8 @@ protected:
         std::vector<UIWidgetPtr> attachedWidgets;
     };
 
-    void drawAttachedEffect(const Point& dest, const LightViewPtr& lightView, bool isOnTop);
-    void drawAttachedLightEffect(const Point& dest, const LightViewPtr& lightView);
+    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
+    void drawAttachedLightEffect(const Point& dest, LightView* lightView);
 
     void onDetachEffect(const AttachedEffectPtr& effect, bool callEvent = true);
     void drawAttachedParticlesEffect(const Point& dest);
