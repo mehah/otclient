@@ -49,6 +49,7 @@ Module
     - game_store
     - game_quickloot
     - game_cyclopedia
+    - game_wheel
     - game_creatureinformation
     - game_rewardwall
   @onLoad: init()
