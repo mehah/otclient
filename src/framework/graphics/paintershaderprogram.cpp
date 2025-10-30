@@ -23,6 +23,7 @@
 #include "paintershaderprogram.h"
 
 #include "glutil.h"
+#include "texture.h"
 
 #include "texturemanager.h"
 #include "framework/core/clock.h"

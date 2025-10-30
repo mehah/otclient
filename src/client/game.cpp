@@ -30,11 +30,15 @@
 #include "map.h"
 #include "protocolgame.h"
 #include "protocolcodes.h"
+#include "thingtype.h"
+#include "thingtypemanager.h"
+#include "tile.h"
 #include "framework/core/eventdispatcher.h"
 #include "framework/core/graphicalapplication.h"
 #include "framework/luaengine/luainterface.h"
 #include "framework/net/packet_player.h"
 #include "framework/net/packet_recorder.h"
+#include "luavaluecasts_client.h"
 
 Game g_game;
 

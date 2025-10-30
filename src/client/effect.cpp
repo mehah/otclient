@@ -33,7 +33,7 @@
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 
-void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
+void Effect::draw(const Point& dest, const bool drawThings, LightView* lightView)
 {
     if (!canDraw() || isHided())
         return;

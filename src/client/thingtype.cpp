@@ -610,7 +610,7 @@ void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& scree
     g_drawPool.resetShaderProgram();
 }
 
-void ThingType::draw(const Point& dest, const int layer, const int xPattern, const int yPattern, const int zPattern, const int animationPhase, const Color& color, const bool drawThings, const LightViewPtr& lightView)
+void ThingType::draw(const Point& dest, const int layer, const int xPattern, const int yPattern, const int zPattern, const int animationPhase, const Color& color, const bool drawThings, LightView* lightView)
 {
     if (m_null)
         return;

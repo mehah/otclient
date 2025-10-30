@@ -24,6 +24,7 @@
 
 #include "graphics.h"
 #include "image.h"
+#include "painter.h"
 #include "framework/core/asyncdispatcher.h"
 #include "framework/core/eventdispatcher.h"
 #include "framework/core/graphicalapplication.h"

@@ -24,6 +24,7 @@
 #include "declarations.h"
 #include "staticdata.h"
 #include "framework/core/inputevent.h"
+#include "framework/ui/declarations.h"
 
 class TileBlock
 {

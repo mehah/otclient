@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "const.h"
+
 class Position
 {
 public:

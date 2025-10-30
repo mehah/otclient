@@ -149,7 +149,7 @@ AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
     return *it;
 }
 
-void AttachableObject::drawAttachedEffect(const Point& dest, const LightViewPtr& lightView, const bool isOnTop)
+void AttachableObject::drawAttachedEffect(const Point& dest, LightView* lightView, const bool isOnTop)
 {
     if (!hasAttachedEffects()) return;
     for (const auto& effect : m_data->attachedEffects) {
@@ -162,7 +162,7 @@ void AttachableObject::drawAttachedEffect(const Point& dest, const LightViewPtr&
     }
 }
 
-void AttachableObject::drawAttachedLightEffect(const Point& dest, const LightViewPtr& lightView) {
+void AttachableObject::drawAttachedLightEffect(const Point& dest, LightView* lightView) {
     if (!hasAttachedEffects()) return;
     for (const auto& effect : m_data->attachedEffects)
         effect->drawLight(dest, lightView);

@@ -47,7 +47,7 @@ public:
     void exportImage(const std::string& fileName);
 #endif
 
-    void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, const LightViewPtr& lightView = nullptr);
+    void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, LightView* lightView = nullptr);
 
     void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color);
 

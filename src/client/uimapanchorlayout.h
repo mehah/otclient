@@ -23,6 +23,8 @@
 #pragma once
 #include <framework/ui/uianchorlayout.h>
 
+#include "position.h"
+
 class UIPositionAnchor final : public UIAnchor
 {
 public:

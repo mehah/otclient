@@ -48,7 +48,7 @@
 #include "uieffect.h"
 #include "uiitem.h"
 #include "uimissile.h"
-
+#include <framework/graphics/paintershaderprogram.h>
 #include "attachableobject.h"
 #include "thingtype.h"
 #include "uigraph.h"

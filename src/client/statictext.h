@@ -24,6 +24,8 @@
 
 #include <framework/graphics/cachedtext.h>
 
+#include "declarations.h"
+#include "framework/core/declarations.h"
 #include "framework/luaengine/luaobject.h"
 
  // @bindclass

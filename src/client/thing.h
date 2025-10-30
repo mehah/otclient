@@ -31,8 +31,8 @@
 class Thing : public AttachableObject
 {
 public:
-    virtual void draw(const Point& /*dest*/, bool /*drawThings*/ = true, const LightViewPtr & = nullptr) {}
-    virtual void drawLight(const Point& /*dest*/, const LightViewPtr&) {}
+    virtual void draw(const Point& /*dest*/, bool /*drawThings*/ = true, LightView* = nullptr) {}
+    virtual void drawLight(const Point& /*dest*/, LightView*) {}
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
     bool isThing() override { return true; }

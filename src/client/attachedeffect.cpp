@@ -76,7 +76,7 @@ int getBounce(const AttachedEffect::Bounce bounce, const ticks_t ticks) {
     return minHeight + (height - std::abs(height - static_cast<int>(ticks / (bounce.speed / 100.f)) % static_cast<int>(height * 2)));
 }
 
-void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightViewPtr& lightView, const bool drawThing) {
+void AttachedEffect::draw(const Point& dest, const bool isOnTop, LightView* lightView, const bool drawThing) {
     if (m_transform)
         return;
 
@@ -154,7 +154,7 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightView
     }
 }
 
-void AttachedEffect::drawLight(const Point& dest, const LightViewPtr& lightView) {
+void AttachedEffect::drawLight(const Point& dest, LightView* lightView) {
     if (!lightView) return;
 
     const auto& dirControl = m_offsetDirections[m_direction];

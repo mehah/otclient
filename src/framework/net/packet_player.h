@@ -24,6 +24,8 @@
 
 #include <framework/net/outputmessage.h>
 
+#include "framework/core/declarations.h"
+
 class PacketPlayer : public LuaObject
 {
 public:
