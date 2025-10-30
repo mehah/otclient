@@ -83,6 +83,7 @@ namespace Proto
         // original tibia ONLY
         GameServerImbuementDurations = 93,
         GameServerPassiveCooldown = 94,
+        GameServerWheelOfDestiny = 95,
         GameServerBosstiaryData = 97,
         GameServerBosstiarySlots = 98,
         GameServerSendClientCheck = 99,
