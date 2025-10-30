@@ -159,6 +159,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerPassiveCooldown:
                     parsePassiveCooldown(msg);
                     break;
+                case Proto::GameServerWheelOfDestiny:
+                    parseWheelOfDestiny(msg);
+                    break;
                 case Proto::GameServerBosstiaryData:
                     parseBosstiaryData(msg);
                     break;
@@ -4433,6 +4436,81 @@ void ProtocolGame::parsePassiveCooldown(const InputMessagePtr& msg)
     } else if (unknownType == 1) {
         msg->getU8(); // unknown
         msg->getU8(); // unknown
+    }
+}
+
+void ProtocolGame::parseWheelOfDestiny(const InputMessagePtr& msg)
+{
+    // not supported yet, parse only
+    msg->getU32(); // currently viewed player cid
+    bool unlocked = msg->getU8(); // 0x00 - false, anything else - true
+    if (!unlocked) {
+        return;
+    }
+
+    msg->getU8(); // 0x00 - cannot edit, 0x01 - can edit, 0x02 - can edit with limitations
+    msg->getU8(); // vocation client id
+    msg->getU16(); // available points
+    msg->getU16(); // bonus points
+
+    // amount of points put on each piece of the wheel
+    for (int i = 0; i < 36; i++) {
+        msg->getU16();
+    }
+
+    // wheel scrolls
+    uint16_t listSize = msg->getU16();
+    for (uint16_t i = 0; i < listSize; i++) {
+        msg->getU16();
+    }
+
+    // basic wheel code ends here
+    int version = g_game.getProtocolVersion();
+    if (version < 1330) {
+        return;
+    }
+
+    if (version > 1500) {
+        msg->getU8(); // way of the monk quest, known values: 0 and 10
+    }
+
+    //// gem atelier
+
+    // active gems
+    listSize = msg->getU8();
+    for (uint16_t i = 0; i < listSize; i++) {
+        msg->getU16();
+    }
+
+    // total gems
+    listSize = msg->getU16();
+    for (uint16_t i = 0; i < listSize; i++) {
+        msg->getU16(); // index
+        msg->getU8(); // bool unlocked
+        msg->getU8(); // domain
+        uint8_t grade = msg->getU8();
+        msg->getU8(); // bonus 1
+        if (grade > 0) {
+            msg->getU8(); // bonus 2
+        }
+
+        if (grade > 1) {
+            msg->getU8(); // bonus 3
+        }
+    }
+
+    // grade modifiers for all vocations
+    listSize = msg->getU8();
+    for (int i = 0; i < listSize; i++) {
+        msg->getU8(); // key
+        msg->getU8(); // value
+    }
+
+    // grade modifiers for vocation of currently viewed player
+    listSize = msg->getU8();
+    for (int i = 0; i < listSize; i++) {
+        msg->getU8(); // key
+        msg->getU8(); // value
     }
 }
 
