@@ -4501,14 +4501,14 @@ void ProtocolGame::parseWheelOfDestiny(const InputMessagePtr& msg)
 
     // grade modifiers for all vocations
     listSize = msg->getU8();
-    for (int i = 0; i < listSize; i++) {
+    for (uint16_t i = 0; i < listSize; i++) {
         msg->getU8(); // key
         msg->getU8(); // value
     }
 
     // grade modifiers for vocation of currently viewed player
     listSize = msg->getU8();
-    for (int i = 0; i < listSize; i++) {
+    for (uint16_t i = 0; i < listSize; i++) {
         msg->getU8(); // key
         msg->getU8(); // value
     }
