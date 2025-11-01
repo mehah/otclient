@@ -84,6 +84,7 @@ void LocalPlayer::preWalk(Otc::Direction direction)
 
     const auto& oldPos = getPosition();
     Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
+    Creature::onPositionChange(getLastStepToPosition(), getLastStepFromPosition());
     registerAdjustInvalidPosEvent();
 }
 
@@ -238,6 +239,9 @@ void LocalPlayer::terminateWalk()
 
 void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPos)
 {
+    if (isPreWalking())
+        return;
+
     Creature::onPositionChange(newPos, oldPos);
 
     if (newPos == m_autoWalkDestination)
