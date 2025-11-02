@@ -42,6 +42,7 @@
 #include <emscripten/emscripten.h>
 #endif
 #include <framework/html/htmlmanager.h>
+#include <framework/platform/platformwindow.h>
 
 GraphicalApplication g_app;
 

@@ -33,6 +33,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #endif
+#include <framework/platform/platformwindow.h>
 
 UITextEdit::UITextEdit()
 {

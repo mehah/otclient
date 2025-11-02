@@ -25,8 +25,6 @@
 #include "declarations.h"
 #include "framebuffer.h"
 #include "framework/core/timer.h"
-#include <framework/core/graphicalapplication.h>
-#include <framework/platform/platformwindow.h>
 #include <framework/util/spinlock.h>
 
 #include "../stdext/storage.h"

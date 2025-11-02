@@ -27,6 +27,7 @@
 #include "mapview.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/otml/otmlnode.h"
+#include <framework/platform/platformwindow.h>
 
 UIMap::UIMap()
 {

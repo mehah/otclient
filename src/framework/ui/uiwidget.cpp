@@ -26,12 +26,14 @@
 #include "uimanager.h"
 #include "uitranslator.h"
 #include "framework/core/eventdispatcher.h"
+#include <framework/core/graphicalapplication.h>
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 #include "framework/html/htmlmanager.h"
 #include "framework/html/htmlnode.h"
 #include "framework/otml/otmlnode.h"
+#include <framework/platform/platformwindow.h>
 
 UIWidget::UIWidget()
 {

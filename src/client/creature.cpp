@@ -43,6 +43,7 @@
 #include "framework/graphics/painter.h"
 #include "framework/graphics/shadermanager.h"
 #include "framework/ui/uiwidget.h"
+#include <framework/core/graphicalapplication.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;

@@ -30,6 +30,7 @@
 #include "framework/otml/otmldocument.h"
 #include "framework/otml/otmlexception.h"
 #include "framework/otml/otmlnode.h"
+#include <framework/platform/platformwindow.h>
 
 UIManager g_ui;
 

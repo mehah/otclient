@@ -33,10 +33,12 @@
 #include "tile.h"
 #include "framework/core/asyncdispatcher.h"
 #include "framework/core/eventdispatcher.h"
+#include <framework/core/graphicalapplication.h>
 #include "framework/graphics/graphics.h"
 #include "framework/graphics/painter.h"
 #include "framework/graphics/shadermanager.h"
 #include "framework/graphics/texturemanager.h"
+#include <framework/platform/platformwindow.h>
 
 MapView::MapView() : m_lightView(std::make_unique<LightView>(Size())), m_pool(g_drawPool.get(DrawPoolType::MAP))
 {

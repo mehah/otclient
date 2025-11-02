@@ -43,6 +43,8 @@
 #include "houses.h"
 #include "towns.h"
 #endif
+#include <framework/platform/platformwindow.h>
+#include <framework/core/graphicalapplication.h>
 
 const static TilePtr m_nulltile;
 

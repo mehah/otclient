@@ -33,6 +33,7 @@
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/image.h"
 #include "framework/otml/otmlnode.h"
+#include <framework/core/graphicalapplication.h>
 
 const static TexturePtr m_textureNull;
 
