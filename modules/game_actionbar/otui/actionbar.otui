@@ -203,7 +203,6 @@ Panel
 
   ScrollablePanel
     id: tabBar
-
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     anchors.left: prev.right
@@ -213,6 +212,7 @@ Panel
     margin-top: -2
     horizontal-scrollbar: actionScroll
     layout: horizontalBox
+    @onGeometryChange: modules.game_actionbar.updateVisibleWidgets()
 
   HorizontalScrollBar
     id: actionScroll
