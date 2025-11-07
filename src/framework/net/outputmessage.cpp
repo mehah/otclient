@@ -93,6 +93,15 @@ void OutputMessage::addString(const std::string_view buffer)
     m_messageSize += len;
 }
 
+void OutputMessage::addBytes(const std::string_view buffer)
+{
+    const int len = buffer.length();
+    checkWrite(len);
+    memcpy(m_buffer + m_writePos, buffer.data(), len);
+    m_writePos += len;
+    m_messageSize += len;
+}
+
 void OutputMessage::addPaddingBytes(const int bytes, const uint8_t byte)
 {
     if (bytes <= 0)
