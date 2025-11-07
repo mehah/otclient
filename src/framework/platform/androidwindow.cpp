@@ -25,6 +25,7 @@
 #include "androidwindow.h"
 #include "androidmanager.h"
 #include <game-activity/native_app_glue/android_native_app_glue.h>
+#include "framework/core/clock.h"
 #include <framework/core/eventdispatcher.h>
 
 AndroidWindow& g_androidWindow = (AndroidWindow&) g_window;
