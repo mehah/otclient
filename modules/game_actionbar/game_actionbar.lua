@@ -488,3 +488,10 @@ function updateInventoryItems(_)
         end
     end
 end
+
+-- Export function for external modules to call when panel visibility changes
+function updateVisibleWidgetsExternal()
+    -- Call the updateVisibleWidgets function from ActionBarLayout.lua
+    -- The function should be available globally since all logic files are loaded
+    updateVisibleWidgets()
+end

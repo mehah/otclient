@@ -149,6 +149,42 @@ function updateVisibleWidgets()
             local dimension = actionBar.isVertical and tabBar:getHeight() or tabBar:getWidth()
             local visibleCount = math.max(1, math.floor(dimension / 36))
             local firstIndex = actionBar.firstVisibleIndex or 1
+            local totalChildren = #children
+            
+            -- If we can show all buttons, start from the beginning
+            if visibleCount >= totalChildren then
+                firstIndex = 1
+            else
+                -- Check if we're currently at or past the end
+                local currentLastVisible = firstIndex + visibleCount - 1
+                
+                if currentLastVisible > totalChildren then
+                    -- We're past the end, pull back to show the last N buttons
+                    firstIndex = math.max(1, totalChildren - visibleCount + 1)
+                elseif currentLastVisible < totalChildren then
+                    -- We're not at the end yet, but check if window got bigger
+                    -- and we can show more buttons by moving forward
+                    local optimalFirstIndex = math.max(1, totalChildren - visibleCount + 1)
+                    
+                    -- If we were previously at the end and window got bigger,
+                    -- or if we can move forward to show more without losing current view
+                    if firstIndex > optimalFirstIndex then
+                        -- Keep current position, we have space ahead
+                    else
+                        -- Try to show more at the end if we have space
+                        local newFirstIndex = math.min(firstIndex, optimalFirstIndex)
+                        firstIndex = newFirstIndex
+                    end
+                end
+                
+                -- Final bounds check
+                firstIndex = math.max(1, math.min(firstIndex, totalChildren - visibleCount + 1))
+            end
+            
+            -- Update the action bar's stored indices
+            actionBar.firstVisibleIndex = firstIndex
+            
+            -- Apply visibility to buttons
             for i, button in ipairs(children) do
                 if i >= firstIndex and i < firstIndex + visibleCount then
                     button:setVisible(true)
@@ -156,6 +192,18 @@ function updateVisibleWidgets()
                 else
                     button:setVisible(false)
                 end
+            end
+            -- Update navigation button states
+            local prevEnabled = firstIndex > 1
+            local nextEnabled = (firstIndex + visibleCount - 1) < totalChildren
+            
+            if actionBar.prevPanel then
+                if actionBar.prevPanel.prev then actionBar.prevPanel.prev:setOn(prevEnabled) end
+                if actionBar.prevPanel.first then actionBar.prevPanel.first:setOn(prevEnabled) end
+            end
+            if actionBar.nextPanel then
+                if actionBar.nextPanel.next then actionBar.nextPanel.next:setOn(nextEnabled) end
+                if actionBar.nextPanel.last then actionBar.nextPanel.last:setOn(nextEnabled) end
             end
         end
     end
