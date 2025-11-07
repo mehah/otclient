@@ -75,6 +75,7 @@ class DrawPool
 {
 public:
     static constexpr uint16_t
+        FPS1 = 1000 / 1,
         FPS10 = 1000 / 10,
         FPS20 = 1000 / 20,
         FPS60 = 1000 / 60;
