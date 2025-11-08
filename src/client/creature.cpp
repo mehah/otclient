@@ -526,7 +526,7 @@ void Creature::updateJump()
 
 void Creature::onPositionChange(const Position& newPos, const Position& oldPos)
 {
-    callLuaField("onPositionChange", newPos, oldPos);
+    callLuaFieldUnchecked("onPositionChange", newPos, oldPos);
 }
 
 void Creature::onAppear()
