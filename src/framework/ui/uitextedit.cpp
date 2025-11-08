@@ -34,6 +34,9 @@
 #include <emscripten/emscripten.h>
 #endif
 #include <framework/platform/platformwindow.h>
+#ifdef ANDROID
+#include <framework/platform/androidmanager.h>
+#endif
 
 UITextEdit::UITextEdit()
 {
@@ -1226,10 +1229,17 @@ void UITextEdit::onFocusChange(const bool focused, const Fw::FocusReason reason)
             blinkCursor();
         update(true);
 #ifdef ANDROID
-        g_androidManager.showKeyboardSoft();
+        if (getProp(PropEditable)) {
+            g_androidManager.showKeyboardSoft();
+            g_androidManager.showInputPreview(getText());
+        }
 #endif
     } else if (getProp(PropSelectable))
         clearSelection();
+#ifdef ANDROID
+    if (!focused && getProp(PropEditable))
+        g_androidManager.hideInputPreview();
+#endif
     UIWidget::onFocusChange(focused, reason);
 }
 
@@ -1481,6 +1491,12 @@ bool UITextEdit::onMousePress(const Point& mousePos, const Fw::MouseButton butto
         return true;
 
     if (button == Fw::MouseLeftButton) {
+#ifdef ANDROID
+        if (getProp(PropEditable)) {
+            g_androidManager.showKeyboardSoft();
+            g_androidManager.showInputPreview(getText());
+        }
+#endif
         const int pos = getTextPos(mousePos);
         if (pos >= 0) {
             const int mods = g_window.getKeyboardModifiers();
@@ -1589,6 +1605,15 @@ bool UITextEdit::onDoubleClick(const Point& mousePos)
     }
 
     return true;
+}
+
+void UITextEdit::onTextChange(const std::string_view text, const std::string_view oldText)
+{
+    UIWidget::onTextChange(text, oldText);
+#ifdef ANDROID
+    if (getProp(PropEditable) && isActive())
+        g_androidManager.updateInputPreview(std::string(text));
+#endif
 }
 
 void UITextEdit::onTextAreaUpdate(const Point& offset, const Size& visibleSize, const Size& totalSize)

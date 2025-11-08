@@ -2,6 +2,7 @@ package com.otclient
 
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -20,9 +21,23 @@ class MainActivity : GameActivity() {
         androidManager = AndroidManager(
             context = this,
             editText = binding.editText,
+            previewContainer = binding.keyboardPreviewContainer,
+            previewText = binding.inputPreviewText,
         ).apply {
             nativeInit()
             nativeSetAudioEnabled(true)
+        }
+
+        var lastImeVisible = false
+        ViewCompat.setOnApplyWindowInsetsListener(binding.keyboardPreviewContainer) { view, insets ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val imeVisible = imeInsets.bottom > 0
+            if (imeVisible != lastImeVisible) {
+                lastImeVisible = imeVisible
+                androidManager.onImeVisibilityChanged(imeVisible)
+            }
+            view.translationY = -imeInsets.bottom.toFloat()
+            insets
         }
 
         hideSystemBars()
