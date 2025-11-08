@@ -70,8 +70,17 @@ local function ExprHandlerError(runtime, error, widget, controller, nodeStr, onE
     pwarning(error .. "\n\n------------------------------------")
 end
 
+local function check_load(expr, chunkName, mode, env)
+    if _VERSION == 'Lua 5.1' and loadstring then
+        local fn, err = loadstring(expr, chunkName)
+        if fn and env then setfenv(fn, env) end
+        return fn, err
+    end
+    return load(expr, chunkName, mode or 'bt', env)
+end
+
 local function getFncByExpr(exp, nodeStr, widget, controller, onError)
-    local f, syntaxErr = load(exp,
+    local f, syntaxErr = check_load(exp,
         ("Controller: %s | %s"):format(controller.name, controller.dataUI.name))
     if not f then
         ExprHandlerError(false, syntaxErr, widget, controller, nodeStr, onError)
@@ -480,14 +489,14 @@ function ngfor_exec(content, env, fn)
     local evalIterable, evalIf, evalKey
 
     if is51 then
-        local li, erri = load("return " .. iterable, "for_iterable")
+        local li, erri = check_load("return " .. iterable, "for_iterable")
         if not li then error(erri) end
         evalIterable = function(e)
             setfenv(li, e); return li()
         end
 
         if ifCond then
-            local lf, errf = load("return " .. ifCond, "for_if")
+            local lf, errf = check_load("return " .. ifCond, "for_if")
             if not lf then error(errf) end
             evalIf = function(e)
                 setfenv(lf, e); return lf()
@@ -495,25 +504,25 @@ function ngfor_exec(content, env, fn)
         end
 
         if trackBy then
-            local lk, errk = load("return " .. trackBy, "for_key")
+            local lk, errk = check_load("return " .. trackBy, "for_key")
             if not lk then error(errk) end
             evalKey = function(e)
                 setfenv(lk, e); return lk()
             end
         end
     else
-        local ci, erri = load("return function(_ENV) return " .. iterable .. " end", "for_iterable", "t")
+        local ci, erri = check_load("return function(_ENV) return " .. iterable .. " end", "for_iterable", "t")
         if not ci then error(erri) end
         ci = ci(); evalIterable = function(e) return ci(e) end
 
         if ifCond then
-            local cf, errf = load("return function(_ENV) return " .. ifCond .. " end", "for_if", "t")
+            local cf, errf = check_load("return function(_ENV) return " .. ifCond .. " end", "for_if", "t")
             if not cf then error(errf) end
             cf = cf(); evalIf = function(e) return cf(e) end
         end
 
         if trackBy then
-            local ck, errk = load("return function(_ENV) return " .. trackBy .. " end", "for_key", "t")
+            local ck, errk = check_load("return function(_ENV) return " .. trackBy .. " end", "for_key", "t")
             if not ck then error(errk) end
             ck = ck(); evalKey = function(e) return ck(e) end
         end
