@@ -1,5 +1,6 @@
 package com.otclient
 
+import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.inputmethod.BaseInputConnection
 
@@ -13,11 +14,21 @@ class NativeInputConnection(
         val keyCode = event.keyCode
         if (event.action == KeyEvent.ACTION_DOWN) {
             val text = when {
-                event.isPrintingKey -> event.unicodeChar.toChar().toString()
                 keyCode == KeyEvent.KEYCODE_SPACE -> " "
+                !event.characters.isNullOrEmpty() -> event.characters
+                event.isPrintingKey -> {
+                    val unicodeChar = event.getUnicodeChar(event.metaState)
+                    if (unicodeChar == 0 ||
+                        unicodeChar and KeyCharacterMap.COMBINING_ACCENT != 0
+                    ) {
+                        null
+                    } else {
+                        String(Character.toChars(unicodeChar))
+                    }
+                }
                 else -> null
             }
-            if (text != null) commitText(text, 1)
+            if (!text.isNullOrEmpty()) commitText(text, 1)
             targetView.onNativeKeyDown(keyCode)
             return true
         } else if (event.action == KeyEvent.ACTION_UP) {
