@@ -12,9 +12,12 @@ class NativeInputConnection(
     override fun sendKeyEvent(event: KeyEvent): Boolean {
         val keyCode = event.keyCode
         if (event.action == KeyEvent.ACTION_DOWN) {
-            if (event.isPrintingKey) {
-                commitText(event.unicodeChar.toChar().toString(), 1)
+            val text = when {
+                event.isPrintingKey -> event.unicodeChar.toChar().toString()
+                keyCode == KeyEvent.KEYCODE_SPACE -> " "
+                else -> null
             }
+            if (text != null) commitText(text, 1)
             targetView.onNativeKeyDown(keyCode)
             return true
         } else if (event.action == KeyEvent.ACTION_UP) {
