@@ -45,6 +45,10 @@ void AndroidManager::setAndroidManager(JNIEnv* env, jobject androidManager) {
     m_midShowSoftKeyboard = jniEnv->GetMethodID(androidManagerJClass, "showSoftKeyboard", "()V");
     m_midHideSoftKeyboard = jniEnv->GetMethodID(androidManagerJClass, "hideSoftKeyboard", "()V");
     m_midGetDisplayDensity = jniEnv->GetMethodID(androidManagerJClass, "getDisplayDensity", "()F");
+    m_midShowInputPreview = jniEnv->GetMethodID(androidManagerJClass, "showInputPreview", "(Ljava/lang/String;)V");
+    m_midUpdateInputPreview = jniEnv->GetMethodID(androidManagerJClass, "updateInputPreview", "(Ljava/lang/String;)V");
+    m_midHideInputPreview = jniEnv->GetMethodID(androidManagerJClass, "hideInputPreview", "()V");
+    jniEnv->DeleteLocalRef(androidManagerJClass);
 }
 
 void AndroidManager::showKeyboardSoft() {
@@ -55,6 +59,25 @@ void AndroidManager::showKeyboardSoft() {
 void AndroidManager::hideKeyboard() {
     JNIEnv* env = getJNIEnv();
     env->CallVoidMethod(m_androidManagerJObject, m_midHideSoftKeyboard);
+}
+
+void AndroidManager::showInputPreview(const std::string& text) {
+    JNIEnv* env = getJNIEnv();
+    jstring jText = env->NewStringUTF(text.c_str());
+    env->CallVoidMethod(m_androidManagerJObject, m_midShowInputPreview, jText);
+    env->DeleteLocalRef(jText);
+}
+
+void AndroidManager::updateInputPreview(const std::string& text) {
+    JNIEnv* env = getJNIEnv();
+    jstring jText = env->NewStringUTF(text.c_str());
+    env->CallVoidMethod(m_androidManagerJObject, m_midUpdateInputPreview, jText);
+    env->DeleteLocalRef(jText);
+}
+
+void AndroidManager::hideInputPreview() {
+    JNIEnv* env = getJNIEnv();
+    env->CallVoidMethod(m_androidManagerJObject, m_midHideInputPreview);
 }
 
 void AndroidManager::unZipAssetData() {
