@@ -125,6 +125,7 @@ public:
     bool hasMiniMapColor() { return (m_flags & ThingFlagAttrMinimapColor); }
     bool hasLensHelp() { return (m_flags & ThingFlagAttrLensHelp); }
     bool isFullGround() { return (m_flags & ThingFlagAttrFullGround); }
+    bool hasFloorChange() { return (m_flags & ThingFlagAttrFloorChange); }
     bool isIgnoreLook() { return (m_flags & ThingFlagAttrLook); }
     bool isCloth() { return (m_flags & ThingFlagAttrCloth); }
     bool isMarketable() { return (m_flags & ThingFlagAttrMarket); }

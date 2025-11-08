@@ -74,7 +74,7 @@ public:
 
     bool isWalkable(bool ignoreCreatures = false);
     bool isClickable();
-    bool isPathable() { return (m_thingTypeFlag & NOT_PATHABLE) == 0; }
+    bool isPathable() const;
     bool isFullGround() { return m_thingTypeFlag & FULL_GROUND; }
     bool isFullyOpaque();
     bool isSingleDimension() { return (m_thingTypeFlag & NOT_SINGLE_DIMENSION) == 0 && m_walkingCreatures.empty(); }
@@ -90,6 +90,7 @@ public:
     bool hasEffect() const { return m_effects && !m_effects->empty(); }
     bool hasGround();
     bool hasTopGround(const bool ignoreBorder = false);
+    bool hasTopFloorChange() const;
 
     bool hasCreatures() { return m_thingTypeFlag & HAS_CREATURE; }
 

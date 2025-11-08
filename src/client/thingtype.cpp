@@ -956,6 +956,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr) {
         case ThingAttrTopEffect: return ThingFlagAttrTopEffect;
         case ThingAttrMarket: return ThingFlagAttrMarket;
         case ThingAttrDecoKit: return ThingFlagAttrDecoKit;
+        case ThingAttrFloorChange: return ThingFlagAttrFloorChange;
         default: break;
     }
 

@@ -591,9 +591,40 @@ ThingPtr Tile::getTopMultiUseThing()
     return m_things[0];
 }
 
+bool Tile::hasTopFloorChange() const
+{
+    // Some custom maps hide non-walkable items beneath a stair in order to break cave-botting.
+    // The original 7.6 client still lets you step on those tiles because it only looks at the visible
+    // topmost item (the stair, which carries FloorChange). We mirror that behaviour here by scanning
+    // the stack from top to bottom and bailing as soon as the first visible item is not a floor change.
+    for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
+        const auto& thing = *it;
+        if (!thing)
+            continue;
+
+        if (thing->isTopEffect())
+            continue;
+        if (thing->isCreature())
+            continue;
+        if (!thing->isItem())
+            continue;
+
+        const auto& type = thing->getThingType();
+        if (type && type->hasFloorChange())
+            return true;
+
+        return false;
+    }
+    return false;
+}
+
 bool Tile::isWalkable(const bool ignoreCreatures)
 {
-    if (m_thingTypeFlag & NOT_WALKABLE || !getGround()) {
+    if ((m_thingTypeFlag & NOT_WALKABLE) && !hasTopFloorChange()) {
+        return false;
+    }
+
+    if (!getGround()) {
         return false;
     }
 
@@ -602,12 +633,18 @@ bool Tile::isWalkable(const bool ignoreCreatures)
             if (!thing->isCreature()) continue;
 
             const auto& creature = thing->static_self_cast<Creature>();
-            if (!creature->isPassable() && creature->canBeSeen())
+            if (!creature->isPassable() && creature->canBeSeen()) {
                 return false;
+            }
         }
     }
 
     return true;
+}
+
+bool Tile::isPathable() const
+{
+    return hasTopFloorChange() || ((m_thingTypeFlag & NOT_PATHABLE) == 0);
 }
 
 bool Tile::isCompletelyCovered(const uint8_t firstFloor, const bool resetCache)
@@ -883,11 +920,13 @@ void Tile::setThingFlag(const ThingPtr& thing)
     if (thing->getWidth() > 1 && thing->getHeight() > 1)
         m_thingTypeFlag |= HAS_WALL;
 
-    if (thing->isNotWalkable())
+    if (thing->isNotWalkable()) {
         m_thingTypeFlag |= NOT_WALKABLE;
+    }
 
-    if (thing->isNotPathable())
+    if (thing->isNotPathable()) {
         m_thingTypeFlag |= NOT_PATHABLE;
+    }
 
     if (thing->blockProjectile())
         m_thingTypeFlag |= BLOCK_PROJECTTILE;
