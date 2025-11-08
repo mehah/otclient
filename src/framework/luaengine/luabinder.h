@@ -27,6 +27,7 @@
 
 #include <framework/stdext/traits.h>
 #include <tuple>
+#include <type_traits>
 
 /// This namespace contains some dirty metaprogamming that uses a lot of C++0x features
 /// The purpose here is to create templates that can bind any function from C++
@@ -163,25 +164,36 @@ namespace luabinder
         return bind_fun(std::function<Ret(Args...)>(f));
     }
 
-    /// Create member function lambdas
+    /// Create member-function lambdas (handles const and void vs non-void)
     template<typename Ret, typename C, typename... Args>
-    std::function<Ret(const std::shared_ptr<C>&, const Args&...)> make_mem_func(Ret(C::* f)(Args...))
+    std::function<Ret(const std::shared_ptr<C>&, const Args&...)>
+    make_mem_func(Ret(C::* f)(Args...))
     {
         auto mf = std::mem_fn(f);
-        return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
+        return [=](const std::shared_ptr<C>& obj, const Args&... args) -> Ret {
             if (!obj)
                 throw LuaException("failed to call a member function because the passed object is nil");
-            return mf(obj.get(), args...);
+            if constexpr (std::is_void_v<Ret>) {
+                mf(obj.get(), args...);
+            } else {
+                return mf(obj.get(), args...);
+            }
         };
     }
-    template<typename C, typename... Args>
-    std::function<void(const std::shared_ptr<C>&, const Args&...)> make_mem_func(void (C::* f)(Args...))
+
+    template<typename Ret, typename C, typename... Args>
+    std::function<Ret(const std::shared_ptr<C>&, const Args&...)>
+    make_mem_func(Ret(C::* f)(Args...) const)
     {
         auto mf = std::mem_fn(f);
-        return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable {
+        return [=](const std::shared_ptr<C>& obj, const Args&... args) -> Ret {
             if (!obj)
                 throw LuaException("failed to call a member function because the passed object is nil");
-            mf(obj.get(), args...);
+            if constexpr (std::is_void_v<Ret>) {
+                mf(obj.get(), args...);
+            } else {
+                return mf(obj.get(), args...);
+            }
         };
     }
 
@@ -202,6 +214,16 @@ namespace luabinder
     /// Bind member functions
     template<typename C, typename Ret, class FC, typename... Args>
     LuaCppFunction bind_mem_fun(Ret(FC::* f)(Args...))
+    {
+        using Tuple = std::tuple<std::shared_ptr<FC>, typename stdext::remove_const_ref<Args>::type...>;
+        auto lambda = make_mem_func<Ret, FC>(f);
+        return bind_fun_specializer<typename stdext::remove_const_ref<Ret>::type,
+            decltype(lambda),
+            Tuple>(lambda);
+    }
+    // Overload for const member functions
+    template<typename C, typename Ret, class FC, typename... Args>
+    LuaCppFunction bind_mem_fun(Ret(FC::* f)(Args...) const)
     {
         using Tuple = std::tuple<std::shared_ptr<FC>, typename stdext::remove_const_ref<Args>::type...>;
         auto lambda = make_mem_func<Ret, FC>(f);

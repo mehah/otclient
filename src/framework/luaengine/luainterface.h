@@ -429,11 +429,11 @@ void LuaInterface::bindClassStaticFunction(const std::string_view className, con
     registerClassStaticFunction(className, functionName, luabinder::bind_fun(function));
 }
 
-template<class C, typename F, class FC>
-void LuaInterface::bindClassMemberFunction(const std::string_view functionName, F FC::* function)
-{
-    registerClassMemberFunction<C>(functionName, luabinder::bind_mem_fun<C>(function));
-}
+    template<class C, typename F, class FC>
+    void LuaInterface::bindClassMemberFunction(const std::string_view functionName, F FC::* function)
+    {
+        registerClassMemberFunction<C>(functionName, luabinder::bind_mem_fun<C>(function));
+    }
 template<class C, typename F, class FC>
 void LuaInterface::bindClassMemberFunction(const std::string_view className, const std::string_view functionName, F FC::* function)
 {
