@@ -34,6 +34,9 @@
 #include <emscripten/emscripten.h>
 #endif
 #include <framework/platform/platformwindow.h>
+#ifdef ANDROID
+#include <framework/platform/androidmanager.h>
+#endif
 
 UITextEdit::UITextEdit()
 {
@@ -1481,6 +1484,10 @@ bool UITextEdit::onMousePress(const Point& mousePos, const Fw::MouseButton butto
         return true;
 
     if (button == Fw::MouseLeftButton) {
+#ifdef ANDROID
+        if (getProp(PropEditable))
+            g_androidManager.showKeyboardSoft();
+#endif
         const int pos = getTextPos(mousePos);
         if (pos >= 0) {
             const int mods = g_window.getKeyboardModifiers();
