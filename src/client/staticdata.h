@@ -381,6 +381,7 @@ struct CyclopediaCharacterCombatStats
     uint8_t weaponElementType;
     uint16_t defense;
     uint16_t armor;
+    uint16_t mantra;
     uint8_t haveBlessings;
 };
 

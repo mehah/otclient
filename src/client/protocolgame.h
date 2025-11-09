@@ -310,6 +310,7 @@ private:
     void parseTaskHuntingData(const InputMessagePtr& msg);
     void parseExperienceTracker(const InputMessagePtr& msg);
     void parseLootContainers(const InputMessagePtr& msg);
+    void parseMonkData(const InputMessagePtr& msg);
     void parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg);
     void parseCyclopediaHousesInfo(const InputMessagePtr& msg);
     void parseCyclopediaHouseList(const InputMessagePtr& msg);
@@ -381,6 +382,7 @@ public:
 
 private:
     bool m_enableSendExtendedOpcode{ false };
+    std::vector<std::pair<uint8_t, std::string>> m_pendingExtendedOpcodes;
     bool m_gameInitialized{ false };
     bool m_mapKnown{ false };
     bool m_firstRecv{ true };
@@ -394,4 +396,5 @@ private:
     std::string m_sessionKey;
     std::string m_characterName;
     LocalPlayerPtr m_localPlayer;
+    void flushPendingExtendedOpcodes();
 };

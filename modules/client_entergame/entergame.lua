@@ -596,30 +596,40 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
         return
     end
 
-    local host, path = G.host:match("([^/]+)/([^/].*)")
-    local url = G.host
+    -- Robust URL parsing: support http/https scheme, path and explicit :port
+    local original = G.host or ""
+    local is_https = original:match("^https://") ~= nil
+    local url = original
+    if is_https then
+        url = url:gsub("^https://", "")
+    elseif url:match("^http://") then
+        url = url:gsub("^http://", "")
+    end
 
-    if not G.port then
-        local isHttps, _ = string.find(host, "https")
-        if not isHttps then
-            G.port = 443
-        else -- http
-            G.port = 80
+    local host, path = url:match("^([^/]+)(/.*)$")
+    if not host then
+        host = url
+        path = "/"
+    elseif not path or path == "" then
+        path = "/"
+    end
+
+    -- Extract explicit port from host if present (e.g., example.com:8080)
+    local h, p = host:match("^(.-):(%d+)$")
+    if h and p then
+        host = h
+        if not G.port or G.port == 0 then
+            G.port = tonumber(p)
         end
     end
 
-    if not path then
-        path = ""
-    else
-        path = '/' .. path
+    if not G.port or G.port == 0 then
+        G.port = is_https and 443 or 80
     end
 
-    if not host then
-        loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
-    else
-        loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
-            host .. ":" .. tostring(G.port) .. path))
-    end
+    print(string.format("host: %s, path: %s, port: %d", host, path, G.port))
+
+    loadBox = displayCancelBox(tr('Connecting'), tr('Your character list is being loaded. Please wait.'))
 
     connect(loadBox, {
         onCancel = function(msgbox)

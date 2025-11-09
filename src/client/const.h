@@ -852,6 +852,12 @@ namespace Otc
         OPEN_SEARCH = 5,
     };
 
+    enum class MonkData : uint8_t {
+        Harmony = 0x00,
+        Serenity = 0x01,
+        Virtue = 0x02,
+    };
+
     enum Vocations_t : uint8_t
     {
         NONE = 0,

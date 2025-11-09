@@ -38,8 +38,26 @@ void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& b
         msg->addString(buffer);
         send(msg);
     } else {
-        g_logger.error("Unable to send extended opcode {}, extended opcodes are not enabled", opcode);
+        // queue until server enables extended opcodes (opcode 0)
+        m_pendingExtendedOpcodes.emplace_back(opcode, buffer);
+        g_logger.info("Queuing extended opcode {} until enabled", opcode);
     }
+}
+
+void ProtocolGame::flushPendingExtendedOpcodes()
+{
+    if (!m_enableSendExtendedOpcode || m_pendingExtendedOpcodes.empty())
+        return;
+
+    for (const auto& [opcode, buffer] : m_pendingExtendedOpcodes) {
+        const auto& msg = std::make_shared<OutputMessage>();
+        msg->addU8(Proto::ClientExtendedOpcode);
+        msg->addU8(opcode);
+        msg->addString(buffer);
+        send(msg);
+    }
+    g_logger.info("Flushed {} queued extended opcode(s)", m_pendingExtendedOpcodes.size());
+    m_pendingExtendedOpcodes.clear();
 }
 
 void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint8_t challengeRandom)
