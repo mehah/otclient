@@ -219,7 +219,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
 
     Rect barsRect = backgroundRect;
 
-    if (drawFlags & Otc::DrawBars) {
+    if ((drawFlags & Otc::DrawBars) && !isNpc()) {
         g_drawPool.addFilledRect(backgroundRect, Color::black);
         g_drawPool.addFilledRect(healthRect, fillColor);
 
