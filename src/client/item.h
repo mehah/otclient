@@ -23,7 +23,7 @@
 #pragma once
 
 #include "thing.h"
-#include <framework/global.h>
+#include "framework/core/declarations.h"
 
 enum ItemAttr : uint8_t
 {
@@ -75,8 +75,8 @@ class Item final : public Thing
 public:
     static ItemPtr create(int id);
 
-    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr) override;
-    void drawLight(const Point& dest, const LightViewPtr& lightView) override;
+    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
+    void drawLight(const Point& dest, LightView* lightView) override;
 
     void setId(uint32_t id) override;
 
@@ -99,6 +99,11 @@ public:
     uint8_t getTier() { return m_tier; }
 
     bool isValid() { return getThingType() != nullptr; }
+
+    bool hasWearOut() { return Thing::hasWearOut(); }
+    bool hasClockExpire() { return Thing::hasClockExpire(); }
+    bool hasExpire() { return Thing::hasExpire(); }
+    bool hasExpireStop() { return Thing::hasExpireStop(); }
 
     void setAsync(const bool enable) { m_async = enable; }
 
@@ -158,7 +163,7 @@ public:
 private:
     ThingType* getThingType() const override;
 
-    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, const LightViewPtr& lightView = nullptr);
+    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView = nullptr);
 
     uint16_t m_countOrSubType{ 0 };
     uint32_t m_durationTime{ 0 };

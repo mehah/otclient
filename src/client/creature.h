@@ -22,20 +22,15 @@
 
 #pragma once
 
-#include "mapview.h"
 #include "outfit.h"
 #include "thing.h"
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 
-struct PreyMonster
-{
-    std::string name;
-    Outfit outfit;
-};
+#include "staticdata.h"
 
-// @bindclass
+ // @bindclass
 class Creature : public Thing
 {
 public:
@@ -53,9 +48,9 @@ public:
     void onAppear() override;
     void onDisappear() override;
 
-    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr) override;
+    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
     void draw(const Rect& destRect, uint8_t size, bool center = false);
-    void drawLight(const Point& dest, const LightViewPtr& lightView) override;
+    void drawLight(const Point& dest, LightView* lightView) override;
 
     void internalDraw(Point dest, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags);
@@ -66,7 +61,7 @@ public:
     void setHealthPercent(uint8_t healthPercent);
     void setManaPercent(uint8_t value) { m_manaPercent = value; }
     void setDirection(Otc::Direction direction);
-    void setOutfit(const Outfit& outfit);
+    void setOutfit(const Outfit& outfit, bool fireEvent = true);
     void setLight(const Light& light) { m_light = light; }
     void setSpeed(uint16_t speed);
     void setBaseSpeed(uint16_t baseSpeed);
@@ -132,7 +127,7 @@ public:
     int getDrawElevation();
 
     Otc::Direction getDirection() { return m_direction; }
-    Outfit getOutfit() { return m_outfit; }
+    const auto& getOutfit() { return m_outfit; }
     const Light& getLight() const override;
     bool hasLight() const override { return Thing::hasLight() || getLight().intensity > 0; }
     bool hasMountShader() const { return m_mountShaderId > 0; }
@@ -203,7 +198,7 @@ minHeight,
     }
 
     void setVocation(uint8_t vocation) { m_vocation = vocation; }
-    const uint8_t getVocation() { return m_vocation; }
+    uint8_t getVocation() { return m_vocation; }
 
 protected:
     virtual void terminateWalk();

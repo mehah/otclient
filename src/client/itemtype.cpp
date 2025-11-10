@@ -21,11 +21,12 @@
  */
 
 #ifdef FRAMEWORK_EDITOR
+#include "itemtype.h"
+
 #include "game.h"
 #include "thingtypemanager.h"
 
 #include <framework/core/binarytree.h>
-#include <framework/core/filestream.h>
 
 void ItemType::unserialize(const BinaryTreePtr& node)
 {

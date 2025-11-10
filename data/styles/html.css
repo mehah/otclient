@@ -1,3 +1,4 @@
+/* === Base global === */
 * {
   height: auto;
   width: auto;
@@ -20,7 +21,9 @@
   --image-color: white;
 }
 
+/* === Form controls === */
 button {
+  display: inline-block;
   text-align: center !important;
   padding: 5 10 5 10;
 }
@@ -53,7 +56,6 @@ input[type="radio"] {
 }
 
 textarea {
-  white-space: pre;
   width: 128;
   height: 128;
 }
@@ -64,6 +66,7 @@ select {
   text-align: center;
 }
 
+/* === Core structural elements === */
 br {
   display: block;
   height: 15;
@@ -71,10 +74,6 @@ br {
 
 div {
   display: block;
-}
-
-img {
-  display: inline-block;
 }
 
 pre {
@@ -90,6 +89,7 @@ hr {
   margin-bottom: 8;
 }
 
+/* === Headings === */
 h1,
 h2,
 h3,
@@ -122,32 +122,44 @@ h1,
 h1 * {
   --font-scale: 2;
 }
-
 h2,
 h2 * {
   --font-scale: 1.5;
 }
-
 h3,
 h3 * {
   --font-scale: 1;
 }
-
 h4,
 h4 * {
   --font-scale: 0.8;
 }
-
 h5,
 h5 * {
   --font-scale: 0.5;
 }
-
 h6,
 h6 * {
   --font-scale: 0.3;
 }
 
+/* === Lists === */
+ul,
+ol,
+dl {
+  display: block;
+}
+
+li {
+  display: list-item;
+}
+
+dt,
+dd {
+  display: block;
+}
+
+/* === Tables === */
 table,
 thead,
 tbody,
@@ -173,39 +185,85 @@ table {
 thead {
   display: table-header-group;
 }
-
 tbody {
   display: table-row-group;
 }
-
 tfoot {
   display: table-footer-group;
 }
-
 tr {
   display: table-row;
 }
-
 td {
   display: table-cell;
 }
-
 th {
   display: table-cell;
   font-weight: bold;
   text-align: center;
 }
-
 colgroup {
   display: table-column-group;
 }
-
 col {
   display: table-column;
 }
-
 caption {
   display: table-caption;
   text-align: center;
   caption-side: top;
+}
+
+/* === Embedded & media elements === */
+img,
+iframe,
+embed,
+object,
+canvas,
+video,
+audio,
+progress,
+meter {
+  display: inline-block;
+}
+
+/* === Semantic block-level elements (faltavam no original) === */
+address,
+article,
+aside,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+figcaption,
+figure,
+details,
+dialog,
+fieldset,
+form,
+menu,
+summary,
+blockquote,
+p {
+  display: block;
+}
+
+/* === Extras === */
+legend {
+  display: block;
+}
+summary {
+  display: list-item;
+}
+
+/* === Hidden elements === */
+script,
+style,
+template,
+source,
+track,
+area {
+  display: none;
 }

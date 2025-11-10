@@ -22,6 +22,9 @@
 
 #include "uicreature.h"
 
+#include "creature.h"
+#include "framework/otml/otmlnode.h"
+
 void UICreature::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
@@ -30,13 +33,22 @@ void UICreature::drawSelf(const DrawPoolType drawPane)
     UIWidget::drawSelf(drawPane);
 
     if (m_creature) {
-        if (m_creature->getClientId() == 0) {
-            m_creature->setOutfit(m_outfit);
+        if (m_creature->getOutfit() != m_outfit) {
+            m_creature->setOutfit(m_outfit, false);
         }
 
         m_creature->setMarked(m_imageColor);
         m_creature->draw(getPaddingRect(), m_creatureSize, m_center);
     }
+}
+
+void UICreature::setCreature(const CreaturePtr& creature) {
+    m_creature = creature;
+    if (m_creature) {
+        m_direction = m_creature->getDirection();
+        m_outfit = m_creature->getOutfit();
+    } else
+        m_outfit = {};
 }
 
 void UICreature::setOutfit(const Outfit& outfit)
@@ -51,6 +63,21 @@ void UICreature::setOutfit(const Outfit& outfit)
     if (m_creature)
         m_creature->setShader(m_shaderName);
 }
+
+Otc::Direction UICreature::getDirection() {
+    if (m_creature != nullptr) {
+        return m_creature->getDirection();
+    }
+    return Otc::InvalidDirection;
+}
+
+void UICreature::setDirection(Otc::Direction dir) {
+    m_direction = dir;
+    if (m_creature)
+        m_creature->setDirection(dir);
+}
+
+Outfit UICreature::getOutfit() { if (!m_creature) setOutfit({}); return m_creature->getOutfit(); }
 
 void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {

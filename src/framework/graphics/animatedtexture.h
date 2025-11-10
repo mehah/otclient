@@ -23,7 +23,6 @@
 #pragma once
 
 #include "texture.h"
-#include <framework/core/timer.h>
 
 class AnimatedTexture final : public Texture
 {

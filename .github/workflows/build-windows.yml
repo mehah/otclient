@@ -15,7 +15,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pull-requests: read
+
 env:
+  LUKKA_RUN_VCPKG_SHA: "${{ vars.LUKKA_RUN_VCPKG_SHA }}"
   CMAKE_BUILD_PARALLEL_LEVEL: 2
   MAKEFLAGS: "-j 2"
 
@@ -52,6 +57,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+        with:
+          repository: ${{ github.event_name == 'push' && github.repository || (github.event.pull_request.head.repo.fork && github.repository || github.event.pull_request.head.repo.full_name) }}
+          ref: ${{ github.event_name == 'push' && github.ref || (github.event.pull_request.head.repo.fork && github.event.pull_request.base.ref || github.event.pull_request.head.ref) }}
+          fetch-depth: 0
       - name: Get vcpkg commit ID
         id: vcpkg-step
         shell: pwsh
@@ -96,10 +105,23 @@ jobs:
 
       - name: Install vcpkg
         if: ${{ matrix.buildtype == 'windows-release' }}
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
         with:
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
+
+      - name: Validate vcpkg baseline SHA
+        shell: pwsh
+        run: |
+          $SHAS = "${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}"
+          if ([string]::IsNullOrEmpty($SHAS)) {
+            echo "::error title=Missing vcpkg baseline::Provide a full 40-char vcpkgGitCommitId."
+            exit 1
+          }
+          if ($SHAS -notmatch '^[0-9a-f]{40}$') {
+            echo "::error title=Invalid vcpkg baseline::vcpkgGitCommitId must be a full 40-char commit SHA."
+            exit 1
+          }
       - name: Get latest CMake and Ninja
         uses: lukka/get-cmake@v3.31.6
 

@@ -164,6 +164,7 @@ endif()
 
 # Client options
 add_definitions(-DCLIENT)
+add_definitions(-DNOMINMAX)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
 # === Build options ===
@@ -173,6 +174,7 @@ message(STATUS "Build commit: ${BUILD_COMMIT}")
 add_definitions(-D"BUILD_COMMIT=\\\"${BUILD_COMMIT}\\\"")
 message(STATUS "Build revision: ${BUILD_REVISION}")
 add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
+
 
 # *****************************************************************************
 # Packages / Libs
@@ -409,6 +411,7 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
           framework/ui/uiboxlayout.cpp
           framework/ui/uigridlayout.cpp
           framework/ui/uihorizontallayout.cpp
+          framework/ui/uilayoutflexbox.cpp
           framework/ui/uilayout.cpp
           framework/ui/uimanager.cpp
           framework/ui/uiparticles.cpp

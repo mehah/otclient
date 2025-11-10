@@ -43,6 +43,9 @@ function UIItem:onDrop(widget, mousePos)
     if not (toPos) and self:getParent() and self:getParent().slotPosition then
         toPos = self:getParent().slotPosition
     end
+    if modules.game_actionbar and modules.game_actionbar.tryAssignActionButtonFromDrop(mousePos, widget, item:getId()) then
+        return true
+    end
 
     if self.selectable then
         if item:isPickupable() then
@@ -52,25 +55,6 @@ function UIItem:onDrop(widget, mousePos)
         return false
     end
 
-    if not itemPos or not toPos then
-        local pressedWidget = g_ui.getPressedWidget()
-        local rootWidget = g_ui.getRootWidget()
-        if pressedWidget and rootWidget then
-            local parentWidget = pressedWidget:getParent()
-            local mousePosWidget = g_ui.getRootWidget():recursiveGetChildByPos(mousePos, false)
-            if parentWidget and mousePosWidget then
-                local mousePosWidgetParent = mousePosWidget:getParent()
-                if mousePosWidgetParent and mousePosWidgetParent:getId() == 'actionBarPanel' then
-                    if not itemPos and parentWidget:getId() == 'actionBarPanel' then
-                        modules.game_actionbar.onDragReassign(widget, item)
-                    elseif not toPos and parentWidget:getId() == 'contentsPanel' then
-                        modules.game_actionbar.onChooseItemByDrag(self, mousePos, item)
-                    end
-                end
-            end
-        end
-        return false
-    end
     if itemPos.x ~= 65535 and not itemTile then
         return false
     end

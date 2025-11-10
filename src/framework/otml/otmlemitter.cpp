@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "otmlemitter.h"
 #include "otmldocument.h"
+#include "otmlemitter.h"
 
 std::string OTMLEmitter::emitNode(const OTMLNodePtr& node, const int currentDepth)
 {

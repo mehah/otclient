@@ -21,19 +21,16 @@
  */
 
 #include "spriteappearances.h"
-#include "game.h"
-#include <framework/core/filestream.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/image.h>
 
-#include <algorithm>
-#include <framework/core/asyncdispatcher.h>
-#include <nlohmann/json.hpp>
-
+#include <nlohmann/json_fwd.hpp>
 #include "lzma.h"
+#include "gameconfig.h"
+#include "framework/core/filestream.h"
+#include "framework/core/resourcemanager.h"
+#include "framework/graphics/image.h"
 
  // warnings related to protobuf
- // https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
+    // https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
 
 using json = nlohmann::json;
 
@@ -48,6 +45,21 @@ void SpriteAppearances::init()
 void SpriteAppearances::terminate()
 {
     unload();
+}
+
+Size SpriteSheet::getSpriteSize() const
+{
+    Size size(g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
+
+    switch (spriteLayout) {
+        case SpriteLayout::ONE_BY_ONE: break;
+        case SpriteLayout::ONE_BY_TWO: size.setHeight(64); break;
+        case SpriteLayout::TWO_BY_ONE: size.setWidth(64); break;
+        case SpriteLayout::TWO_BY_TWO: size.resize(64, 64); break;
+        default: break;
+    }
+
+    return size;
 }
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const

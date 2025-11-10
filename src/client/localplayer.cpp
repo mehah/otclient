@@ -21,10 +21,14 @@
  */
 
 #include "localplayer.h"
+
+#include "container.h"
 #include "game.h"
+#include "item.h"
 #include "map.h"
 #include "tile.h"
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
 
 void LocalPlayer::lockWalk(const uint16_t millis)
 {
@@ -80,6 +84,7 @@ void LocalPlayer::preWalk(Otc::Direction direction)
 
     const auto& oldPos = getPosition();
     Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
+    Creature::onPositionChange(getLastStepToPosition(), getLastStepFromPosition());
     registerAdjustInvalidPosEvent();
 }
 
@@ -213,6 +218,8 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
     return true;
 }
 
+bool LocalPlayer::isWalkLocked() { return m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration; }
+
 void LocalPlayer::stopAutoWalk()
 {
     m_autoWalkDestination = {};
@@ -232,6 +239,9 @@ void LocalPlayer::terminateWalk()
 
 void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPos)
 {
+    if (isPreWalking())
+        return;
+
     Creature::onPositionChange(newPos, oldPos);
 
     if (newPos == m_autoWalkDestination)
@@ -242,12 +252,12 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
     m_serverWalk = false;
 }
 
-void LocalPlayer::setStates(const uint32_t states)
+void LocalPlayer::setStates(const uint64_t states)
 {
     if (m_states == states)
         return;
 
-    const uint32_t oldStates = m_states;
+    const uint64_t oldStates = m_states;
     m_states = states;
 
     if (isParalyzed())
@@ -371,6 +381,19 @@ void LocalPlayer::setMana(const uint32_t mana, const uint32_t maxMana)
     callLuaField("onManaChange", mana, maxMana, oldMana, oldMaxMana);
 }
 
+void LocalPlayer::setManaShield(const uint32_t manaShield, const uint32_t maxManaShield)
+{
+    if (m_manaShield == manaShield && m_maxManaShield == maxManaShield)
+        return;
+
+    const uint32_t oldManaShield = m_manaShield;
+    const uint32_t oldMaxManaShield = m_maxManaShield;
+    m_manaShield = manaShield;
+    m_maxManaShield = maxManaShield;
+
+    callLuaField("onManaShieldChange", manaShield, maxManaShield, oldManaShield, oldMaxManaShield);
+}
+
 void LocalPlayer::setMagicLevel(const uint16_t magicLevel, const uint16_t magicLevelPercent)
 {
     if (m_magicLevel == magicLevel && m_magicLevelPercent == magicLevelPercent)
@@ -434,15 +457,67 @@ void LocalPlayer::setInventoryItem(const Otc::InventorySlot inventory, const Ite
     callLuaField("onInventoryChange", inventory, item, oldItem);
 }
 
-void LocalPlayer::setVocation(const uint8_t vocation)
+void LocalPlayer::setInventoryCountCache(std::map<std::pair<uint16_t, uint8_t>, uint16_t> counts)
 {
-    if (m_vocation == vocation)
-        return;
+    m_inventoryCountCache = std::move(counts);
+}
 
-    const uint8_t oldVocation = m_vocation;
-    m_vocation = vocation;
+bool LocalPlayer::hasEquippedItemId(const uint16_t itemId, const uint8_t tier)
+{
+    if (itemId == 0)
+        return false;
 
-    callLuaField("onVocationChange", vocation, oldVocation);
+    for (const auto& item : m_inventoryItems) {
+        if (!item)
+            continue;
+
+        if (item->getId() != itemId)
+            continue;
+
+        if (item->getTier() != tier)
+            continue;
+
+        return true;
+    }
+
+    return false;
+}
+
+uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tier)
+{
+    if (std::cmp_equal(itemId, 0))
+        return 0;
+
+    const auto key = std::make_pair(itemId, tier);
+    const auto it = m_inventoryCountCache.find(key);
+    if (it != m_inventoryCountCache.end()) {
+        return it->second;
+    }
+
+    uint32_t total = 0;
+
+    const auto accumulate = [&](const ItemPtr& item) {
+        if (item && std::cmp_equal(item->getId(), itemId) && item->getTier() == tier) {
+            total += item->getCount();
+        }
+    };
+
+    for (const auto& item : m_inventoryItems)
+        accumulate(item);
+
+    for (const auto& [containerId, container] : g_game.getContainers()) {
+        if (!container)
+            continue;
+
+        for (const auto& item : container->getItems())
+            accumulate(item);
+    }
+
+    constexpr uint32_t maxUint16 = 65535;
+    if (total > maxUint16) {
+        total = maxUint16;
+    }
+    return static_cast<uint16_t>(total);
 }
 
 void LocalPlayer::setPremium(const bool premium)

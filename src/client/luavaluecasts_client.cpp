@@ -21,7 +21,10 @@
  */
 
 #include "luavaluecasts_client.h"
-#include <framework/luaengine/luainterface.h>
+
+#include "game.h"
+#include "item.h"
+#include "framework/luaengine/luainterface.h"
 
 int push_luavalue(const Outfit& outfit)
 {
@@ -482,7 +485,6 @@ int push_luavalue(const SubOffer& subOffer) {
         g_lua.setField("basePrice");
     }
     if (g_game.getClientVersion() < 1310) {
-
         g_lua.pushString(subOffer.name);
         g_lua.setField("name");
         g_lua.pushString(subOffer.description);
@@ -532,7 +534,7 @@ int push_luavalue(const StoreOffer& offer) {
             g_lua.pushString(offer.reasonIdDisable);
             g_lua.setField("reasonIdDisable");
         }
-    } else{
+    } else {
         g_lua.pushBoolean(offer.configurable);
         g_lua.setField("configurable");
     }
@@ -833,11 +835,11 @@ int push_luavalue(const CharmData& charm) {
     g_lua.pushInteger(charm.removeRuneCost);
     g_lua.setField("removeRuneCost");
     //if (g_game.getClientVersion() >= 1410) {
-        g_lua.pushInteger(charm.availableCharmSlots);
-        g_lua.setField("availableCharmSlots");
-        g_lua.pushInteger(charm.tier);
-        g_lua.setField("tier");
-   // }
+    g_lua.pushInteger(charm.availableCharmSlots);
+    g_lua.setField("availableCharmSlots");
+    g_lua.pushInteger(charm.tier);
+    g_lua.setField("tier");
+    // }
 
     return 1;
 }
@@ -1599,5 +1601,41 @@ int push_luavalue(const ForgeOpenData& data) {
 
     g_lua.pushInteger(data.dustLevel);
     g_lua.setField("dustLevel");
+    return 1;
+}
+
+// Custom structs implementations
+int push_luavalue(const BossCooldownData& data) {
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(data.bossRaceId);
+    g_lua.setField("bossRaceId");
+    g_lua.pushInteger(data.cooldownTime);
+    g_lua.setField("cooldownTime");
+    return 1;
+}
+
+int push_luavalue(const PartyMemberData& data) {
+    g_lua.createTable(0, 6);
+    g_lua.pushInteger(data.memberID);
+    g_lua.setField("memberID");
+    g_lua.pushInteger(data.highlight);
+    g_lua.setField("highlight");
+    g_lua.pushInteger(data.loot);
+    g_lua.setField("loot");
+    g_lua.pushInteger(data.supply);
+    g_lua.setField("supply");
+    g_lua.pushInteger(data.damage);
+    g_lua.setField("damage");
+    g_lua.pushInteger(data.healing);
+    g_lua.setField("healing");
+    return 1;
+}
+
+int push_luavalue(const PartyMemberName& data) {
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(data.memberID);
+    g_lua.setField("memberID");
+    g_lua.pushString(data.memberName);
+    g_lua.setField("memberName");
     return 1;
 }
