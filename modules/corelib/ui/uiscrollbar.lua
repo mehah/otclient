@@ -124,6 +124,7 @@ function UIScrollBar.create()
     scrollbar.minimum = -999999
     scrollbar.maximum = 999999
     scrollbar.step = 1
+    scrollbar.incrementValue = 1
     scrollbar.orientation = 'vertical'
     scrollbar.pixelsScroll = false
     scrollbar.showValue = false
@@ -177,6 +178,8 @@ function UIScrollBar:onStyleApply(styleName, styleNode)
             self.pixelsScroll = true
         elseif name == 'show-value' then
             self.showValue = true
+        elseif name == 'increment' then
+            self.incrementValue = value
         elseif name == 'symbol' then
             self.symbol = value
         elseif name == 'mouse-scroll' then
@@ -188,23 +191,28 @@ function UIScrollBar:onStyleApply(styleName, styleNode)
 end
 
 function UIScrollBar:onDecrement()
-    if g_keyboard.isCtrlPressed() then
-        self:decrement(self.value)
-    elseif g_keyboard.isShiftPressed() then
-        self:decrement(10)
-    else
-        self:decrement()
-    end
+  local count = self.incrementValue
+  if g_keyboard.isShiftPressed() and g_keyboard.isCtrlPressed() then
+    count = 1000
+  elseif g_keyboard.isCtrlPressed() then
+    count = self.ctrlIncrement
+  elseif g_keyboard.isShiftPressed() then
+    count = self.shiftIncrement
+  end
+
+  self:decrement(count)
 end
 
 function UIScrollBar:onIncrement()
-    if g_keyboard.isCtrlPressed() then
-        self:increment(self.maximum)
-    elseif g_keyboard.isShiftPressed() then
-        self:increment(10)
-    else
-        self:increment()
-    end
+  local count = self.incrementValue
+  if g_keyboard.isShiftPressed() and g_keyboard.isCtrlPressed() then
+    count = 1000
+  elseif g_keyboard.isCtrlPressed() then
+    count = self.ctrlIncrement
+  elseif g_keyboard.isShiftPressed() then
+    count = self.shiftIncrement
+  end
+  self:increment(count)
 end
 
 function UIScrollBar:decrement(count)
@@ -355,3 +363,6 @@ end
 function UIScrollBar:getMouseScroll()
     return self.mouseScroll
 end
+
+function UIScrollBar:getIncrementValue() return self.incrementValue end
+function UIScrollBar:setIncrementStep(value) self.incrementValue = value end

@@ -1499,7 +1499,7 @@ MarketMainWindow < Panel
     visible: true
     !text: tr('Close')
     size: 75 20
-    @onClick: hide()
+    @onClick: modules.game_market.hide()
 
   Button
     id: myOffers
