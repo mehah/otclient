@@ -24,6 +24,7 @@ local mainMarket = nil
 local lastItemID = 0
 local lastItemTier = 0
 local currentActionType = 1
+local isSearching = false
 
 local cache = {
 	SCROLL_MARKET_ITEMS = {
@@ -210,10 +211,11 @@ function myOffersButton(widget)
   end
 
   if widget:getId() ~= 'myOffers' then
-	if lastItemID then
+	if lastItemID and lastItemID > 0 then
 		sendMarketAction(3, lastItemID, lastItemTier)
-		lastItemID, lastItemTier = 0
 	end
+	lastItemID = 0
+	lastItemTier = 0
   end
 
   if marketMain:isVisible() then
@@ -260,6 +262,8 @@ local marketHistoryBuy = {}
 local marketHistorySell = {}
 
 function onMarketReadOffer(action, amount, counter, itemId, playerName, price, state, timestamp, var, itemTier)
+	print("onMarketReadOffer - action:", action, "amount:", amount, "itemId:", itemId, "var:", var, "player:", playerName, "price:", price, "counter:", counter, "timestamp:", timestamp)
+	
 	-- Create offer data structure
 	local offer = {
 		timestamp = timestamp,
@@ -268,41 +272,20 @@ function onMarketReadOffer(action, amount, counter, itemId, playerName, price, s
 		itemId = itemId,
 		amount = amount,
 		price = price,
-		playerName = playerName,
+		holder = playerName,
 		state = state,
 		var = var,
-		itemTier = itemTier or 0
+		tier = itemTier or 0
 	}
 	
-	-- Check if this is for own offers or history
-	if var == 2 or var == 0xFFFE then  -- MARKETREQUEST_OWN_OFFERS or OLD_MARKETREQUEST_MY_OFFERS
-		if action == 1 then  -- Buy offer
-			table.insert(marketOffersBuy, offer)
-		else  -- Sell offer
-			table.insert(marketOffersSell, offer)
-		end
-		-- When we receive the complete batch, call the parse function
-		scheduleEvent(function()
-			if #marketOffersBuy > 0 or #marketOffersSell > 0 then
-				MarketOwnOffers.onParseMyOffers(marketOffersBuy, marketOffersSell)
-				marketOffersBuy = {}
-				marketOffersSell = {}
-			end
-		end, 10)
-	elseif var == 1 or var == 0xFFFF then  -- MARKETREQUEST_OWN_HISTORY or OLD_MARKETREQUEST_MY_HISTORY
-		if action == 1 then  -- Buy offer
-			table.insert(marketHistoryBuy, offer)
-		else  -- Sell offer
-			table.insert(marketHistorySell, offer)
-		end
-		-- When we receive the complete batch, call the parse function
-		scheduleEvent(function()
-			if #marketHistoryBuy > 0 or #marketHistorySell > 0 then
-				MarketHistory.onParseMarketHistory(marketHistoryBuy, marketHistorySell)
-				marketHistoryBuy = {}
-				marketHistorySell = {}
-			end
-		end, 10)
+	-- Since var seems to be itemId, we need to determine request type differently
+	-- For now, just accumulate all offers - onMarketBrowse will process them
+	if action == 0 then  -- Buy offer (MarketAction.Buy)
+		table.insert(marketOffersBuy, offer)
+		print("Added to marketOffersBuy, count now:", #marketOffersBuy)
+	else  -- Sell offer (action == 1, MarketAction.Sell)
+		table.insert(marketOffersSell, offer)
+		print("Added to marketOffersSell, count now:", #marketOffersSell)
 	end
 end
 
@@ -480,65 +463,99 @@ function onMarketEnter(items, offerCount, balance, vocation)
 	marketWindow.contentPanel.category.onChildFocusChange = function(self, selected) onSelectChildCategory(self, selected) end
 end
 
-function onMarketBrowse(itemID, tier, buyList, sellList)
-	if table.empty(lastSelectedItem) then return end
+function onMarketBrowse(intOffers, nameOffers)
+	print("=== onMarketBrowse START ===")
+	print("intOffers type:", type(intOffers), "value:", intOffers)
+	print("nameOffers type:", type(nameOffers), "value:", nameOffers)
+	print("marketOffersBuy before processing:", #marketOffersBuy, "items")
+	print("marketOffersSell before processing:", #marketOffersSell, "items")
+	
+	if table.empty(lastSelectedItem) then 
+		print("lastSelectedItem is empty, returning")
+		return 
+	end
+
+	-- Process accumulated offers from onMarketReadOffer
+	local buyOffersData = marketOffersBuy
+	local sellOffersData = marketOffersSell
+	
+	print("Buy offers count:", #buyOffersData, "Sell offers count:", #sellOffersData)
+	
+	-- Clear the accumulator for next browse
+	marketOffersBuy = {}
+	marketOffersSell = {}
+	
+	-- Get current item info
+	local itemID = lastSelectedItem.itemId
+	local tier = lastSelectedItem.tier or 0
 
 	if lastItemID == itemID and lastItemTier == tier then
-		if #buyList == 1 then
-			local updateItem = buyList[1]
-			for i, data in pairs(buyOffers) do
-				if data.counter == updateItem.counter and data.timestamp == updateItem.timestamp then
-					if updateItem.amount == 0 then
-						table.remove(buyOffers, i)
-					else
-						buyOffers[i] = updateItem
+		-- Update existing offers (single offer update)
+		if #buyOffersData == 1 then
+			local updateItem = buyOffersData[1]
+			if buyOffers then
+				for i, data in pairs(buyOffers) do
+					if data.counter == updateItem.counter and data.timestamp == updateItem.timestamp then
+						if updateItem.amount == 0 then
+							table.remove(buyOffers, i)
+						else
+							buyOffers[i] = updateItem
+						end
+						break
 					end
-					break
 				end
 			end
 		end
 
-		if #sellList == 1 then
-			local updateItem = sellList[1]
-			for i, data in pairs(sellOffers) do
-				if data.counter == updateItem.counter and data.timestamp == updateItem.timestamp then
-					if updateItem.amount == 0 then
-						table.remove(sellOffers, i)
-					else
-						sellOffers[i] = updateItem
+		if #sellOffersData == 1 then
+			local updateItem = sellOffersData[1]
+			if sellOffers then
+				for i, data in pairs(sellOffers) do
+					if data.counter == updateItem.counter and data.timestamp == updateItem.timestamp then
+						if updateItem.amount == 0 then
+							table.remove(sellOffers, i)
+						else
+							sellOffers[i] = updateItem
+						end
+						break
 					end
-					break
 				end
 			end
 		end
 	else
-		buyOffers = buyList
-		sellOffers = sellList
+		-- Full refresh - replace all offers
+		buyOffers = buyOffersData
+		sellOffers = sellOffersData
+		lastItemID = itemID
+		lastItemTier = tier
 	end
 
 	cache.SCROLL_BUY_OFFERS.listFit = math.floor(mainMarket.buyOffersList:getHeight() / 16) - 1
 	cache.SCROLL_BUY_OFFERS.listMin = 0
 	cache.SCROLL_BUY_OFFERS.listPool = {}
-	cache.SCROLL_BUY_OFFERS.listData = buyOffers
+	cache.SCROLL_BUY_OFFERS.listData = buyOffers or {}
 	cache.SCROLL_BUY_OFFERS.lastSelected = 0
 
 	local colorCount = 0
 	mainMarket.buyOffersList:destroyChildren()
 
-	for i, data in pairs(buyOffers) do
-		if i > cache.SCROLL_BUY_OFFERS.listFit then
-			break
-		end
+	print("Displaying buy offers - total:", buyOffers and #buyOffers or 0)
+	
+	if buyOffers then
+		for i, data in ipairs(buyOffers) do
+			if i > cache.SCROLL_BUY_OFFERS.listFit then
+				break
+			end
 
-		local widget = g_ui.createWidget('MarketOfferWidget', mainMarket.buyOffersList)
-		local color = colorCount % 2 == 0 and '#414141' or '#484848'
-		local holder = data.holder
-		widget:setId(color)
-		widget.offerId = i  -- Store offer index as property
-		widget:setBackgroundColor(color)
-		widget.name:setText(short_text(data.holder, 15))
-		widget.amount:setText(data.amount)
-		widget.endAt:setText(os.date("%Y-%m-%d, %H:%M:%S", data.timestamp))
+			local widget = g_ui.createWidget('MarketOfferWidget', mainMarket.buyOffersList)
+			local color = colorCount % 2 == 0 and '#414141' or '#484848'
+			local holder = data.holder
+			widget:setId(color)
+			widget.offerId = i  -- Store offer index as property
+			widget:setBackgroundColor(color)
+			widget.name:setText(short_text(data.holder, 15))
+			widget.amount:setText(data.amount)
+			widget.endAt:setText(os.date("%Y-%m-%d, %H:%M:%S", data.timestamp))
 
 
 		if #holder >= 15 then
@@ -558,10 +575,13 @@ function onMarketBrowse(itemID, tier, buyList, sellList)
 		widget.amount:setColor(count > 0 and "#c0c0c0" or "#808080")
 		widget.endAt:setColor(count > 0 and "#c0c0c0" or "#808080")
 		table.insert(cache.SCROLL_BUY_OFFERS.listPool, widget)
+		end
 	end
 
-	cache.SCROLL_BUY_OFFERS.listMin = #buyOffers > 0 and 1 or 0
-	cache.SCROLL_BUY_OFFERS.listMax = #buyOffers + 1
+	print("Buy offers displayed:", #cache.SCROLL_BUY_OFFERS.listPool)
+
+	cache.SCROLL_BUY_OFFERS.listMin = (buyOffers and #buyOffers > 0) and 1 or 0
+	cache.SCROLL_BUY_OFFERS.listMax = (buyOffers and #buyOffers or 0) + 1
 
 	local buyListScroll = marketWindow:recursiveGetChildById("buyOffersListScroll")
 	buyListScroll:setValue(cache.SCROLL_BUY_OFFERS.listMin)
@@ -572,26 +592,27 @@ function onMarketBrowse(itemID, tier, buyList, sellList)
 	cache.SCROLL_SELL_OFFERS.listFit = math.floor(mainMarket.sellOffersList:getHeight() / 16) - 1
 	cache.SCROLL_SELL_OFFERS.listMin = 0
 	cache.SCROLL_SELL_OFFERS.listPool = {}
-	cache.SCROLL_SELL_OFFERS.listData = sellOffers
+	cache.SCROLL_SELL_OFFERS.listData = sellOffers or {}
 	cache.SCROLL_SELL_OFFERS.lastSelected = 0
 
 	colorCount = 0
 	mainMarket.sellOffersList:destroyChildren()
 
-	for i, data in pairs(sellOffers) do
-		if i > cache.SCROLL_SELL_OFFERS.listFit then
-			break
-		end
+	if sellOffers then
+		for i, data in ipairs(sellOffers) do
+			if i > cache.SCROLL_SELL_OFFERS.listFit then
+				break
+			end
 
-		local widget = g_ui.createWidget('MarketOfferWidget', mainMarket.sellOffersList)
-		local color = colorCount % 2 == 0 and '#414141' or '#484848'
-		local holder = data.holder
-		widget:setId(color)
-		widget.offerId = i  -- Store offer index as property
-		widget:setBackgroundColor(color)
-		widget.name:setText(short_text(data.holder, 15))
-		widget.amount:setText(data.amount)
-		widget.endAt:setText(os.date("%Y-%m-%d, %H:%M:%S", data.timestamp))
+			local widget = g_ui.createWidget('MarketOfferWidget', mainMarket.sellOffersList)
+			local color = colorCount % 2 == 0 and '#414141' or '#484848'
+			local holder = data.holder
+			widget:setId(color)
+			widget.offerId = i  -- Store offer index as property
+			widget:setBackgroundColor(color)
+			widget.name:setText(short_text(data.holder, 15))
+			widget.amount:setText(data.amount)
+			widget.endAt:setText(os.date("%Y-%m-%d, %H:%M:%S", data.timestamp))
 
 
 		local totalPrice = data.price * data.amount
@@ -619,10 +640,11 @@ function onMarketBrowse(itemID, tier, buyList, sellList)
 		widget.endAt:setColor(hasMoney and "#c0c0c0" or "#808080")
 		colorCount = colorCount + 1
 		table.insert(cache.SCROLL_SELL_OFFERS.listPool, widget)
+		end
 	end
 
-	cache.SCROLL_SELL_OFFERS.listMin = #sellOffers > 0 and 1 or 0
-	cache.SCROLL_SELL_OFFERS.listMax = #sellOffers + 1
+	cache.SCROLL_SELL_OFFERS.listMin = (sellOffers and #sellOffers > 0) and 1 or 0
+	cache.SCROLL_SELL_OFFERS.listMax = (sellOffers and #sellOffers or 0) + 1
 
 	local sellListScroll = marketWindow:recursiveGetChildById("sellOffersListScroll")
 	sellListScroll:setValue(cache.SCROLL_SELL_OFFERS.listMin)
@@ -809,7 +831,7 @@ function onItemListValueChange(scroll, value, delta)
 		widget.item:getItem():setCount(count)
 		widget.item.itemIndex = i  -- Store item index as property
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), data.marketData.name))
-		widget.item:setTier(data.tier and data.tier or tier)
+		widget.item:getItem():setTier(data.tier and data.tier or tier)
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
@@ -1000,7 +1022,7 @@ function onSelectChildItem(widget, selected, oldFocus)
 	end
 
 	marketWindow.contentPanel.selectedItem:setItemId(itemID)
-	marketWindow.contentPanel.selectedItem:setTier(itemTier)
+	marketWindow.contentPanel.selectedItem:getItem():setTier(itemTier)
 
 	lastSelectedItem = {itemId = itemID, tier = itemTier, lastWidget = widget}
 
@@ -1010,6 +1032,11 @@ function onSelectChildItem(widget, selected, oldFocus)
 		marketWindow.contentPanel.selectedItem:getItem():setCount(getDepotItemCount(itemID, itemTier))
 	end
 	onClearMainMarket(false)
+	
+	-- Clear the offer accumulators before requesting new data from server
+	marketOffersBuy = {}
+	marketOffersSell = {}
+	
 	sendMarketAction(3, itemID, selected.item:getItem():getTier())
 end
 
@@ -1018,6 +1045,10 @@ function onClearMainMarket(cleanList)
 	sellOffers = {}
 	MarketOwnOffers.mySellOffers = {}
 	MarketOwnOffers.myBuyOffers = {}
+	
+	-- Don't clear the accumulators here - let onMarketBrowse handle that
+	-- when it receives the new data from the server
+	
 	lastItemID = 0
 	lastItemTier = 0
 	mainMarket.sellAcceptButton:setEnabled(false)
@@ -1466,12 +1497,28 @@ function createMarketOffer()
 	lastItemTier = 0
 
 	sendMarketCreateOffer(currentActionType, lastSelectedItem.itemId, lastSelectedItem.tier, amount, price, mainMarket.anonymous:isChecked())
+	
+	-- Refresh the offers list for the current item after a short delay to allow server to process
+	scheduleEvent(function()
+		if not table.empty(lastSelectedItem) then
+			-- Clear accumulators before requesting fresh data
+			marketOffersBuy = {}
+			marketOffersSell = {}
+			sendMarketAction(3, lastSelectedItem.itemId, lastSelectedItem.tier)
+		end
+	end, 500)
 end
 
 function onSearchItem(textField)
+	if isSearching then
+		return
+	end
+	isSearching = true
+	
 	lastSelectedItem = {}
 	if #textField:getText() == 0 then
 		onClearSearch()
+		isSearching = false
 		return
 	end
 
@@ -1490,6 +1537,7 @@ function onSearchItem(textField)
 
 	local itemList = marketWindow:recursiveGetChildById("itemList")
 	if not itemList then
+		isSearching = false
 		return true
 	end
 
@@ -1534,7 +1582,7 @@ function onSearchItem(textField)
 					goto continue
 				end
 
-				if matchText(textField:getText(), data.marketData.name) then
+				if matchText(data.marketData.name, textField:getText()) then
 					table.insert(cache.SCROLL_MARKET_ITEMS.listData, data)
 				end
 
@@ -1545,7 +1593,7 @@ function onSearchItem(textField)
 		end
 	end
 
-	for i, itemInfo in pairs(cache.SCROLL_MARKET_ITEMS.listData) do
+	for i, itemInfo in ipairs(cache.SCROLL_MARKET_ITEMS.listData) do
 		if #cache.SCROLL_MARKET_ITEMS.listPool >= cache.SCROLL_MARKET_ITEMS.listFit then
 			break
 		end
@@ -1596,6 +1644,8 @@ function onSearchItem(textField)
 
 	sellScrollbar.onValueChange = function(self, value, delta) onItemListValueChange(self, value, delta) end
 	itemList:setVirtualOffset({x = 0, y = 0})
+	
+	isSearching = false
 end
 
 function onShowRedirect(item)
