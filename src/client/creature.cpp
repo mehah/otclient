@@ -286,10 +286,13 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
             if (!iconTex.texture) continue;
             const Rect dest(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5 + iconOffset * 14, iconTex.clip.size());
             g_drawPool.addTexturedRect(dest, iconTex.texture, iconTex.clip);
-            m_icons->numberText.setText(std::to_string(iconTex.count));
-            const auto textSize = m_icons->numberText.getTextSize();
-            const Rect numberRect(dest.right() + 2, dest.y() + (dest.height() - textSize.height()) / 2, textSize);
-            m_icons->numberText.draw(numberRect, Color::white);
+            // draw count only when greater than 0
+            if (iconTex.count > 0) {
+                m_icons->numberText.setText(std::to_string(iconTex.count));
+                const auto textSize = m_icons->numberText.getTextSize();
+                const Rect numberRect(dest.right() + 2, dest.y() + (dest.height() - textSize.height()) / 2, textSize);
+                m_icons->numberText.draw(numberRect, Color::white);
+            }
             ++iconOffset;
         }
     }
