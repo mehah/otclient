@@ -2084,18 +2084,161 @@ MarketHistory < Panel
 
     TextList
       id: sellOffersList
-      size: 718 194
+      size: 968 244
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 12
+      padding-top: 17
       vertical-scrollbar: sellOffersListScroll
       text-wrap: true
+      keep-scroll-range: true
+      background-color: #404040
+
+    UIWidget
+      id: sellHolder
+      size: 954 17
+      anchors.top: sellOffersList.top
+      anchors.left: sellOffersList.left
+      margin-left: 1
+      border-width-bottom: 1
+      border-color-bottom: #757575
+
+    UIWidget
+      id: itemButton
+      size: 502 15
+      text: Item
+      color: #C0C0C0
+      font: Verdana Bold-11px
+      text-offset: 1 -1
+      text-align: leftCenter
+      anchors.top: sellOffersList.top
+      anchors.left: sellOffersList.left
+      margin-top: 1
+      margin-left: 1
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: sellOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: amountButton
+      size: 59 15
+      text: Amount
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 4 -1
+      text-align: leftCenter
+      anchors.top: sellOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: sellOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: piecepriceButton
+      size: 84 15
+      text: Piece Price
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 7 -1
+      text-align: leftCenter
+      anchors.top: sellOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: sellOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: totalpriceButton
+      size: 84 15
+      text: Total Price
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 7 -1
+      text-align: leftCenter
+      anchors.top: sellOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: sellOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: sellEndButton
+      size: 149 15
+      text: Ended At
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 1 -1
+      text-align: leftCenter
+      anchors.top: sellOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: sellOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: sellStatusButton
+      size: 70 15
+      text: Status
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 1 -1
+      text-align: leftCenter
+      anchors.top: sellOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
 
     VerticalScrollBar
       id: sellOffersListScroll
-      anchors.top: prev.top
-      anchors.bottom: prev.bottom
-      anchors.right: prev.right
+      anchors.top: sellOffersList.top
+      anchors.bottom: sellOffersList.bottom
+      anchors.right: sellOffersList.right
       margin-right: 1
       margin-top: 1
       margin-bottom: 1
@@ -2104,7 +2247,7 @@ MarketHistory < Panel
 
     Label
       id: buyOffersLabel
-      anchors.top: prev.bottom
+      anchors.top: sellOffersList.bottom
       anchors.left: parent.left
       margin-top: 12
       margin-left: 1
@@ -2115,18 +2258,161 @@ MarketHistory < Panel
 
     TextList
       id: buyOffersList
-      size: 718 194
+      size: 968 244
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 12
+      padding-top: 17
       vertical-scrollbar: buyOffersListScroll
       text-wrap: true
+      keep-scroll-range: true
+      background-color: #404040
+
+    UIWidget
+      id: buyHolder
+      size: 954 17
+      anchors.top: buyOffersList.top
+      anchors.left: buyOffersList.left
+      margin-left: 1
+      border-width-bottom: 1
+      border-color-bottom: #757575
+
+    UIWidget
+      id: itemButton
+      size: 502 15
+      text: Item
+      color: #C0C0C0
+      font: Verdana Bold-11px
+      text-offset: 1 -1
+      text-align: leftCenter
+      anchors.top: buyOffersList.top
+      anchors.left: buyOffersList.left
+      margin-top: 1
+      margin-left: 1
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: buyOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: amountButton
+      size: 59 15
+      text: Amount
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 4 -1
+      text-align: leftCenter
+      anchors.top: buyOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: buyOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: piecepriceButton
+      size: 84 15
+      text: Piece Price
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 7 -1
+      text-align: leftCenter
+      anchors.top: buyOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: buyOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: totalpriceButton
+      size: 84 15
+      text: Total Price
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 7 -1
+      text-align: leftCenter
+      anchors.top: buyOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: buyOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: buyEndButton
+      size: 149 15
+      text: Ended At
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 1 -1
+      text-align: leftCenter
+      anchors.top: buyOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
+
+    UIWidget
+      height: 14
+      anchors.left: prev.right
+      anchors.top: buyOffersList.top
+      image-source: /images/ui/separator_vertical
+      margin-top: 1
+
+    UIWidget
+      id: buyStatusButton
+      size: 70 15
+      text: Status
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      text-offset: 1 -1
+      text-align: leftCenter
+      anchors.top: buyOffersList.top
+      anchors.left: prev.right
+      margin-top: 1
+      margin-left: 2
+      border-width-bottom: 1
+      border-color-bottom: #292a29
+      background-color: #363636
 
     VerticalScrollBar
       id: buyOffersListScroll
-      anchors.top: prev.top
-      anchors.bottom: prev.bottom
-      anchors.right: prev.right
+      anchors.top: buyOffersList.top
+      anchors.bottom: buyOffersList.bottom
+      anchors.right: buyOffersList.right
       margin-right: 1
       margin-top: 1
       margin-bottom: 1
@@ -2209,6 +2495,7 @@ MarketHistory < Panel
       anchors.right: parent.right
       !text: tr('Market')
       size: 75 20
+      @onClick: myOffersButton(self)
 
     Button
       id: historyButton
@@ -2217,6 +2504,7 @@ MarketHistory < Panel
       !text: tr('Offer History')
       size: 75 20
       margin-right: 5
+      @onClick: myOffersButton(self)
 
     Button
       id: currentOffers
@@ -2225,6 +2513,7 @@ MarketHistory < Panel
       !text: tr('Current Offers')
       size: 75 20
       margin-right: 5
+      @onClick: myOffersButton(self)
 
 NewMainWindow
   id: marketWindow

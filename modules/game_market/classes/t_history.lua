@@ -132,17 +132,9 @@ function MarketHistory.onBottomListValueChange(scroll, value, delta)
 end
 
 function MarketHistory.onParseMarketHistory(buyOffers, sellOffers)
-	local window = marketWindow.MarketHistory.currentOffers
-	window.sellEndButton:setWidth(149)
-	window.buyEndButton:setWidth(149)
-	window.buySeparator:setVisible(true)
-	window.buyStatusButton:setVisible(true)
-	window.sellSeparator:setVisible(true)
-	window.sellStatusButton:setVisible(true)
-	window.buyOffersList:destroyChildren()
+	local window = marketWindow.MarketHistory.offerHistory
 	window.sellOffersList:destroyChildren()
-	window.buyCancelOffer:setVisible(false)
-	window.sellCancelOffer:setVisible(false)
+	window.buyOffersList:destroyChildren()
 	lastSelectedHistorySell = nil
 	lastSelectedHistoryBuy = nil
 
