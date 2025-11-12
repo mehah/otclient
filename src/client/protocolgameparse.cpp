@@ -5598,7 +5598,7 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
         }
 
         const uint16_t count = msg->getU16();
-        depotItems.push_back({ itemId, count, itemTier });
+        depotItems.push_back({ itemId, itemTier, count });
     }
 
     g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, -1, -1);

@@ -970,12 +970,16 @@ function onItemListValueChange(scroll, value, delta)
 		widget.item:getItem():setCount(count)
 		widget.item.itemIndex = i  -- Store item index as property
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), data.marketData.name))
-		widget.item:getItem():setTier(data.tier and data.tier or tier)
+		
+		local itemTier = data.tier and data.tier or tier
+		widget.item:getItem():setTier(itemTier)
+		ItemsDatabase.setTier(widget.item, itemTier, true)
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
 		end
 
+		-- Update opacity based on depot availability
 		widget.grayHover:setOpacity(count > 0 and '0.0' or '0.5')
 	  end
 	end
@@ -1085,15 +1089,15 @@ function onSelectChildCategory(widget, selected, keepFilter)
 
 		if tier ~= 0 then
 			widget.item:getItem():setTier(tier)
+			ItemsDatabase.setTier(widget.item, tier, true)
 		end
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
 		end
 
-		if count > 0 then
-			widget.grayHover:setOpacity('0.0')
-		end
+		-- Update opacity based on depot availability
+		widget.grayHover:setOpacity(count > 0 and '0.0' or '0.5')
 
 		table.insert(cache.SCROLL_MARKET_ITEMS.listPool, widget)
 
@@ -1125,8 +1129,10 @@ function onUpdateChildItem(itemID, tier)
 				widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), itemInfo.marketData.name))
 			end
 
-			widget.item:getItem():setCount(count == 0 and 0 or count)
-			widget.grayHover:setOpacity(count == 0 and '0.5' or '0.0')
+			widget.item:getItem():setCount(count)
+			
+			-- Update opacity based on depot availability
+			widget.grayHover:setOpacity(count > 0 and '0.0' or '0.5')
 			break
 		end
 	end
@@ -1616,15 +1622,38 @@ end
 
 function createMarketOffer()
 	if table.empty(lastSelectedItem) then
+		print("DEBUG: lastSelectedItem is empty")
 		return
 	end
 
 	local n = mainMarket.createOfferAmount:getText()
-	local amount = n:gsub("%D", "")
-	local price = tonumber(mainMarket.grossAmount.value)
-	if currentActionType == 0 and getTotalMoney() < price then
+	local amount = tonumber(n:gsub("%D", ""))
+	local piecePrice = tonumber(mainMarket.grossAmount.value)
+	
+	print("DEBUG: amount =", amount, "piecePrice =", piecePrice, "currentActionType =", currentActionType)
+	
+	if not amount or not piecePrice then
+		print("DEBUG: amount or piecePrice is nil")
 		return
 	end
+	
+	if amount <= 0 or piecePrice <= 0 then
+		print("DEBUG: amount or piecePrice is <= 0")
+		return
+	end
+	
+	-- For buy offers, check if player has enough money for the total order value
+	if currentActionType == 0 then
+		local totalOrderValue = piecePrice * amount
+		print("DEBUG: Buy offer - totalOrderValue =", totalOrderValue, "getTotalMoney() =", getTotalMoney())
+		if getTotalMoney() < totalOrderValue then
+			print("DEBUG: Not enough money")
+			return
+		end
+	end
+	
+	print("DEBUG: Sending market offer - itemId:", lastSelectedItem.itemId, "tier:", lastSelectedItem.tier, "amount:", amount, "price:", piecePrice)
+	
 	mainMarket.amountCreateScrollBar:setRange(0, 0)
 	mainMarket.createButton:setEnabled(false)
 	mainMarket.amountCreateScrollBar:setValue(0)
@@ -1638,7 +1667,7 @@ function createMarketOffer()
 	lastItemID = 0
 	lastItemTier = 0
 
-	sendMarketCreateOffer(currentActionType, lastSelectedItem.itemId, lastSelectedItem.tier, amount, price, mainMarket.anonymous:isChecked())
+	sendMarketCreateOffer(currentActionType, lastSelectedItem.itemId, lastSelectedItem.tier, amount, piecePrice, mainMarket.anonymous:isChecked())
 	
 	-- Refresh the offers list for the current item after a short delay to allow server to process
 	scheduleEvent(function()
@@ -1762,15 +1791,15 @@ function onSearchItem(textField)
 
 		if tier ~= 0 then
 			widget.item:getItem():setTier(tier)
+			ItemsDatabase.setTier(widget.item, tier, true)
 		end
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
 		end
 
-		if count > 0 then
-			widget.grayHover:setOpacity('0.0')
-		end
+		-- Update opacity based on depot availability
+		widget.grayHover:setOpacity(count > 0 and '0.0' or '0.5')
 
 		table.insert(cache.SCROLL_MARKET_ITEMS.listPool, widget)
 
@@ -1890,14 +1919,14 @@ function onShowRedirect(item)
 
 		-- Tier as index
 		widget.item:getItem():setTier(itemInfo.tier)
+		ItemsDatabase.setTier(widget.item, itemInfo.tier, true)
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
 		end
 
-		if count > 0 then
-			widget.grayHover:setOpacity('0.0')
-		end
+		-- Update opacity based on depot availability
+		widget.grayHover:setOpacity(count > 0 and '0.0' or '0.5')
 
 		table.insert(cache.SCROLL_MARKET_ITEMS.listPool, widget)
 
