@@ -138,7 +138,6 @@ function hide()
 	sendMarketLeave()
   	lastSelectedItem = {}
 	modules.game_console.getConsole():focus()
-	print("Market closed in " .. (g_clock.millis() - benchmark) / 1000 .. " seconds.")
 end
 
 function show()
@@ -179,6 +178,39 @@ function detailsButton()
   end
 end
 
+function closeMarket()
+  if not marketWindow then
+    return
+  end
+  
+  -- Reset to main market view before closing
+  local marketMain = marketWindow:getChildById('contentPanel')
+  local marketHistory = marketWindow:getChildById('MarketHistory')
+  
+  if marketHistory and marketHistory:isVisible() then
+    marketHistory:setVisible(false)
+    if marketMain then
+      marketMain:setVisible(true)
+    end
+  end
+  
+  -- Reset window title
+  marketWindow:setText(tr('Market'))
+  
+  -- Hide the window
+  marketWindow:hide()
+  
+  -- Clear the market data
+  onClearMainMarket(true)
+  onClearSearch()
+  
+  -- Reset state
+  lastSelectedItem = {}
+  
+  -- Return focus to console
+  modules.game_console.getConsole():focus()
+end
+
 function offersButton()
   local mainMarket = marketWindow.contentPanel:getChildById('mainMarket')
   local detailsMarket = marketWindow.contentPanel:getChildById('detailsMarket')
@@ -193,11 +225,6 @@ function offersButton()
 end
 
 function myOffersButton(widget)
-  print("========================================")
-  print("=== myOffersButton CALLED ===")
-  print("Widget ID:", widget:getId())
-  print("========================================")
-  
   local marketPanel = marketWindow.contentPanel:getChildById('mainMarket')
   local detailsMarket = marketWindow.contentPanel:getChildById('detailsMarket')
   local marketMain = marketWindow:getChildById('contentPanel')
@@ -210,28 +237,21 @@ function myOffersButton(widget)
   MarketOwnOffers.mySellOffers = {}
 
   if widget:getId() == 'myOffers' then
-	print("=== MY OFFERS BUTTON CLICKED ===")
 	-- Clear the accumulators before requesting My Offers data
 	marketMyOffersBuy = {}
 	marketMyOffersSell = {}
-	print("Sending sendMarketAction(2) for My Offers")
 	sendMarketAction(2)
   elseif widget:getId() == "currentOffers" then
-	print("=== CURRENT OFFERS BUTTON CLICKED ===")
 	-- Clear the accumulators before requesting My Offers data
 	marketMyOffersBuy = {}
 	marketMyOffersSell = {}
-	print("Sending sendMarketAction(2) for Current Offers")
 	sendMarketAction(2)
   elseif widget:getId() == 'historyButton' then
-	print("=== OFFER HISTORY BUTTON CLICKED ===")
 	marketHistoryBuy = {}
 	marketHistorySell = {}
-	print("Sending sendMarketAction(1) for Offer History")
 	sendMarketAction(1)
   elseif widget:getId() == 'marketButton' then
-	print("=== MARKET BUTTON CLICKED ===")
-	print("Going back to main market")
+	-- Going back to main market
   end
 
   if widget:getId() ~= 'myOffers' and widget:getId() ~= 'historyButton' then
@@ -241,22 +261,16 @@ function myOffersButton(widget)
 	lastItemID = 0
 	lastItemTier = 0
   end
-
-  print("marketMain:isVisible():", marketMain:isVisible())
-  print("marketHistory:isVisible():", marketHistory:isVisible())
   
   if marketMain:isVisible() then
-	print("Main market is visible, switching to history view")
 	-- Switching from main market to history view
 	if widget:getId() == 'historyButton' then
-		print("Showing offerHistory panel")
 		-- Show history panel, hide current offers panel
 		currentOffersPanel:setVisible(false)
 		offerHistoryPanel:setVisible(true)
 		-- Update window title
 		marketWindow:setText(tr('Offer History'))
 	else
-		print("Showing currentOffers panel (My Offers)")
 		-- Show current offers panel (My Offers), hide history panel
 		currentOffersPanel.sellSeparator:setVisible(false)
 		currentOffersPanel.sellStatusButton:setVisible(false)
@@ -273,16 +287,13 @@ function myOffersButton(widget)
 	closeButton:setVisible(false)
 	marketHistory:setVisible(true)
   elseif marketHistory:isVisible() then
-	print("Market history is visible, widget id:", widget:getId())
 	-- Already in history view, check if switching between panels or going back
 	if widget:getId() == 'historyButton' then
-		print("Switching to offerHistory panel")
 		currentOffersPanel:setVisible(false)
 		offerHistoryPanel:setVisible(true)
 		-- Update window title
 		marketWindow:setText(tr('Offer History'))
 	elseif widget:getId() == 'myOffers' or widget:getId() == 'currentOffers' then
-		print("Switching to currentOffers panel (My Offers)")
 		-- Hide status columns and separators for My Offers view
 		if currentOffersPanel.sellSeparator then
 			currentOffersPanel.sellSeparator:setVisible(false)
@@ -307,10 +318,7 @@ function myOffersButton(widget)
 		currentOffersPanel:setVisible(true)
 		-- Update window title
 		marketWindow:setText(tr('My Offers'))
-		print("currentOffersPanel visible:", currentOffersPanel:isVisible())
-		print("offerHistoryPanel visible:", offerHistoryPanel:isVisible())
 	elseif widget:getId() == 'marketButton' then
-		print("Going back to main market from history view")
 		lastSelectedMySell = nil
 		lastSelectedMyBuy = nil
 		lastSelectedHistorySell = nil
@@ -324,7 +332,6 @@ function myOffersButton(widget)
 		marketWindow:setText(tr('Market'))
 	end
   else
-	print("Neither main nor history visible, going to main")
 	lastSelectedMySell = nil
 	lastSelectedMyBuy = nil
 	lastSelectedHistorySell = nil
@@ -362,11 +369,6 @@ local marketMyOffersBuy = {}
 local marketMyOffersSell = {}
 
 function onMarketReadOffer(action, amount, counter, itemId, playerName, price, state, timestamp, var, itemTier)
-	print("========================================")
-	print("=== onMarketReadOffer CALLED ===")
-	print("========================================")
-	print("onMarketReadOffer - action:", action, "amount:", amount, "itemId:", itemId, "var:", var, "player:", playerName, "price:", price, "counter:", counter, "timestamp:", timestamp)
-	
 	-- Create offer data structure
 	local offer = {
 		timestamp = timestamp,
@@ -388,28 +390,22 @@ function onMarketReadOffer(action, amount, counter, itemId, playerName, price, s
 		-- Offer History request
 		if action == 0 then  -- Buy offer
 			table.insert(marketHistoryBuy, offer)
-			print("Added to marketHistoryBuy, count now:", #marketHistoryBuy)
 		else  -- Sell offer (action == 1)
 			table.insert(marketHistorySell, offer)
-			print("Added to marketHistorySell, count now:", #marketHistorySell)
 		end
 	elseif var == 2 then
 		-- My Offers request
 		if action == 0 then  -- Buy offer
 			table.insert(marketMyOffersBuy, offer)
-			print("Added to marketMyOffersBuy, count now:", #marketMyOffersBuy)
 		else  -- Sell offer (action == 1)
 			table.insert(marketMyOffersSell, offer)
-			print("Added to marketMyOffersSell, count now:", #marketMyOffersSell)
 		end
 	else
 		-- Browse Item request (var == 3) or other
 		if action == 0 then  -- Buy offer
 			table.insert(marketOffersBuy, offer)
-			print("Added to marketOffersBuy, count now:", #marketOffersBuy)
 		else  -- Sell offer (action == 1)
 			table.insert(marketOffersSell, offer)
-			print("Added to marketOffersSell, count now:", #marketOffersSell)
 		end
 	end
 end
@@ -589,22 +585,9 @@ function onMarketEnter(items, offerCount, balance, vocation)
 end
 
 function onMarketBrowse(intOffers, nameOffers)
-	print("========================================")
-	print("=== onMarketBrowse CALLED ===")
-	print("========================================")
-	print("intOffers type:", type(intOffers), "value:", intOffers)
-	print("nameOffers type:", type(nameOffers), "value:", nameOffers)
-	print("marketOffersBuy before processing:", #marketOffersBuy, "items")
-	print("marketOffersSell before processing:", #marketOffersSell, "items")
-	print("marketMyOffersBuy before processing:", #marketMyOffersBuy, "items")
-	print("marketMyOffersSell before processing:", #marketMyOffersSell, "items")
-	print("marketHistoryBuy before processing:", #marketHistoryBuy, "items")
-	print("marketHistorySell before processing:", #marketHistorySell, "items")
-	
 	-- Check if this is an "Offer History" request (var=1)
 	if #marketHistoryBuy > 0 or #marketHistorySell > 0 then
 		-- This is an "Offer History" response
-		print("Processing Offer History data")
 		local buyOffersData = marketHistoryBuy
 		local sellOffersData = marketHistorySell
 		
@@ -620,7 +603,6 @@ function onMarketBrowse(intOffers, nameOffers)
 	-- Check if this is a "My Offers" request (var=2) vs Browse Item (var=3)
 	if #marketMyOffersBuy > 0 or #marketMyOffersSell > 0 then
 		-- This is a "My Offers" response
-		print("Processing My Offers data")
 		local buyOffersData = marketMyOffersBuy
 		local sellOffersData = marketMyOffersSell
 		
@@ -634,23 +616,13 @@ function onMarketBrowse(intOffers, nameOffers)
 	end
 	
 	-- Otherwise, process as Browse Item request
-	print("Checking lastSelectedItem - is table:", type(lastSelectedItem))
-	if lastSelectedItem then
-		print("  lastSelectedItem.itemId:", lastSelectedItem.itemId)
-		print("  lastSelectedItem.tier:", lastSelectedItem.tier)
-	end
-	print("table.empty(lastSelectedItem):", table.empty(lastSelectedItem))
-	
 	if table.empty(lastSelectedItem) then 
-		print("lastSelectedItem is empty, returning")
 		return 
 	end
 
 	-- Process accumulated offers from onMarketReadOffer
 	local buyOffersData = marketOffersBuy
 	local sellOffersData = marketOffersSell
-	
-	print("Buy offers count:", #buyOffersData, "Sell offers count:", #sellOffersData)
 	
 	-- Clear the accumulator for next browse
 	marketOffersBuy = {}
@@ -710,17 +682,12 @@ function onMarketBrowse(intOffers, nameOffers)
 	local colorCount = 0
 	mainMarket.buyOffersList:destroyChildren()
 
-	print("Displaying buy offers - total:", buyOffers and #buyOffers or 0)
-	print("mainMarket:", mainMarket)
-	print("mainMarket.buyOffersList:", mainMarket and mainMarket.buyOffersList or "nil")
-	
 	if buyOffers then
 		for i, data in ipairs(buyOffers) do
 			if i > cache.SCROLL_BUY_OFFERS.listFit then
 				break
 			end
 
-			print("  Creating buy offer widget", i, "for holder:", data.holder)
 			local widget = g_ui.createWidget('MarketOfferWidget', mainMarket.buyOffersList)
 			local color = colorCount % 2 == 0 and '#484848' or '#414141'
 			local holder = data.holder
@@ -751,8 +718,6 @@ function onMarketBrowse(intOffers, nameOffers)
 		table.insert(cache.SCROLL_BUY_OFFERS.listPool, widget)
 		end
 	end
-
-	print("Buy offers displayed:", #cache.SCROLL_BUY_OFFERS.listPool)
 
 	cache.SCROLL_BUY_OFFERS.listMin = (buyOffers and #buyOffers > 0) and 1 or 0
 	cache.SCROLL_BUY_OFFERS.listMax = (buyOffers and #buyOffers or 0) + 1
@@ -985,7 +950,7 @@ function onItemListValueChange(scroll, value, delta)
 			isSelected = lastSelectedItem.itemId == data.thingType:getId() and data.tier == lastSelectedItem.tier
 		end
 
-		local backgroundColor = isSelected and '#585858' or '#404040'
+		local backgroundColor = isSelected and '#585858' or '#464242'
 		widget:setBackgroundColor(backgroundColor)
 		if isSelected then
 			lastSelectedItem.lastWidget = widget
@@ -1113,7 +1078,7 @@ function onSelectChildCategory(widget, selected, keepFilter)
 			widget.name:setTooltip(itemInfo.marketData.name)
 		end
 
-		widget:setBackgroundColor('#404040')
+		widget:setBackgroundColor('#464242')
 		widget.item:getItem():setCount(count)
 		widget.item.itemIndex = i  -- Store item index as property
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), itemInfo.marketData.name))
@@ -1178,28 +1143,23 @@ function onUpdateChildItem(itemID, tier)
 end
 
 function onSelectChildItem(widget, selected, oldFocus)
-	print("=== onSelectChildItem CALLED ===")
 	if not selected then 
-		print("  selected is nil, returning")
 		return 
 	end
 
 	if oldFocus then
-		oldFocus:setBackgroundColor('#404040')
+		oldFocus:setBackgroundColor('#464242')
 	end
 
 	if lastSelectedItem.lastWidget then
-		lastSelectedItem.lastWidget:setBackgroundColor('#404040')
+		lastSelectedItem.lastWidget:setBackgroundColor('#464242')
 	end
 
 	selected:setBackgroundColor('#585858')
 	local itemID = selected.item:getItemId()
 	local itemTier = selected.item:getItem():getTier()
-	print("  itemID:", itemID, "itemTier:", itemTier)
-	print("  lastSelectedItem.itemId:", lastSelectedItem.itemId, "lastSelectedItem.tier:", lastSelectedItem.tier)
 	
 	if lastSelectedItem.itemId == itemID and lastSelectedItem.tier == itemTier then
-		print("  Same item already selected, returning")
 		return true
 	end
 
@@ -1207,7 +1167,6 @@ function onSelectChildItem(widget, selected, oldFocus)
 	marketWindow.contentPanel.selectedItem:getItem():setTier(itemTier)
 
 	lastSelectedItem = {itemId = itemID, tier = itemTier, lastWidget = widget}
-	print("  Set lastSelectedItem to:", lastSelectedItem)
 
 	if itemID == 22118 then
 		marketWindow.contentPanel.selectedItem:getItem():setCount(getTransferableTibiaCoins())
@@ -1220,7 +1179,6 @@ function onSelectChildItem(widget, selected, oldFocus)
 	marketOffersBuy = {}
 	marketOffersSell = {}
 	
-	print("=== Calling sendMarketAction(3, itemID, tier) ===")
 	sendMarketAction(3, itemID, selected.item:getItem():getTier())
 end
 
@@ -1797,7 +1755,7 @@ function onSearchItem(textField)
 			widget.name:setTooltip(itemInfo.marketData.name)
 		end
 
-		widget:setBackgroundColor('#404040')
+		widget:setBackgroundColor('#464242')
 		widget.item:getItem():setCount(count)
 		widget.item.itemIndex = i  -- Store item index as property
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), itemInfo.marketData.name))
@@ -1925,7 +1883,7 @@ function onShowRedirect(item)
 			widget.name:setTooltip(itemInfo.marketData.name)
 		end
 
-		widget:setBackgroundColor('#404040')
+		widget:setBackgroundColor('#464242')
 		widget.item:getItem():setCount(count)
 		widget.item.itemIndex = i  -- Store item index as property
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), itemInfo.marketData.name))

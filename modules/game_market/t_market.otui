@@ -417,7 +417,7 @@ MarketItemList < UIWidget
   UIWidget
     id: grayHover
     size: 146 36
-    background-color: #404040
+    background-color: #464242
     opacity: 0.5
     anchors.left: parent.left
     phantom: true
@@ -436,6 +436,12 @@ MarketMainWindow < Panel
     anchors.top: parent.top
     anchors.left: parent.left
     vertical-scrollbar: categoryScroll
+    background-color: #464242
+    border-width: 1
+    border-color-top: #141414
+    border-color-left: #141414
+    border-color-bottom: #747575
+    border-color-right: #747575
     text-wrap: true
     @onSetup: |
       g_keyboard.bindKeyPress('Up', function() self:focusPreviousChild(KeyboardFocusReason) self:ensureChildVisible(self:getFocusedChild()) end, self)
@@ -544,7 +550,12 @@ MarketMainWindow < Panel
     vertical-scrollbar: itemListScroll
     text-wrap: true
     keep-scroll-range: true
-    background-color: #404040
+    background-color: #464242
+    border-width: 1
+    border-color-top: #141414
+    border-color-left: #141414
+    border-color-bottom: #747575
+    border-color-right: #747575
     @onSetup: |
       g_keyboard.bindKeyPress('Up', function() focusPrevItemWidget(self) end, self)
       g_keyboard.bindKeyPress('Down', function() focusNextItemWidget(self) end, self)
@@ -642,7 +653,12 @@ MarketMainWindow < Panel
       anchors.left: parent.left
       margin-top: 12
       vertical-scrollbar: detailsListScroll
-      image-source: /images/ui/textedit
+      background-color: #464242
+      border-width: 1
+      border-color-top: #141414
+      border-color-left: #141414
+      border-color-bottom: #747575
+      border-color-right: #747575
       text-wrap: true
 
     VerticalScrollBar
@@ -673,7 +689,12 @@ MarketMainWindow < Panel
       anchors.left: parent.left
       margin-top: 12
       vertical-scrollbar: statisticsListScroll
-      image-source: /images/ui/textedit
+      background-color: #464242
+      border-width: 1
+      border-color-top: #141414
+      border-color-left: #141414
+      border-color-bottom: #747575
+      border-color-right: #747575
       text-wrap: true
 
     VerticalScrollBar
@@ -791,7 +812,12 @@ MarketMainWindow < Panel
       vertical-scrollbar: sellOffersListScroll
       text-wrap: true
       keep-scroll-range: true
-      background-color: #404040
+      background-color: #464242
+      border-width: 1
+      border-color-top: #141414
+      border-color-left: #141414
+      border-color-bottom: #747575
+      border-color-right: #747575
       @onSetup: |
         g_keyboard.bindKeyPress('Up', function() focusPrevSellLabel(self) end, self)
         g_keyboard.bindKeyPress('Down', function() focusNextSellLabel(self) end, self)
@@ -819,7 +845,7 @@ MarketMainWindow < Panel
       margin-left: 1
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -845,7 +871,7 @@ MarketMainWindow < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -871,7 +897,7 @@ MarketMainWindow < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -897,7 +923,7 @@ MarketMainWindow < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -924,7 +950,7 @@ MarketMainWindow < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1036,7 +1062,12 @@ MarketMainWindow < Panel
       vertical-scrollbar: buyOffersListScroll
       keep-scroll-range: true
       text-wrap: true
-      background-color: #404040
+      background-color: #464242
+      border-width: 1
+      border-color-top: #141414
+      border-color-left: #141414
+      border-color-bottom: #747575
+      border-color-right: #747575
       @onSetup: |
         g_keyboard.bindKeyPress('Up', function() focusPrevBuyLabel(self) end, self)
         g_keyboard.bindKeyPress('Down', function() focusNextBuyLabel(self) end, self)
@@ -1064,7 +1095,7 @@ MarketMainWindow < Panel
       margin-left: 1
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1090,7 +1121,7 @@ MarketMainWindow < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1116,7 +1147,7 @@ MarketMainWindow < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1142,7 +1173,7 @@ MarketMainWindow < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1169,7 +1200,7 @@ MarketMainWindow < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1502,7 +1533,7 @@ MarketMainWindow < Panel
     visible: true
     !text: tr('Close')
     size: 75 20
-    @onClick: toggle()
+    @onClick: closeMarket()
 
   Button
     id: myOffers
@@ -1574,7 +1605,12 @@ MarketHistory < Panel
       vertical-scrollbar: sellOffersListScroll
       text-wrap: true
       keep-scroll-range: true
-      background-color: #404040
+      background-color: #464242
+      border-width: 1
+      border-color-top: #141414
+      border-color-left: #141414
+      border-color-bottom: #747575
+      border-color-right: #747575
 
     UIWidget
       id: sellHolder
@@ -1599,7 +1635,7 @@ MarketHistory < Panel
       margin-left: 1
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1626,7 +1662,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1653,7 +1689,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1680,7 +1716,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1708,7 +1744,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1738,7 +1774,7 @@ MarketHistory < Panel
       margin-left: 152
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       visible: false
       $pressed:
@@ -1786,7 +1822,12 @@ MarketHistory < Panel
       vertical-scrollbar: buyOffersListScroll
       text-wrap: true
       keep-scroll-range: true
-      background-color: #404040
+      background-color: #464242
+      border-width: 1
+      border-color-top: #141414
+      border-color-left: #141414
+      border-color-bottom: #747575
+      border-color-right: #747575
 
     UIWidget
       size: 954 17
@@ -1810,7 +1851,7 @@ MarketHistory < Panel
       margin-left: 1
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1837,7 +1878,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1864,7 +1905,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1891,7 +1932,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1918,7 +1959,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       $pressed:
         color: #dfdfdf88
@@ -1948,7 +1989,7 @@ MarketHistory < Panel
       margin-left: 152
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
       opacity: 1.0
       visible: false
       $pressed:
@@ -2092,7 +2133,12 @@ MarketHistory < Panel
       vertical-scrollbar: sellOffersListScroll
       text-wrap: true
       keep-scroll-range: true
-      background-color: #404040
+      background-color: #464242
+      border-width: 1
+      border-color-top: #141414
+      border-color-left: #141414
+      border-color-bottom: #747575
+      border-color-right: #747575
 
     UIWidget
       id: sellHolder
@@ -2117,7 +2163,7 @@ MarketHistory < Panel
       margin-left: 1
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2140,7 +2186,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2163,7 +2209,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2186,7 +2232,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2209,7 +2255,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2232,7 +2278,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     VerticalScrollBar
       id: sellOffersListScroll
@@ -2266,7 +2312,12 @@ MarketHistory < Panel
       vertical-scrollbar: buyOffersListScroll
       text-wrap: true
       keep-scroll-range: true
-      background-color: #404040
+      background-color: #464242
+      border-width: 1
+      border-color-top: #141414
+      border-color-left: #141414
+      border-color-bottom: #747575
+      border-color-right: #747575
 
     UIWidget
       id: buyHolder
@@ -2291,7 +2342,7 @@ MarketHistory < Panel
       margin-left: 1
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2314,7 +2365,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2337,7 +2388,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2360,7 +2411,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2383,7 +2434,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     UIWidget
       height: 14
@@ -2406,7 +2457,7 @@ MarketHistory < Panel
       margin-left: 2
       border-width-bottom: 1
       border-color-bottom: #292a29
-      background-color: #363636
+      background-color: #464242
 
     VerticalScrollBar
       id: buyOffersListScroll
@@ -2518,6 +2569,8 @@ MarketHistory < Panel
 NewMainWindow
   id: marketWindow
   !text: tr('Market')
+  font: Verdana Bold-11-px-lowspace
+  color: #c0c0c0
   anchors.horizontalCenter: parent.horizontalCenter
   size: 1000 645
   @onEscape: modules.game_market.hide()
