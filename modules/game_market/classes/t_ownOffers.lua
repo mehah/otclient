@@ -80,7 +80,7 @@ function MarketOwnOffers.onParseMyOffers(buyOffers, sellOffers)
         end
 
         local widget = g_ui.createWidget('MarketCurrentWidget', window.sellOffersList)
-		local color = i % 2 == 0 and '#414141' or '#484848'
+		local color = i % 2 == 0 and '#484848' or '#414141'
 		widget:setId(color)
 		widget.actionId = i
 		widget:setBackgroundColor(color)
@@ -125,7 +125,7 @@ function MarketOwnOffers.onParseMyOffers(buyOffers, sellOffers)
         end
 
 		local widget = g_ui.createWidget('MarketCurrentWidget', window.buyOffersList)
-		local color = i % 2 == 0 and '#414141' or '#484848'
+		local color = i % 2 == 0 and '#484848' or '#414141'
 		widget:setId(color)
 		widget.actionId = i
 		widget:setBackgroundColor(color)
@@ -257,7 +257,7 @@ function MarketOwnOffers.onTopListValueChange(scroll, value, delta)
 		break
 	  end
 
-      local color = i % 2 == 0 and '#414141' or '#484848'
+      local color = i % 2 == 0 and '#484848' or '#414141'
       widget:setId(color)
       widget.actionId = index
       widget:setBackgroundColor(color)
@@ -306,7 +306,7 @@ local function createWidgetMarket(widget, count, value, startLabel, i)
 	if not data then
 		return false
 	end
-	local color = count % 2 == 0 and '#414141' or '#484848'
+	local color = count % 2 == 0 and '#484848' or '#414141'
 
 	widget:setId(color)
 	widget.actionId = index

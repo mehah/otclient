@@ -34,11 +34,15 @@ function MarketHistory.onTopListValueChange(scroll, value, delta)
   for i, widget in ipairs(topListPool) do
     local index = value > 0 and (startLabel + i - 1) or (startLabel + i)
     local data = topListData[index]
-	if data then
-		local color = ((index % 2 == 0) and '#484848' or '#414141')
-		widget:setId(color)
-		widget.actionId = index
-		widget:setBackgroundColor(color)
+	if not data then
+		widget:setVisible(false)
+		goto continue
+	end
+
+	local color = i % 2 == 0 and '#484848' or '#414141'
+	widget:setId(color)
+	widget.actionId = i
+	widget:setBackgroundColor(color)
 		widget:setColor('#c0c0c0')
 		widget.amount:setText(data.amount)
 		widget.name:setText(g_things.getThingType(data.itemId):getMarketData().name)
@@ -63,22 +67,21 @@ function MarketHistory.onTopListValueChange(scroll, value, delta)
 			widget.totalPrice:setTooltip(comma_value(totalPrice))
 		end
 
-		if unitPrice > 99999999 then
-			widget.piecePrice:setTooltip(comma_value(unitPrice))
-		end
+	if unitPrice > 99999999 then
+		widget.piecePrice:setTooltip(comma_value(unitPrice))
 	end
+
+	::continue::
   end
 
-  local window = marketWindow.MarketHistory:recursiveGetChildById('sellOffersList')
-  window:focusChild(nil)
-  lastSelectedHistorySell = nil
+local window = marketWindow.MarketHistory:recursiveGetChildById('sellOffersList')
+window:focusChild(nil)
+lastSelectedHistorySell = nil
 end
 
 function MarketHistory.onBottomListValueChange(scroll, value, delta)
 	local startLabel = math.max(bottomListMin, value)
-	local endLabel = startLabel + bottomListFitItems - 1
-
-	if endLabel > bottomListMax then
+	local endLabel = startLabel + bottomListFitItems - 1	if endLabel > bottomListMax then
 	  endLabel = bottomListMax
 	  startLabel = endLabel - bottomListFitItems + 1
 	end
@@ -90,7 +93,7 @@ function MarketHistory.onBottomListValueChange(scroll, value, delta)
 		break
 	  end
 
-	  local color = ((index % 2 == 0) and '#484848' or '#414141')
+	  local color = ((index % 2 == 0) and '#414141' or '#484848')
 	  widget:setId(color)
 	  widget.actionId = index
 	  widget:setBackgroundColor(color)
@@ -197,18 +200,18 @@ function MarketHistory.onParseMarketHistory(buyOffers, sellOffers)
 	bottomListData = buyOffers
 	bottomListMax = #buyOffers
 
-	for i = 1, historyOfferPool do
-		local widget = g_ui.createWidget('MarketHistoryWidget', window.buyOffersList)
-		local data = buyOffers[i]
-		if not data then
-			widget:setVisible(false)
-			goto continue
-		end
+for i = 1, historyOfferPool do
+	local widget = g_ui.createWidget('MarketHistoryWidget', window.buyOffersList)
+	local data = buyOffers[i]
+	if not data then
+		widget:setVisible(false)
+		goto continue
+	end
 
-		local color = i % 2 == 0 and '#414141' or '#484848'
-		widget:setId(color)
-		widget.actionId = i
-		widget:setBackgroundColor(color)
+	local color = i % 2 == 0 and '#484848' or '#414141'
+	widget:setId(color)
+	widget.actionId = i
+	widget:setBackgroundColor(color)
 		widget.amount:setText(data.amount)
 		widget.name:setText(g_things.getThingType(data.itemId):getMarketData().name)
 		widget.endAt:setText(os.date("%Y-%m-%d, %H:%M:%S", data.timestamp))

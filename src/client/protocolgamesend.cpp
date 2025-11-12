@@ -1321,18 +1321,36 @@ void ProtocolGame::sendMarketLeave()
     send(msg);
 }
 
-void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType)
+void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
 {
+    g_logger.info("sendMarketBrowse: browseId={}, browseType={}, tier={}, clientVersion={}", 
+                  browseId, browseType, tier, g_game.getClientVersion());
+    
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketBrowse);
     if (g_game.getClientVersion() >= 1251) {
+        g_logger.info("  Using version >= 1251 format");
         msg->addU8(browseId);
         if (browseType > 0) {
+            g_logger.info("  Adding browseType (itemId): {}", browseType);
             msg->addU16(browseType);
+            // If browseId is 3 (browse item), send tier if item has classification
+            if (browseId == 3) {
+                const auto& item = Item::create(browseType);
+                if (item && item->getClassification() > 0) {
+                    g_logger.info("  Item has classification, adding tier: {}", tier);
+                    msg->addU8(tier);
+                } else {
+                    g_logger.info("  Item has no classification (item={}, classification={})", 
+                                  static_cast<void*>(item.get()), item ? item->getClassification() : 0);
+                }
+            }
         }
     } else {
+        g_logger.info("  Using legacy format, browseType={}", browseType);
         msg->addU16(browseType);
     }
+    g_logger.info("  Sending message to server");
     send(msg);
 }
 
