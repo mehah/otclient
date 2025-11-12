@@ -1770,6 +1770,9 @@ Otc::OperatingSystem_t Game::getOs()
 
 void Game::leaveMarket()
 {
+    if (!canPerformGameAction())
+        return;
+
     enableBotCall();
     m_protocolGame->sendMarketLeave();
     disableBotCall();

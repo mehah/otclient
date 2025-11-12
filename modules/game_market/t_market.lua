@@ -68,13 +68,21 @@ local sortButtons = {
 local enableCategories = { 17, 18, 19, 20, 21, 27, 32 }
 local enableClassification = {1, 3, 7, 8, 15, 17, 18, 19, 20, 21, 24, 27, 32 }
 
+g_logger.info("game_market: Script loaded, about to define init()")
+
 function init()
+  g_logger.info("game_market: init() called")
   marketWindow = g_ui.displayUI('t_market')
+  g_logger.info("game_market: UI loaded successfully")
   mainMarket = marketWindow.contentPanel.mainMarket
+  g_logger.info("game_market: mainMarket assigned")
   marketWindow.contentPanel.lockerOnly.onCheckChange = function(self, checked) toggleShowLockerOnly(self, checked) end
+  g_logger.info("game_market: lockerOnly callback set")
 
   hide()
+  g_logger.info("game_market: hide() called")
   mainMarket.createOfferSell:setChecked(true)
+  g_logger.info("game_market: createOfferSell checked")
   connect(g_game, {
 	onResourcesBalanceChange = onResourcesBalanceChange,
 	onGameEnd = hide,
@@ -86,6 +94,7 @@ function init()
 	onParseStoreGetCoin = onParseStoreGetCoin,
 	onMarketLeave = hide,
   })
+  g_logger.info("game_market: callbacks connected successfully")
 end
 
 function terminate()
@@ -112,7 +121,6 @@ function toggle()
     -- User is closing the market window
     sendMarketLeave()
     marketWindow:hide()
-	modules.game_console.getConsole():focus()
   else
     -- User is opening the market window
     marketWindow:show(true)
@@ -121,6 +129,10 @@ function toggle()
 end
 
 function hide()
+	if not marketWindow then
+		return
+	end
+	
 	local benchmark = g_clock.millis()
 	local mainMarket = marketWindow.contentPanel:getChildById('mainMarket')
 	local detailsMarket = marketWindow.contentPanel:getChildById('detailsMarket')
@@ -135,9 +147,7 @@ function hide()
 	marketWindow:hide()
 	onClearSearch()
 
-	sendMarketLeave()
   	lastSelectedItem = {}
-	modules.game_console.getConsole():focus()
 end
 
 function show()
@@ -148,7 +158,7 @@ function show()
 end
 
 function buyPoints()
-  if DONATION_URL and DONATION_URL ~= "https://yourserver.com/donate" then
+  if DONATION_URL and DONATION_URL ~= "https://localhost/donate" then
     g_platform.openUrl(DONATION_URL)
   else
     displayInfoBox("Information", "Donation URL not configured. Please contact the server administrator.")
@@ -208,7 +218,12 @@ function closeMarket()
   lastSelectedItem = {}
   
   -- Return focus to console
-  modules.game_console.getConsole():focus()
+  if modules.game_console then
+    local console = modules.game_console.getConsole()
+    if console then
+      console:focus()
+    end
+  end
 end
 
 function offersButton()
@@ -475,7 +490,12 @@ function configureList()
 	-- Initialize FistWeapons category
 	marketItems[MarketCategoryFistWeapons] = {}
 
-	local types = g_things.findThingTypeByAttr(ThingAttrMarket, 0)
+	local types = g_things.findThingTypeByAttr(ThingAttrMarket, ThingCategoryItem)
+	if not types then
+		g_logger.error("configureList: findThingTypeByAttr returned nil")
+		return
+	end
+	
 	for _, itemType in pairs(types) do
 		if itemType:getId() == 49870 or itemType:getId() == 14258 then
 			goto continue
@@ -1521,7 +1541,7 @@ function onPiecePriceEdit(widget)
 		fee = 1000000
 	end
 
-	local thing = g_things.getThingType(lastSelectedItem.itemId)
+	local thing = g_things.getThingType(lastSelectedItem.itemId, ThingCategoryItem)
 	local stackable = thing:isStackable()
 	local maxCount = stackable and 64000 or 2000
 
