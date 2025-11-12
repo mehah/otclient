@@ -1764,15 +1764,11 @@ void Game::leaveMarket()
 }
 
 void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
-{
-    g_logger.info("browseMarket called: browseId={}, browseType={}, tier={}", browseId, browseType, tier);
-    
+{    
     if (!canPerformGameAction()) {
-        g_logger.warning("browseMarket: canPerformGameAction returned false!");
         return;
     }
 
-    g_logger.info("browseMarket: sending to protocol");
     m_protocolGame->sendMarketBrowse(browseId, browseType, tier);
 }
 
