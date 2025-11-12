@@ -68,21 +68,13 @@ local sortButtons = {
 local enableCategories = { 17, 18, 19, 20, 21, 27, 32 }
 local enableClassification = {1, 3, 7, 8, 15, 17, 18, 19, 20, 21, 24, 27, 32 }
 
-g_logger.info("game_market: Script loaded, about to define init()")
-
 function init()
-  g_logger.info("game_market: init() called")
   marketWindow = g_ui.displayUI('t_market')
-  g_logger.info("game_market: UI loaded successfully")
   mainMarket = marketWindow.contentPanel.mainMarket
-  g_logger.info("game_market: mainMarket assigned")
   marketWindow.contentPanel.lockerOnly.onCheckChange = function(self, checked) toggleShowLockerOnly(self, checked) end
-  g_logger.info("game_market: lockerOnly callback set")
 
   hide()
-  g_logger.info("game_market: hide() called")
   mainMarket.createOfferSell:setChecked(true)
-  g_logger.info("game_market: createOfferSell checked")
   connect(g_game, {
 	onResourcesBalanceChange = onResourcesBalanceChange,
 	onGameEnd = hide,
@@ -94,7 +86,6 @@ function init()
 	onParseStoreGetCoin = onParseStoreGetCoin,
 	onMarketLeave = hide,
   })
-  g_logger.info("game_market: callbacks connected successfully")
 end
 
 function terminate()
@@ -158,7 +149,7 @@ function show()
 end
 
 function buyPoints()
-  if DONATION_URL and DONATION_URL ~= "https://localhost/donate" then
+  if DONATION_URL and DONATION_URL ~= "http://localhost/?subtopic=shop&step=terms" then
     g_platform.openUrl(DONATION_URL)
   else
     displayInfoBox("Information", "Donation URL not configured. Please contact the server administrator.")
@@ -492,7 +483,6 @@ function configureList()
 
 	local types = g_things.findThingTypeByAttr(ThingAttrMarket, ThingCategoryItem)
 	if not types then
-		g_logger.error("configureList: findThingTypeByAttr returned nil")
 		return
 	end
 	
@@ -1317,8 +1307,10 @@ function onSelectSellOffer(widget, selected, oldFocus)
 	end
 
 	local maxValue = math.min(currentOffer.amount, math.floor(money / currentOffer.price))
-	mainMarket.amountSellScrollBar:setValue(1)
+	
+	-- Set scrollbar range first, then value
 	mainMarket.amountSellScrollBar:setRange(1, maxValue)
+	mainMarket.amountSellScrollBar:setValue(1)
 	mainMarket.amountSellScrollBar:setIncrementStep(1)
 	mainMarket.totalValue:setText(comma_value(currentOffer.price))
 	mainMarket.sellAcceptButton:setEnabled(true)
@@ -1378,8 +1370,10 @@ function onSelectBuyOffer(widget, selected, oldFocus)
 	end
 
 	local currentOffer = buyOffers[cache.SCROLL_BUY_OFFERS.lastSelected]
-	mainMarket.amountBuyScrollBar:setValue(lastSelectedItem.itemId == 22118 and 25 or 1)
+	
+	-- Set scrollbar range first, then value
 	mainMarket.amountBuyScrollBar:setRange(1, math.min(count, currentOffer.amount))
+	mainMarket.amountBuyScrollBar:setValue(lastSelectedItem.itemId == 22118 and 25 or 1)
 	mainMarket.amountBuyScrollBar:setIncrementStep(1)
 	mainMarket.totalSellValue:setText(comma_value(currentOffer.price))
 	mainMarket.buyAcceptButton:setEnabled(true)
@@ -1642,7 +1636,6 @@ end
 
 function createMarketOffer()
 	if table.empty(lastSelectedItem) then
-		print("DEBUG: lastSelectedItem is empty")
 		return
 	end
 
@@ -1650,29 +1643,21 @@ function createMarketOffer()
 	local amount = tonumber(n:gsub("%D", ""))
 	local piecePrice = tonumber(mainMarket.grossAmount.value)
 	
-	print("DEBUG: amount =", amount, "piecePrice =", piecePrice, "currentActionType =", currentActionType)
-	
 	if not amount or not piecePrice then
-		print("DEBUG: amount or piecePrice is nil")
 		return
 	end
 	
 	if amount <= 0 or piecePrice <= 0 then
-		print("DEBUG: amount or piecePrice is <= 0")
 		return
 	end
 	
 	-- For buy offers, check if player has enough money for the total order value
 	if currentActionType == 0 then
 		local totalOrderValue = piecePrice * amount
-		print("DEBUG: Buy offer - totalOrderValue =", totalOrderValue, "getTotalMoney() =", getTotalMoney())
 		if getTotalMoney() < totalOrderValue then
-			print("DEBUG: Not enough money")
 			return
 		end
 	end
-	
-	print("DEBUG: Sending market offer - itemId:", lastSelectedItem.itemId, "tier:", lastSelectedItem.tier, "amount:", amount, "price:", piecePrice)
 	
 	mainMarket.amountCreateScrollBar:setRange(0, 0)
 	mainMarket.createButton:setEnabled(false)
