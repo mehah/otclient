@@ -109,9 +109,12 @@ end
 
 function toggle()
   if marketWindow:isVisible() then
+    -- User is closing the market window
+    sendMarketLeave()
     marketWindow:hide()
 	modules.game_console.getConsole():focus()
   else
+    -- User is opening the market window
     marketWindow:show(true)
     marketWindow.contentPanel.searchText:focus()
   end
@@ -201,6 +204,11 @@ function myOffersButton(widget)
   MarketOwnOffers.mySellOffers = {}
 
   if widget:getId() == 'myOffers' then
+	print("=== MY OFFERS BUTTON CLICKED ===")
+	-- Clear the accumulators before requesting My Offers data
+	marketMyOffersBuy = {}
+	marketMyOffersSell = {}
+	print("Sending sendMarketAction(2) for My Offers")
 	sendMarketAction(2)
   elseif widget:getId() == "currentOffers" then
 	sendMarketAction(2)
@@ -260,8 +268,13 @@ local marketOffersBuy = {}
 local marketOffersSell = {}
 local marketHistoryBuy = {}
 local marketHistorySell = {}
+local marketMyOffersBuy = {}
+local marketMyOffersSell = {}
 
 function onMarketReadOffer(action, amount, counter, itemId, playerName, price, state, timestamp, var, itemTier)
+	print("========================================")
+	print("=== onMarketReadOffer CALLED ===")
+	print("========================================")
 	print("onMarketReadOffer - action:", action, "amount:", amount, "itemId:", itemId, "var:", var, "player:", playerName, "price:", price, "counter:", counter, "timestamp:", timestamp)
 	
 	-- Create offer data structure
@@ -275,17 +288,30 @@ function onMarketReadOffer(action, amount, counter, itemId, playerName, price, s
 		holder = playerName,
 		state = state,
 		var = var,
-		tier = itemTier or 0
+		tier = itemTier or 0,
+		itemTier = itemTier or 0
 	}
 	
-	-- Since var seems to be itemId, we need to determine request type differently
-	-- For now, just accumulate all offers - onMarketBrowse will process them
-	if action == 0 then  -- Buy offer (MarketAction.Buy)
-		table.insert(marketOffersBuy, offer)
-		print("Added to marketOffersBuy, count now:", #marketOffersBuy)
-	else  -- Sell offer (action == 1, MarketAction.Sell)
-		table.insert(marketOffersSell, offer)
-		print("Added to marketOffersSell, count now:", #marketOffersSell)
+	-- Route to appropriate accumulator based on var (request type)
+	-- var = 2: My Offers, var = 3: Browse Item
+	if var == 2 then
+		-- My Offers request
+		if action == 0 then  -- Buy offer
+			table.insert(marketMyOffersBuy, offer)
+			print("Added to marketMyOffersBuy, count now:", #marketMyOffersBuy)
+		else  -- Sell offer (action == 1)
+			table.insert(marketMyOffersSell, offer)
+			print("Added to marketMyOffersSell, count now:", #marketMyOffersSell)
+		end
+	else
+		-- Browse Item request (var == 3) or other
+		if action == 0 then  -- Buy offer
+			table.insert(marketOffersBuy, offer)
+			print("Added to marketOffersBuy, count now:", #marketOffersBuy)
+		else  -- Sell offer (action == 1)
+			table.insert(marketOffersSell, offer)
+			print("Added to marketOffersSell, count now:", #marketOffersSell)
+		end
 	end
 end
 
@@ -433,7 +459,7 @@ function onMarketEnter(items, offerCount, balance, vocation)
 	local colorCount = 0
 	for _, pair in pairs(categoryList) do
 		local widget = g_ui.createWidget('CategoryItemListLabel', marketWindow.contentPanel.category)
-		local color = colorCount % 2 == 0 and '#414141' or '#484848'
+		local color = colorCount % 2 == 0 and '#484848' or '#414141'
 		widget.categoryId = pair[1]  -- Store category ID in widget property
 		widget.color = color
 		widget:setId(pair[2])
@@ -464,11 +490,39 @@ function onMarketEnter(items, offerCount, balance, vocation)
 end
 
 function onMarketBrowse(intOffers, nameOffers)
-	print("=== onMarketBrowse START ===")
+	print("========================================")
+	print("=== onMarketBrowse CALLED ===")
+	print("========================================")
 	print("intOffers type:", type(intOffers), "value:", intOffers)
 	print("nameOffers type:", type(nameOffers), "value:", nameOffers)
 	print("marketOffersBuy before processing:", #marketOffersBuy, "items")
 	print("marketOffersSell before processing:", #marketOffersSell, "items")
+	print("marketMyOffersBuy before processing:", #marketMyOffersBuy, "items")
+	print("marketMyOffersSell before processing:", #marketMyOffersSell, "items")
+	
+	-- Check if this is a "My Offers" request (var=2) vs Browse Item (var=3)
+	if #marketMyOffersBuy > 0 or #marketMyOffersSell > 0 then
+		-- This is a "My Offers" response
+		print("Processing My Offers data")
+		local buyOffersData = marketMyOffersBuy
+		local sellOffersData = marketMyOffersSell
+		
+		-- Clear the accumulator
+		marketMyOffersBuy = {}
+		marketMyOffersSell = {}
+		
+		-- Call the My Offers handler
+		MarketOwnOffers.onParseMyOffers(buyOffersData, sellOffersData)
+		return
+	end
+	
+	-- Otherwise, process as Browse Item request
+	print("Checking lastSelectedItem - is table:", type(lastSelectedItem))
+	if lastSelectedItem then
+		print("  lastSelectedItem.itemId:", lastSelectedItem.itemId)
+		print("  lastSelectedItem.tier:", lastSelectedItem.tier)
+	end
+	print("table.empty(lastSelectedItem):", table.empty(lastSelectedItem))
 	
 	if table.empty(lastSelectedItem) then 
 		print("lastSelectedItem is empty, returning")
@@ -540,6 +594,8 @@ function onMarketBrowse(intOffers, nameOffers)
 	mainMarket.buyOffersList:destroyChildren()
 
 	print("Displaying buy offers - total:", buyOffers and #buyOffers or 0)
+	print("mainMarket:", mainMarket)
+	print("mainMarket.buyOffersList:", mainMarket and mainMarket.buyOffersList or "nil")
 	
 	if buyOffers then
 		for i, data in ipairs(buyOffers) do
@@ -547,8 +603,9 @@ function onMarketBrowse(intOffers, nameOffers)
 				break
 			end
 
+			print("  Creating buy offer widget", i, "for holder:", data.holder)
 			local widget = g_ui.createWidget('MarketOfferWidget', mainMarket.buyOffersList)
-			local color = colorCount % 2 == 0 and '#414141' or '#484848'
+			local color = colorCount % 2 == 0 and '#484848' or '#414141'
 			local holder = data.holder
 			widget:setId(color)
 			widget.offerId = i  -- Store offer index as property
@@ -605,7 +662,7 @@ function onMarketBrowse(intOffers, nameOffers)
 			end
 
 			local widget = g_ui.createWidget('MarketOfferWidget', mainMarket.sellOffersList)
-			local color = colorCount % 2 == 0 and '#414141' or '#484848'
+			local color = colorCount % 2 == 0 and '#484848' or '#414141'
 			local holder = data.holder
 			widget:setId(color)
 			widget.offerId = i  -- Store offer index as property
@@ -683,7 +740,7 @@ function onBuyListValueChange(scroll, value, delta)
 	  local data = cache.SCROLL_BUY_OFFERS.listData[index]
 
 	  if data then
-		local color = index % 2 == 0 and '#414141' or '#484848'
+		local color = index % 2 == 0 and '#484848' or '#414141'
 		local holder = data.holder
 		widget:setId(color)
 		widget.offerId = index  -- Store offer index as property
@@ -734,7 +791,7 @@ function onSellListValueChange(scroll, value, delta)
 	  local data = cache.SCROLL_SELL_OFFERS.listData[index]
 
 	  if data then
-		local color = index % 2 == 0 and '#414141' or '#484848'
+		local color = index % 2 == 0 and '#484848' or '#414141'
 		local holder = data.holder
 		widget:setId(color)
 		widget.offerId = index  -- Store offer index as property
@@ -1004,7 +1061,11 @@ function onUpdateChildItem(itemID, tier)
 end
 
 function onSelectChildItem(widget, selected, oldFocus)
-	if not selected then return end
+	print("=== onSelectChildItem CALLED ===")
+	if not selected then 
+		print("  selected is nil, returning")
+		return 
+	end
 
 	if oldFocus then
 		oldFocus:setBackgroundColor('#404040')
@@ -1017,7 +1078,11 @@ function onSelectChildItem(widget, selected, oldFocus)
 	selected:setBackgroundColor('#585858')
 	local itemID = selected.item:getItemId()
 	local itemTier = selected.item:getItem():getTier()
+	print("  itemID:", itemID, "itemTier:", itemTier)
+	print("  lastSelectedItem.itemId:", lastSelectedItem.itemId, "lastSelectedItem.tier:", lastSelectedItem.tier)
+	
 	if lastSelectedItem.itemId == itemID and lastSelectedItem.tier == itemTier then
+		print("  Same item already selected, returning")
 		return true
 	end
 
@@ -1025,6 +1090,7 @@ function onSelectChildItem(widget, selected, oldFocus)
 	marketWindow.contentPanel.selectedItem:getItem():setTier(itemTier)
 
 	lastSelectedItem = {itemId = itemID, tier = itemTier, lastWidget = widget}
+	print("  Set lastSelectedItem to:", lastSelectedItem)
 
 	if itemID == 22118 then
 		marketWindow.contentPanel.selectedItem:getItem():setCount(getTransferableTibiaCoins())
@@ -1037,6 +1103,7 @@ function onSelectChildItem(widget, selected, oldFocus)
 	marketOffersBuy = {}
 	marketOffersSell = {}
 	
+	print("=== Calling sendMarketAction(3, itemID, tier) ===")
 	sendMarketAction(3, itemID, selected.item:getItem():getTier())
 end
 
@@ -1525,7 +1592,7 @@ function onSearchItem(textField)
 	if lastSelectedCategory then
 		local colourCount = 0
 		for i, pair in ipairs(categoryList) do
-			local colour = colourCount % 2 == 0 and '#414141' or '#484848'
+			local colour = colourCount % 2 == 0 and '#484848' or '#414141'
 			if pair[2] == lastSelectedCategory:getText() then
 				lastSelectedCategory:setBackgroundColor(colour)
 				lastSelectedCategory:setColor('#c0c0c0')
@@ -1654,7 +1721,7 @@ function onShowRedirect(item)
 	if lastSelectedCategory then
 		local colourCount = 0
 		for i, pair in ipairs(categoryList) do
-			local colour = colourCount % 2 == 0 and '#414141' or '#484848'
+			local colour = colourCount % 2 == 0 and '#484848' or '#414141'
 			if pair[2] == lastSelectedCategory:getText() then
 				lastSelectedCategory:setBackgroundColor(colour)
 				lastSelectedCategory:setColor('#c0c0c0')
@@ -1801,7 +1868,7 @@ function checkSortMarketOptions(itemData)
 	end
 
 	local playerLevel = player:getLevel()
-	local playerVocation = translateWheelVocation(player:getVocation())
+	local playerVocationId = player:getVocation()
 
 	if sortButtons["levelButton"] then
 		if itemData.marketData.requiredLevel > playerLevel then
@@ -1811,8 +1878,12 @@ function checkSortMarketOptions(itemData)
 
 	if sortButtons["vocButton"] then
 		local itemVocation = itemData.marketData.restrictVocation
-		if #itemVocation > 0 and not table.contains(itemVocation, playerVocation) then
-			return false
+		if itemVocation > 0 then
+			local demotedVoc = playerVocationId > 10 and (playerVocationId - 10) or playerVocationId
+			local vocBitMask = Bit.bit(demotedVoc)
+			if not Bit.hasBit(itemVocation, vocBitMask) then
+				return false
+			end
 		end
 	end
 
@@ -1870,12 +1941,32 @@ function onSortMarketFields(widget, checked)
 		return true
 	end
 
+	-- Preserve the selected item info before clearing
+	local preservedItemId = lastSelectedItem.itemId
+	local preservedItemTier = lastSelectedItem.tier
+	
 	lastSelectedItem = {}
 	onClearMainMarket(true)
 	onSelectChildCategory(nil, lastSelectedCategory, true)
+	
+	-- Re-select the item if one was selected
+	if preservedItemId then
+		scheduleEvent(function()
+			local itemList = marketWindow:recursiveGetChildById("itemList")
+			if itemList then
+				for _, widget in pairs(itemList:getChildren()) do
+					if widget.item:getItemId() == preservedItemId and 
+					   widget.item:getItem():getTier() == (preservedItemTier or 0) then
+						itemList:focusChild(widget)
+						break
+					end
+				end
+			end
+		end, 50)
+	end
 end
 
-function onMarketDetail(itemID, tier, details, purchase, sale)
+function onMarketDetail(itemID, details, purchase, sale, tier)
 	marketWindow.contentPanel.detailsMarket.detailsList:destroyChildren()
 	for i, str in pairs(details) do
 		if #str == 0 then
@@ -1883,7 +1974,8 @@ function onMarketDetail(itemID, tier, details, purchase, sale)
 		end
 
 		local widget = g_ui.createWidget('DatailsLabel', marketWindow.contentPanel.detailsMarket.detailsList)
-		widget:setText(MarketDetailNames[i + 1] .. str)
+		local detailName = MarketDetailNames[i] or ("Detail " .. i .. ": ")
+		widget:setText(detailName .. str)
 		:: continue ::
 	end
 
@@ -1891,32 +1983,46 @@ function onMarketDetail(itemID, tier, details, purchase, sale)
 	local purchaseWidget = g_ui.createWidget('StatisticWidget', marketWindow.contentPanel.detailsMarket.statisticsList)
 	purchaseWidget.header:setText("Buy Offers:")
 	if #purchase > 0 then
-		local transactionsText = purchaseWidget.transactions:getText():gsub("0", purchase[1].numTransactions)
+		-- purchase[1] = { timestamp, action, transactions, totalPrice, highestPrice, lowestPrice }
+		local stats = purchase[1]
+		local numTransactions = stats[3]
+		local totalPrice = stats[4]
+		local highestPrice = stats[5]
+		local lowestPrice = stats[6]
+		
+		local transactionsText = purchaseWidget.transactions:getText():gsub("0", numTransactions)
 		purchaseWidget.transactions:setText(transactionsText)
 
-		local highestText = purchaseWidget.highestPrice:getText():gsub("0", comma_value(purchase[1].highestPrice))
+		local highestText = purchaseWidget.highestPrice:getText():gsub("0", comma_value(highestPrice))
 		purchaseWidget.highestPrice:setText(highestText)
 
-		local avgText = purchaseWidget.avgPrice:getText():gsub("0", comma_value(math.floor(purchase[1].totalPrice / purchase[1].numTransactions)))
+		local avgText = purchaseWidget.avgPrice:getText():gsub("0", comma_value(math.floor(totalPrice / numTransactions)))
 		purchaseWidget.avgPrice:setText(avgText)
 
-		local lowText = purchaseWidget.lowPrice:getText():gsub("0", comma_value(purchase[1].lowestPrice))
+		local lowText = purchaseWidget.lowPrice:getText():gsub("0", comma_value(lowestPrice))
 		purchaseWidget.lowPrice:setText(lowText)
 	end
 
 	local saleWidget = g_ui.createWidget('StatisticWidget', marketWindow.contentPanel.detailsMarket.statisticsList)
 	saleWidget.header:setText("Sell Offers:")
 	if #sale > 0 then
-		local transactionsText = saleWidget.transactions:getText():gsub("0", sale[1].numTransactions)
+		-- sale[1] = { timestamp, action, transactions, totalPrice, highestPrice, lowestPrice }
+		local stats = sale[1]
+		local numTransactions = stats[3]
+		local totalPrice = stats[4]
+		local highestPrice = stats[5]
+		local lowestPrice = stats[6]
+		
+		local transactionsText = saleWidget.transactions:getText():gsub("0", numTransactions)
 		saleWidget.transactions:setText(transactionsText)
 
-		local highestText = saleWidget.highestPrice:getText():gsub("0", comma_value(sale[1].highestPrice))
+		local highestText = saleWidget.highestPrice:getText():gsub("0", comma_value(highestPrice))
 		saleWidget.highestPrice:setText(highestText)
 
-		local avgText = saleWidget.avgPrice:getText():gsub("0", comma_value(math.floor(sale[1].totalPrice / sale[1].numTransactions)))
+		local avgText = saleWidget.avgPrice:getText():gsub("0", comma_value(math.floor(totalPrice / numTransactions)))
 		saleWidget.avgPrice:setText(avgText)
 
-		local lowText = saleWidget.lowPrice:getText():gsub("0", comma_value(sale[1].lowestPrice))
+		local lowText = saleWidget.lowPrice:getText():gsub("0", comma_value(lowestPrice))
 		saleWidget.lowPrice:setText(lowText)
 	end
 end

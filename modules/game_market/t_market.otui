@@ -544,6 +544,7 @@ MarketMainWindow < Panel
     vertical-scrollbar: itemListScroll
     text-wrap: true
     keep-scroll-range: true
+    background-color: #404040
     @onSetup: |
       g_keyboard.bindKeyPress('Up', function() focusPrevItemWidget(self) end, self)
       g_keyboard.bindKeyPress('Down', function() focusNextItemWidget(self) end, self)
@@ -790,6 +791,7 @@ MarketMainWindow < Panel
       vertical-scrollbar: sellOffersListScroll
       text-wrap: true
       keep-scroll-range: true
+      background-color: #404040
       @onSetup: |
         g_keyboard.bindKeyPress('Up', function() focusPrevSellLabel(self) end, self)
         g_keyboard.bindKeyPress('Down', function() focusNextSellLabel(self) end, self)
@@ -1034,6 +1036,7 @@ MarketMainWindow < Panel
       vertical-scrollbar: buyOffersListScroll
       keep-scroll-range: true
       text-wrap: true
+      background-color: #404040
       @onSetup: |
         g_keyboard.bindKeyPress('Up', function() focusPrevBuyLabel(self) end, self)
         g_keyboard.bindKeyPress('Down', function() focusNextBuyLabel(self) end, self)
@@ -1499,7 +1502,7 @@ MarketMainWindow < Panel
     visible: true
     !text: tr('Close')
     size: 75 20
-    @onClick: modules.game_market.hide()
+    @onClick: toggle()
 
   Button
     id: myOffers
@@ -1571,6 +1574,7 @@ MarketHistory < Panel
       vertical-scrollbar: sellOffersListScroll
       text-wrap: true
       keep-scroll-range: true
+      background-color: #404040
 
     UIWidget
       id: sellHolder
@@ -1782,6 +1786,7 @@ MarketHistory < Panel
       vertical-scrollbar: buyOffersListScroll
       text-wrap: true
       keep-scroll-range: true
+      background-color: #404040
 
     UIWidget
       size: 954 17
