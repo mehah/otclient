@@ -12,15 +12,23 @@
 -- @param itemId: Item ID for browse action (optional)
 -- @param tier: Item tier for browse action (optional)
 function sendMarketAction(action, itemId, tier)
+    print("========================================")
+    print("=== sendMarketAction CALLED ===")
+    print("  action:", action, "itemId:", itemId, "tier:", tier)
+    print("========================================")
+    
     if action == 3 and itemId then
-        -- Browse item
-        g_game.browseMarket(itemId, tier or 0)
-    elseif action == 1 then
-        -- Request my offers
-        -- Protocol will send the offers data via onMarketReadOffer
+        -- Browse item (MARKETREQUEST_ITEM_BROWSE = 3)
+        print("  Calling g_game.browseMarket(3,", itemId, ",", tier or 0, ")")
+        g_game.browseMarket(3, itemId, tier or 0)
     elseif action == 2 then
-        -- Request my history
-        -- Protocol will send the history data via onMarketReadOffer
+        -- Request my offers (MARKETREQUEST_OWN_OFFERS = 2)
+        print("  Calling g_game.browseMarket(2, 0, 0)")
+        g_game.browseMarket(2, 0, 0)
+    elseif action == 1 then
+        -- Request my history (MARKETREQUEST_OWN_HISTORY = 1)
+        print("  Calling g_game.browseMarket(1, 0, 0)")
+        g_game.browseMarket(1, 0, 0)
     end
 end
 
