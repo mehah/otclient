@@ -193,11 +193,17 @@ function offersButton()
 end
 
 function myOffersButton(widget)
+  print("========================================")
+  print("=== myOffersButton CALLED ===")
+  print("Widget ID:", widget:getId())
+  print("========================================")
+  
   local marketPanel = marketWindow.contentPanel:getChildById('mainMarket')
   local detailsMarket = marketWindow.contentPanel:getChildById('detailsMarket')
   local marketMain = marketWindow:getChildById('contentPanel')
   local marketHistory = marketWindow:getChildById('MarketHistory')
-  local sellButton = marketWindow.MarketHistory.currentOffers.buyCancelOffer
+  local currentOffersPanel = marketWindow.MarketHistory.currentOffers
+  local offerHistoryPanel = marketWindow.MarketHistory.offerHistory
   local closeButton = marketWindow.contentPanel:getChildById('closeButton')
 
   MarketOwnOffers.myBuyOffers = {}
@@ -211,14 +217,24 @@ function myOffersButton(widget)
 	print("Sending sendMarketAction(2) for My Offers")
 	sendMarketAction(2)
   elseif widget:getId() == "currentOffers" then
+	print("=== CURRENT OFFERS BUTTON CLICKED ===")
+	-- Clear the accumulators before requesting My Offers data
+	marketMyOffersBuy = {}
+	marketMyOffersSell = {}
+	print("Sending sendMarketAction(2) for Current Offers")
 	sendMarketAction(2)
-	return
   elseif widget:getId() == 'historyButton' then
+	print("=== OFFER HISTORY BUTTON CLICKED ===")
+	marketHistoryBuy = {}
+	marketHistorySell = {}
+	print("Sending sendMarketAction(1) for Offer History")
 	sendMarketAction(1)
-	return
+  elseif widget:getId() == 'marketButton' then
+	print("=== MARKET BUTTON CLICKED ===")
+	print("Going back to main market")
   end
 
-  if widget:getId() ~= 'myOffers' then
+  if widget:getId() ~= 'myOffers' and widget:getId() ~= 'historyButton' then
 	if lastItemID and lastItemID > 0 then
 		sendMarketAction(3, lastItemID, lastItemTier)
 	end
@@ -226,26 +242,100 @@ function myOffersButton(widget)
 	lastItemTier = 0
   end
 
+  print("marketMain:isVisible():", marketMain:isVisible())
+  print("marketHistory:isVisible():", marketHistory:isVisible())
+  
   if marketMain:isVisible() then
-	marketWindow.MarketHistory.currentOffers.sellSeparator:setVisible(false)
-	marketWindow.MarketHistory.currentOffers.sellStatusButton:setVisible(false)
-	marketWindow.MarketHistory.currentOffers.buySeparator:setVisible(false)
-	marketWindow.MarketHistory.currentOffers.buyStatusButton:setVisible(false)
-	marketWindow.MarketHistory.currentOffers.sellEndButton:setWidth(220)
-	marketWindow.MarketHistory.currentOffers.buyEndButton:setWidth(220)
-    marketMain:setVisible(false)
+	print("Main market is visible, switching to history view")
+	-- Switching from main market to history view
+	if widget:getId() == 'historyButton' then
+		print("Showing offerHistory panel")
+		-- Show history panel, hide current offers panel
+		currentOffersPanel:setVisible(false)
+		offerHistoryPanel:setVisible(true)
+		-- Update window title
+		marketWindow:setText(tr('Offer History'))
+	else
+		print("Showing currentOffers panel (My Offers)")
+		-- Show current offers panel (My Offers), hide history panel
+		currentOffersPanel.sellSeparator:setVisible(false)
+		currentOffersPanel.sellStatusButton:setVisible(false)
+		currentOffersPanel.buySeparator:setVisible(false)
+		currentOffersPanel.buyStatusButton:setVisible(false)
+		currentOffersPanel.sellEndButton:setWidth(220)
+		currentOffersPanel.buyEndButton:setWidth(220)
+		currentOffersPanel:setVisible(true)
+		offerHistoryPanel:setVisible(false)
+		-- Update window title
+		marketWindow:setText(tr('My Offers'))
+	end
+	marketMain:setVisible(false)
 	closeButton:setVisible(false)
-    marketHistory:setVisible(true)
+	marketHistory:setVisible(true)
+  elseif marketHistory:isVisible() then
+	print("Market history is visible, widget id:", widget:getId())
+	-- Already in history view, check if switching between panels or going back
+	if widget:getId() == 'historyButton' then
+		print("Switching to offerHistory panel")
+		currentOffersPanel:setVisible(false)
+		offerHistoryPanel:setVisible(true)
+		-- Update window title
+		marketWindow:setText(tr('Offer History'))
+	elseif widget:getId() == 'myOffers' or widget:getId() == 'currentOffers' then
+		print("Switching to currentOffers panel (My Offers)")
+		-- Hide status columns and separators for My Offers view
+		if currentOffersPanel.sellSeparator then
+			currentOffersPanel.sellSeparator:setVisible(false)
+		end
+		if currentOffersPanel.sellStatusButton then
+			currentOffersPanel.sellStatusButton:setVisible(false)
+		end
+		if currentOffersPanel.buySeparator then
+			currentOffersPanel.buySeparator:setVisible(false)
+		end
+		if currentOffersPanel.buyStatusButton then
+			currentOffersPanel.buyStatusButton:setVisible(false)
+		end
+		if currentOffersPanel.sellEndButton then
+			currentOffersPanel.sellEndButton:setWidth(220)
+		end
+		if currentOffersPanel.buyEndButton then
+			currentOffersPanel.buyEndButton:setWidth(220)
+		end
+		-- Show current offers panel, hide history panel
+		offerHistoryPanel:setVisible(false)
+		currentOffersPanel:setVisible(true)
+		-- Update window title
+		marketWindow:setText(tr('My Offers'))
+		print("currentOffersPanel visible:", currentOffersPanel:isVisible())
+		print("offerHistoryPanel visible:", offerHistoryPanel:isVisible())
+	elseif widget:getId() == 'marketButton' then
+		print("Going back to main market from history view")
+		lastSelectedMySell = nil
+		lastSelectedMyBuy = nil
+		lastSelectedHistorySell = nil
+		lastSelectedHistoryBuy = nil
+		marketHistory:setVisible(false)
+		marketMain:setVisible(true)
+		detailsMarket:setVisible(false)
+		marketPanel:setVisible(true)
+		closeButton:setVisible(true)
+		-- Update window title back to Market
+		marketWindow:setText(tr('Market'))
+	end
   else
+	print("Neither main nor history visible, going to main")
 	lastSelectedMySell = nil
 	lastSelectedMyBuy = nil
 	lastSelectedHistorySell = nil
 	lastSelectedHistoryBuy = nil
-    marketHistory:setVisible(false)
-    marketMain:setVisible(true)
-    detailsMarket:setVisible(false)
-    marketPanel:setVisible(true)
+	marketHistory:setVisible(false)
+	marketMain:setVisible(true)
+	detailsMarket:setVisible(false)
+	marketPanel:setVisible(true)
 	closeButton:setVisible(true)
+	-- Update window title back to Market
+	marketWindow:setText(tr('Market'))
   end
 end
 
@@ -293,8 +383,17 @@ function onMarketReadOffer(action, amount, counter, itemId, playerName, price, s
 	}
 	
 	-- Route to appropriate accumulator based on var (request type)
-	-- var = 2: My Offers, var = 3: Browse Item
-	if var == 2 then
+	-- var = 1: Offer History, var = 2: My Offers, var = 3: Browse Item
+	if var == 1 then
+		-- Offer History request
+		if action == 0 then  -- Buy offer
+			table.insert(marketHistoryBuy, offer)
+			print("Added to marketHistoryBuy, count now:", #marketHistoryBuy)
+		else  -- Sell offer (action == 1)
+			table.insert(marketHistorySell, offer)
+			print("Added to marketHistorySell, count now:", #marketHistorySell)
+		end
+	elseif var == 2 then
 		-- My Offers request
 		if action == 0 then  -- Buy offer
 			table.insert(marketMyOffersBuy, offer)
@@ -499,6 +598,24 @@ function onMarketBrowse(intOffers, nameOffers)
 	print("marketOffersSell before processing:", #marketOffersSell, "items")
 	print("marketMyOffersBuy before processing:", #marketMyOffersBuy, "items")
 	print("marketMyOffersSell before processing:", #marketMyOffersSell, "items")
+	print("marketHistoryBuy before processing:", #marketHistoryBuy, "items")
+	print("marketHistorySell before processing:", #marketHistorySell, "items")
+	
+	-- Check if this is an "Offer History" request (var=1)
+	if #marketHistoryBuy > 0 or #marketHistorySell > 0 then
+		-- This is an "Offer History" response
+		print("Processing Offer History data")
+		local buyOffersData = marketHistoryBuy
+		local sellOffersData = marketHistorySell
+		
+		-- Clear the accumulator
+		marketHistoryBuy = {}
+		marketHistorySell = {}
+		
+		-- Call the Offer History handler
+		MarketHistory.onParseMarketHistory(buyOffersData, sellOffersData)
+		return
+	end
 	
 	-- Check if this is a "My Offers" request (var=2) vs Browse Item (var=3)
 	if #marketMyOffersBuy > 0 or #marketMyOffersSell > 0 then
