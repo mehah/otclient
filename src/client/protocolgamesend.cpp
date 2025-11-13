@@ -1345,10 +1345,8 @@ void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t brows
             }
         }
     } else {
-        g_logger.info("  Using legacy format, browseType={}", browseType);
         msg->addU16(browseType);
     }
-    g_logger.info("  Sending message to server");
     send(msg);
 }
 

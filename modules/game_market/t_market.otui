@@ -378,6 +378,7 @@ MarketItemList < UIWidget
   focusable: true
 
   UIWidget
+    id: itemBackground
     size: 34 34
     image-source: /images/ui/item
     anchors.top: parent.top
@@ -477,6 +478,8 @@ MarketMainWindow < Panel
     anchors.left: parent.left
     margin-top: 30
     !text: tr('Level')
+    font: cipsoftFont
+    color: #dfdfdfff
     @onClick: modules.game_market.onSortMarketFields(self, self:isChecked())
 
   Button
@@ -486,6 +489,8 @@ MarketMainWindow < Panel
     anchors.left: prev.right
     margin-left: 5
     !text: tr('Voc.')
+    font: cipsoftFont
+    color: #dfdfdfff
     @onClick: modules.game_market.onSortMarketFields(self, self:isChecked())
 
   Button
@@ -495,6 +500,8 @@ MarketMainWindow < Panel
     anchors.left: prev.right
     margin-left: 5
     !text: tr('1H')
+    font: cipsoftFont
+    color: #dfdfdfff
     enabled: false
     @onClick: modules.game_market.onSortMarketFields(self, self:isChecked())
 
@@ -505,6 +512,8 @@ MarketMainWindow < Panel
     anchors.left: prev.right
     margin-left: 5
     !text: tr('2H')
+    font: cipsoftFont
+    color: #dfdfdfff
     enabled: false
     @onClick: modules.game_market.onSortMarketFields(self, self:isChecked())
 
@@ -559,9 +568,8 @@ MarketMainWindow < Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     margin-top: 3
-    vertical-scrollbar: itemListScroll
     text-wrap: true
-    keep-scroll-range: true
+    vertical-scrollbar: itemListScroll
     background-color: #404040
     border-width: 1
     border-color-top: #141414
@@ -803,6 +811,8 @@ MarketMainWindow < Panel
       anchors.top: parent.top
       anchors.right: parent.right
       !text: tr('Accept')
+      font: cipsoftFont
+      color: #dfdfdfff
       enabled: false
       @onClick: modules.game_market.onAcceptSellOffer()
 
@@ -1053,6 +1063,8 @@ MarketMainWindow < Panel
       anchors.right: parent.right
       margin-top: 12
       !text: tr('Accept')
+      font: cipsoftFont
+      color: #dfdfdfff
       enabled: false
       @onClick: modules.game_market.onAcceptBuyOffer()
 
@@ -1442,6 +1454,8 @@ MarketMainWindow < Panel
       anchors.right: parent.right
       enabled: false
       !text: tr('Create')
+      font: cipsoftFont
+      color: #dfdfdfff
       @onClick: modules.game_market.createMarketOffer()
 
     Button
@@ -1544,6 +1558,8 @@ MarketMainWindow < Panel
     anchors.right: parent.right
     visible: true
     !text: tr('Close')
+    font: cipsoftFont
+    color: #dfdfdfff
     size: 75 20
     @onClick: closeMarket()
 
@@ -1552,6 +1568,8 @@ MarketMainWindow < Panel
     anchors.bottom: parent.bottom
     anchors.right: prev.left
     !text: tr('My Offers')
+    font: cipsoftFont
+    color: #dfdfdfff
     size: 75 20
     margin-right: 5
     @onClick: myOffersButton(self)
@@ -1561,6 +1579,8 @@ MarketMainWindow < Panel
     anchors.bottom: parent.bottom
     anchors.right: prev.left
     !text: tr('Details')
+    font: cipsoftFont
+    color: #dfdfdfff
     size: 75 20
     margin-right: 5
     @onClick: detailsButton()
@@ -1570,6 +1590,8 @@ MarketMainWindow < Panel
     anchors.bottom: parent.bottom
     anchors.right: prev.left
     !text: tr('Offers')
+    font: cipsoftFont
+    color: #dfdfdfff
     size: 75 20
     margin-right: 5
     @onClick: offersButton()
@@ -1590,7 +1612,7 @@ MarketHistory < Panel
       id: sellCancelOffer
       anchors.top: parent.top
       anchors.right: parent.right
-      !text: tr('Cancel Off...')
+      !text: tr('Cancel Offer')
       size: 75 20
       enabled: false
       @onClick: modules.game_market.MarketOwnOffers.cancelMarketOffer(true)
@@ -1819,7 +1841,7 @@ MarketHistory < Panel
       id: buyCancelOffer
       anchors.top: prev.top
       anchors.right: parent.right
-      !text: tr('Cancel Off...')
+      !text: tr('Cancel Offer')
       size: 75 20
       enabled: false
       @onClick: modules.game_market.MarketOwnOffers.cancelMarketOffer(false)
