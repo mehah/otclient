@@ -68,6 +68,10 @@ local enableCategories = { 17, 18, 19, 20, 21, 27, 32, MarketCategoryWeaponsAxes
 -- Categories that enable classification/tier filters
 local enableClassification = {1, 3, 7, 8, 13, 15, 17, 18, 19, 20, 21, 24, 25, 27, 31, 32, MarketCategoryWeaponsAxes, MarketCategoryWeaponsClubs, MarketCategoryWeaponsDistance, MarketCategoryWeaponsSwords, MarketCategoryWeaponsWands, MarketCategoryWeaponsAll }
 
+function onMarketErrorMessage(messageMode, message)
+	displayInfoBox("Error", message)
+end
+
 function init()
   marketWindow = g_ui.displayUI('t_market')
   mainMarket = marketWindow.contentPanel.mainMarket
@@ -86,6 +90,9 @@ function init()
 	onParseStoreGetCoin = onParseStoreGetCoin,
 	onMarketLeave = hide,
   })
+  
+  -- Register handler for market error messages (mode 40)
+  registerMessageMode(40, onMarketErrorMessage)
 end
 
 function terminate()
@@ -100,6 +107,9 @@ function terminate()
 	  onParseStoreGetCoin = onParseStoreGetCoin,
 	  onMarketLeave = hide,
 	})
+	
+	-- Unregister market error message handler
+	unregisterMessageMode(40, onMarketErrorMessage)
 
 	if marketWindow then
 	  marketWindow:destroy()
