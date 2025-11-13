@@ -63,8 +63,10 @@ local sortButtons = {
 	["tierFilter"] = 0
 }
 
-local enableCategories = { 17, 18, 19, 20, 21, 27, 32 }
-local enableClassification = {1, 3, 7, 8, 15, 17, 18, 19, 20, 21, 24, 27, 32 }
+-- Categories that enable hand filter (one-handed/two-handed weapons)
+local enableCategories = { 17, 18, 19, 20, 21, 27, 32, MarketCategoryWeaponsAxes, MarketCategoryWeaponsClubs, MarketCategoryWeaponsDistance, MarketCategoryWeaponsSwords, MarketCategoryWeaponsWands, MarketCategoryWeaponsAll }
+-- Categories that enable classification/tier filters
+local enableClassification = {1, 3, 7, 8, 13, 15, 17, 18, 19, 20, 21, 24, 25, 27, 31, 32, MarketCategoryWeaponsAxes, MarketCategoryWeaponsClubs, MarketCategoryWeaponsDistance, MarketCategoryWeaponsSwords, MarketCategoryWeaponsWands, MarketCategoryWeaponsAll }
 
 function init()
   marketWindow = g_ui.displayUI('t_market')
@@ -440,10 +442,19 @@ end
 
 function configureList()
 	marketItems = {}
-	for c = MarketCategory.First, MarketCategoryWeaponsAll do
+	-- Initialize all categories from 1 to 31 (including Soul Cores)
+	for c = 1, 31 do
 		marketItems[c] = {}
 	end
-	-- Initialize FistWeapons category
+	
+	-- Initialize weapon subcategories
+	marketItems[MarketCategoryWeaponsAmmo] = {}
+	marketItems[MarketCategoryWeaponsAxes] = {}
+	marketItems[MarketCategoryWeaponsClubs] = {}
+	marketItems[MarketCategoryWeaponsDistance] = {}
+	marketItems[MarketCategoryWeaponsSwords] = {}
+	marketItems[MarketCategoryWeaponsWands] = {}
+	marketItems[MarketCategoryWeaponsAll] = {}
 	marketItems[MarketCategoryFistWeapons] = {}
 
 	local types = g_things.findThingTypeByAttr(ThingAttrMarket, ThingCategoryItem)
@@ -471,11 +482,46 @@ function configureList()
 		:: continue ::
 	end
 
-	for c = MarketCategory.Ammunition, MarketCategory.WandsRods do
-		if marketItems[c] then
-			for _, data in pairs(marketItems[c]) do
-				table.insert(marketItems[MarketCategoryWeaponsAll], data)
-			end
+	-- Populate weapon subcategories
+	if marketItems[MarketCategory.Ammunition] then
+		for _, data in pairs(marketItems[MarketCategory.Ammunition]) do
+			table.insert(marketItems[MarketCategoryWeaponsAmmo], data)
+			table.insert(marketItems[MarketCategoryWeaponsAll], data)
+		end
+	end
+
+	if marketItems[MarketCategory.Axes] then
+		for _, data in pairs(marketItems[MarketCategory.Axes]) do
+			table.insert(marketItems[MarketCategoryWeaponsAxes], data)
+			table.insert(marketItems[MarketCategoryWeaponsAll], data)
+		end
+	end
+
+	if marketItems[MarketCategory.Clubs] then
+		for _, data in pairs(marketItems[MarketCategory.Clubs]) do
+			table.insert(marketItems[MarketCategoryWeaponsClubs], data)
+			table.insert(marketItems[MarketCategoryWeaponsAll], data)
+		end
+	end
+
+	if marketItems[MarketCategory.DistanceWeapons] then
+		for _, data in pairs(marketItems[MarketCategory.DistanceWeapons]) do
+			table.insert(marketItems[MarketCategoryWeaponsDistance], data)
+			table.insert(marketItems[MarketCategoryWeaponsAll], data)
+		end
+	end
+
+	if marketItems[MarketCategory.Swords] then
+		for _, data in pairs(marketItems[MarketCategory.Swords]) do
+			table.insert(marketItems[MarketCategoryWeaponsSwords], data)
+			table.insert(marketItems[MarketCategoryWeaponsAll], data)
+		end
+	end
+
+	if marketItems[MarketCategory.WandsRods] then
+		for _, data in pairs(marketItems[MarketCategory.WandsRods]) do
+			table.insert(marketItems[MarketCategoryWeaponsWands], data)
+			table.insert(marketItems[MarketCategoryWeaponsAll], data)
 		end
 	end
 
@@ -491,15 +537,28 @@ function configureList()
 		return nameA < nameB
 	end
 
-	for c = MarketCategory.First, MarketCategoryWeaponsAll do
+	-- Sort all categories from 1 to 31
+	for c = 1, 31 do
+		if marketItems[c] then
+			table.sort(marketItems[c], compareMarketItemsByNameCaseInsensitive)
+		end
+	end
+	
+	-- Sort weapon subcategories
+	for _, c in ipairs({MarketCategoryWeaponsAmmo, MarketCategoryWeaponsAxes, MarketCategoryWeaponsClubs, 
+	                    MarketCategoryWeaponsDistance, MarketCategoryWeaponsSwords, MarketCategoryWeaponsWands, 
+	                    MarketCategoryWeaponsAll}) do
 		if marketItems[c] then
 			table.sort(marketItems[c], compareMarketItemsByNameCaseInsensitive)
 		end
 	end
 
 	categoryList = {}
-	for i = MarketCategory.First, MarketCategory.Last do
+	-- Add all categories from 1 to 31
+	for i = 1, 31 do
+		-- Skip weapon categories as they will be added as subcategories
 		if i >= MarketCategory.Ammunition and i <= MarketCategory.WandsRods then
+			-- Skip these, we'll add them as "Weapons: X" format
 		else
 			local categoryName = getMarketCategoryName(i)
 			if categoryName then
@@ -508,7 +567,15 @@ function configureList()
 		end
 	end
 
+	-- Add weapon subcategories with proper naming
+	table.insert(categoryList, {MarketCategoryWeaponsAmmo, "Weapons: Ammo"})
+	table.insert(categoryList, {MarketCategoryWeaponsAxes, "Weapons: Axes"})
+	table.insert(categoryList, {MarketCategoryWeaponsClubs, "Weapons: Clubs"})
+	table.insert(categoryList, {MarketCategoryWeaponsDistance, "Weapons: Distance"})
+	table.insert(categoryList, {MarketCategoryWeaponsSwords, "Weapons: Swords"})
+	table.insert(categoryList, {MarketCategoryWeaponsWands, "Weapons: Wands"})
 	table.insert(categoryList, {MarketCategoryWeaponsAll, "Weapons: All"})
+	
 	table.sort(categoryList, function(a, b) return a[2] < b[2] end)
 end
 
@@ -1738,7 +1805,8 @@ function onSearchItem(textField)
 	end
 
 	local tier = sortButtons["tierFilter"] or 0
-	for c = MarketCategory.First, MarketCategory.Last do
+	-- Search in all categories from 1 to 31 (includes Soul Cores)
+	for c = 1, 31 do
 		local marketItem = marketItems[c]
 		if marketItem then
 			for _, data in ipairs(marketItem) do
@@ -1748,8 +1816,6 @@ function onSearchItem(textField)
 					end
 				end
 			end
-		else
-			perror("MarketData ".. c .. " is nil")
 		end
 	end
 
@@ -1861,9 +1927,11 @@ function onShowRedirect(item)
 		marketWindow.contentPanel.tierFilter:clearOptions()
 	end
 
-	for c = MarketCategory.First, MarketCategory.Last do
+	-- Search in all categories from 1 to 31 (includes Soul Cores)
+	local itemFound = false
+	for c = 1, 31 do
 		local marketItem = marketItems[c]
-		if marketItem then
+		if marketItem and not itemFound then
 			for _, data in ipairs(marketItem) do
 				if item:getId() == data.thingType:getId() then
 					local tierCount = item:getClassification()
@@ -1877,6 +1945,7 @@ function onShowRedirect(item)
 						table.insert(cache.SCROLL_MARKET_ITEMS.listData, tableCopy)
 					end
 
+					itemFound = true
 					break
 				end
 			end
@@ -2114,7 +2183,8 @@ function onMarketDetail(itemID, details, purchase, sale, tier)
 end
 
 function getItemNameById(itemId)
-  for c = MarketCategory.First, MarketCategoryWeaponsAll do
+  -- Search in all categories from 1 to 31 (includes Soul Cores)
+  for c = 1, 31 do
 		local marketItem = marketItems[c]
 		if marketItem then
 			for _, data in pairs(marketItem) do
@@ -2124,6 +2194,7 @@ function getItemNameById(itemId)
 			end
 		end
 	end
+	
   return ''
 end
 
@@ -2305,4 +2376,54 @@ function focusNextBuyLabel(list)
 	if cache.SCROLL_BUY_OFFERS.lastSelected + 1 < #cache.SCROLL_BUY_OFFERS.listData then
 		cache.SCROLL_BUY_OFFERS.lastSelected = cache.SCROLL_BUY_OFFERS.lastSelected + 1
 	end
+end
+
+function openStorePotions()
+	-- Close market window
+	if marketWindow and marketWindow:isVisible() then
+		closeMarket()
+	end
+	
+	-- Open game store
+	if not modules.game_store then
+		return
+	end
+	
+	-- Show the store
+	modules.game_store.show()
+	
+	-- Wait a bit for the store to load categories, then select Consumables > Potions
+	scheduleEvent(function()
+		local storeUI = modules.game_store.getUI()
+		if not storeUI then
+			return
+		end
+		
+		local listCategory = storeUI:recursiveGetChildById('listCategory')
+		if not listCategory then
+			return
+		end
+		
+		-- Find and click Consumables category
+		local consumablesWidget = listCategory:getChildById('Consumables')
+		if consumablesWidget and consumablesWidget.Button then
+			consumablesWidget.Button:onClick()
+			
+			-- Wait a bit for subcategories to expand, then click Potions
+			scheduleEvent(function()
+				-- Find Potions subcategory by searching through children
+				if consumablesWidget.subCategories then
+					for subId, subData in ipairs(consumablesWidget.subCategories) do
+						if subData.name == "Potions" then
+							local potionsWidget = consumablesWidget:getChildById(subId)
+							if potionsWidget and potionsWidget.Button then
+								potionsWidget.Button:onClick()
+								break
+							end
+						end
+					end
+				end
+			end, 300)
+		end
+	end, 500)
 end

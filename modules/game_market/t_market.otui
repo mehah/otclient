@@ -1466,6 +1466,7 @@ MarketMainWindow < Panel
       image-source: /images/ui/buy-potions-button
       image-clip: 0 0 108 20
       visible: false
+      @onClick: modules.game_market.openStorePotions()
       $hover !pressed:
         image-clip: 0 0 108 20
       $pressed:
