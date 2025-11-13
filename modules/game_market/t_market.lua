@@ -1528,6 +1528,13 @@ function onAcceptBuyOffer()
 		return
 	end
 
+	-- Check if trying to accept own offer
+	local player = g_game.getLocalPlayer()
+	if player and currentOffer.holder == player:getName() then
+		displayInfoBox("Error", "You cannot accept your own offer.")
+		return
+	end
+
   local amount = tonumber(mainMarket.amountBuy:getText())
 
 	sendMarketAcceptOffer(currentOffer.timestamp, currentOffer.counter, amount)
@@ -1539,7 +1546,16 @@ function updateCreateCount(widget, value)
 	end
 
 	mainMarket.createOfferAmount:setText("Amount: " .. value)
-	onPiecePriceEdit(mainMarket.piecePriceCreate)
+	
+	-- Revalidate price when amount changes to catch overflow conditions
+	if #mainMarket.piecePriceCreate:getText() > 0 then
+		onPiecePriceEdit(mainMarket.piecePriceCreate)
+	else
+		mainMarket.grossAmount:setText("0")
+		mainMarket.grossAmount.value = 0
+		mainMarket.profitAmount:setText("0")
+		mainMarket.feeAmount:setText("0")
+	end
 end
 
 function onPiecePriceEdit(widget)
@@ -1610,7 +1626,21 @@ function onPiecePriceEdit(widget)
 	mainMarket.amountCreateScrollBar:setStep(steps)
 
 	if currentActionType == 0 then
-		local grossProfit = numericValue * amount
+		-- Check for safe multiplication before calculating total
+		local maxSafeValue = 9007199254740992 -- 2^53, Lua's safe integer limit
+		local grossProfit = 0
+		
+		if amount > 0 and numericValue > maxSafeValue / amount then
+			-- Overflow would occur - disable create button and show warning
+			mainMarket.grossAmount:setText("TOO LARGE")
+			mainMarket.grossAmount.value = numericValue
+			mainMarket.profitAmount:setText("TOO LARGE")
+			mainMarket.createButton:setEnabled(false)
+			mainMarket.feeAmount:setText(convertGold(fee))
+			return
+		end
+		
+		grossProfit = numericValue * amount
 		mainMarket.grossAmount:setText(convertGold(grossProfit, true))
 		mainMarket.grossAmount.value = numericValue
 		mainMarket.profitAmount:setText(convertGold(grossProfit + fee, true))
@@ -1657,7 +1687,21 @@ function onPiecePriceEdit(widget)
 			mainMarket.amountCreateScrollBar:setRange(0, 0)
 		end
 
-		local grossProfit = numericValue * amount
+		-- Check for safe multiplication before calculating total
+		local maxSafeValue = 9007199254740992 -- 2^53, Lua's safe integer limit
+		local grossProfit = 0
+		
+		if amount > 0 and numericValue > maxSafeValue / amount then
+			-- Overflow would occur - disable create button and show warning
+			mainMarket.grossAmount:setText("TOO LARGE")
+			mainMarket.grossAmount.value = numericValue
+			mainMarket.profitAmount:setText("TOO LARGE")
+			mainMarket.createButton:setEnabled(false)
+			mainMarket.feeAmount:setText(convertGold(fee))
+			return
+		end
+		
+		grossProfit = numericValue * amount
 		mainMarket.grossAmount:setText(convertGold(grossProfit, true))
 		mainMarket.grossAmount.value = numericValue
 		mainMarket.profitAmount:setText(convertGold(grossProfit - fee, true))
@@ -1689,6 +1733,7 @@ end
 
 function createMarketOffer()
 	if table.empty(lastSelectedItem) then
+		displayInfoBox("Error", "No item selected.")
 		return
 	end
 
@@ -1697,17 +1742,45 @@ function createMarketOffer()
 	local piecePrice = tonumber(mainMarket.grossAmount.value)
 	
 	if not amount or not piecePrice then
+		displayInfoBox("Error", "Invalid amount or price.")
 		return
 	end
 	
 	if amount <= 0 or piecePrice <= 0 then
+		displayInfoBox("Error", "Amount and price must be greater than zero.")
 		return
 	end
 	
-	-- For buy offers, check if player has enough money for the total order value
+	-- For buy offers, check if player has enough money for the total order value + fee
 	if currentActionType == 0 then
+		-- Check for potential overflow before multiplication (Lua safe integer limit is 2^53)
+		local maxSafeValue = 9007199254740992 -- 2^53
+		if piecePrice > maxSafeValue / amount then
+			-- Overflow would occur, reject the offer
+			displayInfoBox("Error", "Total order value is too large. Please reduce the amount or piece price.")
+			return
+		end
+		
 		local totalOrderValue = piecePrice * amount
-		if getTotalMoney() < totalOrderValue then
+		
+		-- Calculate the fee (same formula as onPiecePriceEdit)
+		local fee = math.ceil((piecePrice / 50) * amount)
+		if fee < 20 then
+			fee = 20
+		elseif fee > 1000000 then
+			fee = 1000000
+		end
+		
+		local totalCost = totalOrderValue + fee
+		if getTotalMoney() < totalCost then
+			displayInfoBox("Error", "Insufficient gold. You need " .. comma_value(totalCost) .. " gold to create this buy offer.")
+			return
+		end
+	else
+		-- For sell offers, check if player has enough items
+		local itemCount = lastSelectedItem.itemId == 22118 and getTransferableTibiaCoins() or getDepotItemCount(lastSelectedItem.itemId, lastSelectedItem.tier)
+		if itemCount < amount then
+			displayInfoBox("Error", "Insufficient items in depot. You have " .. itemCount .. " but need " .. amount .. ".")
 			return
 		end
 	end
