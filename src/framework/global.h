@@ -22,14 +22,14 @@
 
 #pragma once
 
-using namespace std::literals;
-
 #include "config.h"
 
 #include "stdext/compiler.h"
 
 // common C/C++ headers
 #include "pch.h"
+
+using namespace std::literals;
 
 // global constants
 #include "const.h"

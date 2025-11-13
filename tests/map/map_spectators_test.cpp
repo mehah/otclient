@@ -3,12 +3,14 @@
 #define private public
 #define protected public
 #include "client/map.h"
-#undef protected
-#undef private
 
 #include "client/creature.h"
 #include "client/gameconfig.h"
 #include "client/tile.h"
+#include "client/thingtype.h"
+
+#undef protected
+#undef private
 
 #include <framework/core/logger.h>
 #include <framework/core/resourcemanager.h>
