@@ -568,6 +568,7 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, const int32_t size)
             j = 0;
     }
 
+    delete[] new_Data;
     return nullptr;
 }
 
