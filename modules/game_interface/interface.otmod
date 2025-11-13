@@ -33,6 +33,7 @@ Module
     - game_playerdeath
     - game_playermount
     - game_ruleviolation
+    - game_market
     - game_spelllist
     - game_cooldown
     - game_modaldialog
@@ -51,6 +52,5 @@ Module
     - game_cyclopedia
     - game_creatureinformation
     - game_rewardwall
-    - game_market
   @onLoad: init()
   @onUnload: terminate()
