@@ -26,6 +26,7 @@
 #include "framework/net/outputmessage.h"
 #include "protocolcodes.h"
 #include "thingtypemanager.h"
+#include "thingtype.h"
 #include "framework/util/crypt.h"
 
 void ProtocolGame::onSend() {}
@@ -1331,8 +1332,8 @@ void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t brows
             msg->addU16(browseType);
             // If browseId is 3 (browse item), send tier if item has classification
             if (browseId == 3) {
-                const auto& item = Item::create(browseType);
-                if (item && item->getClassification() > 0) {
+                const auto& thing = g_things.getThingType(browseType, ThingCategoryItem);
+                if (thing && thing->getClassification() > 0) {
                     msg->addU8(tier);
                 }
             }
@@ -1349,8 +1350,8 @@ void ProtocolGame::sendMarketCreateOffer(const uint8_t type, const uint16_t item
     msg->addU8(Proto::ClientMarketCreate);
     msg->addU8(type);
     msg->addU16(itemId);
-    if (const auto& item = Item::create(itemId)) {
-        if (item->getClassification() > 0) {
+    if (const auto& thing = g_things.getThingType(itemId, ThingCategoryItem)) {
+        if (thing->getClassification() > 0) {
             msg->addU8(itemTier);
         }
     }
