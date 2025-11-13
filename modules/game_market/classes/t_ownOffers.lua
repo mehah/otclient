@@ -72,14 +72,6 @@ function MarketOwnOffers.onParseMyOffers(buyOffers, sellOffers)
 		MarketOwnOffers.mySellOffers = sellOffers
 	end
 
-	-- Sort offers by timestamp descending (newest first)
-	if #MarketOwnOffers.myBuyOffers > 0 then
-		table.sort(MarketOwnOffers.myBuyOffers, function(a, b) return a.timestamp > b.timestamp end)
-	end
-	if #MarketOwnOffers.mySellOffers > 0 then
-		table.sort(MarketOwnOffers.mySellOffers, function(a, b) return a.timestamp > b.timestamp end)
-	end
-
 	window.sellOffersList:destroyChildren()
     for i = 1, MarketOwnOffers.ownSellPool do
         local data = MarketOwnOffers.mySellOffers[i]
