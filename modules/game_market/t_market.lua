@@ -1033,7 +1033,7 @@ function onItemListValueChange(scroll, value, delta)
 
             local isSelected = lastSelectedItem.itemId == data.thingType:getId()
             if data.tier then
-                isSelected = lastSelectedItem.itemId == data.thingType:getId() and data.tier == lastSelectedItem.tier
+                isSelected = lastSelectedItem.itemId == data.thingType:getId() and data.tier == (lastSelectedItem.tier or 0)
             end
 
             local backgroundColor = isSelected and '#585858' or '#363636'
@@ -1287,7 +1287,7 @@ function onSelectChildItem(widget, selected, oldFocus)
     local itemID = selected.item:getItemId()
     local itemTier = selected.item:getItem():getTier()
 
-    if lastSelectedItem.itemId == itemID and lastSelectedItem.tier == itemTier then
+    if lastSelectedItem.itemId == itemID and (lastSelectedItem.tier or 0) == itemTier then
         return true
     end
 
@@ -1735,7 +1735,7 @@ function onPiecePriceEdit(widget)
         end
     else
         local itemCount = isTibiaCoin and getTransferableTibiaCoins() or
-                              getDepotItemCount(lastSelectedItem.itemId, lastSelectedItem.tier)
+                              getDepotItemCount(lastSelectedItem.itemId, lastSelectedItem.tier or 0)
         if itemCount > 0 then
             if isTibiaCoin and itemCount < 25 then
                 mainMarket.amountCreateScrollBar:setValue(0)
@@ -1842,7 +1842,7 @@ function createMarketOffer()
     else
         -- For sell offers, check if player has enough items
         local itemCount = lastSelectedItem.itemId == 22118 and getTransferableTibiaCoins() or
-                              getDepotItemCount(lastSelectedItem.itemId, lastSelectedItem.tier)
+                              getDepotItemCount(lastSelectedItem.itemId, lastSelectedItem.tier or 0)
         if itemCount < amount then
             displayInfoBox("Error",
                 "Insufficient items in depot. You have " .. itemCount .. " but need " .. amount .. ".")
@@ -1863,14 +1863,14 @@ function createMarketOffer()
     lastItemID = 0
     lastItemTier = 0
 
-    sendMarketCreateOffer(currentActionType, lastSelectedItem.itemId, lastSelectedItem.tier, amount, piecePrice,
+    sendMarketCreateOffer(currentActionType, lastSelectedItem.itemId, lastSelectedItem.tier or 0, amount, piecePrice,
         mainMarket.anonymous:isChecked())
 
     scheduleEvent(function()
         if not table.empty(lastSelectedItem) then
             marketOffersBuy = {}
             marketOffersSell = {}
-            sendMarketAction(3, lastSelectedItem.itemId, lastSelectedItem.tier)
+            sendMarketAction(3, lastSelectedItem.itemId, lastSelectedItem.tier or 0)
         end
     end, 500)
 end
@@ -2132,8 +2132,9 @@ function onShowRedirect(item)
         widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "),
             itemInfo.marketData.name))
 
-        widget.item:getItem():setTier(itemInfo.tier)
-        ItemsDatabase.setTier(widget.item, itemInfo.tier, true)
+        local itemTier = itemInfo.tier or 0
+        widget.item:getItem():setTier(itemTier)
+        ItemsDatabase.setTier(widget.item, itemTier, true)
 
         -- Apply rarity frame
         ItemsDatabase.setRarityItem(widget.itemBackground, widget.item:getItem())
