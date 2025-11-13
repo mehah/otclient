@@ -38,5 +38,12 @@ MarketDetailNames = {
     "Tier: "
 }
 
-MarketCategoryWeaponsAll = 100
-MarketCategoryFistWeapons = 101
+-- Weapon subcategories for display
+MarketCategoryWeaponsAmmo = 100
+MarketCategoryWeaponsAxes = 101
+MarketCategoryWeaponsClubs = 102
+MarketCategoryWeaponsDistance = 103
+MarketCategoryWeaponsSwords = 104
+MarketCategoryWeaponsWands = 105
+MarketCategoryWeaponsAll = 106
+MarketCategoryFistWeapons = 107
