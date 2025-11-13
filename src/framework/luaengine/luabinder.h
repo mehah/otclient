@@ -246,9 +246,31 @@ namespace luabinder
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
             if (!obj) {
                 g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
-                return Ret{};
+                if constexpr (std::is_void_v<Ret>) {
+                    return;
+                } else {
+                    return Ret{};
+                }
             }
-            return mf(obj.get(), args...); 
+            if constexpr (std::is_void_v<Ret>) {
+                mf(obj.get(), args...);
+                return;
+            }
+            return mf(obj.get(), args...);
+        };
+    }
+
+    template<typename C, typename... Args>
+    std::function<void(const std::shared_ptr<C>&, const Args&...)>
+    make_mem_func(void (C::*f)(Args...) const)
+    {
+        auto mf = std::mem_fn(f);
+        return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable {
+            if (!obj) {
+                g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
+                return;
+            }
+            mf(obj.get(), args...);
         };
     }
 
@@ -267,7 +289,21 @@ namespace luabinder
     make_mem_func_singleton(Ret (C::*f)(Args...) const, C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable -> Ret { return mf(instance, args...); };
+        return [=](Args... args) mutable -> Ret {
+            if constexpr (std::is_void_v<Ret>) {
+                mf(instance, args...);
+                return;
+            }
+            return mf(instance, args...);
+        };
+    }
+
+    template<typename C, typename... Args>
+    std::function<void(const Args&...)>
+    make_mem_func_singleton(void (C::*f)(Args...) const, C* instance)
+    {
+        auto mf = std::mem_fn(f);
+        return [=](Args... args) mutable { mf(instance, args...); };
     }
 
     template<typename C, typename Ret, class FC, typename... Args>
