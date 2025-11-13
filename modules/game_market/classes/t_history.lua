@@ -53,8 +53,9 @@ function MarketHistory.onTopListValueChange(scroll, value, delta)
             widget.endAt:setColor("#c0c0c0")
             widget.status:setColor("#c0c0c0")
 
-            if data.itemTier > 0 then
-                widget.name:setText(widget.name:getText() .. " (Tier " .. data.itemTier .. ")")
+            local itemTier = data.itemTier or 0
+            if itemTier > 0 then
+                widget.name:setText(widget.name:getText() .. " (Tier " .. itemTier .. ")")
             end
 
             local totalPrice = data.price * data.amount
@@ -107,8 +108,9 @@ function MarketHistory.onBottomListValueChange(scroll, value, delta)
         widget.endAt:setColor("#c0c0c0")
         widget.status:setColor("#c0c0c0")
 
-        if data.itemTier > 0 then
-            widget.name:setText(widget.name:getText() .. " (Tier " .. data.itemTier .. ")")
+        local itemTier = data.itemTier or 0
+        if itemTier > 0 then
+            widget.name:setText(widget.name:getText() .. " (Tier " .. itemTier .. ")")
         end
 
         local totalPrice = data.price * data.amount
@@ -157,8 +159,9 @@ function MarketHistory.onParseMarketHistory(buyOffers, sellOffers)
             widget.endAt:setText(os.date("%Y-%m-%d, %H:%M:%S", data.timestamp))
             widget.status:setText(MarketSellStatus[data.state])
 
-            if data.itemTier > 0 then
-                widget.name:setText(widget.name:getText() .. " (Tier " .. data.itemTier .. ")")
+            local itemTier = data.itemTier or 0
+            if itemTier > 0 then
+                widget.name:setText(widget.name:getText() .. " (Tier " .. itemTier .. ")")
             end
 
             local totalPrice = data.price * data.amount
@@ -205,8 +208,9 @@ function MarketHistory.onParseMarketHistory(buyOffers, sellOffers)
             widget.endAt:setText(os.date("%Y-%m-%d, %H:%M:%S", data.timestamp))
             widget.status:setText(MarketBuyStatus[data.state])
 
-            if data.itemTier > 0 then
-                widget.name:setText(widget.name:getText() .. " (Tier " .. data.itemTier .. ")")
+            local itemTier = data.itemTier or 0
+            if itemTier > 0 then
+                widget.name:setText(widget.name:getText() .. " (Tier " .. itemTier .. ")")
             end
 
             local totalPrice = data.price * data.amount
