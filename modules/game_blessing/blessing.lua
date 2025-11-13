@@ -1,6 +1,9 @@
 BlessingController = Controller:new()
 
 function BlessingController:onInit()
+    BlessingController:registerEvents(g_game, {
+        onBlessingsChange = onBlessingsChange
+    })
 end
 
 function BlessingController:onTerminate()
@@ -30,20 +33,20 @@ end
 function BlessingController:showHistory()
     local ui = BlessingController.ui
     if ui.historyPanel:isVisible() then
+        BlessingController.historyButtonText = "History"
         setBlessingView()
     else
+        BlessingController.historyButtonText = "Back"
         setHistoryView()
     end
 end
 
 function setHistoryView()
     local ui = BlessingController.ui
-    BlessingController.historyButtonText = "History"
     ui.blessingsRecordPanel:hide()
     ui.promotionPanel:hide()
     ui.deathPenaltyPanel:hide()
     ui.historyPanel:show()
-    ui.buttonsPanel.historyButton:setText("Back")
 end
 
 function setBlessingView()
@@ -52,10 +55,10 @@ function setBlessingView()
     ui.promotionPanel:show()
     ui.deathPenaltyPanel:show()
     ui.historyPanel:hide()
-    ui.buttonsPanel.historyButton:setText("History")
 end
 
 function show()
+    BlessingController.historyButtonText = "History"
     g_ui.importStyle("style.otui")
     BlessingController:loadHtml('blessing.html')
     g_game.requestBless()
@@ -63,9 +66,6 @@ function show()
     BlessingController.ui:raise()
     BlessingController.ui:focus()
     setBlessingView()
-    BlessingController:scheduleEvent(function()
-        BlessingController.ui:centerIn('parent')
-    end, 1, "LazyHtml")
 end
 
 function hide()
@@ -126,4 +126,8 @@ end
 function BlessingController:onClickSendStore()
     modules.game_store.toggle()
     g_game.sendRequestStorePremiumBoost()
+end
+
+function onBlessingsChange(blessings, blessVisualState)
+    modules.game_inventory.onBlessingsChange(blessings, blessVisualState)
 end

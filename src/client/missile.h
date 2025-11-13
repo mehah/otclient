@@ -29,7 +29,7 @@
 class Missile final : public Thing
 {
 public:
-    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr) override;
+    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
 
     void setId(uint32_t id) override;
     void setPath(const Position& fromPosition, const Position& toPosition);

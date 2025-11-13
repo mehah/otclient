@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include <random>
-
 namespace stdext
 {
     inline bool is_power_of_two(const size_t v) { return ((v != 0) && !(v & (v - 1))); }
@@ -51,5 +49,4 @@ namespace stdext
     int32_t normal_random(int32_t minNumber, int32_t maxNumber);
     bool random_bool(double probability = 0.5);
     std::mt19937& random_gen();
-
 }

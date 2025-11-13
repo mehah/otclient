@@ -21,21 +21,19 @@
  */
 
 #include "thingtype.h"
+
+#include "animator.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "lightview.h"
-#include "localplayer.h"
-#include "map.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
-
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/filestream.h>
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/filestream.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/image.h"
+#include "framework/otml/otmlnode.h"
 #include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/image.h>
-#include <framework/graphics/texture.h>
-#include <framework/otml/otml.h>
 
 const static TexturePtr m_textureNull;
 
@@ -306,7 +304,9 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
     // player_corpse
     // cyclopediaitem
     // ammo
-
+    if (flags.has_ammo() && flags.ammo()) {
+        m_flags |= ThingFlagAttrAmmo;
+    }
     if (flags.has_show_off_socket() && flags.show_off_socket()) {
         m_flags |= ThingFlagAttrPodium;
     }
@@ -611,7 +611,7 @@ void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& scree
     g_drawPool.resetShaderProgram();
 }
 
-void ThingType::draw(const Point& dest, const int layer, const int xPattern, const int yPattern, const int zPattern, const int animationPhase, const Color& color, const bool drawThings, const LightViewPtr& lightView)
+void ThingType::draw(const Point& dest, const int layer, const int xPattern, const int yPattern, const int zPattern, const int animationPhase, const Color& color, const bool drawThings, LightView* lightView)
 {
     if (m_null)
         return;
@@ -963,6 +963,33 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr) {
 }
 
 bool ThingType::isTall(const bool useRealSize) { return useRealSize ? getRealSize() > g_gameConfig.getSpriteSize() : getHeight() > 1; }
+int ThingType::getAnimationPhases() { return m_animator ? m_animator->getAnimationPhases() : m_animationPhases; }
+
+int ThingType::getMeanPrice() {
+    static constexpr std::array<std::pair<uint32_t, uint32_t>, 3> forcedPrices = { {
+        {3043, 10000},// Crystal Coin
+        {3031, 1}, // Gold Coin
+        {3035, 100} // Platinum Coin
+    } };
+
+    const uint32_t itemId = getId();
+
+    const auto it = std::ranges::find_if(forcedPrices, [itemId](const auto& pair) { return pair.first == itemId; });
+
+    if (it != forcedPrices.end()) {
+        return it->second;
+    }
+
+    const auto npcCount = m_npcData.size();
+    if (npcCount == 0) {
+        return 0;
+    }
+
+    const int totalBuyPrice = std::accumulate(m_npcData.begin(), m_npcData.end(), 0,
+        [](int sum, const auto& npc) { return sum + npc.buyPrice; });
+
+    return totalBuyPrice / static_cast<int>(npcCount);
+}
 
 #ifdef FRAMEWORK_EDITOR
 void ThingType::serialize(const FileStreamPtr& fin)

@@ -1,7 +1,7 @@
-#include "textureatlas.h"
-#include "texturemanager.h"
-#include "graphics.h"
 #include "framebuffer.h"
+#include "textureatlas.h"
+
+#include "painter.h"
 
 constexpr uint8_t SMOOTH_PADDING = 2;
 

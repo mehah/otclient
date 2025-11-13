@@ -19,14 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <algorithm>
-#include <cmath>
-#include <functional>
+#include "uilayoutflexbox.h"
+#include "uimanager.h"
+#include "uiwidget.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/html/htmlmanager.h>
 #include <framework/html/htmlnode.h>
-#include "uimanager.h"
-#include "uiwidget.h"
 
 namespace {
     inline uint32_t SIZE_VERSION_COUNTER = 1;
@@ -750,6 +748,64 @@ namespace {
             w->getHeightHtml().applyUpdate(w->getHeight(), SIZE_VERSION_COUNTER);
         }
     }
+
+    void applyPlacementAnchors(UIWidget* widget)
+    {
+        if (!widget) return;
+
+        auto align = widget->getPlacement();
+        if (align == Fw::AlignNone) return;
+
+        switch (align) {
+            case Fw::AlignTopLeft:
+                widget->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                widget->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                break;
+
+            case Fw::AlignTopRight:
+                widget->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                widget->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                break;
+
+            case Fw::AlignBottomLeft:
+                widget->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                widget->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+                break;
+
+            case Fw::AlignBottomRight:
+                widget->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                widget->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+                break;
+
+            case Fw::AlignLeftCenter:
+                widget->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                widget->addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+                break;
+
+            case Fw::AlignRightCenter:
+                widget->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                widget->addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+                break;
+
+            case Fw::AlignTopCenter:
+                widget->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                widget->addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+                break;
+
+            case Fw::AlignBottomCenter:
+                widget->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+                widget->addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+                break;
+
+            case Fw::AlignCenter:
+                widget->addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+                widget->addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+                break;
+
+            default:
+                break;
+        }
+    }
 }
 
 void UIWidget::refreshHtml(bool siblingsTo) {
@@ -809,9 +865,8 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
 
     bool needUpdate = false;
 
-    if (m_positionType == PositionType::Absolute && (unit == Unit::Auto || unit == Unit::Percent)) {
-        if (isWidth && m_positions.right.unit == Unit::Auto || !isWidth && m_positions.bottom.unit == Unit::Auto)
-            unit = Unit::FitContent;
+    if (m_positionType == PositionType::Absolute && unit == Unit::Auto) {
+        unit = Unit::FitContent;
     }
 
     switch (unit) {
@@ -1171,7 +1226,7 @@ void UIWidget::updateTableLayout()
 
             UIWidget* cell = info.widget;
             const int padY = cell->getPaddingTop() + cell->getPaddingBottom();
-            const int contentH = std::max(0, tallestInRow - padY);
+            const int contentH = std::max<int>(0, tallestInRow - padY);
 
             if (cell->m_height.unit == Unit::Auto || cell->m_height.unit == Unit::FitContent) {
                 cell->setHeight_px(contentH);
@@ -1380,71 +1435,16 @@ void UIWidget::updateSize() {
         return;
 
     if (m_htmlNode && (m_htmlNode->getType() == NodeType::Text || m_htmlNode->getStyle("inherit-text") == "true")) {
-        const auto& parentSize = m_parent->m_width.unit == Unit::FitContent ? m_textSizeNowrap : m_parent->getSize();
-
-        auto height = m_textSizeNowrap.height();
-        if (parentSize.width() < m_textSizeNowrap.width()) {
-            if (isTextWrap() && m_rect.isValid()) {
-                const auto& text = m_font->wrapText(m_text, parentSize.width() - m_textOffset.x);
-                height *= std::count(text.begin(), text.end(), '\n') + 1;
-            }
+        setProp(PropTextVerticalAutoResize, true);
+        if (m_parent->m_width.unit == Unit::FitContent) {
+            setProp(PropTextHorizontalAutoResize, true);
+            setWidth_px(m_realTextSize.width());
+        } else {
+            setProp(PropTextHorizontalAutoResize, false);
+            setWidth_px(m_parent->getSize().width());
         }
-
-        setSize({
-            std::min<int>(parentSize.width() , m_textSizeNowrap.width()) + getPaddingLeft() + getPaddingRight() + m_textOffset.x,
-            height + getPaddingTop() + getPaddingBottom() + m_textOffset.y
-        });
+        updateText();
         return;
-    }
-
-    if (m_positionType == PositionType::Absolute) {
-        const bool L = m_positions.left.unit != Unit::Auto;
-        const bool R = m_positions.right.unit != Unit::Auto;
-        const bool T = m_positions.top.unit != Unit::Auto;
-        const bool B = m_positions.bottom.unit != Unit::Auto;
-
-        const bool updateWidth = m_width.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) && L && R;
-        const bool updateHeight = m_height.needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER) && T && B;
-
-        if (updateWidth || updateHeight) {
-            auto parent = getVirtualParent();
-            parent->updateSize();
-
-            const int pContentW = parent->getWidth() - parent->getPaddingLeft() - parent->getPaddingRight();
-            const int pContentH = parent->getHeight() - parent->getPaddingTop() - parent->getPaddingBottom();
-
-            auto resolveH = [&](const SizeUnit& len, int base) -> int {
-                return (len.unit == Unit::Percent) ? (base * len.value) / 100 : len.value;
-            };
-
-            if (updateWidth) {
-                const int leftPx = resolveH(m_positions.left, pContentW);
-                const int rightPx = resolveH(m_positions.right, pContentW);
-
-                const int ml = getMarginLeft();
-                const int mr = getMarginRight();
-
-                int w = pContentW - leftPx - rightPx - ml - mr;
-                if (w < 0) w = 0;
-
-                setWidth_px(w);
-                m_width.applyUpdate(getWidth(), SIZE_VERSION_COUNTER);
-            }
-
-            if (updateHeight) {
-                const int topPx = resolveH(m_positions.top, pContentH);
-                const int bottomPx = resolveH(m_positions.bottom, pContentH);
-
-                const int mt = getMarginTop();
-                const int mb = getMarginBottom();
-
-                int h = pContentH - topPx - bottomPx - mt - mb;
-                if (h < 0) h = 0;
-
-                setHeight_px(h);
-                m_height.applyUpdate(getHeight(), SIZE_VERSION_COUNTER);
-            }
-        }
     }
 
     const bool widthNeedsUpdate = m_width.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) || m_width.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER);
@@ -1453,26 +1453,203 @@ void UIWidget::updateSize() {
     if (widthNeedsUpdate || heightNeedsUpdate) {
         auto width = -1;
         auto height = -1;
-
         auto parent = m_parent;
         while (m_positionType == PositionType::Absolute && parent->m_positionType == PositionType::Static) {
             parent = parent->m_parent;
         }
-
         if (widthNeedsUpdate) {
             width = parent->getWidth();
-            if (width > -1)
+            if (width > -1 && m_positionType != PositionType::Absolute)
                 width -= parent->getPaddingLeft() + parent->getPaddingRight();
         }
-
         if (heightNeedsUpdate) {
             height = parent->getHeight();
-            if (height > -1)
+            if (height > -1 && m_positionType != PositionType::Absolute)
                 height -= parent->getPaddingTop() + parent->getPaddingBottom();
         }
-
         if (width > -1 || height > -1) {
             updateDimension(this, width, height);
+        }
+    }
+
+    if (m_positionType == PositionType::Absolute) {
+        UIWidgetPtr cb = getVirtualParent();
+        if (!cb) return;
+        cb->updateSize();
+
+        const int pl = cb->getPaddingLeft();
+        const int pr = cb->getPaddingRight();
+        const int pt = cb->getPaddingTop();
+        const int pb = cb->getPaddingBottom();
+
+        const int cbw_content = std::max(0, cb->getWidth());
+        const int cbh_content = std::max(0, cb->getHeight());
+        const int cbw_padding = std::max(0, cbw_content + pl + pr);
+        const int cbh_padding = std::max(0, cbh_content + pt + pb);
+
+        auto toPx = [&](const SizeUnit& u, int base) -> int {
+            switch (u.unit) {
+                case Unit::Percent: return std::lround(base * (u.value / 100.0));
+                case Unit::Px: return u.value;
+                default: return 0;
+            }
+        };
+
+        const bool hasL = m_positions.left.unit != Unit::Auto;
+        const bool hasR = m_positions.right.unit != Unit::Auto;
+        const bool hasT = m_positions.top.unit != Unit::Auto;
+        const bool hasB = m_positions.bottom.unit != Unit::Auto;
+
+        const int baseW_for_offsets = (hasL || hasR) ? cbw_content : cbw_padding;
+        const int baseH_for_offsets = (hasT || hasB) ? cbh_content : cbh_padding;
+
+        int left = hasL ? toPx(m_positions.left, baseW_for_offsets) : pl;
+        int right = hasR ? toPx(m_positions.right, baseW_for_offsets) : pr;
+        int top = hasT ? toPx(m_positions.top, baseH_for_offsets) : pt;
+        int bottom = hasB ? toPx(m_positions.bottom, baseH_for_offsets) : pb;
+
+        const int ml = getMarginLeft();
+        const int mr = getMarginRight();
+        const int mt = getMarginTop();
+        const int mb = getMarginBottom();
+
+        bool widthAutoLike =
+            m_width.unit == Unit::Auto || m_width.unit == Unit::FitContent ||
+            m_width.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) ||
+            m_width.needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER);
+
+        int resolvedW = getWidth();
+        if (resolvedW < 0 && m_width.valueCalculed > -1) resolvedW = m_width.valueCalculed;
+
+        auto shrinkToFitWidth = [&]() -> int {
+            int w = 0, h = 0;
+            applyFitContentRecursive(this, w, h);
+            return std::max(0, w);
+        };
+
+        const int cbw_for_size = (hasL || hasR) ? cbw_content : cbw_padding;
+
+        if (hasL && hasR && widthAutoLike) {
+            int w = cbw_for_size - left - right - ml - mr;
+            if (w < 0) w = 0;
+            setWidth_px(w);
+            m_width.applyUpdate(getWidth(), SIZE_VERSION_COUNTER);
+            resolvedW = getWidth();
+        } else if ((hasL && !hasR && !widthAutoLike) || (hasR && !hasL && !widthAutoLike)) {
+            int w = std::max(0, resolvedW);
+            int other = cbw_for_size - (hasL ? left : right) - w - ml - mr;
+            if (hasL) right = other; else left = other;
+        } else if (hasL && hasR && !widthAutoLike) {
+            int w = std::max(0, resolvedW);
+            right = cbw_for_size - left - w - ml - mr;
+        } else {
+            if (widthAutoLike) {
+                int w = shrinkToFitWidth();
+                setWidth_px(w);
+                m_width.applyUpdate(getWidth(), SIZE_VERSION_COUNTER);
+                resolvedW = getWidth();
+            }
+            if (!hasL && !hasR) {
+                left = pl;
+                right = cbw_for_size - left - std::max(0, resolvedW) - ml - mr;
+            } else if (!hasL) {
+                left = cbw_for_size - right - std::max(0, resolvedW) - ml - mr;
+            } else {
+                right = cbw_for_size - left - std::max(0, resolvedW) - ml - mr;
+            }
+        }
+
+        if (m_minSize.width() > 0 || m_maxSize.width() > 0) {
+            int clamped = std::max(m_minSize.width(), std::max(0, resolvedW));
+            if (m_maxSize.width() > 0) clamped = std::min(m_maxSize.width(), clamped);
+            if (clamped != resolvedW) {
+                setWidth_px(clamped);
+                m_width.applyUpdate(getWidth(), SIZE_VERSION_COUNTER);
+                resolvedW = clamped;
+                if (hasL) right = cbw_for_size - left - resolvedW - ml - mr;
+                else left = cbw_for_size - right - resolvedW - ml - mr;
+            }
+        }
+
+        bool heightAutoLike =
+            m_height.unit == Unit::Auto || m_height.unit == Unit::FitContent ||
+            m_height.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) ||
+            m_height.needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER);
+
+        int resolvedH = getHeight();
+        if (resolvedH < 0 && m_height.valueCalculed > -1) resolvedH = m_height.valueCalculed;
+
+        auto shrinkToFitHeight = [&]() -> int {
+            int w = 0, h = 0;
+            applyFitContentRecursive(this, w, h);
+            return std::max(0, h);
+        };
+
+        const int cbh_for_size = (hasT || hasB) ? cbh_content : cbh_padding;
+
+        if (hasT && hasB && heightAutoLike) {
+            int h = cbh_for_size - top - bottom - mt - mb;
+            if (h < 0) h = 0;
+            setHeight_px(h);
+            m_height.applyUpdate(getHeight(), SIZE_VERSION_COUNTER);
+            resolvedH = getHeight();
+        } else if ((hasT && !hasB && !heightAutoLike) || (hasB && !hasT && !heightAutoLike)) {
+            int h = std::max(0, resolvedH);
+            int other = cbh_for_size - (hasT ? top : bottom) - h - mt - mb;
+            if (hasT) bottom = other; else top = other;
+        } else if (hasT && hasB && !heightAutoLike) {
+            int h = std::max(0, resolvedH);
+            bottom = cbh_for_size - top - h - mt - mb;
+        } else {
+            if (heightAutoLike) {
+                int h = shrinkToFitHeight();
+                setHeight_px(h);
+                m_height.applyUpdate(getHeight(), SIZE_VERSION_COUNTER);
+                resolvedH = getHeight();
+            }
+            if (!hasT && !hasB) {
+                top = pt;
+                bottom = cbh_for_size - top - std::max(0, resolvedH) - mt - mb;
+            } else if (!hasT) {
+                top = cbh_for_size - bottom - std::max(0, resolvedH) - mt - mb;
+            } else {
+                bottom = cbh_for_size - top - std::max(0, resolvedH) - mt - mb;
+            }
+        }
+
+        if (m_minSize.height() > 0 || m_maxSize.height() > 0) {
+            int clamped = std::max(m_minSize.height(), std::max(0, resolvedH));
+            if (m_maxSize.height() > 0) clamped = std::min(m_maxSize.height(), clamped);
+            if (clamped != resolvedH) {
+                setHeight_px(clamped);
+                m_height.applyUpdate(getHeight(), SIZE_VERSION_COUNTER);
+                resolvedH = clamped;
+                if (hasT) bottom = cbh_for_size - top - resolvedH - mt - mb;
+                else top = cbh_for_size - bottom - resolvedH - mt - mb;
+            }
+        }
+
+        setMarginLeft(0);
+        setMarginRight(0);
+        setMarginTop(0);
+        setMarginBottom(0);
+
+        if (hasL && hasR) {
+            setMarginLeft(std::max(0, left));
+            setMarginRight(std::max(0, right));
+        } else if (hasL) {
+            setMarginLeft(std::max(0, (left == INT_MIN ? 0 : left)));
+        } else if (hasR) {
+            setMarginRight(std::max(0, (right == INT_MIN ? 0 : right)));
+        }
+
+        if (hasT && hasB) {
+            setMarginTop(std::max(0, top));
+            setMarginBottom(std::max(0, bottom));
+        } else if (hasT) {
+            setMarginTop(std::max(0, (top == INT_MIN ? 0 : top)));
+        } else if (hasB) {
+            setMarginBottom(std::max(0, (bottom == INT_MIN ? 0 : bottom)));
         }
     }
 
@@ -1486,6 +1663,13 @@ void UIWidget::updateSize() {
         int width = 0;
         int height = 0;
         applyFitContentRecursive(this, width, height);
+    }
+
+    if (m_displayType == DisplayType::Flex || m_displayType == DisplayType::InlineFlex) {
+        layoutFlex(*this);
+        m_width.pendingUpdate = false;
+        m_height.pendingUpdate = false;
+        return;
     }
 
     if (m_displayType == DisplayType::Table) {
@@ -1507,25 +1691,49 @@ void UIWidget::applyAnchorAlignment() {
 
     resetAnchors();
 
-    if (m_displayType == DisplayType::None) {
+    if (m_displayType == DisplayType::None)
         return;
-    }
 
     if (!hasAnchoredLayout())
         return;
 
-    if (m_htmlNode->getAttr("anchor") == "parent") {
-        addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-        addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+    if (m_placement != Fw::AlignNone) {
+        applyPlacementAnchors(this);
         return;
     }
 
     if (m_parent && m_parent->getDisplay() == DisplayType::TableCell) {
         const auto ta = resolveCellTextAlign(this);
         const auto va = resolveCellVerticalAlign(this);
-
         anchorHorizontalInCell(this, ta);
         anchorVerticalInCell(this, va);
+        return;
+    }
+
+    if (m_positionType == PositionType::Absolute) {
+        const auto& pos = getPositions();
+        const bool L = pos.left.unit != Unit::Auto;
+        const bool R = pos.right.unit != Unit::Auto;
+        const bool T = pos.top.unit != Unit::Auto;
+        const bool B = pos.bottom.unit != Unit::Auto;
+
+        if (L && R) {
+            addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+        } else if (R && !L) {
+            addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+        } else {
+            addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        }
+
+        if (T && B) {
+            addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+            addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+        } else if (B && !T) {
+            addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+        } else {
+            addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+        }
         return;
     }
 
@@ -1540,7 +1748,6 @@ void UIWidget::applyAnchorAlignment() {
 
     if (parentDisplay == DisplayType::InlineBlock || parentDisplay == DisplayType::Block || parentDisplay == DisplayType::TableCell) {
         bool anchored = true;
-
         const auto isInline = isInlineLike(m_displayType);
 
         if (isInline && m_parent->getTextAlign() == Fw::AlignCenter ||
@@ -1557,7 +1764,7 @@ void UIWidget::applyAnchorAlignment() {
                 else
                     addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
             } else if (isInline && m_parent->getTextAlign() == Fw::AlignRight ||
-                    !isInline && m_parent->getJustifyItems() == JustifyItemsType::Right) {
+                       !isInline && m_parent->getJustifyItems() == JustifyItemsType::Right) {
                 if (ctx.lastNormalWidget)
                     addAnchor(Fw::AnchorRight, "next", Fw::AnchorLeft);
                 else
@@ -1567,10 +1774,9 @@ void UIWidget::applyAnchorAlignment() {
 
         if (m_positionType != PositionType::Absolute) {
             bool addVertical = false;
-
-            if (parentDisplay == DisplayType::InlineBlock) {
+            if (parentDisplay == DisplayType::InlineBlock)
                 addVertical = m_parent->getHtmlNode()->getStyle("vertical-align") == "middle";
-            } else
+            else
                 addVertical = m_parent->getHtmlNode()->getStyle("align-items") == "center";
 
             if (addVertical) {
@@ -1592,32 +1798,16 @@ void UIWidget::applyAnchorAlignment() {
         }
     }
 
-    if (m_positionType == PositionType::Absolute) {
-        if (getPositions().top.unit == Unit::Auto && getPositions().bottom.unit != Unit::Auto) {
-            addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
-        } else {
-            addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
-        }
-
-        if (getPositions().left.unit == Unit::Auto && getPositions().right.unit != Unit::Auto) {
-            addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
-        } else {
-            addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-        }
-
-        return;
-    }
-
     const ClearType effClear = mapLogicalClear(m_clearType);
     const bool topCleared = applyClear(this, ctx, effClear);
 
-    if (effFloat == FloatType::Left || effFloat == FloatType::Right) {
+    if (effFloat == FloatType::Left || effFloat == FloatType::Right)
         applyFloat(this, ctx, effFloat, topCleared);
-    } else if (isFlexContainer(parentDisplay)) {
+    else if (isFlexContainer(parentDisplay))
         applyFlex(this, ctx, topCleared);
-    } else if (isGridContainer(parentDisplay)) {
+    else if (isGridContainer(parentDisplay))
         applyGridOrTable(this, ctx, topCleared);
-    } else if (isTableBox(parentDisplay)) {
+    else if (isTableBox(parentDisplay)) {
         switch (parentDisplay) {
             case DisplayType::Table: {
                 if (m_displayType == DisplayType::TableCaption)
@@ -1643,9 +1833,8 @@ void UIWidget::applyAnchorAlignment() {
                 break;
             }
         }
-    } else if (isInlineLike(m_displayType)) {
+    } else if (isInlineLike(m_displayType))
         applyInline(this, ctx, topCleared);
-    } else {
+    else
         applyBlock(this, ctx, topCleared);
-    }
 }

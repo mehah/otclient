@@ -21,20 +21,20 @@
  */
 
 #include "soundmanager.h"
-#include "soundbuffer.h"
-#include "soundeffect.h"
-#include "soundchannel.h"
-#include "soundfile.h"
-#include "streamsoundsource.h"
-#include "combinedsoundsource.h"
-
-#include <cstdint>
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/clock.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/core/garbagecollection.h>
 #include <nlohmann/json.hpp>
 #include <sounds.pb.h>
+
+#include "soundbuffer.h"
+#include "soundchannel.h"
+#include "soundeffect.h"
+#include "soundfile.h"
+#include "soundsource.h"
+#include "streamsoundsource.h"
+#include "client/game.h"
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/clock.h"
+#include "framework/core/garbagecollection.h"
+#include "framework/core/resourcemanager.h"
 
 using namespace otclient::protobuf;
 

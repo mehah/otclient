@@ -21,9 +21,9 @@
  */
 
 #include <framework/net/outputmessage.h>
-#include <framework/util/crypt.h>
 
 #include "client/game.h"
+#include "framework/util/crypt.h"
 
 OutputMessage::OutputMessage() {
     m_maxHeaderSize = g_game.getClientVersion() >= 1405 ? 7 : 8;
@@ -88,6 +88,15 @@ void OutputMessage::addString(const std::string_view buffer)
         throw stdext::exception(fmt::format("string length > {}", MAX_STRING_LENGTH));
     checkWrite(len + 2);
     addU16(len);
+    memcpy(m_buffer + m_writePos, buffer.data(), len);
+    m_writePos += len;
+    m_messageSize += len;
+}
+
+void OutputMessage::addBytes(const std::string_view buffer)
+{
+    const int len = buffer.length();
+    checkWrite(len);
     memcpy(m_buffer + m_writePos, buffer.data(), len);
     m_writePos += len;
     m_messageSize += len;

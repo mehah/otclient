@@ -166,7 +166,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalIncludeDirectories>
@@ -185,13 +185,13 @@
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <AdditionalIncludeDirectories>
@@ -208,7 +208,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|Win32'">
@@ -486,6 +486,7 @@
     <ClCompile Include="..\src\framework\ui\uigridlayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uihorizontallayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uilayout.cpp" />
+    <ClCompile Include="..\src\framework\ui\uilayoutflexbox.cpp" />
     <ClCompile Include="..\src\framework\ui\uimanager.cpp" />
     <ClCompile Include="..\src\framework\ui\uiparticles.cpp" />
     <ClCompile Include="..\src\framework\ui\uiqrcode.cpp" />
@@ -578,6 +579,7 @@
     <ClInclude Include="..\src\framework\graphics\animatedtexture.h" />
     <ClInclude Include="..\src\framework\graphics\apngloader.h" />
     <ClInclude Include="..\src\framework\graphics\bitmapfont.h" />
+    <ClInclude Include="..\src\framework\graphics\bitmapfontwrapoptions.h" />
     <ClInclude Include="..\src\framework\graphics\cachedtext.h" />
     <ClInclude Include="..\src\framework\graphics\coordsbuffer.h" />
     <ClInclude Include="..\src\framework\graphics\declarations.h" />
@@ -676,6 +678,7 @@
     <ClInclude Include="..\src\framework\ui\uigridlayout.h" />
     <ClInclude Include="..\src\framework\ui\uihorizontallayout.h" />
     <ClInclude Include="..\src\framework\ui\uilayout.h" />
+    <ClInclude Include="..\src\framework\ui\uilayoutflexbox.h" />
     <ClInclude Include="..\src\framework\ui\uimanager.h" />
     <ClInclude Include="..\src\framework\ui\uiparticles.h" />
     <ClInclude Include="..\src\framework\ui\uiqrcode.h" />

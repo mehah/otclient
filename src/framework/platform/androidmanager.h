@@ -37,6 +37,10 @@ public:
     void showKeyboardSoft();
     void hideKeyboard();
 
+    void showInputPreview(const std::string& text);
+    void updateInputPreview(const std::string& text);
+    void hideInputPreview();
+
     void unZipAssetData();
 
     std::string getStringFromJString(jstring);
@@ -53,6 +57,9 @@ private:
     jmethodID m_midShowSoftKeyboard;
     jmethodID m_midHideSoftKeyboard;
     jmethodID m_midGetDisplayDensity;
+    jmethodID m_midShowInputPreview;
+    jmethodID m_midUpdateInputPreview;
+    jmethodID m_midHideInputPreview;
 };
 
 extern AndroidManager g_androidManager;

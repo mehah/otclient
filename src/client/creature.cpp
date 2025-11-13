@@ -21,23 +21,29 @@
  */
 
 #include "creature.h"
+
+#include "animator.h"
+#include "attachedeffect.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "lightview.h"
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
+#include "framework/graphics/texturemanager.h"
+#include "protocolcodes.h"
+#include "statictext.h"
+#include "thingtype.h"
 #include "thingtypemanager.h"
 #include "tile.h"
-
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/scheduledevent.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
+#include "framework/graphics/shadermanager.h"
+#include "framework/ui/uiwidget.h"
 #include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/shadermanager.h>
-#include <framework/graphics/texturemanager.h>
-#include <framework/ui/uiwidget.h>
-
-#include "statictext.h"
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -58,9 +64,9 @@ void Creature::onCreate() {
     callLuaField("onCreate");
 }
 
-void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr& /*lightView*/)
+void Creature::draw(const Point& dest, const bool drawThings, LightView* /*lightView*/)
 {
-    if (!canBeSeen() || !canDraw())
+    if (!canBeSeen() || !canDraw() || isDead())
         return;
 
     if (drawThings) {
@@ -95,7 +101,7 @@ void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr
     // drawLight(dest, lightView);
 }
 
-void Creature::drawLight(const Point& dest, const LightViewPtr& lightView) {
+void Creature::drawLight(const Point& dest, LightView* lightView) {
     if (!lightView) return;
 
     auto light = getLight();
@@ -183,7 +189,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     const int cropSizeText = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? getExactSize() : 12;
     const int cropSizeBackGround = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? cropSizeText - nameSize.height() : 0;
 
-    const bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
+    const bool isScaled = g_app.getCreatureInformationScale() != DEFAULT_DISPLAY_DENSITY;
     if (isScaled) {
         p.scale(g_app.getCreatureInformationScale());
     }
@@ -211,23 +217,37 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     Rect healthRect = backgroundRect.expanded(-1);
     healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
-    if (drawFlags & Otc::DrawBars) {
+    Rect barsRect = backgroundRect;
+
+    if ((drawFlags & Otc::DrawBars) && (g_game.getClientVersion() >= 1100 ? !isNpc() : true)) {
         g_drawPool.addFilledRect(backgroundRect, Color::black);
         g_drawPool.addFilledRect(healthRect, fillColor);
 
         if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
             if (const auto& player = g_game.getLocalPlayer()) {
-                backgroundRect.moveTop(backgroundRect.bottom());
+                if (player->isMage() && player->getMaxManaShield() > 0) {
+                    barsRect.moveTop(barsRect.bottom());
+                    g_drawPool.addFilledRect(barsRect, Color::black);
 
-                g_drawPool.addFilledRect(backgroundRect, Color::black);
+                    Rect manaShieldRect = barsRect.expanded(-1);
+                    const double maxManaShield = player->getMaxManaShield();
+                    manaShieldRect.setWidth((maxManaShield ? player->getManaShield() / maxManaShield : 1) * 25);
 
-                Rect manaRect = backgroundRect.expanded(-1);
+                    g_drawPool.addFilledRect(manaShieldRect, Color::darkPink);
+                }
+
+                barsRect.moveTop(barsRect.bottom());
+                g_drawPool.addFilledRect(barsRect, Color::black);
+
+                Rect manaRect = barsRect.expanded(-1);
                 const double maxMana = player->getMaxMana();
                 manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
 
                 g_drawPool.addFilledRect(manaRect, Color::blue);
             }
         }
+
+        backgroundRect = barsRect;
     }
 
     g_drawPool.setDrawOrder(DrawOrder::SECOND);
@@ -506,7 +526,7 @@ void Creature::updateJump()
 
 void Creature::onPositionChange(const Position& newPos, const Position& oldPos)
 {
-    callLuaField("onPositionChange", newPos, oldPos);
+    callLuaFieldUnchecked("onPositionChange", newPos, oldPos);
 }
 
 void Creature::onAppear()
@@ -806,7 +826,9 @@ void Creature::setOutfit(const Outfit& outfit, bool fireEvent)
     m_outfit = outfit;
     m_numPatternZ = 0;
     m_exactSize = 0;
-    m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
+    if (m_walkingAnimationSpeed == 0) {
+        m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
+    }
 
     if (m_outfit.isInvalid())
         m_outfit.setCategory(m_outfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);

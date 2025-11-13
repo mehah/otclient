@@ -21,9 +21,10 @@
  */
 
 #include "attachedeffectmanager.h"
+
 #include "attachedeffect.h"
 #include "thingtypemanager.h"
-#include <framework/core/resourcemanager.h>
+#include "framework/core/resourcemanager.h"
 
 AttachedEffectManager g_attachedEffects;
 

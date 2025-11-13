@@ -21,3 +21,25 @@
  */
 
 #include "player.h"
+
+bool Player::isMage() const {
+    switch (m_vocation) {
+        case Otc::Vocations_t::SORCERER:
+        case Otc::Vocations_t::DRUID:
+        case Otc::Vocations_t::MASTER_SORCERER:
+        case Otc::Vocations_t::ELDER_DRUID:
+            return true;
+        default: return false;
+    }
+}
+
+void Player::setVocation(const uint8_t vocation)
+{
+    if (m_vocation == vocation)
+        return;
+
+    const uint8_t oldVocation = m_vocation;
+    m_vocation = vocation;
+
+    callLuaField("onVocationChange", vocation, oldVocation);
+}

@@ -97,3 +97,23 @@ end
 if not G.currentRsa then
     g_game.setRsa(OTSERV_RSA)
 end
+
+function g_game.closeContainerByItemId(itemId, tier)
+    if not itemId then
+        return false
+    end
+    local containersToClose = {}
+    for _, container in pairs(g_game.getContainers()) do
+        local containerItem = container:getContainerItem()
+        if containerItem and containerItem:getId() == itemId then
+            local containerTier = containerItem.getTier and containerItem:getTier() or nil
+            if not tier or containerTier == tier then
+                table.insert(containersToClose, container)
+            end
+        end
+    end
+    for _, container in ipairs(containersToClose) do
+        g_game.close(container)
+    end
+    return #containersToClose > 0
+end

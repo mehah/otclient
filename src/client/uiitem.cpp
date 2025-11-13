@@ -21,8 +21,11 @@
  */
 
 #include "uiitem.h"
-#include "lightview.h"
-#include <framework/graphics/fontmanager.h>
+
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/otml/otmlnode.h"
+#include "gameconfig.h"
+#include "item.h"
 
 UIItem::UIItem() { setProp(PropDraggable, true, false); }
 
@@ -129,6 +132,11 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
 
     UIWidget::onStyleApply(styleName, styleNode);
 }
+
+int UIItem::getItemId() { return m_item ? m_item->getId() : 0; }
+int UIItem::getItemCount() { return m_item ? m_item->getCount() : 0; }
+int UIItem::getItemSubType() { return m_item ? m_item->getSubType() : 0; }
+int UIItem::getItemCountOrSubType() { return m_item ? m_item->getCountOrSubType() : 0; }
 
 void UIItem::setShader(std::string_view name) {
     m_shaderName = name;

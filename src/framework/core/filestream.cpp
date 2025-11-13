@@ -21,11 +21,11 @@
  */
 
 #include "filestream.h"
-#include "binarytree.h"
-#include "graphicalapplication.h"
-#include <framework/core/application.h>
 
 #include <physfs.h>
+
+#include "binarytree.h"
+#include "graphicalapplication.h"
 
 inline void grow(std::vector<uint8_t>& data, const size_t size) {
     if (size > data.size())
