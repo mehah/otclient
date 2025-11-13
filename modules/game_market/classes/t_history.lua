@@ -138,14 +138,6 @@ function MarketHistory.onParseMarketHistory(buyOffers, sellOffers)
 	lastSelectedHistorySell = nil
 	lastSelectedHistoryBuy = nil
 
-	-- Sort offers by timestamp descending (newest first)
-	if #buyOffers > 0 then
-		table.sort(buyOffers, function(a, b) return a.timestamp > b.timestamp end)
-	end
-	if #sellOffers > 0 then
-		table.sort(sellOffers, function(a, b) return a.timestamp > b.timestamp end)
-	end
-
 	topListFitItems = math.floor(window.sellOffersList:getHeight() / labelSize)
 	topListMin = 0
 	topListPool = {}

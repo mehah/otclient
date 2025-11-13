@@ -679,18 +679,44 @@ function onMarketBrowse(intOffers, nameOffers)
 	local itemID = lastSelectedItem.itemId
 	local tier = lastSelectedItem.tier or 0
 
-	-- Always do a full refresh and sort by timestamp descending (newest first)
-	buyOffers = buyOffersData
-	sellOffers = sellOffersData
-	lastItemID = itemID
-	lastItemTier = tier
+	if lastItemID == itemID and lastItemTier == tier then
+		if #buyOffersData == 1 then
+			local updateItem = buyOffersData[1]
+			if buyOffers then
+				for i, data in pairs(buyOffers) do
+					if data.counter == updateItem.counter and data.timestamp == updateItem.timestamp then
+						if updateItem.amount == 0 then
+							table.remove(buyOffers, i)
+						else
+							buyOffers[i] = updateItem
+						end
+						break
+					end
+				end
+			end
+		end
 
-	-- Sort offers by timestamp descending (newest first)
-	if buyOffers and #buyOffers > 0 then
-		table.sort(buyOffers, function(a, b) return a.timestamp > b.timestamp end)
-	end
-	if sellOffers and #sellOffers > 0 then
-		table.sort(sellOffers, function(a, b) return a.timestamp > b.timestamp end)
+		if #sellOffersData == 1 then
+			local updateItem = sellOffersData[1]
+			if sellOffers then
+				for i, data in pairs(sellOffers) do
+					if data.counter == updateItem.counter and data.timestamp == updateItem.timestamp then
+						if updateItem.amount == 0 then
+							table.remove(sellOffers, i)
+						else
+							sellOffers[i] = updateItem
+						end
+						break
+					end
+				end
+			end
+		end
+	else
+		-- Full refresh - replace all offers
+		buyOffers = buyOffersData
+		sellOffers = sellOffersData
+		lastItemID = itemID
+		lastItemTier = tier
 	end
 
 	cache.SCROLL_BUY_OFFERS.listFit = math.floor(mainMarket.buyOffersList:getHeight() / 16) - 1
