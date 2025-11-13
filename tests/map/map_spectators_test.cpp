@@ -41,6 +41,32 @@ public:
         setRemovedSilently(true);
         setOldPositionSilently({});
     }
+
+    ThingType* getThingType() const override
+    {
+        static ThingType type;
+
+        static const bool initialized = [] {
+            type.m_null = false;
+            type.m_category = ThingCategoryCreature;
+            type.m_size = Size(1, 1);
+            type.m_realSize = 32;
+            type.m_layers = 1;
+            type.m_animationPhases = 1;
+            type.m_opacity = 1.f;
+            return true;
+        }();
+
+        (void)initialized;
+        return &type;
+    }
+
+    void terminateWalk() override
+    {
+        m_walking = false;
+        m_walkedPixels = 0;
+        m_walkOffset = {};
+    }
 };
 
 class DummyItem final : public Thing
