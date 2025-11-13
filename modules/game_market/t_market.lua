@@ -1,7 +1,5 @@
 marketWindow = nil
 
-local DONATION_URL = "http://localhost/?subtopic=shop&step=terms"
-
 local marketItems = {}
 local categoryList = {}
 local depotLockerItems = {}
@@ -147,8 +145,8 @@ function show()
 end
 
 function buyPoints()
-  if DONATION_URL and DONATION_URL ~= "http://localhost/?subtopic=shop&step=terms" then
-    g_platform.openUrl(DONATION_URL)
+  if Services.getCoinsUrl and Services.getCoinsUrl ~= "" then
+    g_platform.openUrl(Services.getCoinsUrl)
   else
     displayInfoBox("Information", "Donation URL not configured. Please contact the server administrator.")
   end
@@ -525,16 +523,11 @@ function onMarketEnter(items, offerCount, balance, vocation)
 
 	marketWindow.contentPanel.category:destroyChildren()
 
-	local colorCount = 0
 	for _, pair in pairs(categoryList) do
 		local widget = g_ui.createWidget('CategoryItemListLabel', marketWindow.contentPanel.category)
-		local color = colorCount % 2 == 0 and '#484848' or '#414141'
 		widget.categoryId = pair[1]
-		widget.color = color
 		widget:setId(pair[2])
 		widget:setText(pair[2])
-		widget:setBackgroundColor(color)
-		colorCount = colorCount + 1
 	end
 
 	local firstWidget = marketWindow.contentPanel.category:getFirstChild()
@@ -542,6 +535,14 @@ function onMarketEnter(items, offerCount, balance, vocation)
 
 	local lastWidget = marketWindow.contentPanel.category:getChildById('Weapons: All')
 	marketWindow.contentPanel.category:moveChildToIndex(lastWidget, marketWindow.contentPanel.category:getChildCount())
+
+	local colorCount = 0
+	for _, widget in pairs(marketWindow.contentPanel.category:getChildren()) do
+		local color = colorCount % 2 == 0 and '#484848' or '#414141'
+		widget.color = color
+		widget:setBackgroundColor(color)
+		colorCount = colorCount + 1
+	end
 
 	marketWindow.contentPanel.classFilter:clearOptions()
 	marketWindow.contentPanel.tierFilter:clearOptions()
@@ -551,6 +552,13 @@ function onMarketEnter(items, offerCount, balance, vocation)
 	itemListScroll:setMinimum(0)
 	itemListScroll:setMaximum(0)
 	itemListScroll.onValueChange = nil
+	
+	-- Disable automatic scrollbar updates for itemList since we use virtual scrolling
+	local itemList = marketWindow:recursiveGetChildById("itemList")
+	if itemList then
+		-- Override updateScrollBars to prevent automatic range calculation
+		itemList.updateScrollBars = function() end
+	end
 
 	show()
 	marketWindow:focus()
@@ -881,28 +889,38 @@ function onSellListValueChange(scroll, value, delta)
 end
 
 function onItemListValueChange(scroll, value, delta)
-	local startLabel = math.max(cache.SCROLL_MARKET_ITEMS.listMin, value)
+	-- Ensure we have a valid pool
+	if #cache.SCROLL_MARKET_ITEMS.listPool == 0 or #cache.SCROLL_MARKET_ITEMS.listData == 0 then
+		return
+	end
+	
+	local startLabel = math.max(1, value)
 	local endLabel = startLabel + #cache.SCROLL_MARKET_ITEMS.listPool - 1
   
 	if endLabel > cache.SCROLL_MARKET_ITEMS.listMax then
 	  endLabel = cache.SCROLL_MARKET_ITEMS.listMax
-	  startLabel = endLabel - #cache.SCROLL_MARKET_ITEMS.listPool + 1
+	  startLabel = math.max(1, endLabel - #cache.SCROLL_MARKET_ITEMS.listPool + 1)
 	end
 
-	cache.SCROLL_MARKET_ITEMS.offset = cache.SCROLL_MARKET_ITEMS.offset + ((value % 5) * 2)
-	if cache.SCROLL_MARKET_ITEMS.offset > 20 or value == 0 or value == 133 then
+	-- Calculate virtual offset for smooth scrolling
+	local maxScrollValue = cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool + 1
+	
+	if value == 0 or value == 1 then
 		cache.SCROLL_MARKET_ITEMS.offset = 0
-	end
-  
-	if value >= #cache.SCROLL_MARKET_ITEMS.listData - 6 then
+	elseif value >= maxScrollValue - 1 then
 		cache.SCROLL_MARKET_ITEMS.offset = 28
+	else
+		cache.SCROLL_MARKET_ITEMS.offset = cache.SCROLL_MARKET_ITEMS.offset + ((value % 5) * 2)
+		if cache.SCROLL_MARKET_ITEMS.offset > 20 then
+			cache.SCROLL_MARKET_ITEMS.offset = 0
+		end
 	end
 
 	local list = marketWindow:recursiveGetChildById("itemList")
 	list:setVirtualOffset({x = 0, y = cache.SCROLL_MARKET_ITEMS.offset})
 
 	for i, widget in ipairs(cache.SCROLL_MARKET_ITEMS.listPool) do
-	  local index = value > 0 and (startLabel + i - 1) or (startLabel + i)
+	  local index = startLabel + i - 1
 	  local data = cache.SCROLL_MARKET_ITEMS.listData[index]
 	  if data and widget.item then
 
@@ -911,7 +929,7 @@ function onItemListValueChange(scroll, value, delta)
 			isSelected = lastSelectedItem.itemId == data.thingType:getId() and data.tier == lastSelectedItem.tier
 		end
 
-		local backgroundColor = isSelected and '#585858' or '#464242'
+		local backgroundColor = isSelected and '#585858' or '#363636'
 		widget:setBackgroundColor(backgroundColor)
 		if isSelected then
 			lastSelectedItem.lastWidget = widget
@@ -929,12 +947,15 @@ function onItemListValueChange(scroll, value, delta)
 		end
 
 		widget.item:getItem():setCount(count)
-		widget.item.itemIndex = i  -- Store item index as property
+		widget.item.itemIndex = index  -- Store the actual data index, not pool index
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), data.marketData.name))
 		
 		local itemTier = data.tier and data.tier or tier
 		widget.item:getItem():setTier(itemTier)
 		ItemsDatabase.setTier(widget.item, itemTier, true)
+		
+		-- Apply rarity frame
+		ItemsDatabase.setRarityItem(widget.itemBackground, widget.item:getItem())
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
@@ -943,6 +964,12 @@ function onItemListValueChange(scroll, value, delta)
 		-- Update opacity based on depot availability
 		widget.grayHover:setOpacity(count > 0 and '0.0' or '0.5')
 	  end
+	end
+	
+	-- Ensure scrollbar range stays correct
+	local correctMax = math.max(1, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool + 1)
+	if scroll:getMaximum() ~= correctMax then
+		scroll:setMaximum(correctMax)
 	end
 end
 
@@ -968,7 +995,7 @@ function onSelectChildCategory(widget, selected, keepFilter)
 	isRebuildingCategory = true
 
 	cache.SCROLL_MARKET_ITEMS.listFit = math.floor(itemList:getHeight() / 36) + 1
-	cache.SCROLL_MARKET_ITEMS.listMin = 0
+	cache.SCROLL_MARKET_ITEMS.listMin = 1
 	cache.SCROLL_MARKET_ITEMS.listPool = {}
 	cache.SCROLL_MARKET_ITEMS.listData = {}
 
@@ -1023,13 +1050,10 @@ function onSelectChildCategory(widget, selected, keepFilter)
 
 	local tier = sortButtons["tierFilter"] or 0
 	
-	for i, itemInfo in pairs(marketItems[selected.categoryId]) do
-		if not checkSortMarketOptions(itemInfo) or (showLockerOnly and getDepotItemCount(itemInfo.thingType:getId(), tier) == 0) then
-			goto continue
+	for i, itemInfo in ipairs(marketItems[selected.categoryId]) do
+		if checkSortMarketOptions(itemInfo) and not (showLockerOnly and getDepotItemCount(itemInfo.thingType:getId(), tier) == 0) then
+			table.insert(cache.SCROLL_MARKET_ITEMS.listData, itemInfo)
 		end
-
-		table.insert(cache.SCROLL_MARKET_ITEMS.listData, itemInfo)
-		:: continue ::
 	end
 
 	for i, itemInfo in ipairs(cache.SCROLL_MARKET_ITEMS.listData) do
@@ -1049,7 +1073,7 @@ function onSelectChildCategory(widget, selected, keepFilter)
 			widget.name:setTooltip(itemInfo.marketData.name)
 		end
 
-		widget:setBackgroundColor('#464242')
+		widget:setBackgroundColor('#363636')
 		widget.item:getItem():setCount(count)
 		widget.item.itemIndex = i
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), itemInfo.marketData.name))
@@ -1058,6 +1082,9 @@ function onSelectChildCategory(widget, selected, keepFilter)
 			widget.item:getItem():setTier(tier)
 			ItemsDatabase.setTier(widget.item, tier, true)
 		end
+		
+		-- Apply rarity frame
+		ItemsDatabase.setRarityItem(widget.itemBackground, widget.item:getItem())
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
@@ -1068,12 +1095,13 @@ function onSelectChildCategory(widget, selected, keepFilter)
 		table.insert(cache.SCROLL_MARKET_ITEMS.listPool, widget)
 	end
 
+	cache.SCROLL_MARKET_ITEMS.listMin = #cache.SCROLL_MARKET_ITEMS.listData > 0 and 1 or 0
 	cache.SCROLL_MARKET_ITEMS.listMax = #cache.SCROLL_MARKET_ITEMS.listData
 
 	local itemListScroll = marketWindow:recursiveGetChildById("itemListScroll")
-	itemListScroll:setValue(0)
+	itemListScroll:setValue(cache.SCROLL_MARKET_ITEMS.listMin)
 	itemListScroll:setMinimum(cache.SCROLL_MARKET_ITEMS.listMin)
-	itemListScroll:setMaximum(#cache.SCROLL_MARKET_ITEMS.listPool < 8 and 0 or math.max(0, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool) + 2)
+	itemListScroll:setMaximum(math.max(cache.SCROLL_MARKET_ITEMS.listMin, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool + 1))
 	itemListScroll.onValueChange = function(self, value, delta) onItemListValueChange(self, value, delta) end
 
 	itemList:setVirtualOffset({x = 0, y = 0})
@@ -1083,6 +1111,17 @@ function onSelectChildCategory(widget, selected, keepFilter)
 	end
 	
 	isRebuildingCategory = false
+	
+	-- Force scrollbar range after UI initialization
+	scheduleEvent(function()
+		local scroll = marketWindow:recursiveGetChildById("itemListScroll")
+		if scroll and #cache.SCROLL_MARKET_ITEMS.listData > 0 then
+			local correctMin = 1
+			local correctMax = math.max(1, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool + 1)
+			scroll:setMinimum(correctMin)
+			scroll:setMaximum(correctMax)
+		end
+	end, 50)
 end
 
 function onUpdateChildItem(itemID, tier)
@@ -1117,11 +1156,11 @@ function onSelectChildItem(widget, selected, oldFocus)
 	end
 
 	if oldFocus then
-		oldFocus:setBackgroundColor('#464242')
+		oldFocus:setBackgroundColor('#363636')
 	end
 
 	if lastSelectedItem.lastWidget then
-		lastSelectedItem.lastWidget:setBackgroundColor('#464242')
+		lastSelectedItem.lastWidget:setBackgroundColor('#363636')
 	end
 
 	selected:setBackgroundColor('#585858')
@@ -1702,16 +1741,12 @@ function onSearchItem(textField)
 	for c = MarketCategory.First, MarketCategory.Last do
 		local marketItem = marketItems[c]
 		if marketItem then
-			for _, data in pairs(marketItem) do
-				if not checkSortMarketOptions(data) or (showLockerOnly and getDepotItemCount(data.thingType:getId(), tier) == 0)then
-					goto continue
+			for _, data in ipairs(marketItem) do
+				if checkSortMarketOptions(data) and not (showLockerOnly and getDepotItemCount(data.thingType:getId(), tier) == 0) then
+					if matchText(data.marketData.name, textField:getText()) then
+						table.insert(cache.SCROLL_MARKET_ITEMS.listData, data)
+					end
 				end
-
-				if matchText(data.marketData.name, textField:getText()) then
-					table.insert(cache.SCROLL_MARKET_ITEMS.listData, data)
-				end
-
-				::continue::
 			end
 		else
 			perror("MarketData ".. c .. " is nil")
@@ -1735,7 +1770,7 @@ function onSearchItem(textField)
 			widget.name:setTooltip(itemInfo.marketData.name)
 		end
 
-		widget:setBackgroundColor('#464242')
+		widget:setBackgroundColor('#363636')
 		widget.item:getItem():setCount(count)
 		widget.item.itemIndex = i  -- Store item index as property
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), itemInfo.marketData.name))
@@ -1744,6 +1779,9 @@ function onSearchItem(textField)
 			widget.item:getItem():setTier(tier)
 			ItemsDatabase.setTier(widget.item, tier, true)
 		end
+		
+		-- Apply rarity frame
+		ItemsDatabase.setRarityItem(widget.itemBackground, widget.item:getItem())
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
@@ -1755,12 +1793,13 @@ function onSearchItem(textField)
 		table.insert(cache.SCROLL_MARKET_ITEMS.listPool, widget)
 	end
 
+	cache.SCROLL_MARKET_ITEMS.listMin = #cache.SCROLL_MARKET_ITEMS.listData > 0 and 1 or 0
 	cache.SCROLL_MARKET_ITEMS.listMax = #cache.SCROLL_MARKET_ITEMS.listData
 
 	local sellScrollbar = marketWindow:recursiveGetChildById("itemListScroll")
-	sellScrollbar:setValue(0)
+	sellScrollbar:setValue(cache.SCROLL_MARKET_ITEMS.listMin)
 	sellScrollbar:setMinimum(cache.SCROLL_MARKET_ITEMS.listMin)
-	sellScrollbar:setMaximum(#cache.SCROLL_MARKET_ITEMS.listPool < 8 and 0 or math.max(0, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool) + 2)
+	sellScrollbar:setMaximum(math.max(cache.SCROLL_MARKET_ITEMS.listMin, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool + 1))
 
 	sellScrollbar.onValueChange = function(self, value, delta) onItemListValueChange(self, value, delta) end
 	itemList:setVirtualOffset({x = 0, y = 0})
@@ -1825,7 +1864,7 @@ function onShowRedirect(item)
 	for c = MarketCategory.First, MarketCategory.Last do
 		local marketItem = marketItems[c]
 		if marketItem then
-			for _, data in pairs(marketItem) do
+			for _, data in ipairs(marketItem) do
 				if item:getId() == data.thingType:getId() then
 					local tierCount = item:getClassification()
 					if tierCount == 4 then
@@ -1861,13 +1900,16 @@ function onShowRedirect(item)
 			widget.name:setTooltip(itemInfo.marketData.name)
 		end
 
-		widget:setBackgroundColor('#464242')
+		widget:setBackgroundColor('#363636')
 		widget.item:getItem():setCount(count)
 		widget.item.itemIndex = i
 		widget.item:setTooltip(tr("%s%s%s%s", comma_value(count), "x", (count > 65000 and "+ " or " "), itemInfo.marketData.name))
 
 		widget.item:getItem():setTier(itemInfo.tier)
 		ItemsDatabase.setTier(widget.item, itemInfo.tier, true)
+		
+		-- Apply rarity frame
+		ItemsDatabase.setRarityItem(widget.itemBackground, widget.item:getItem())
 
 		if widget.name:getText():len() <= 15 then
 			widget.name:setMarginTop(1)
@@ -1878,12 +1920,13 @@ function onShowRedirect(item)
 		table.insert(cache.SCROLL_MARKET_ITEMS.listPool, widget)
 	end
 
+	cache.SCROLL_MARKET_ITEMS.listMin = #cache.SCROLL_MARKET_ITEMS.listData > 0 and 1 or 0
 	cache.SCROLL_MARKET_ITEMS.listMax = #cache.SCROLL_MARKET_ITEMS.listData
 
 	local sellScrollbar = marketWindow:recursiveGetChildById("itemListScroll")
-	sellScrollbar:setValue(0)
+	sellScrollbar:setValue(cache.SCROLL_MARKET_ITEMS.listMin)
 	sellScrollbar:setMinimum(cache.SCROLL_MARKET_ITEMS.listMin)
-	sellScrollbar:setMaximum(#cache.SCROLL_MARKET_ITEMS.listPool < 8 and 0 or math.max(0, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool) + 2)
+	sellScrollbar:setMaximum(math.max(cache.SCROLL_MARKET_ITEMS.listMin, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool + 1))
 
 	sellScrollbar.onValueChange = function(self, value, delta) onItemListValueChange(self, value, delta) end
 	itemList:setVirtualOffset({x = 0, y = 0})
@@ -2135,6 +2178,15 @@ function focusNextItemWidget(list)
 	local cIndex = list:getChildIndex(c)
 	local cCount = list:getChildCount()
 	local scrollbar = marketWindow:recursiveGetChildById('itemListScroll')
+	
+	-- Force correct scrollbar range
+	if #cache.SCROLL_MARKET_ITEMS.listData > 0 and #cache.SCROLL_MARKET_ITEMS.listPool > 0 then
+		local correctMax = math.max(1, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool + 1)
+		if scrollbar:getMaximum() ~= correctMax then
+			scrollbar:setMaximum(correctMax)
+		end
+	end
+	
 	if scrollbar:getMaximum() > 0 and cIndex == cCount and scrollbar:getValue() == scrollbar:getMaximum() then
 		return
 	end
@@ -2142,7 +2194,11 @@ function focusNextItemWidget(list)
 	if cIndex < (cCount - 1) then
 	  list:focusNextChild(KeyboardFocusReason)
 	else
+	  -- Force correct max before incrementing
+	  local correctMax = math.max(1, cache.SCROLL_MARKET_ITEMS.listMax - #cache.SCROLL_MARKET_ITEMS.listPool + 1)
+	  scrollbar:setMaximum(correctMax)
 	  scrollbar:setValue(scrollbar:getValue() + 1)
+	  
 	  if cIndex == (cCount - 1) then
 		list:focusNextChild(KeyboardFocusReason)
 		if scrollbar:getMaximum() > 0 then
