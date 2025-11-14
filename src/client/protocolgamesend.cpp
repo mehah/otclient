@@ -1323,7 +1323,7 @@ void ProtocolGame::sendMarketLeave()
 }
 
 void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
-{    
+{
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketBrowse);
     if (g_game.getClientVersion() >= 1251) {
