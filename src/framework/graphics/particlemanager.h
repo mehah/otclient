@@ -23,7 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include "particletype.h"
 
 class ParticleManager
 {

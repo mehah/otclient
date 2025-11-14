@@ -22,8 +22,8 @@
 
 #pragma once
 
+#include "coordsbuffer.h"
 #include "declarations.h"
-#include "painter.h"
 #include "texture.h"
 
 class FrameBuffer

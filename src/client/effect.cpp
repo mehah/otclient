@@ -21,14 +21,19 @@
  */
 
 #include "effect.h"
-#include "game.h"
-#include "map.h"
-#include <client/client.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/shadermanager.h>
 
-void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
+#include "animator.h"
+#include "client.h"
+#include "game.h"
+#include "gameconfig.h"
+#include "map.h"
+#include "thingtype.h"
+#include "thingtypemanager.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/shadermanager.h"
+
+void Effect::draw(const Point& dest, const bool drawThings, LightView* lightView)
 {
     if (!canDraw() || isHided())
         return;

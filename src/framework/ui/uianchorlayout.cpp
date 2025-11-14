@@ -237,11 +237,13 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             continue;
 
         if (widget->getPositionType() == PositionType::Absolute) {
-            parentWidget = anchor->getAnchoredEdge() == Fw::AnchorTop && widget->getPositions().top.unit != Unit::Auto ||
-                anchor->getAnchoredEdge() == Fw::AnchorLeft && widget->getPositions().left.unit != Unit::Auto ||
-                anchor->getAnchoredEdge() == Fw::AnchorRight && widget->getPositions().right.unit != Unit::Auto ||
-                anchor->getAnchoredEdge() == Fw::AnchorBottom && widget->getPositions().bottom.unit != Unit::Auto ?
-                virtualParentWidget : getParentWidget();
+            parentWidget =
+                ((anchor->getAnchoredEdge() == Fw::AnchorTop && widget->getPositions().top.unit != Unit::Auto) ||
+                 (anchor->getAnchoredEdge() == Fw::AnchorLeft && widget->getPositions().left.unit != Unit::Auto) ||
+                 (anchor->getAnchoredEdge() == Fw::AnchorRight && widget->getPositions().right.unit != Unit::Auto) ||
+                 (anchor->getAnchoredEdge() == Fw::AnchorBottom && widget->getPositions().bottom.unit != Unit::Auto))
+                ? virtualParentWidget
+                : getParentWidget();
         }
 
         // determine hooked widget
@@ -283,8 +285,11 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                         }
                     }
 
-                    if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)
+                    if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute) {
+                        if (widget->getPositions().left.unit != Unit::Auto)
+                            margin -= hookedWidget->getPaddingLeft();
                         margin += widget->getPositions().left.value;
+                    }
 
                     // Fix anchor position
                     margin += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
@@ -299,9 +304,12 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             case Fw::AnchorRight: {
                 auto margin = widget->getMarginRight();
                 if (widget->isOnHtml()) {
-                    if (widget->getPositions().left.unit == Unit::Auto &&
-                            (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute))
+                    if (widget->getPositionType() == PositionType::Absolute && widget->getPositions().right.unit != Unit::Auto)
+                        margin -= hookedWidget->getPaddingRight();
+
+                    if (widget->getPositions().left.unit == Unit::Auto && (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)) {
                         margin += widget->getPositions().right.value;
+                    }
                 }
 
                 if (!horizontalMoved) {
@@ -340,8 +348,12 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                         margin += widget->getLineHeight().valueCalculed - hookedWidget->getLineHeight().valueCalculed;
                     }
 
-                    if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)
+                    if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute) {
+                        if (widget->getPositions().top.unit != Unit::Auto)
+                            margin -= hookedWidget->getPaddingTop();
+
                         margin += widget->getPositions().top.value;
+                    }
 
                     // Fix anchor position
                     margin += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
@@ -374,9 +386,12 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                             margin += hookedWidget->getPositions().bottom.value;
                     }
 
-                    if (widget->getPositions().top.unit == Unit::Auto &&
-        (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute))
+                    if (widget->getPositionType() == PositionType::Absolute && widget->getPositions().bottom.unit != Unit::Auto)
+                        margin -= hookedWidget->getPaddingBottom();
+
+                    if (widget->getPositions().top.unit == Unit::Auto && (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)) {
                         margin += widget->getPositions().bottom.value;
+                    }
                 }
 
                 if (!verticalMoved) {

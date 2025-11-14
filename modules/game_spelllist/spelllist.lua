@@ -199,32 +199,27 @@ function terminate()
 end
 
 function initializeSpelllist()
-    for i = 1, #SpelllistSettings[SpelllistProfile].spellOrder do
-        local spell = SpelllistSettings[SpelllistProfile].spellOrder[i]
-        local info = SpellInfo[SpelllistProfile][spell]
+    for spellName, info in pairs(SpellInfo[SpelllistProfile]) do
+        if info then
+            local tmpLabel = g_ui.createWidget('SpellListLabel', spellList)
+            tmpLabel:setId(spellName)
+            tmpLabel:setText(spellName .. '\n\'' .. info.words .. '\'')
+            tmpLabel:setPhantom(false)
 
-        local tmpLabel = g_ui.createWidget('SpellListLabel', spellList)
-        tmpLabel:setId(spell)
-        tmpLabel:setText(spell .. '\n\'' .. info.words .. '\'')
-        tmpLabel:setPhantom(false)
+            local iconId = tonumber(info.clientId)
+            if not iconId then
+                perror('Spell icon \'' .. info.icon .. '\' not found.')
+            end
 
-        local iconId = tonumber(info.icon)
-        if not iconId and SpellIcons[info.icon] then
-            iconId = SpellIcons[info.icon][1]
+            tmpLabel:setHeight(SpelllistSettings[SpelllistProfile].iconSize.height + 4)
+            tmpLabel:setTextOffset(topoint((SpelllistSettings[SpelllistProfile].iconSize.width + 10) .. ' ' ..
+                                               (SpelllistSettings[SpelllistProfile].iconSize.height - 32) / 2 + 3))
+            tmpLabel:setImageSource(SpelllistSettings[SpelllistProfile].iconFile)
+            tmpLabel:setImageClip(Spells.getImageClip(iconId, SpelllistProfile))
+            tmpLabel:setImageSize(tosize(SpelllistSettings[SpelllistProfile].iconSize.width .. ' ' ..
+                                             SpelllistSettings[SpelllistProfile].iconSize.height))
+            tmpLabel.onClick = updateSpellInformation
         end
-
-        if not (iconId) then
-            perror('Spell icon \'' .. info.icon .. '\' not found.')
-        end
-
-        tmpLabel:setHeight(SpelllistSettings[SpelllistProfile].iconSize.height + 4)
-        tmpLabel:setTextOffset(topoint((SpelllistSettings[SpelllistProfile].iconSize.width + 10) .. ' ' ..
-                                           (SpelllistSettings[SpelllistProfile].iconSize.height - 32) / 2 + 3))
-        tmpLabel:setImageSource(SpelllistSettings[SpelllistProfile].iconFile)
-        tmpLabel:setImageClip(Spells.getImageClip(iconId, SpelllistProfile))
-        tmpLabel:setImageSize(tosize(SpelllistSettings[SpelllistProfile].iconSize.width .. ' ' ..
-                                         SpelllistSettings[SpelllistProfile].iconSize.height))
-        tmpLabel.onClick = updateSpellInformation
     end
 
     connect(spellList, {
@@ -239,9 +234,8 @@ end
 
 function changeSpelllistProfile(oldProfile)
     -- Delete old labels
-    for i = 1, #SpelllistSettings[oldProfile].spellOrder do
-        local spell = SpelllistSettings[oldProfile].spellOrder[i]
-        local tmpLabel = spellList:getChildById(spell)
+    for spellName, info in pairs(SpellInfo[oldProfile]) do
+        local tmpLabel = spellList:getChildById(spellName)
 
         tmpLabel:destroy()
     end
@@ -253,11 +247,8 @@ function changeSpelllistProfile(oldProfile)
 end
 
 function updateSpelllist()
-    for i = 1, #SpelllistSettings[SpelllistProfile].spellOrder do
-        local spell = SpelllistSettings[SpelllistProfile].spellOrder[i]
-        local info = SpellInfo[SpelllistProfile][spell]
-        local tmpLabel = spellList:getChildById(spell)
-
+    for spellName, info in pairs(SpellInfo[SpelllistProfile]) do
+        local tmpLabel = spellList:getChildById(spellName)
         local localPlayer = g_game.getLocalPlayer()
         if (not (filters.level) or info.level <= localPlayer:getLevel()) and
             (not (filters.vocation) or table.find(info.vocations, localPlayer:getVocation())) and

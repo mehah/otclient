@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "position.h"
 #include "gameconfig.h"
+#include "position.h"
 
 bool Position::isMapPosition() const { return ((x >= 0) && (y >= 0) && (x < UINT16_MAX) && (y < UINT16_MAX) && (z <= g_gameConfig.getMapMaxZ())); }
 

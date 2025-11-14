@@ -20,22 +20,16 @@
  * THE SOFTWARE.
  */
 
-#include <algorithm>
-#include <filesystem>
-#include <ranges>
-
-#include "filestream.h"
 #include "resourcemanager.h"
-#include <client/game.h>
-
-#include <framework/core/application.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/luaengine/luainterface.h>
-#include <framework/net/protocolhttp.h>
-#include <framework/platform/platform.h>
-#include <framework/util/crypt.h>
 
 #include <physfs.h>
+
+#include "filestream.h"
+#include "graphicalapplication.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/net/protocolhttp.h"
+#include "framework/platform/platform.h"
+#include "framework/util/crypt.h"
 
 ResourceManager g_resources;
 

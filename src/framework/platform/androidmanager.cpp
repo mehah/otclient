@@ -25,6 +25,7 @@
 #include <framework/global.h>
 #include <framework/core/unzipper.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/sound/soundmanager.h>
 
 AndroidManager g_androidManager;
 
@@ -44,6 +45,10 @@ void AndroidManager::setAndroidManager(JNIEnv* env, jobject androidManager) {
     m_midShowSoftKeyboard = jniEnv->GetMethodID(androidManagerJClass, "showSoftKeyboard", "()V");
     m_midHideSoftKeyboard = jniEnv->GetMethodID(androidManagerJClass, "hideSoftKeyboard", "()V");
     m_midGetDisplayDensity = jniEnv->GetMethodID(androidManagerJClass, "getDisplayDensity", "()F");
+    m_midShowInputPreview = jniEnv->GetMethodID(androidManagerJClass, "showInputPreview", "(Ljava/lang/String;)V");
+    m_midUpdateInputPreview = jniEnv->GetMethodID(androidManagerJClass, "updateInputPreview", "(Ljava/lang/String;)V");
+    m_midHideInputPreview = jniEnv->GetMethodID(androidManagerJClass, "hideInputPreview", "()V");
+    jniEnv->DeleteLocalRef(androidManagerJClass);
 }
 
 void AndroidManager::showKeyboardSoft() {
@@ -54,6 +59,36 @@ void AndroidManager::showKeyboardSoft() {
 void AndroidManager::hideKeyboard() {
     JNIEnv* env = getJNIEnv();
     env->CallVoidMethod(m_androidManagerJObject, m_midHideSoftKeyboard);
+}
+
+namespace {
+    jstring latin1ToJString(JNIEnv* env, const std::string& text) {
+        std::u16string utf16;
+        utf16.reserve(text.size());
+        for (unsigned char c : text) {
+            utf16.push_back(static_cast<char16_t>(c));
+        }
+        return env->NewString(reinterpret_cast<const jchar*>(utf16.data()), static_cast<jsize>(utf16.size()));
+    }
+}
+
+void AndroidManager::showInputPreview(const std::string& text) {
+    JNIEnv* env = getJNIEnv();
+    jstring jText = latin1ToJString(env, text);
+    env->CallVoidMethod(m_androidManagerJObject, m_midShowInputPreview, jText);
+    env->DeleteLocalRef(jText);
+}
+
+void AndroidManager::updateInputPreview(const std::string& text) {
+    JNIEnv* env = getJNIEnv();
+    jstring jText = latin1ToJString(env, text);
+    env->CallVoidMethod(m_androidManagerJObject, m_midUpdateInputPreview, jText);
+    env->DeleteLocalRef(jText);
+}
+
+void AndroidManager::hideInputPreview() {
+    JNIEnv* env = getJNIEnv();
+    env->CallVoidMethod(m_androidManagerJObject, m_midHideInputPreview);
 }
 
 void AndroidManager::unZipAssetData() {
@@ -87,11 +122,25 @@ std::string AndroidManager::getAppBaseDir() {
 std::string AndroidManager::getStringFromJString(jstring text) {
     JNIEnv* env = getJNIEnv();
 
-    const char* newChar = env->GetStringUTFChars(text,nullptr);
-    std::string newText = newChar;
-    env->ReleaseStringUTFChars(text, newChar);
+    const jchar* chars = env->GetStringChars(text, nullptr);
+    const jsize length = env->GetStringLength(text);
 
-    return newText;
+    std::string result;
+    result.reserve(length);
+
+    for (jsize i = 0; i < length; ++i) {
+        const jchar codePoint = chars[i];
+        if (codePoint <= 0xFF) {
+            result.push_back(static_cast<char>(codePoint));
+        } else {
+            // fallback for characters outside ISO-8859-1 range
+            result.push_back('?');
+        }
+    }
+
+    env->ReleaseStringChars(text, chars);
+
+    return result;
 }
 
 float AndroidManager::getScreenDensity() {
@@ -122,6 +171,10 @@ extern "C" {
 
 void Java_com_otclient_AndroidManager_nativeInit(JNIEnv* env, jobject androidManager) {
     g_androidManager.setAndroidManager(env, androidManager);
+}
+
+void Java_com_otclient_AndroidManager_nativeSetAudioEnabled(JNIEnv*, jobject, jboolean enabled) {
+    g_sounds.setAudioEnabled(enabled);
 }
 
 }

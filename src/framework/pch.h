@@ -22,53 +22,78 @@
 
 #pragma once
 
- // common C headers
+ // ===== C Standard Library =====
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
-// common STL headers
+// ===== C++ Standard Library =====
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <deque>
+#include <filesystem>
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <list>
 #include <map>
 #include <memory>
+#include <queue>
+#include <ranges>
+#include <regex>
+#include <set>
+#include <span>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <tuple>
 #include <typeinfo>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <ranges>
-#include <span>
+#include <numbers>
+#include <future>
+#include <atomic>
+#include <random>
 
+// ===== Third-Party Libraries =====
+// zlib
 #include <zlib.h>
 
+// parallel-hashmap
 #include <parallel_hashmap/btree.h>
 #include <parallel_hashmap/phmap.h>
+
+// pugixml
 #include <pugixml.hpp>
 
-// FMT
+// fmt
+#include <fmt/args.h>
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/args.h>
 #include <fmt/ranges.h>
 
+// Asio (standalone)
+#include <asio/io_service.hpp>
+#include <asio/ip/tcp.hpp>
+#include <asio/read.hpp>
+#include <asio/read_until.hpp>
+#include <asio/ssl.hpp>
+#include <asio/streambuf.hpp>
+#include <asio/write.hpp>
+
+// ===== Utilities / Helpers =====
 // FMT Custom Formatter for Enums
 template <typename E>
 std::enable_if_t<std::is_enum_v<E>, std::underlying_type_t<E>>
 format_as(E e) {
     return static_cast<std::underlying_type_t<E>>(e);
 }
-
-using namespace std::literals;

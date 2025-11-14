@@ -21,10 +21,9 @@
  */
 
 #include "fontmanager.h"
-#include "texture.h"
 
-#include <framework/core/resourcemanager.h>
-#include <framework/otml/otml.h>
+#include "framework/core/resourcemanager.h"
+#include "framework/otml/otmldocument.h"
 
 FontManager g_fonts;
 

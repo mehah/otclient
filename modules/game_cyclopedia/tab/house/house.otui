@@ -7,7 +7,7 @@ UIWidget
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    image-source: /images/game/actionbar/2pixel-up-frame-borderimage
+    image-source: /images/ui/2pixel_up_frame_borderimage
     image-border: 5
     height: 52
     margin-top: 5
@@ -63,7 +63,7 @@ UIWidget
     size: 250 358
     anchors.top: TopBase.bottom
     anchors.left: parent.left
-    image-source: /images/game/actionbar/2pixel-up-frame-borderimage
+    image-source: /images/ui/2pixel_up_frame_borderimage
     image-border: 5
     margin-top: 8
     margin-bottom: 8
@@ -105,7 +105,7 @@ UIWidget
       step: 1
       minimum: 1
       maximum: 300
-      image-source:
+      image-source: none
       visible: false
     UIWidget
       id: MapViewbase
