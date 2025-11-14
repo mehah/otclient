@@ -721,14 +721,6 @@ struct CyclopediaCharacterMiscStats
     std::vector<Concoction> concoctions;
 };
 
-struct ForgeHistory
-{
-    uint32_t createdAt;
-    uint8_t actionType;
-    std::string description;
-    uint8_t bonus;
-};
-
 struct ForgeItemInfo
 {
     uint16_t id{ 0 };
@@ -740,59 +732,6 @@ struct ForgeTransferData
 {
     std::vector<ForgeItemInfo> donors;
     std::vector<ForgeItemInfo> receivers;
-};
-
-struct ForgeTierPrice
-{
-    uint8_t tier{ 0 };
-    uint64_t price{ 0 };
-};
-
-struct ForgeGradeData
-{
-    uint8_t tier{ 0 };
-    uint8_t exaltedCores{ 0 };
-};
-
-struct ForgeClassTierPrices
-{
-    uint8_t classId{ 0 };
-    std::vector<ForgeTierPrice> tiers;
-};
-
-struct ForgeResultData
-{
-    uint8_t actionType{ 0 };
-    bool convergence{ false };
-    bool success{ false };
-    uint16_t leftItemId{ 0 };
-    uint8_t leftTier{ 0 };
-    uint16_t rightItemId{ 0 };
-    uint8_t rightTier{ 0 };
-    uint8_t bonus{ 0 };
-    uint8_t coreCount{ 0 };
-};
-
-struct ForgeConfigData
-{
-    std::vector<ForgeClassTierPrices> classPrices;
-    std::vector<ForgeGradeData> fusionGrades;
-    std::vector<ForgeTierPrice> convergenceFusionPrices;
-    std::vector<ForgeTierPrice> convergenceTransferPrices;
-    uint8_t dustPercent{ 0 };
-    uint8_t dustToSliver{ 0 };
-    uint8_t sliverToCore{ 0 };
-    uint8_t dustPercentUpgrade{ 0 };
-    uint16_t maxDustLevel{ 0 };
-    uint16_t maxDustCap{ 0 };
-    uint8_t normalDustFusion{ 0 };
-    uint8_t convergenceDustFusion{ 0 };
-    uint8_t normalDustTransfer{ 0 };
-    uint8_t convergenceDustTransfer{ 0 };
-    uint8_t fusionChanceBase{ 0 };
-    uint8_t fusionChanceImproved{ 0 };
-    uint8_t fusionReduceTierLoss{ 0 };
-    bool hasConvergence{ false };
 };
 
 struct ForgeOpenData
