@@ -17,7 +17,7 @@ function sendMarketAcceptOffer(timestamp, counter, amount)
 end
 
 function sendMarketCreateOffer(offerType, itemId, tier, amount, price, anonymous)
-    g_game.createMarketOffer(offerType, itemId, tier, amount, price, anonymous and 1 or 0)
+    g_game.createMarketOffer(offerType, itemId, tier or 0, amount, price, anonymous and 1 or 0)
 end
 
 function sendMarketCancelOffer(timestamp, counter)
