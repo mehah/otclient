@@ -353,7 +353,7 @@ UIWidget
       image-clip: 36 26 9 27
 
     $disabled:
-      image-clip: 54 27 9 27
+      image-clip: 27 27 9 27
 
   Button
     id: rightIncreaseSidePanels
