@@ -21,11 +21,7 @@
  */
 
 #pragma once
-
-#include <asio.hpp>
-#include <list>
-#include <map>
-#include <set>
+#include <framework/global.h>
 
 using ProxyPacket = std::vector<uint8_t>;
 using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;

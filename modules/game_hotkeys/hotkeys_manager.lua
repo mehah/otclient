@@ -418,6 +418,9 @@ function addKeyCombo(keyCombo, keySettings, focus)
     if not keyCombo then
         return
     end
+    if modules.game_actionbar and modules.game_actionbar.removeHotkeyFromActionBar then
+        modules.game_actionbar.removeHotkeyFromActionBar(keyCombo)
+    end
     local hotkeyLabel = currentHotkeys:getChildById(keyCombo)
     if not hotkeyLabel then
         hotkeyLabel = g_ui.createWidget('HotkeyListLabel')
@@ -886,4 +889,41 @@ function canPerformKeyCombo(keyCombo)
     return  string.match(keyCombo, "Ctrl%+") or
             string.match(keyCombo, "Alt%+") or 
             string.match(keyCombo, "F%d+")
+end
+
+-- Actionbar
+function removeHotkeyByCombo(keyCombo)
+    if not keyCombo or keyCombo == "" then
+        return false
+    end
+    local hotkeyLabel = currentHotkeys and currentHotkeys:getChildById(keyCombo)
+    if hotkeyLabel then
+        if boundCombosCallback[keyCombo] then
+            g_keyboard.unbindKeyPress(keyCombo, boundCombosCallback[keyCombo])
+            boundCombosCallback[keyCombo] = nil
+        end
+        if currentHotkeyLabel == hotkeyLabel then
+            currentHotkeyLabel = nil
+        end
+        hotkeyLabel:destroy()
+        updateHotkeyForm(true)
+        return true
+    end
+    return false
+end
+
+function isHotkeyUsedByManager(keyCombo)
+    if not keyCombo or keyCombo == "" then
+        return false
+    end
+    if boundCombosCallback[keyCombo] then
+        return true
+    end
+    if currentHotkeys then
+        local hotkeyLabel = currentHotkeys:getChildById(keyCombo)
+        if hotkeyLabel then
+            return true
+        end
+    end
+    return false
 end

@@ -1,6 +1,6 @@
 Font
   name: Verdana-9px
-  texture: Verdana-9px
+  texture: verdana-9px
   height: 13
   glyph-size: 13 13
   space-width: 3

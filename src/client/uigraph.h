@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "declarations.h"
 #include <framework/ui/uiwidget.h>
 
 struct Graph

@@ -820,7 +820,7 @@ UIWidget
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        image-source: /images/game/actionbar/1pixel-down-frame
+        image-source: /images/ui/1pixel_down_frame
         image-border: 5
         UIWidget
           anchors.fill: parent
@@ -916,7 +916,7 @@ UIWidget
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        image-source: /images/game/actionbar/1pixel-down-frame
+        image-source: /images/ui/1pixel_down_frame
         image-border: 5
         UIWidget
           anchors.fill: parent
@@ -1092,7 +1092,7 @@ UIWidget
     UIWidget
       id: filters
       width: 114
-      image-source: /images/game/actionbar/1pixel-down-frame
+      image-source: /images/ui/1pixel_down_frame
       image-border: 5
       anchors.top: achievements.top
       anchors.bottom: ListBase.top
@@ -1147,7 +1147,7 @@ UIWidget
     UIWidget
       id: regular
       height: 20
-      image-source: /images/game/actionbar/1pixel-down-frame
+      image-source: /images/ui/1pixel_down_frame
       image-border: 5
       anchors.top: sort.bottom
       anchors.left: sort.left
@@ -1172,7 +1172,7 @@ UIWidget
     UIWidget
       id: secret
       height: 20
-      image-source: /images/game/actionbar/1pixel-down-frame
+      image-source: /images/ui/1pixel_down_frame
       image-border: 5
       anchors.top: regular.bottom
       anchors.left: regular.left
@@ -1262,7 +1262,7 @@ UIWidget
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        image-source: /images/game/actionbar/1pixel-down-frame
+        image-source: /images/ui/1pixel_down_frame
         image-border: 5
         UIWidget
           anchors.fill: parent
@@ -1319,7 +1319,7 @@ UIWidget
       anchors.top: parent.top
       anchors.left: parent.left
       anchors.right: parent.right
-      image-source: /images/game/actionbar/2pixel-up-frame-borderimage
+      image-source: /images/ui/2pixel_up_frame_borderimage
       image-border: 5
       CheckBox
         id: inventory
@@ -1390,7 +1390,7 @@ UIWidget
       anchors.top: filters.bottom
       anchors.left: parent.left
       anchors.right: filters.right
-      image-source: /images/game/actionbar/2pixel-up-frame-borderimage
+      image-source: /images/ui/2pixel_up_frame_borderimage
       image-border: 5
       margin-top: 5
       RoundCheckBox
@@ -1427,7 +1427,7 @@ UIWidget
       anchors.top: parent.top
       anchors.left: parent.left
       anchors.right: parent.right
-      image-source: /images/game/actionbar/2pixel-up-frame-borderimage
+      image-source: /images/ui/2pixel_up_frame_borderimage
       image-border: 5
       RoundCheckBox
         id: outfits

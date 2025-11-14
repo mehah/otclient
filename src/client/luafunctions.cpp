@@ -48,8 +48,9 @@
 #include "uieffect.h"
 #include "uiitem.h"
 #include "uimissile.h"
-
+#include <framework/graphics/paintershaderprogram.h>
 #include "attachableobject.h"
+#include "thingtype.h"
 #include "uigraph.h"
 #include "uimap.h"
 #include "uimapanchorlayout.h"
@@ -59,6 +60,9 @@
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
+#include "itemtype.h"
+#include "creatures.h"
+
 #endif
 
 #include <framework/luaengine/luainterface.h>
@@ -271,7 +275,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "sendPartyAnalyzerReset", &Game::sendPartyAnalyzerReset, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendPartyAnalyzerPriceType", &Game::sendPartyAnalyzerPriceType, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendPartyAnalyzerPriceValue", &Game::sendPartyAnalyzerPriceValue, &g_game);
-    
+
     g_lua.bindSingletonFunction("g_game", "requestOutfit", &Game::requestOutfit, &g_game);
     g_lua.bindSingletonFunction("g_game", "changeOutfit", &Game::changeOutfit, &g_game);
     g_lua.bindSingletonFunction("g_game", "addVip", &Game::addVip, &g_game);
@@ -307,6 +311,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "requestQuestLog", &Game::requestQuestLog, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestQuestLine", &Game::requestQuestLine, &g_game);
     g_lua.bindSingletonFunction("g_game", "equipItem", &Game::equipItem, &g_game);
+    g_lua.bindSingletonFunction("g_game", "equipItemId", &Game::equipItemId, &g_game);
     g_lua.bindSingletonFunction("g_game", "mount", &Game::mount, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestItemInfo", &Game::requestItemInfo, &g_game);
     g_lua.bindSingletonFunction("g_game", "ping", &Game::ping, &g_game);
@@ -516,6 +521,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("getScaleFactor", &Thing::getScaleFactor);
     g_lua.bindClassMemberFunction<Thing>("setScaleFactor", &Thing::setScaleFactor);
     g_lua.bindClassMemberFunction<Thing>("canAnimate", &Thing::canAnimate);
+    g_lua.bindClassMemberFunction<Thing>("isAmmo", &Thing::isAmmo);
+    g_lua.bindClassMemberFunction<Thing>("hasExpireStop", &Thing::isAmmo);
+    g_lua.bindClassMemberFunction<Thing>("hasWearout", &Thing::isAmmo);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<House>();
@@ -720,6 +728,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("getDefaultAction", &ThingType::getDefaultAction);
     g_lua.bindClassMemberFunction<ThingType>("getName", &ThingType::getName);
     g_lua.bindClassMemberFunction<ThingType>("getDescription", &ThingType::getDescription);
+    g_lua.bindClassMemberFunction<ThingType>("isAmmo", &ThingType::isAmmo);
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindClassMemberFunction<ThingType>("exportImage", &ThingType::exportImage);
 #endif
@@ -748,10 +757,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getNpcSaleData", &Item::getNpcSaleData);
     g_lua.bindClassMemberFunction<Item>("getMeanPrice", &Item::getMeanPrice);
     g_lua.bindClassMemberFunction<Item>("getClothSlot", &Item::getClothSlot);
-    g_lua.bindClassMemberFunction<Item>("hasWearOut", &ThingType::hasWearOut);
-    g_lua.bindClassMemberFunction<Item>("hasClockExpire", &ThingType::hasClockExpire);
-    g_lua.bindClassMemberFunction<Item>("hasExpire", &ThingType::hasExpire);
-    g_lua.bindClassMemberFunction<Item>("hasExpireStop", &ThingType::hasExpireStop);
+    g_lua.bindClassMemberFunction<Item>("hasWearOut", &Item::hasWearOut);
+    g_lua.bindClassMemberFunction<Item>("hasClockExpire", &Item::hasClockExpire);
+    g_lua.bindClassMemberFunction<Item>("hasExpire", &Item::hasExpire);
+    g_lua.bindClassMemberFunction<Item>("hasExpireStop", &Item::hasExpireStop);
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindClassMemberFunction<Item>("getName", &Item::getName);
     g_lua.bindClassMemberFunction<Item>("getServerId", &Item::getServerId);
@@ -880,6 +889,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("getBaseMagicLevel", &LocalPlayer::getBaseMagicLevel);
     g_lua.bindClassMemberFunction<LocalPlayer>("getTotalCapacity", &LocalPlayer::getTotalCapacity);
     g_lua.bindClassMemberFunction<LocalPlayer>("getInventoryItem", &LocalPlayer::getInventoryItem);
+    g_lua.bindClassMemberFunction<LocalPlayer>("hasEquippedItemId", &LocalPlayer::hasEquippedItemId);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getInventoryCount", &LocalPlayer::getInventoryCount);
     g_lua.bindClassMemberFunction<LocalPlayer>("getVocation", &LocalPlayer::getVocation);
     g_lua.bindClassMemberFunction<LocalPlayer>("getBlessings", &LocalPlayer::getBlessings);
     g_lua.bindClassMemberFunction<LocalPlayer>("isPremium", &LocalPlayer::isPremium);
@@ -1096,6 +1107,13 @@ void Client::registerLuaFunctions()
     g_lua.bindClassStaticFunction<UIProgressRect>("create", [] { return std::make_shared<UIProgressRect>(); });
     g_lua.bindClassMemberFunction<UIProgressRect>("setPercent", &UIProgressRect::setPercent);
     g_lua.bindClassMemberFunction<UIProgressRect>("getPercent", &UIProgressRect::getPercent);
+    g_lua.bindClassMemberFunction<UIProgressRect>("stop", &UIProgressRect::stop);
+    g_lua.bindClassMemberFunction<UIProgressRect>("setDuration", &UIProgressRect::setDuration);
+    g_lua.bindClassMemberFunction<UIProgressRect>("start", &UIProgressRect::start);
+    g_lua.bindClassMemberFunction<UIProgressRect>("showTime", &UIProgressRect::showTime);
+    g_lua.bindClassMemberFunction<UIProgressRect>("showProgress", &UIProgressRect::showProgress);
+    g_lua.bindClassMemberFunction<UIProgressRect>("getTimeElapsed", &UIProgressRect::getTimeElapsed);
+    g_lua.bindClassMemberFunction<UIProgressRect>("getDuration", &UIProgressRect::getDuration);
 
 #ifndef __EMSCRIPTEN__
     g_lua.registerClass<UIGraph, UIWidget>();

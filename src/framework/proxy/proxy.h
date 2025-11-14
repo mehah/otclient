@@ -21,10 +21,7 @@
  */
 
 #pragma once
-
-#include <asio.hpp>
-#include <list>
-#include <map>
+#include <framework/global.h>
 
 class Proxy;
 class Session;

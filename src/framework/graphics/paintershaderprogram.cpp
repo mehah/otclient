@@ -21,10 +21,12 @@
  */
 
 #include "paintershaderprogram.h"
+
+#include "glutil.h"
 #include "texture.h"
+
 #include "texturemanager.h"
-#include <framework/core/clock.h>
-#include <framework/platform/platformwindow.h>
+#include "framework/core/clock.h"
 
 PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds()) {}
 

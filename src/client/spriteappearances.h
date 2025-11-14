@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "gameconfig.h"
-#include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
 #include <framework/luaengine/luaobject.h>
 
@@ -52,20 +50,7 @@ public:
     {
     }
 
-    Size getSpriteSize() const
-    {
-        Size size(g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
-
-        switch (spriteLayout) {
-            case SpriteLayout::ONE_BY_ONE: break;
-            case SpriteLayout::ONE_BY_TWO: size.setHeight(64); break;
-            case SpriteLayout::TWO_BY_ONE: size.setWidth(64); break;
-            case SpriteLayout::TWO_BY_TWO: size.resize(64, 64); break;
-            default: break;
-        }
-
-        return size;
-    }
+    Size getSpriteSize() const;
 
     // 64 pixel width == 6 columns each 64x or 32 pixels, 12 columns
     int getColumns() const { return SIZE / getSpriteSize().width(); }

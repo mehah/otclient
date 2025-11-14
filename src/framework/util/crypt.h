@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "../global.h"
-
 #include <stduuid/uuid.h>
 #include <string>
 

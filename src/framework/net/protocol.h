@@ -21,15 +21,9 @@
  */
 
 #pragma once
-#ifdef __EMSCRIPTEN__
-#include "webconnection.h"
-#else
-#include "connection.h"
-#endif
-#include "declarations.h"
 
+#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
-#include <framework/proxy/proxy.h>
 
  // @bindclass
 class Protocol : public LuaObject
@@ -50,7 +44,7 @@ public:
 
     bool isConnected();
     bool isConnecting();
-    ticks_t getElapsedTicksSinceLastRead() const { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }
+    ticks_t getElapsedTicksSinceLastRead() const;
 #ifdef __EMSCRIPTEN__
     WebConnectionPtr getConnection() { return m_connection; }
 #else

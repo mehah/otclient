@@ -21,6 +21,7 @@
  */
 
 #include "container.h"
+
 #include "item.h"
 
 ItemPtr Container::getItem(const int slot)
@@ -58,7 +59,7 @@ void Container::onAddItem(const ItemPtr& item, int slot)
 
     m_items.insert(m_items.begin() + slot, item);
     ++m_size;
-    
+
     updateItemsPositions();
 
     callLuaField("onSizeChange", m_size);

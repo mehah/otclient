@@ -22,24 +22,22 @@
 
 #include "application.h"
 
-#include "asyncdispatcher.h"
-#include <framework/core/configmanager.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/modulemanager.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/luaengine/luainterface.h>
-#include <framework/platform/crashhandler.h>
-#include <framework/platform/platform.h>
-#include <framework/proxy/proxy.h>
-
-#include <csignal>
 #include <gitinfo.h>
 
 #define ADD_QUOTES_HELPER(s) #s
 #define ADD_QUOTES(s) ADD_QUOTES_HELPER(s)
 
-#include <locale>
+#include <csignal>
+
+#include "clock.h"
+#include "configmanager.h"
+#include "eventdispatcher.h"
+#include "graphicalapplication.h"
+#include "modulemanager.h"
+#include "resourcemanager.h"
+#include "framework/platform/crashhandler.h"
+#include "framework/platform/platform.h"
+#include "framework/proxy/proxy.h"
 
 #ifdef FRAMEWORK_NET
 #ifdef __EMSCRIPTEN__
@@ -96,7 +94,7 @@ void Application::init(std::vector<std::string>& args, ApplicationContext* conte
 
     // mobile testing
     if (startupOptions.find("-mobile") != std::string::npos) {
-        g_platform.setDevice({ Platform::Mobile, Platform::Android });
+        g_platform.setDevice({ Mobile, Android });
     }
 
     // initialize configs
