@@ -9,6 +9,14 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="DirectX_QuickCompile|Win32">
+      <Configuration>DirectX_QuickCompile</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DirectX_QuickCompile|x64">
+      <Configuration>DirectX_QuickCompile</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="DirectX|Win32">
       <Configuration>DirectX</Configuration>
       <Platform>Win32</Platform>
@@ -58,6 +66,12 @@
     <PlatformToolset>v143</PlatformToolset>
     <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <EnableUnitySupport>true</EnableUnitySupport>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -65,6 +79,12 @@
     <EnableUnitySupport>true</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <EnableUnitySupport>true</EnableUnitySupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -94,12 +114,22 @@
     <Import Project="arch32.props" />
     <Import Project="release.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="arch32.props" />
+    <Import Project="release.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="arch32.props" />
     <Import Project="release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DirectX|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="arch32.props" />
+    <Import Project="release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="arch32.props" />
     <Import Project="release.props" />
@@ -121,6 +151,10 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../src;</IncludePath>
     <TargetName>$(ProjectName)_dx</TargetName>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|Win32'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../src;</IncludePath>
+    <TargetName>$(ProjectName)_dx</TargetName>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../src;</IncludePath>
     <TargetName>$(ProjectName)_gl_x64</TargetName>
@@ -128,6 +162,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../src;</IncludePath>
     <TargetName>$(ProjectName)_dx_x64</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../src;</IncludePath>
+    <TargetName>$(ProjectName)_dx_x64</TargetName>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='OpenGL|Win32'">
     <VcpkgHostTriplet>
@@ -141,12 +180,22 @@
     <VcpkgTriplet>x86-windows-static</VcpkgTriplet>
     <VcpkgConfiguration>Release</VcpkgConfiguration>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|Win32'" Label="Vcpkg">
+    <VcpkgHostTriplet />
+    <VcpkgTriplet>x86-windows-static</VcpkgTriplet>
+    <VcpkgConfiguration>Release</VcpkgConfiguration>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'" Label="Vcpkg">
     <VcpkgHostTriplet />
     <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
     <VcpkgConfiguration>Release</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX|x64'" Label="Vcpkg">
+    <VcpkgHostTriplet />
+    <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
+    <VcpkgConfiguration>Release</VcpkgConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|x64'" Label="Vcpkg">
     <VcpkgHostTriplet />
     <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
     <VcpkgConfiguration>Release</VcpkgConfiguration>
@@ -272,6 +321,37 @@
       <AdditionalDependencies>libEGL.lib;libGLESv2.lib;dxgi.lib;d3d9.lib;d3d11.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);NDEBUG;OPENGL_ES</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>
+        $(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;
+        $(GITHUB_WORKSPACE)\vcpkg\installed\$(VcpkgTriplet)\include\;
+        generated;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <DisableSpecificWarnings>4244;4251;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CombineFilesOnlyFromTheSameFolder>true</CombineFilesOnlyFromTheSameFolder>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libEGL.lib;libGLESv2.lib;dxgi.lib;d3d9.lib;d3d11.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|x64'">
     <ClCompile>
       <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);NDEBUG;</PreprocessorDefinitions>
@@ -329,6 +409,41 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libEGL.lib;libGLESv2.lib;dxgi.lib;d3d9.lib;d3d11.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DirectX_QuickCompile|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);NDEBUG;OPENGL_ES</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>
+        $(VcpkgRoot)\installed\$(VcpkgTriplet)\include\luajit;
+        $(GITHUB_WORKSPACE)\vcpkg\installed\$(VcpkgTriplet)\include\;
+        generated;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <DisableSpecificWarnings>4244;4251;4996;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CombineFilesOnlyFromTheSameFolder>true</CombineFilesOnlyFromTheSameFolder>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <WarningLevel>Level3</WarningLevel>
+      <AdditionalOptions>/utf-8 /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libEGL.lib;libGLESv2.lib;dxgi.lib;d3d9.lib;d3d11.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

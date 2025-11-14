@@ -9,6 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		DirectX_QuickCompile|x64 = DirectX_QuickCompile|x64
+		DirectX_QuickCompile|x86 = DirectX_QuickCompile|x86
 		DirectX|x64 = DirectX|x64
 		DirectX|x86 = DirectX|x86
 		OpenGL|x64 = OpenGL|x64
@@ -19,6 +21,10 @@ Global
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|x64.Build.0 = Debug|x64
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|x86.ActiveCfg = Debug|Win32
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.Debug|x86.Build.0 = Debug|Win32
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.DirectX_QuickCompile|x64.ActiveCfg = DirectX_QuickCompile|x64
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.DirectX_QuickCompile|x64.Build.0 = DirectX_QuickCompile|x64
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.DirectX_QuickCompile|x86.ActiveCfg = DirectX_QuickCompile|Win32
+		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.DirectX_QuickCompile|x86.Build.0 = DirectX_QuickCompile|Win32
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.DirectX|x64.ActiveCfg = DirectX|x64
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.DirectX|x64.Build.0 = DirectX|x64
 		{17A8F78F-1FFB-4128-A3B3-59CC6C19D89A}.DirectX|x86.ActiveCfg = DirectX|Win32
