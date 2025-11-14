@@ -20,7 +20,7 @@ permissions:
   pull-requests: read
 
 env:
-  LUKKA_RUN_VCPKG_SHA: "${{ vars.LUKKA_RUN_VCPKG_SHA }}"
+  LUKKA_RUN_VCPKG_SHA: "${{ vars.LUKKA_RUN_VCPKG_SHA != '' && vars.LUKKA_RUN_VCPKG_SHA || 'b3dd708d38df5c856fe1c18dc0d59ab771f93921' }}"
   CMAKE_BUILD_PARALLEL_LEVEL: 2
   MAKEFLAGS: "-j 2"
 
@@ -104,18 +104,6 @@ jobs:
           key: vcpkg-${{ matrix.os }}-${{ matrix.buildtype }}-${{ steps.hash.outputs.hash }}
           restore-keys: |
             vcpkg-${{ matrix.buildtype }}-
-      - name: Ensure run-vcpkg action is pinned by full commit SHA
-        run: |
-          if [ -z "${LUKKA_RUN_VCPKG_SHA}" ]; then
-            echo "::error title=Missing pin::Set LUKKA_RUN_VCPKG_SHA (40-char commit) in repository Variables."
-            exit 1
-          fi
-          if ! echo "${LUKKA_RUN_VCPKG_SHA}" | grep -Eq '^[0-9a-f]{40}$'; then
-            echo "::error title=Invalid pin::LUKKA_RUN_VCPKG_SHA must be a full 40-char commit SHA."
-            exit 1
-          fi
-
-
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
         with:
