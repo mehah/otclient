@@ -1781,7 +1781,7 @@ void Game::leaveMarket()
 }
 
 void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
-{    
+{
     if (!canPerformGameAction()) {
         return;
     }
