@@ -686,7 +686,14 @@ function ForgeController:handleSelectTarget(item, isTransfer)
             end
             data.canTransfer = true
         else
-            data.canFusion = true
+            -- For convergence fusion, we need at least 2 items of the same type
+            if data.isConvergence then
+                if item.count >= 2 then
+                    data.canFusion = true
+                end
+            else
+                data.canFusion = true
+            end
         end
     end
 end
