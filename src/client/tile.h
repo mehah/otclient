@@ -91,7 +91,10 @@ public:
     bool hasGround();
     bool hasTopGround(const bool ignoreBorder = false);
 
-    bool hasCreatures() { return m_thingTypeFlag & HAS_CREATURE; }
+    bool hasCreatures() const { return (m_thingTypeFlag & HAS_CREATURE) != 0; }
+    bool hasCreatures() { return static_cast<const Tile&>(*this).hasCreatures(); }
+
+    void appendSpectators(std::vector<CreaturePtr>& out) const;
 
     bool hasTopItem() const { return m_thingTypeFlag & HAS_TOP_ITEM; }
     bool hasCommonItem() const { return m_thingTypeFlag & HAS_COMMON_ITEM; }
@@ -160,11 +163,15 @@ private:
     void drawTop(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation);
     void drawCreature(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation, LightView* lightView = nullptr);
 
+    void updateCreatureRangeForInsert(int16_t stackPos, const ThingPtr& thing);
+    void rebuildCreatureRange();
+
     void setThingFlag(const ThingPtr& thing);
 
     void recalculateThingFlag()
     {
         m_thingTypeFlag = 0;
+        rebuildCreatureRange();
         for (const auto& thing : m_things)
             setThingFlag(thing);
     }
@@ -198,6 +205,9 @@ private:
     uint8_t m_drawElevation{ 0 };
     uint8_t m_minimapColor{ 0 };
     uint8_t m_elevation{ 0 };
+
+    int16_t m_firstCreatureIndex{ -1 };
+    int16_t m_lastCreatureIndex{ -1 };
 
     int8_t m_highlightThingStackPos = -1;
 

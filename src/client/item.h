@@ -109,7 +109,7 @@ public:
 
     ItemPtr clone();
     ItemPtr asItem() { return static_self_cast<Item>(); }
-    bool isItem() override { return true; }
+    bool isItem() const override { return true; }
 
     void updatePatterns();
     int calculateAnimationPhase();
@@ -148,7 +148,7 @@ public:
 
     bool isHouseDoor() { return m_attribs.has(ATTR_HOUSEDOORID); }
     bool isDepot() { return m_attribs.has(ATTR_DEPOT_ID); }
-    bool isContainer() override { return m_attribs.has(ATTR_CONTAINER_ITEMS) || Thing::isContainer(); }
+    bool isContainer() const override { return m_attribs.has(ATTR_CONTAINER_ITEMS) || Thing::isContainer(); }
     bool isDoor() { return m_attribs.has(ATTR_HOUSEDOORID); }
     bool isTeleport() { return m_attribs.has(ATTR_TELE_DEST); }
 

@@ -209,6 +209,9 @@ void Tile::clean()
 
     m_thingTypeFlag = 0;
 
+    m_firstCreatureIndex = -1;
+    m_lastCreatureIndex = -1;
+
 #ifdef FRAMEWORK_EDITOR
     m_flags = 0;
 #endif
@@ -313,6 +316,8 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     m_things.insert(m_things.begin() + stackPos, thing);
 
+    updateCreatureRangeForInsert(static_cast<int16_t>(stackPos), thing);
+
     setThingFlag(thing);
 
     if (size > g_gameConfig.getTileMaxThings())
@@ -385,16 +390,74 @@ ThingPtr Tile::getThing(const int stackPos)
     return nullptr;
 }
 
+void Tile::updateCreatureRangeForInsert(const int16_t stackPos, const ThingPtr& thing)
+{
+    if (m_firstCreatureIndex != -1 && stackPos <= m_firstCreatureIndex) {
+        ++m_firstCreatureIndex;
+    }
+
+    if (m_lastCreatureIndex != -1 && stackPos <= m_lastCreatureIndex) {
+        ++m_lastCreatureIndex;
+    }
+
+    if (!thing->isCreature()) {
+        return;
+    }
+
+    if (m_firstCreatureIndex == -1 || stackPos < m_firstCreatureIndex) {
+        m_firstCreatureIndex = stackPos;
+    }
+
+    if (stackPos > m_lastCreatureIndex) {
+        m_lastCreatureIndex = stackPos;
+    }
+}
+
+void Tile::rebuildCreatureRange()
+{
+    m_firstCreatureIndex = -1;
+    m_lastCreatureIndex = -1;
+
+    const auto count = static_cast<int32_t>(m_things.size());
+    for (int32_t i = 0; i < count; ++i) {
+        if (!m_things[i]->isCreature()) {
+            continue;
+        }
+
+        if (m_firstCreatureIndex == -1) {
+            m_firstCreatureIndex = static_cast<int16_t>(i);
+        }
+
+        m_lastCreatureIndex = static_cast<int16_t>(i);
+    }
+}
+
+void Tile::appendSpectators(std::vector<CreaturePtr>& out) const
+{
+    if (!hasCreatures() || m_lastCreatureIndex == -1) {
+        return;
+    }
+
+    const auto size = static_cast<int32_t>(m_things.size());
+    const auto beginOffset = size - 1 - static_cast<int32_t>(m_lastCreatureIndex);
+    const auto endOffset = size - static_cast<int32_t>(m_firstCreatureIndex);
+
+    auto it = m_things.rbegin() + beginOffset;
+    const auto end = m_things.rbegin() + endOffset;
+
+    for (; it != end; ++it) {
+        const auto& thing = *it;
+        if (thing->isCreature()) {
+            out.emplace_back(thing->static_self_cast<Creature>());
+        }
+    }
+}
+
 std::vector<CreaturePtr> Tile::getCreatures()
 {
     std::vector<CreaturePtr> creatures;
-    if (hasCreatures()) {
-        for (const auto& thing : m_things) {
-            if (thing->isCreature())
-                creatures.emplace_back(thing->static_self_cast<Creature>());
-        }
-    }
-
+    appendSpectators(creatures);
+    std::ranges::reverse(creatures);
     return creatures;
 }
 
@@ -427,8 +490,9 @@ std::vector<ItemPtr> Tile::getItems()
 {
     std::vector<ItemPtr> items;
     for (const auto& thing : m_things) {
-        if (!thing->isItem())
+        if (!thing->isItem()) {
             continue;
+        }
 
         items.emplace_back(thing->static_self_cast<Item>());
     }
