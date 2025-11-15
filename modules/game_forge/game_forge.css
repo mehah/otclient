@@ -441,34 +441,30 @@
 
 .result-window {
   width: 400px;
-  height: 130px;
+  height: 220px;
   position: relative;
   display: block;
-}
-
-.result-dragon {
-  position: absolute;
-  --image-source: "/modules/game_store/images/dragon";
-  --image-size: 192 70;
-  top: -70px;
-  width: 192px;
-  height: 70px;
+  overflow: hidden;
+  --image-repeated: false;
 }
 
 .result-title {
   position: absolute;
-  top: 5;
-  width: 380px;
+  top: 72px;
+  left: 0;
+  right: 0;
+  width: 390px;
   text-align: center;
   color: #c0c0c0;
   height: 20px;
 }
 
 .result-content {
-  top: 0;
-  display: flex;
+  display: block;
+  top: 0px;
   width: 390px;
   height: 90px;
+  margin-top: 80px;
 }
 
 .result-center {
@@ -481,8 +477,9 @@
 }
 
 .result-arrows {
-  text-align: center;
-  padding-top: 20px;
+  justify-content: center;
+  align-items: center;
+  height: 25px;
 }
 
 .result-arrows img:first-child {
@@ -494,16 +491,22 @@
 }
 
 .result-text {
-  text-align: center;
-  width: 272px;
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 30;
+  bottom: 70px;
+  left: 20px;
+  right: 20px;
+  width: 400px;
   text-align: center;
+  color: #c0c0c0;
+  height: 15px;
 }
 
-.result-footer {
-  width: 390px;
-  height: 40px;
+.result-separator {
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+  right: 10px;
+  width: 380px;
+  height: 2px;
+  margin: 0;
 }

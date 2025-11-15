@@ -4,7 +4,11 @@ ForgeButton = nil
 local cloneValue = Helpers.cloneValue
 local normalizeClassPriceEntries = Helpers.normalizeClassPriceEntries
 local normalizeTierPriceEntries = Helpers.normalizeTierPriceEntries
-local formatHistoryDate = Helpers.formatHistoryDate
+-- Don't cache formatHistoryDate as a local since it may be updated
+-- local formatHistoryDate = Helpers.formatHistoryDate
+
+-- Store all callback references to prevent garbage collection
+ForgeController.callbacks = {}
 
 ForgeController.showResult = false
 ForgeController.showBonus = false
@@ -17,12 +21,20 @@ ForgeController.baseResult = Helpers.baseResult
 function ForgeController:onGameStart()
     if g_game.getFeature(GameForgeConvergence) then -- Summer Update 2017
         self:updateResourceBalances()
+        
+        -- Store event callbacks to prevent garbage collection
+        self.callbacks.onBrowseForgeHistory = onBrowseForgeHistory
+        self.callbacks.forgeData = forgeData
+        self.callbacks.onOpenForge = onOpenForge
+        self.callbacks.forgeResultData = forgeResultData
+        self.callbacks.onResourcesBalanceChange = function() self:updateResourceBalances() end
+        
         self:registerEvents(g_game, {
-            onBrowseForgeHistory = onBrowseForgeHistory,
-            forgeData = forgeData,
-            onOpenForge = onOpenForge,
-            onResourcesBalanceChange = function() self:updateResourceBalances() end,
-            forgeResultData = forgeResultData
+            onBrowseForgeHistory = self.callbacks.onBrowseForgeHistory,
+            forgeData = self.callbacks.forgeData,
+            onOpenForge = self.callbacks.onOpenForge,
+            onResourcesBalanceChange = self.callbacks.onResourcesBalanceChange,
+            forgeResultData = self.callbacks.forgeResultData
         })
 
         if not ForgeButton then
@@ -33,9 +45,11 @@ function ForgeController:onGameStart()
         end
         self.currentTab = 'conversion'
     else
-        scheduleEvent(function()
+        -- Store unload callback
+        self.callbacks.unloadModule = function()
             g_modules.getModule("game_forge"):unload()
-        end, 100)
+        end
+        scheduleEvent(self.callbacks.unloadModule, 100)
     end
 end
 
@@ -166,6 +180,38 @@ ForgeController.baseSelected = {
 function ForgeController:onInit()
 end
 
+function ForgeController:terminate()
+    -- Clean up any pending events
+    if ForgeController.resultTimeout then
+        removeEvent(ForgeController.resultTimeout)
+        ForgeController.resultTimeout = nil
+    end
+    
+    -- Clean up all stored callbacks
+    if ForgeController.callbacks then
+        for key, _ in pairs(ForgeController.callbacks) do
+            ForgeController.callbacks[key] = nil
+        end
+        ForgeController.callbacks = {}
+    end
+    
+    -- Reset flags
+    ForgeController.waitingForResult = false
+    ForgeController.showResult = false
+    ForgeController.showBonus = false
+    
+    -- Hide UI
+    if self.ui and not self.ui:isDestroyed() then
+        self:hide()
+    end
+    
+    -- Remove button
+    if ForgeButton then
+        ForgeButton:destroy()
+        ForgeButton = nil
+    end
+end
+
 function ForgeController:getPrice(prices, itemId, currentTier, isConvergence, isTransfer)
     local price = 0
     local tierIndex = (tonumber(currentTier) or 0) + 1
@@ -215,14 +261,32 @@ local forgeActions = {
     TRANSFER = 1
 }
 
-function ForgeController:closeResult()
+-- Named callback functions to prevent garbage collection issues
+ForgeController.callbacks.closeResultCallback = function()
     ForgeController.showResult = false
     ForgeController.showBonus = false
 
-    self:hide()
+    ForgeController:hide()
     if ForgeController.rawOpenForgeData then
         onOpenForge(ForgeController.rawOpenForgeData)
     end
+end
+
+ForgeController.callbacks.updateBonusButton = function()
+    ForgeController.result.button = "Close"
+    ForgeController.result.bonusAction = ForgeController.callbacks.closeResultCallback
+end
+
+ForgeController.callbacks.showBonusCallback = function()
+    ForgeController.showResult = false
+    ForgeController.showBonus = true
+
+    -- Use the stored callback
+    scheduleEvent(ForgeController.callbacks.updateBonusButton, 150)
+end
+
+function ForgeController:closeResult()
+    ForgeController.callbacks.closeResultCallback()
 end
 
 function ForgeController:forgeAction(isTransfer)
@@ -258,7 +322,8 @@ function ForgeController:forgeAction(isTransfer)
         removeEvent(ForgeController.resultTimeout)
     end
     
-    ForgeController.resultTimeout = scheduleEvent(function()
+    -- Store the callback function to maintain a reference
+    ForgeController.callbacks.timeoutCallback = function()
         if ForgeController.waitingForResult then
             ForgeController.waitingForResult = false
             -- If no result received after 5 seconds, refresh the forge window
@@ -266,7 +331,9 @@ function ForgeController:forgeAction(isTransfer)
                 onOpenForge(ForgeController.rawOpenForgeData)
             end
         end
-    end, 5000)
+    end
+    
+    ForgeController.resultTimeout = scheduleEvent(ForgeController.callbacks.timeoutCallback, 5000)
 
     g_game.forgeRequest(actionType, data.isConvergence, data.selected.id, data.selected.tier,
         data.selectedTarget.id, chanceImproved, reduceTierLoss)
@@ -337,18 +404,22 @@ function ForgeController:resultSystemEvent()
             ForgeController.result.leftShader = ""
             ForgeController.result.color = Helpers.red
 
-            scheduleEvent(function()
+            -- Store the callback to maintain reference
+            ForgeController.callbacks.clearRightItem = function()
                 ForgeController.result.rightItemId = -1
                 ForgeController.result.rightTier = 0
-            end, 1000)
+            end
+            scheduleEvent(ForgeController.callbacks.clearRightItem, 1000)
         end
         return
     end
 
     ForgeController.result.eventCount = (ForgeController.result.eventCount or 0) + 1
-    scheduleEvent(function()
-        ForgeController:resultSystemEvent(ForgeController.result)
-    end, 750)
+    -- Store the callback to maintain reference
+    ForgeController.callbacks.continueAnimation = function()
+        ForgeController:resultSystemEvent()
+    end
+    scheduleEvent(ForgeController.callbacks.continueAnimation, 750)
 end
 
 function forgeResultData(rawData)
@@ -357,6 +428,16 @@ function forgeResultData(rawData)
     if ForgeController.resultTimeout then
         removeEvent(ForgeController.resultTimeout)
         ForgeController.resultTimeout = nil
+    end
+    
+    -- Ensure UI is loaded before showing results
+    if not ForgeController.ui or ForgeController.ui:isDestroyed() then
+        ForgeController:show(true)
+    end
+    
+    if not ForgeController.ui then
+        -- UI failed to load, abort
+        return
     end
     
     ForgeController.result = cloneValue(Helpers.baseResult)
@@ -402,9 +483,9 @@ function forgeResultData(rawData)
         end
     end
     if ForgeController.result.bonus == 0 then
-        ForgeController.result.bonusAction = function() ForgeController:closeResult() end
+        ForgeController.result.bonusAction = ForgeController.callbacks.closeResultCallback
     else
-        ForgeController.result.button = "Next"
+        ForgeController.result.buttonLabel = "Next"
 
         local isConvergence = ForgeController.transfer.selected == -1 and ForgeController.fusion.isConvergence
         if ForgeController.result.bonus == 1 then
@@ -430,25 +511,16 @@ function forgeResultData(rawData)
             ForgeController.result.bonusLabel = "What luck! Your item only lost one tier instead of being\nconsumed."
         end
 
-        ForgeController.result.bonusAction = function()
-            ForgeController.showResult = false
-            ForgeController.showBonus = true
-
-            scheduleEvent(function()
-                ForgeController.result.button = "Close"
-                ForgeController.result.bonusAction = function()
-                    ForgeController:closeResult()
-                end
-            end, 150)
-        end
+        ForgeController.result.bonusAction = ForgeController.callbacks.showBonusCallback
     end
 
     ForgeController.result.leftShader = "Outfit - ForgeDonor"
     ForgeController.result.rightShader = "Outfit - cyclopedia-black"
     ForgeController.result.eventCount = 1
-    scheduleEvent(function()
+    ForgeController.callbacks.startResultAnimation = function()
         ForgeController:resultSystemEvent()
-    end, 750)
+    end
+    scheduleEvent(ForgeController.callbacks.startResultAnimation, 750)
 end
 
 local buttonClip = { x = 0, y = 0, width = 43, height = 20 }
@@ -482,43 +554,15 @@ ForgeController.fusion = {
     canFusion = false,
     currentList = {},
 }
-function ForgeController:toggleFusionMenu()
-    self:resetTabsClip()
-    self.currentTab = 'fusion'
-    self.fusion.clip = { x = 0, y = 34, width = 116, height = 34 }
+
+-- Store callback in ForgeController to prevent garbage collection
+ForgeController.fusion.handleSelect = function(item)
+    ForgeController.fusion.selectedTarget = cloneValue(ForgeController.baseSelected)
+    ForgeController:handleSelect(ForgeController.fusion, item, false)
 end
 
-local function handleFusionItems(data)
-    local currentList = {}
-
-    for i, item in pairs(data) do
-        item.key = ("%d_%d"):format(item.id, item.tier)
-        if item.tier > 0 then
-            item.clip = ItemsDatabase.getTierClip(item.tier)
-        end
-
-        local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(item.id)
-        if imagePath then
-            item.imagePath = imagePath
-            item.rarityClipObject = rarityClipObject
-        end
-
-        item.countLabel = string.format("%d / %d", item.count, 1)
-        table.insert(currentList, item)
-    end
-
-    table.sort(currentList, function(a, b)
-        if a.tier == b.tier then
-            return a.id < b.id
-        end
-        return a.tier > b.tier
-    end)
-
-
-    return currentList
-end
-
-function ForgeController.fusion.exaltedCoreImprovements(currentType)
+-- Store callback in ForgeController to prevent garbage collection
+ForgeController.fusion.exaltedCoreImprovements = function(currentType)
     if currentType == 'improve-chance' then
         ForgeController.fusion.chanceImprovedChecked = not ForgeController.fusion.chanceImprovedChecked
         if ForgeController.fusion.chanceImprovedChecked then
@@ -541,7 +585,11 @@ function ForgeController.fusion.exaltedCoreImprovements(currentType)
     end
 end
 
--- FUSION MENU
+function ForgeController:toggleFusionMenu()
+    self:resetTabsClip()
+    self.currentTab = 'fusion'
+    self.fusion.clip = { x = 0, y = 34, width = 116, height = 34 }
+end
 
 -- TRANSFER MENU
 ForgeController.transfer = {
@@ -579,9 +627,33 @@ function ForgeController:toggleTransferMenu()
     self.transfer.clip = { x = 0, y = 34, width = 116, height = 34 }
 end
 
-function ForgeController.fusion.handleSelect(item)
-    ForgeController.fusion.selectedTarget = cloneValue(ForgeController.baseSelected)
-    ForgeController:handleSelect(ForgeController.fusion, item, false)
+local function handleFusionItems(data)
+    local currentList = {}
+
+    for i, item in pairs(data) do
+        item.key = ("%d_%d"):format(item.id, item.tier)
+        if item.tier > 0 then
+            item.clip = ItemsDatabase.getTierClip(item.tier)
+        end
+
+        local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(item.id)
+        if imagePath then
+            item.imagePath = imagePath
+            item.rarityClipObject = rarityClipObject
+        end
+
+        item.countLabel = string.format("%d / %d", item.count, 1)
+        table.insert(currentList, item)
+    end
+
+    table.sort(currentList, function(a, b)
+        if a.tier == b.tier then
+            return a.id < b.id
+        end
+        return a.tier > b.tier
+    end)
+
+    return currentList
 end
 
 function ForgeController:handleSelect(data, item, isTransfer)
@@ -644,7 +716,8 @@ function ForgeController:handleSelect(data, item, isTransfer)
     end
 end
 
-function ForgeController.transfer.handleSelect(item)
+-- Store callback in ForgeController to prevent garbage collection
+ForgeController.transfer.handleSelect = function(item)
     ForgeController.transfer.exaltedCoresLabel = "???"
     if not item then
         return
@@ -1027,7 +1100,7 @@ function ForgeController.conversion.handleButtons()
     ForgeController.currentDustAndMaxLabel = string.format("%d/%d", ForgeController.currentDust,
         dustMax)
     if dustMax >= ForgeController.conversion.dustCap then
-        ForgeController.conversion.dustMaxLabel = "You have reached\nthe maximum dust limit"
+        ForgeController.conversion.dustMaxLabel = "Maximum Reached"
         ForgeController.conversion.disableIncreaseDustLimit = true
     else
         ForgeController.conversion.dustMaxLabel = string.format("Raise limit from\n%d to %d", dustMax, dustMax + 1)
@@ -1129,8 +1202,10 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     ForgeController.history.showNextButton = page < lastPage
 
     for _, entry in ipairs(historyList) do
-        entry.createdAt = formatHistoryDate(entry.createdAt)
-        entry.actionType = historyActionLabels[entry.actionType]
+        entry.createdAt = Helpers.formatHistoryDate(entry.createdAt)
+        -- Convert actionType to number if it's a string, then look up the label
+        local actionTypeNum = tonumber(entry.actionType) or entry.actionType
+        entry.actionType = historyActionLabels[actionTypeNum] or 'Unknown'
         entry.description = entry.description or ''
         if entry.actionType == historyActionLabels[0] or entry.actionType == historyActionLabels[1] then
             local firstSpaceIndex = string.find(entry.description, " ")

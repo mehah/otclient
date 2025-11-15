@@ -56,8 +56,7 @@
                     <img
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
-                      *border-width="1"
-                      *border-color="self.fusion.selected.key == item.key and 'white' or 'transparent'"
+                      *border="self.fusion.selected.key == item.key and '1px white' or '1px transparent'"
                       class="item-rarity"
                     />
                     <UIItem
@@ -104,7 +103,7 @@
                     id="fusion_convergence"
                     type="checkbox"
                     *checked="self.fusion.isConvergence"
-                    onchange="self:toggleConvergence()"
+                    onchange="self:toggleConvergence(false)"
                   /><label style="margin-left: 2px" for="fusion_convergence"
                     >Convergence</label
                   >
@@ -160,8 +159,7 @@
                     <img
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
-                      *border-width="1"
-                      *border-color="self.fusion.selectedTarget.key == item.key and 'white' or 'transparent'"
+                      *border="self.fusion.selectedTarget.key == item.key and '1px white' or '1px transparent'"
                       class="item-rarity"
                     />
                     <UIItem
@@ -450,8 +448,7 @@
                       *if="item.imagePath"
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
-                      *border-width="1"
-                      *border-color="self.transfer.selected and self.transfer.selected.key == item.key and 'white' or 'transparent'"
+                      *border="self.transfer.selected and self.transfer.selected.key == item.key and '1px white' or '1px transparent'"
                       class="item-rarity"
                     />
                     <UIItem
@@ -517,8 +514,7 @@
                   *for="local item in (self.transfer.currentList.receivers or {})"
                   *if="self.transfer.selected and self.transfer.selected.id ~= item.id and self.transfer.selected.slot == item.slot"
                   onclick="self:handleSelectTarget(item, true)"
-                  *border-width="1"
-                  *border-color="self.transfer.selectedTarget.key == item.key and 'white' or 'transparent'"
+                  *border="self.transfer.selectedTarget.key == item.key and '1px white' or '1px transparent'"
                   onhover="self:handleDescription('transfer-cost-receiver-item')"
                 >
                   <div class="item-to-select">
@@ -526,8 +522,7 @@
                       onhover="self:handleDescription('transfer-cost-receiver-item')"
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
-                      *border-width="1"
-                      *border-color="self.transfer.selectedTarget.key == item.key and 'white' or 'transparent'"
+                      *border="self.transfer.selectedTarget.key == item.key and '1px white' or '1px transparent'"
                       class="item-rarity"
                     />
                     <UIItem
@@ -870,11 +865,13 @@
                   *disabled="self.conversion.disableIncreaseDustLimit"
                   onclick="self.conversion.toggle(4)"
                   onhover="self:handleDescription('increase-dust-limit-cost')"
+                  style="position: relative; height: 80px;"
                 >
-                  <UIItem style="item-id: 37160" />
+                  <UIItem style="item-id: 37160; height: 65px; width: 65px; position: absolute; left: 8px; bottom: 10px;" />
+                  <UIItem style="item-id: 37160; height: 65px; width: 65px; position: absolute; left: 63px; top: -5px;" />
                 </div>
-                <div style="margin-top: 8px">
-                  <p style="width: 100px">{{self.conversion.dustMaxLabel}}</p>
+                <div style="margin-top: -7px">
+                  <p style="width: 150px">{{self.conversion.dustMaxLabel}}</p>
                 </div>
               </div>
             </div>
@@ -979,29 +976,28 @@
       class="result-window"
       onescape="self:closeResult()"
       *if="self.showResult or self.showBonus"
+      image-source="/modules/game_forge/images/boxdragon"
     >
-      <div class="result-dragon" placement="top-center"></div>
       <p class="result-title">{{self.result.title}}</p>
 
       <div
         class="result-content"
-        placement="top-center"
         *if="self.showResult and not self.showBonus"
       >
         <UIItem
           *item-id="self.result.leftItemId"
-          style="height: 64px; width: 64px; position: relative"
-          placement="top-left"
+          style="height: 64px; width: 64px; position: relative; margin-left: 60px; margin-right: 40px;"
           *shader="self.result.leftShader"
         >
           <img
             *if="self.result.leftTier > 0 and self.result.label ~= ''"
             class="item-tier-strip"
             src="/images/inventory/tiers-strip.png"
+            style="position: relative; float: left;"
             *image-clip="self.result.leftClip"
           />
         </UIItem>
-        <div class="result-center">
+        <div class="result-center" style="margin-left: 10px; margin-right: 10px;">
           <div class="result-arrows">
             <img
               *for="local value in self.result.arrows"
@@ -1010,18 +1006,10 @@
               height="25"
             />
           </div>
-          <div class="result-text" *if="self.result.label ~= ''">
-            <span>{{self.result.label}} </span
-            ><span style="margin-left: 3px" *color="self.result.color"
-              >{{self.result.labelResult}}</span
-            >
-          </div>
         </div>
-
         <UIItem
           *item-id="self.result.rightItemId"
-          style="height: 64px; width: 64px; position: relative"
-          placement="top-right"
+          style="height: 64px; width: 64px; position: relative; margin-left:110px;"
           *shader="self.result.rightShader"
         >
           <img
@@ -1033,10 +1021,16 @@
         </UIItem>
       </div>
 
+      <div class="result-text" *if="self.result.label ~= '' and self.showResult and not self.showBonus">
+        <span>{{self.result.label}} </span
+        ><span style="margin-left: 3px" *color="self.result.color"
+          >{{self.result.labelResult}}</span
+        >
+      </div>
+
       <div class="result-content" *if="self.showBonus and not self.showResult">
         <div
           style="width: 400px; text-align: center; top: 0"
-          placement="center"
         >
           <UIItem
             *item-id="self.result and self.result.bonusItem"
@@ -1057,15 +1051,12 @@
           </p>
         </div>
       </div>
-      <hr
-        class="separator HorizontalSeparator"
-        style="margin: 0 10; width: 380px"
-      />
-      <div class="result-footer" *if="self.result.label ~= ''">
-        <button style="float: right" onclick="self.result.bonusAction()">
-          {{self.result.buttonLabel}}
-        </button>
-      </div>
+
+      <hr id="resultSeparator" class="result-separator HorizontalSeparator" *if="self.result.label ~= ''" />
+
+      <button class="close-btn" *if="self.result.label ~= ''" style="position: absolute; bottom: 10px; right: 15px; padding: 3px 10px; min-width: 60px; min-height: 20px" onclick="self.result.bonusAction()">
+        {{self.result.buttonLabel}}
+      </button>
     </window>
   </div>
 </html>
