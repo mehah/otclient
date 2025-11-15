@@ -329,7 +329,7 @@ public:
     LuaObjectPtr popObject();
 
     void pushNil();
-    void pushInteger(int64_t v);
+    void pushInteger(long v);
     void pushNumber(double v);
     void pushBoolean(bool v);
     void pushString(std::string_view v);

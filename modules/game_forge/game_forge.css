@@ -84,10 +84,9 @@
   color: #d33c3c;
 }
 .fusion-text-chance-cost {
-  --image-source: "/modules/game_forge/images/cardBg.png";
+  --image-source: "/modules/game_forge/images/cardBg";
   --image-size: 25 20;
   --image-border: 3;
-  margin-left: 2px;
   text-align: center;
   align-items: center;
   display: block;
@@ -103,7 +102,7 @@
   width: 465px;
 }
 .transfer-select-container {
-  --image-source: "/modules/game_forge/images/window-upper.png";
+  --image-source: "/modules/game_forge/images/window-upper";
   --image-size: 466 115;
   --image-border: 30;
   position: relative;
@@ -129,7 +128,7 @@
 .transfer-select-donnor-container {
   --image-border: 1;
   display: block;
-  --image-source: "/modules/game_forge/images/scrollarea.png";
+  --image-source: "/modules/game_forge/images/scrollarea";
   --image-size: 155 80;
   width: 155px;
   height: 80px;
@@ -162,7 +161,7 @@
   height: 66px;
 }
 .transfer-requirement {
-  --image-source: "/modules/game_forge/images/item66.png";
+  --image-source: "/modules/game_forge/images/item66";
   --image-size: 66 66;
   width: 66px;
   height: 66px;
@@ -172,7 +171,7 @@
   height: 64px;
 }
 .transfer-requirement-item-cost {
-  --image-source: "/modules/game_forge/images/info-bg.png";
+  --image-source: "/modules/game_forge/images/info-bg";
   --image-size: 66 20;
   width: 66px;
   height: 20px;
@@ -194,7 +193,7 @@
 .transfer-button {
   height: 65px;
   width: 128px;
-  --image-source: "/modules/game_forge/images/bigger-button.png";
+  --image-source: "/modules/game_forge/images/bigger-button";
   --image-size: 128 66;
   --image-clip: 0 0 128 66;
   width: 128px;
@@ -216,7 +215,7 @@
 .transfer-description {
   --image-size: 465 75;
   height: 75px;
-  --image-source: "/images/game/actionbar/2pixel-up-frame-borderimage.png";
+  --image-source: "/images/ui/2pixel_up_frame_borderimage";
   --image-border: 3;
   margin-top: 10px;
   text-align: left;
@@ -243,12 +242,12 @@
 }
 .conversion-column-img {
   --image-size: 151 235;
-  --image-source: "/modules/game_forge/images/conversion-column.png";
+  --image-source: "/modules/game_forge/images/conversion-column";
   text-align: center;
   --image-border: 2;
 }
 .conversion-column-header {
-  --image-source: "/modules/game_forge/images/conversion-column-header.png";
+  --image-source: "/modules/game_forge/images/conversion-column-header";
   width: 151px;
   height: 18px;
   --image-size: 151 18;
@@ -257,7 +256,7 @@
   --image-border: 2;
 }
 .conversion-column-item-container {
-  --image-source: "/modules/game_forge/images/item66.png";
+  --image-source: "/modules/game_forge/images/item66";
   --image-size: 66 66;
   width: 66px;
   height: 66px;
@@ -271,7 +270,7 @@
   height: 64px;
 }
 .conversion-column-item-cost {
-  --image-source: "/modules/game_forge/images/info-bg.png";
+  --image-source: "/modules/game_forge/images/info-bg";
   --image-size: 66 20;
   width: 66px;
   height: 20px;
@@ -281,7 +280,7 @@
   margin-top: 2px;
 }
 .conversion-column-item-conversion-button {
-  --image-source: "/modules/game_forge/images/bigger-button.png";
+  --image-source: "/modules/game_forge/images/bigger-button";
   --image-size: 83 66;
   --image-clip: 0 0 128 66;
   width: 83px;
@@ -301,7 +300,7 @@
   opacity: 0.5;
 }
 .conversion-column-item-increase-button {
-  --image-source: "/modules/game_forge/images/bigger-button.png";
+  --image-source: "/modules/game_forge/images/bigger-button";
   --image-size: 128 66;
   text-align: center;
   align-items: center;
@@ -324,7 +323,7 @@
 .description {
   --image-size: 465 50;
   height: 50px;
-  --image-source: "/images/game/actionbar/2pixel-up-frame-borderimage.png";
+  --image-source: "/images/ui/2pixel_up_frame_borderimage";
   --image-border: 3;
   margin-top: 10px;
   color: #c0c0c0;
@@ -338,6 +337,14 @@
   height: 290px;
   background-color: #404040;
   width: 465px;
+  --border-width-top: 1;
+  --border-color-top: black;
+  --border-width-left: 1;
+  --border-color-left: black;
+  --border-width-bottom: 1;
+  --border-color-bottom: #747474;
+  --border-width-right: 1;
+  --border-color-right: #747474;
 }
 
 .history-list {
@@ -350,6 +357,9 @@
   width: 100%;
   text-align: left;
   height: 100%;
+  padding-left: 1px;
+  padding-top: 1px;
+  padding-right: 1px;
 }
 
 .history-table tbody tr:nth-child(odd) {
@@ -386,7 +396,7 @@
 /* HISTORY MENU */
 
 .base-gold-bg {
-  --image-source: "/modules/game_forge/images/balanceBg.png";
+  --image-source: "/modules/game_forge/images/balanceBg";
   width: 130px;
   height: 20px;
   align-items: center;
@@ -394,7 +404,7 @@
 }
 
 .base-resource-bg {
-  --image-source: "/modules/game_forge/images/cardBg.png";
+  --image-source: "/modules/game_forge/images/cardBg";
   width: 52px;
   height: 20px;
   align-items: center;
@@ -438,7 +448,7 @@
 
 .result-dragon {
   position: absolute;
-  --image-source: "/modules/game_store/images/dragon.png";
+  --image-source: "/modules/game_store/images/dragon";
   --image-size: 192 70;
   top: -70px;
   width: 192px;
