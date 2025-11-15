@@ -104,3 +104,13 @@ endif()
 add_subdirectory(src/protobuf)
 # Src
 add_subdirectory(src)
+
+option(OTCLIENT_BUILD_TESTS "Build unit tests" ON)
+
+if(OTCLIENT_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+    log_option_enabled("Build tests")
+else()
+    log_option_disabled("Build tests")
+endif()

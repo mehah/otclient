@@ -128,7 +128,7 @@ public:
     bool isParalyzed() const { return (m_states & Otc::IconParalyze) == Otc::IconParalyze; }
 
     LocalPlayerPtr asLocalPlayer() { return static_self_cast<LocalPlayer>(); }
-    bool isLocalPlayer() override { return true; }
+    bool isLocalPlayer() const override { return true; }
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 

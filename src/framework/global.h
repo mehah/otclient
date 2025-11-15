@@ -31,6 +31,8 @@ using namespace std::literals;
 // common C/C++ headers
 #include "pch.h"
 
+using namespace std::literals;
+
 // global constants
 #include "const.h"
 
