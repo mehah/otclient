@@ -43,3 +43,4 @@ function(otclient_add_gtest TARGET_NAME)
 endfunction()
 
 add_subdirectory(map)
+add_subdirectory(stdext)
