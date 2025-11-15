@@ -27,6 +27,7 @@
 
 #include <framework/stdext/traits.h>
 #include <tuple>
+#include <type_traits>
 
 /// This namespace contains some dirty metaprogamming that uses a lot of C++0x features
 /// The purpose here is to create templates that can bind any function from C++
@@ -37,6 +38,17 @@
 /// pushes the result to lua.
 namespace luabinder
 {
+    template<typename Ret>
+    Ret make_default_return_value()
+    {
+        if constexpr (std::is_reference_v<Ret>) {
+            using ValueType = std::remove_cv_t<std::remove_reference_t<Ret>>;
+            static ValueType value{};
+            return value;
+        }
+        return Ret{};
+    }
+
     /// Pack arguments from lua stack into a tuple recursively
     template<int N>
     struct pack_values_into_tuple
@@ -171,7 +183,7 @@ namespace luabinder
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
             if (!obj) {
                 g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
-                return Ret{};
+                return make_default_return_value<Ret>();
             }
             return mf(obj.get(), args...);
         };
@@ -249,7 +261,7 @@ namespace luabinder
                 if constexpr (std::is_void_v<Ret>) {
                     return;
                 } else {
-                    return Ret{};
+                    return make_default_return_value<Ret>();
                 }
             }
             if constexpr (std::is_void_v<Ret>) {
