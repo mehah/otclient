@@ -55,6 +55,10 @@ function UIItem:onDrop(widget, mousePos)
         return false
     end
 
+    if not itemPos then
+        return false
+    end
+
     if itemPos.x ~= 65535 and not itemTile then
         return false
     end

@@ -72,7 +72,19 @@ local OUTFIT_SHADERS = { {
     name = 'Outfit - Outline',
     useFramebuffer = true,
     frag = 'shaders/fragment/outline.frag'
-} }
+}, {
+    name = 'Outfit - ForgeDonor',
+    useFramebuffer = true,
+    frag = 'shaders/fragment/forge_donor.frag'
+}, {
+    name = 'Outfit - ForgeSuccess',
+    useFramebuffer = true,
+    frag = 'shaders/fragment/forge_success.frag'
+}, {
+    name = 'Outfit - ForgeFailed',
+    useFramebuffer = true,
+    frag = 'shaders/fragment/forge_failed.frag'
+}, }
 
 local MOUNT_SHADERS = { {
     name = 'Mount - Default',

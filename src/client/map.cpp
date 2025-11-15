@@ -33,12 +33,11 @@
 #include "missile.h"
 #include "thing.h"
 #include "tile.h"
-
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/eventdispatcher.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/painter.h"
-#include <framework/ui/uiwidget.h>
+#include "framework/ui/uiwidget.h"
 
 namespace
 {
