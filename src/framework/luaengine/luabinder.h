@@ -45,8 +45,9 @@ namespace luabinder
             using ValueType = std::remove_cv_t<std::remove_reference_t<Ret>>;
             static ValueType value{};
             return value;
+        } else {
+            return std::decay_t<Ret>{};
         }
-        return Ret{};
     }
 
     /// Pack arguments from lua stack into a tuple recursively
