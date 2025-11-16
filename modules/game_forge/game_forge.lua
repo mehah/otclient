@@ -62,13 +62,18 @@ local function resetInfo()
     ForgeController.transfer.canTransfer = false
     ForgeController.transfer.isConvergence = false
     ForgeController.transfer.title = "Transfer Requirements"
+    ForgeController.transfer.dustLabel = ForgeController.transfer.dust
+    ForgeController.transfer.currentList = cloneValue(ForgeController.transfer.items)
     ForgeController.fusion.title = "Further Items Needed For Fusion"
     ForgeController.fusion.selected = cloneValue(ForgeController.baseSelected)
     ForgeController.fusion.selectedTarget = cloneValue(ForgeController.baseSelected)
     ForgeController.fusion.isConvergence = false
     ForgeController.fusion.canTransfer = false
+    ForgeController.fusion.canFusion = false
     ForgeController.fusion.chanceImprovedChecked = false
     ForgeController.fusion.reduceTierLossChecked = false
+    ForgeController.fusion.dustLabel = ForgeController.fusion.dust
+    ForgeController.fusion.currentList = cloneValue(ForgeController.fusion.items)
     ForgeController.showResult = false
     ForgeController.showBonus = false
     ForgeController.result = cloneValue(Helpers.baseResult)
@@ -730,6 +735,7 @@ function ForgeController:handleSelectTarget(item, isTransfer)
     data.selectedTarget = cloneValue(ForgeController.baseSelected)
 
     ForgeController.transfer.canTransfer = false
+    ForgeController.fusion.canFusion = false
     if not item then
         return
     end
@@ -1153,7 +1159,6 @@ function ForgeController:resetTabsClip()
     self.transfer.clip = { x = 0, y = 0, width = 116, height = 34 }
     self.conversion.clip = { x = 0, y = 0, width = 116, height = 34 }
     self.history.clip = { x = 0, y = 0, width = 118, height = 34 }
-    resetInfo()
 end
 
 function ForgeController:toggleConversionMenu()

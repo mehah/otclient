@@ -56,7 +56,8 @@
                     <img
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
-                      *border="self.fusion.selected.key == item.key and '1px white' or '1px transparent'"
+                      *border-width="1"
+                      *border-color="self.fusion.selected.key == item.key and 'white' or 'transparent'"
                       class="item-rarity"
                     />
                     <UIItem
@@ -159,7 +160,8 @@
                     <img
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
-                      *border="self.fusion.selectedTarget.key == item.key and '1px white' or '1px transparent'"
+                      *border-width="1"
+                      *border-color="self.fusion.selectedTarget.key == item.key and 'white' or 'transparent'"
                       class="item-rarity"
                     />
                     <UIItem
@@ -262,7 +264,7 @@
                   <div class="fusion-buttons-text-container">
                     <button
                       class="fusion-buttons-improve"
-                      *image-clip="self.fusion.chanceImprovedButtonClip"
+                      *class="self.fusion.chanceImprovedChecked and 'fusion-buttons-improve-checked' or ''"
                       onclick="self.fusion.exaltedCoreImprovements('improve-chance')"
                       *disabled="self.currentExaltedCores <= 0 or self.fusion.reduceTierLossChecked and self.currentExaltedCores == 1"
                     >
@@ -296,7 +298,7 @@
                   <div class="fusion-buttons-text-container">
                     <button
                       class="fusion-buttons-improve"
-                      *image-clip="self.fusion.reduceTierLossButtonClip"
+                      *class="self.fusion.reduceTierLossChecked and 'fusion-buttons-improve-checked' or ''"
                       onclick="self.fusion.exaltedCoreImprovements('reduce-loss')"
                       style="width: 98px"
                       *disabled="self.currentExaltedCores <= 0 or self.fusion.chanceImprovedChecked and self.currentExaltedCores == 1"
@@ -448,7 +450,8 @@
                       *if="item.imagePath"
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
-                      *border="self.transfer.selected and self.transfer.selected.key == item.key and '1px white' or '1px transparent'"
+                      *border-width="1"
+                      *border-color="self.transfer.selected and self.transfer.selected.key == item.key and 'white' or 'transparent'"
                       class="item-rarity"
                     />
                     <UIItem
@@ -514,7 +517,8 @@
                   *for="local item in (self.transfer.currentList.receivers or {})"
                   *if="self.transfer.selected and self.transfer.selected.id ~= item.id and self.transfer.selected.slot == item.slot"
                   onclick="self:handleSelectTarget(item, true)"
-                  *border="self.transfer.selectedTarget.key == item.key and '1px white' or '1px transparent'"
+                  *border-width="1"
+                  *border-color="self.transfer.selectedTarget.key == item.key and 'white' or 'transparent'"
                   onhover="self:handleDescription('transfer-cost-receiver-item')"
                 >
                   <div class="item-to-select">
@@ -522,7 +526,8 @@
                       onhover="self:handleDescription('transfer-cost-receiver-item')"
                       *image-source="item.imagePath"
                       *image-clip="item.rarityClipObject"
-                      *border="self.transfer.selectedTarget.key == item.key and '1px white' or '1px transparent'"
+                      *border-width="1"
+                      *border-color="self.transfer.selectedTarget.key == item.key and 'white' or 'transparent'"
                       class="item-rarity"
                     />
                     <UIItem

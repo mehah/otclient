@@ -191,7 +191,7 @@ function Helpers.handleDescription(data, currentType)
             "You can transfer the tier of a classification 4 item to another item of the same classification. To do this, you must have at least one tier 1 item that will be consumed during the transfer and additional resources. The other item will receive the tier of the consumed item."
         else
             data.description =
-            "You can transfer the tier of an item to another item of the samr classification. To do so, you need at least a tier 2 item that will be consumed during the transfer and additional resources. The other item will received the consumed item's tier reduced by one."
+            "You can transfer the tier of an item to another item of the same classification. To do so, you need at least a tier 2 item that will be consumed during the transfer and additional resources. The other item will received the consumed item's tier reduced by one."
         end
         return
     end
