@@ -48,18 +48,56 @@ void SpriteAppearances::terminate()
 }
 
 Size SpriteSheet::getSpriteSize() const
-{
-    Size size(g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
+{    
+    // this array includes all possible combinations within 384x384 sheet
+    // if you intend to change that, you will also have to modify the assets editor
+    // CHANGING THIS MAY BREAK READING EXISTING SPRITESHEETS
 
-    switch (spriteLayout) {
-        case SpriteLayout::ONE_BY_ONE: break;
-        case SpriteLayout::ONE_BY_TWO: size.setHeight(64); break;
-        case SpriteLayout::TWO_BY_ONE: size.setWidth(64); break;
-        case SpriteLayout::TWO_BY_TWO: size.resize(64, 64); break;
-        default: break;
-    }
+    // tile sizes in spritesheets, see SpriteLayout for array key definitions
+    static const std::array<Size, 36> sizes = {
+        Size(32,32),  // 0
+        Size(32,64),  // 1
+        Size(64,32),  // 2
+        Size(64,64),  // 3
+        Size(32,96),  // 4
+        Size(32,128), // 5
+        Size(32,192), // 6
+        Size(32,384), // 7
+        Size(64,96),  // 8
+        Size(64,128), // 9
+        Size(64,192), // 10
+        Size(64,384), // 11
+        Size(96,32),  // 12
+        Size(96,64),  // 13
+        Size(96,96),  // 14
+        Size(96,128), // 15
+        Size(96,192), // 16
+        Size(96,384), // 17
+        Size(128,32),  // 18
+        Size(128,64),  // 19
+        Size(128,96),  // 20
+        Size(128,128), // 21
+        Size(128,192), // 22
+        Size(128,384), // 23
+        Size(192,32),  // 24
+        Size(192,64),  // 25
+        Size(192,96),  // 26
+        Size(192,128), // 27
+        Size(192,192), // 28
+        Size(192,384), // 29
+        Size(384,32),  // 30
+        Size(384,64),  // 31
+        Size(384,96),  // 32
+        Size(384,128), // 33
+        Size(384,192), // 34
+        Size(384,384)  // 35
+    };
 
-    return size;
+    const size_t idx = static_cast<size_t>(spriteLayout);
+    if (idx < sizes.size())
+        return sizes[idx];
+
+    return sizes[0];
 }
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
