@@ -264,7 +264,7 @@
                   <div class="fusion-buttons-text-container">
                     <button
                       class="fusion-buttons-improve"
-                      *class="self.fusion.chanceImprovedChecked and 'fusion-buttons-improve-checked' or ''"
+                      *image-clip="self.fusion.chanceImprovedChecked and {x=0, y=46, width=61, height=23} or {x=0, y=0, width=61, height=23}"
                       onclick="self.fusion.exaltedCoreImprovements('improve-chance')"
                       *disabled="self.currentExaltedCores <= 0 or self.fusion.reduceTierLossChecked and self.currentExaltedCores == 1"
                     >
@@ -298,7 +298,7 @@
                   <div class="fusion-buttons-text-container">
                     <button
                       class="fusion-buttons-improve"
-                      *class="self.fusion.reduceTierLossChecked and 'fusion-buttons-improve-checked' or ''"
+                      *image-clip="self.fusion.reduceTierLossChecked and {x=0, y=46, width=61, height=23} or {x=0, y=0, width=61, height=23}"
                       onclick="self.fusion.exaltedCoreImprovements('reduce-loss')"
                       style="width: 98px"
                       *disabled="self.currentExaltedCores <= 0 or self.fusion.chanceImprovedChecked and self.currentExaltedCores == 1"

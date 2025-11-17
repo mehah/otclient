@@ -72,17 +72,6 @@
   --image-source: "/modules/game_forge/images/button";
   --image-size: 107 21;
   --image-border: 3;
-  --image-clip: 0 0 61 23;
-}
-.fusion-buttons-improve:hover {
-  --image-clip: 0 23 61 23;
-}
-.fusion-buttons-improve:pressed {
-  padding: 3px 5px !important;
-  --image-clip: 0 46 61 23;
-}
-.fusion-buttons-improve-checked {
-  --image-clip: 0 46 61 23;
 }
 .fusion-buttons-text-container {
   display: flex;
