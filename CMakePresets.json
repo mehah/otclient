@@ -19,7 +19,7 @@
         },
         "BUILD_STATIC_LIBRARY": "ON",
         "VCPKG_TARGET_TRIPLET": "x64-windows-static",
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_BUILD_TYPE": "Release",
         "OPTIONS_ENABLE_SCCACHE": "ON"
       },
       "architecture": {
@@ -62,7 +62,7 @@
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
           "type": "FILEPATH"
         },
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_BUILD_TYPE": "Release",
         "OPTIONS_ENABLE_CCACHE": "ON"
       },
       "condition": {
