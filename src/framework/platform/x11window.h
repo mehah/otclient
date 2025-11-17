@@ -29,6 +29,10 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
+#ifdef None
+#undef None
+#endif
+
 #ifdef OPENGL_ES
 #include <EGL/egl.h>
 #else
