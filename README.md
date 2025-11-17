@@ -558,6 +558,8 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 > In old protocols, if item speed feels too fast, adjust  
 > [`item-ticks-per-frame: 75`](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32) in `data/setup.otml`.
 
+> if you use TVP or Nostalrius 7.72 activate the feature `g_game.enableFeature(GameTileAddThingWithStackpos)` in game_feature .
+
 ---
 
 ## <a id="roadmap"></a>❤️ Roadmap

@@ -1400,7 +1400,7 @@ void ProtocolGame::parseUpdateTile(const InputMessagePtr& msg)
 void ProtocolGame::parseTileAddThing(const InputMessagePtr& msg)
 {
     const auto& pos = getPosition(msg);
-    const int stackPos = g_game.getClientVersion() >= 841 ? msg->getU8() : -1;
+    const int stackPos = g_game.getFeature(Otc::GameTileAddThingWithStackpos) ? msg->getU8() : -1;
     const auto& thing = getThing(msg);
 
     g_map.addThing(thing, pos, stackPos);

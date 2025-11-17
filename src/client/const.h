@@ -562,7 +562,7 @@ namespace Otc
         GameColorizedLootValue = 121,
         GameAllowPreWalk = 122,
         GamePlayerFamiliars = 123,
-        // = 124,
+        GameTileAddThingWithStackpos = 124,
         GameMapCache = 125,
         GameForgeSkillStats = 126,
         GameCharacterSkillStats = 127,
