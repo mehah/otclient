@@ -611,7 +611,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("isWalking", &Creature::isWalking);
     g_lua.bindClassMemberFunction<Creature>("isInvisible", &Creature::isInvisible);
     g_lua.bindClassMemberFunction<Creature>("isDead", &Creature::isDead);
-    g_lua.bindClassMemberFunction<Creature>("isRemoved", &Creature::isRemoved);
+    g_lua.bindClassMemberFunction<Creature>(
+        "isRemoved",
+        static_cast<bool (Creature::*)() const>(&Creature::isRemoved)
+    );
     g_lua.bindClassMemberFunction<Creature>("canBeSeen", &Creature::canBeSeen);
     g_lua.bindClassMemberFunction<Creature>("jump", &Creature::jump);
     g_lua.bindClassMemberFunction<Creature>("setMountShader", &Creature::setMountShader);
@@ -933,7 +936,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("isClickable", &Tile::isClickable);
     g_lua.bindClassMemberFunction<Tile>("isPathable", &Tile::isPathable);
 
-    g_lua.bindClassMemberFunction<Tile>("hasCreatures", &Tile::hasCreatures);
+    g_lua.bindClassMemberFunction<Tile>(
+        "hasCreatures",
+        static_cast<bool (Tile::*)() const>(&Tile::hasCreatures)
+    );
 
     g_lua.bindClassMemberFunction<Tile>("select", &Tile::select);
     g_lua.bindClassMemberFunction<Tile>("unselect", &Tile::unselect);

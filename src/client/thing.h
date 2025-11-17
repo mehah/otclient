@@ -26,7 +26,7 @@
 #include "staticdata.h"
 #include <framework/core/timer.h>
 
- // @bindclass
+// @bindclass
 #pragma pack(push,1) // disable memory alignment
 class Thing : public AttachableObject
 {
@@ -52,15 +52,15 @@ public:
     int getStackPos();
     int getStackPriority();
 
-    virtual bool isItem() { return false; }
-    virtual bool isEffect() { return false; }
-    virtual bool isMissile() { return false; }
-    virtual bool isCreature() { return false; }
+    virtual bool isItem() const { return false; }
+    virtual bool isEffect() const { return false; }
+    virtual bool isMissile() const { return false; }
+    virtual bool isCreature() const { return false; }
 
-    virtual bool isNpc() { return false; }
-    virtual bool isMonster() { return false; }
-    virtual bool isPlayer() { return false; }
-    virtual bool isLocalPlayer() { return false; }
+    virtual bool isNpc() const { return false; }
+    virtual bool isMonster() const { return false; }
+    virtual bool isPlayer() const { return false; }
+    virtual bool isLocalPlayer() const { return false; }
 
     bool isCommon() { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
     void canDraw(const bool canDraw) { m_canDraw = canDraw; }

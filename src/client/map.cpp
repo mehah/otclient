@@ -33,11 +33,27 @@
 #include "missile.h"
 #include "thing.h"
 #include "tile.h"
-#include "framework/core/asyncdispatcher.h"
-#include "framework/core/eventdispatcher.h"
+
+#include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/painter.h"
-#include "framework/ui/uiwidget.h"
+#include <framework/ui/uiwidget.h>
+
+namespace
+{
+void cleanNewSpectators(std::vector<CreaturePtr>& creatures, std::unordered_set<uint32_t>& seenIds, const std::size_t startIndex)
+{
+    auto it = creatures.begin() + startIndex;
+    while (it != creatures.end()) {
+        if (const auto& creature = *it; !creature || !seenIds.insert(creature->getId()).second) {
+            it = creatures.erase(it);
+            continue;
+        }
+        ++it;
+    }
+}
+}
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
@@ -634,6 +650,10 @@ void Map::setLight(const Light& light)
 std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, const bool multiFloor, const int32_t minXRange, const int32_t maxXRange, const int32_t minYRange, const int32_t maxYRange)
 {
     std::vector<CreaturePtr> creatures;
+    creatures.reserve(m_knownCreatures.size());
+    std::unordered_set<uint32_t> seenIds;
+    seenIds.reserve(m_knownCreatures.size());
+
     uint8_t minZRange = 0;
     uint8_t maxZRange = 0;
 
@@ -642,19 +662,31 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
         maxZRange = getLastAwareFloor() - centerPos.z;
     }
 
-    //TODO: optimize
-    //TODO: delivery creatures in distance order
-    for (int iz = -minZRange; iz <= maxZRange; ++iz) {
-        for (int iy = -minYRange; iy <= maxYRange; ++iy) {
-            for (int ix = -minXRange; ix <= maxXRange; ++ix) {
-                if (const auto& tile = getTile(centerPos.translated(ix, iy, iz))) {
-                    const auto& tileCreatures = tile->getCreatures();
-                    creatures.insert(creatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
+    const int startZ = centerPos.z - minZRange;
+    const int endZ = centerPos.z + maxZRange;
+    const int startY = centerPos.y - minYRange;
+    const int endY = centerPos.y + maxYRange;
+    const int startX = centerPos.x - minXRange;
+    const int endX = centerPos.x + maxXRange;
+
+    const auto appendSpectatorsFromLayer = [&](const int z) {
+        for (int y = startY; y <= endY; ++y) {
+            for (int x = startX; x <= endX; ++x) {
+                const auto tile = getTile(Position(x, y, z));
+                if (!tile || !tile->hasCreatures()) {
+                    continue;
                 }
+
+                const auto sizeBeforeAppend = creatures.size();
+                tile->appendSpectators(creatures);
+                cleanNewSpectators(creatures, seenIds, sizeBeforeAppend);
             }
         }
-    }
+    };
 
+    for (int z = startZ; z <= endZ; ++z) {
+        appendSpectatorsFromLayer(z);
+    }
     return creatures;
 }
 
@@ -1471,15 +1503,24 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
     }
 
     p = 0;
+    std::unordered_set<uint32_t> seenIds;
+    seenIds.reserve(m_knownCreatures.size());
     for (int y = centerPos.y - height / 2, endy = centerPos.y + height / 2; y <= endy; ++y) {
         for (int x = centerPos.x - width / 2, endx = centerPos.x + width / 2; x <= endx; ++x) {
-            if (!finalPattern[p++])
+            const auto enabled = finalPattern[p];
+            ++p;
+            if (!enabled) {
                 continue;
-            TilePtr tile = getTile(Position(x, y, centerPos.z));
-            if (!tile)
+            }
+
+            const auto tile = getTile(Position(x, y, centerPos.z));
+            if (!tile || !tile->hasCreatures()) {
                 continue;
-            auto tileCreatures = tile->getCreatures();
-            creatures.insert(creatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
+            }
+
+            const auto sizeBeforeAppend = creatures.size();
+            tile->appendSpectators(creatures);
+            cleanNewSpectators(creatures, seenIds, sizeBeforeAppend);
         }
     }
     return creatures;

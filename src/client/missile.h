@@ -34,7 +34,7 @@ public:
     void setId(uint32_t id) override;
     void setPath(const Position& fromPosition, const Position& toPosition);
 
-    bool isMissile() override { return true; }
+    bool isMissile() const override { return true; }
 
     MissilePtr asMissile() { return static_self_cast<Missile>(); }
 

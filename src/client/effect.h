@@ -33,7 +33,7 @@ public:
     void setId(uint32_t id) override;
     void setPosition(const Position& position, uint8_t stackPos = 0) override;
 
-    bool isEffect() override { return true; }
+    bool isEffect() const override { return true; }
     bool waitFor(const EffectPtr&);
 
     EffectPtr asEffect() { return static_self_cast<Effect>(); }
