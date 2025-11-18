@@ -305,6 +305,20 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     }
 
     g_drawPool.resetDrawOrder();
+
+        // draw name with optional shader
+        auto nameShader = m_nameShader;
+        if (!nameShader.empty()) {
+            // try to get a shader program and set it on painter before drawing name
+            auto program = g_shaders.getShader(nameShader);
+            if (program) g_drawPool.setShaderProgram(program);
+        }
+
+        m_name.draw(textRect, fillColor);
+
+        if (!nameShader.empty()) {
+            g_drawPool.resetShaderProgram();
+        }
 }
 
 void Creature::internalDraw(Point dest, const Color& color)
