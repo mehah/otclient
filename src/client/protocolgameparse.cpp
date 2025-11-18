@@ -608,21 +608,46 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerStoreCompletePurchase:
                     parseCompleteStorePurchase(msg);
                     break;
-                default:
-                    throw Exception("unhandled opcode {}", opcode);
+                default: {
+                    const auto unreadSize = msg->getUnreadSize();
+                    const auto previewSize = std::min<size_t>(unreadSize, 32);
+                    const auto remainingBytes = msg->peekBytes(previewSize);
+
+                    std::stringstream hexDump;
+                    for (const auto byte : remainingBytes) {
+                        hexDump << fmt::format("{:02X} ", byte);
+                    }
+
+                    g_logger.warning(
+                        "Unhandled opcode 0x{:02X} ({}) with {} unread bytes; previous opcode: 0x{:02X} ({}); next bytes: {}",
+                        opcode, opcode, unreadSize, prevOpcode, prevOpcode, hexDump.str());
+                    msg->setReadPos(msg->getMessageSize());
+                    break;
+                }
             }
             prevOpcode = opcode;
         }
     } catch (const stdext::exception& e) {
+        const auto unread = msg->getUnreadSize();
+        const auto readPos = msg->getReadPos();
+        const auto remainingBytes = msg->peekBytes(unread);
+
+        std::stringstream hexDump;
+        for (const auto byte : remainingBytes) {
+            hexDump << fmt::format("{:02X} ", byte);
+        }
+
         g_logger.error(
-            "ProtocolGame parse message exception ({} bytes, {} unread, last opcode is 0x{:02X} ({}), prev opcode is 0x{:02X} ({})): {}\n"
-            "Packet has been saved to packet.log, you can use it to find what was wrong. (Protocol: {})",
+            "ProtocolGame parse message exception ({} bytes, {} unread at pos {}, last opcode: 0x{:02X} ({:d}), prev opcode: 0x{:02X} ({:d}), protocol: {}): {}\n"
+            "Next unread bytes: {}\n",
             msg->getMessageSize(),
-            msg->getUnreadSize(),
+            unread,
+            readPos,
             opcode, opcode,
             prevOpcode, prevOpcode,
+            g_game.getProtocolVersion(),
             e.what(),
-            g_game.getProtocolVersion()
+            hexDump.str()
         );
 
         std::ofstream packet("packet.log", std::ios::app);
@@ -631,15 +656,13 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
         }
 
         packet << fmt::format(
-            "ProtocolGame parse message exception ({} bytes, {} unread, last opcode is 0x{:02X} ({}), prev opcode is 0x{:02X} ({}), proto: {}): {}\n",
-            msg->getMessageSize(),
-            msg->getUnreadSize(),
-            opcode,
-            opcode,
-            prevOpcode,
-            prevOpcode,
+            "[EXCEPTION] {} unread bytes at pos: {}, protocol: {}, current: 0x{:02X} ({:d}), prev: 0x{:02X} ({:d}), error: {}\nBytes: {}\n",
+            unread, readPos,
             g_game.getProtocolVersion(),
-            e.what()
+            opcode, opcode,
+            prevOpcode, prevOpcode,
+            e.what(),
+            hexDump.str()
         );
     }
 }
