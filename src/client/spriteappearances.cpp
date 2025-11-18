@@ -62,6 +62,14 @@ Size SpriteSheet::getSpriteSize() const
     return size;
 }
 
+int SpriteSheet::getSpritesPerSheet() const
+{
+    const Size& size = getSpriteSize();
+    const int spritesPerColumn = SpriteSheet::SIZE / size.height();
+
+    return getColumns() * spritesPerColumn;
+}
+
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 {
     if (sheet->m_loadingState.load(std::memory_order_acquire) == SpriteLoadState::LOADING)
@@ -233,6 +241,12 @@ ImagePtr SpriteAppearances::getSpriteImage(const int id, bool& isLoading)
 
         const int spriteOffset = id - sheet->firstId;
         const int allColumns = sheet->getColumns();
+        const int spritesPerSheet = sheet->getSpritesPerSheet();
+
+        if (spriteOffset < 0 || spriteOffset >= spritesPerSheet) {
+            g_logger.error("Sprite id {} is out of bounds for sheet {} (offset {}, max {})", id, sheet->file, spriteOffset, spritesPerSheet);
+            return nullptr;
+        }
         const int spriteRow = std::floor(static_cast<float>(spriteOffset) / static_cast<float>(allColumns));
         const int spriteColumn = spriteOffset % allColumns;
 
