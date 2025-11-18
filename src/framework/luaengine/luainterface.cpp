@@ -655,6 +655,7 @@ int LuaInterface::luaCppFunctionCallback(lua_State*)
         --g_lua.m_cppCallbackDepth;
         assert(numRets == g_lua.stackSize());
     } catch (stdext::exception& e) {
+        --g_lua.m_cppCallbackDepth;
         // cleanup stack
         while (g_lua.stackSize() > 0)
             g_lua.pop();
@@ -662,12 +663,14 @@ int LuaInterface::luaCppFunctionCallback(lua_State*)
         g_lua.pushString(fmt::format("C++ call failed: {}", g_lua.traceback(e.what())));
         g_lua.error();
     } catch (const std::exception& e) {
+        --g_lua.m_cppCallbackDepth;
         while (g_lua.stackSize() > 0)
             g_lua.pop();
         numRets = 0;
         g_lua.pushString(fmt::format("C++ std::exception: {}", g_lua.traceback(e.what())));
         g_lua.error();
     } catch (...) {
+        --g_lua.m_cppCallbackDepth;
         while (g_lua.stackSize() > 0)
             g_lua.pop();
         numRets = 0;
