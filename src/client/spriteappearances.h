@@ -52,6 +52,8 @@ public:
 
     Size getSpriteSize() const;
 
+    int getSpritesPerSheet() const;
+
     // 64 pixel width == 6 columns each 64x or 32 pixels, 12 columns
     int getColumns() const { return SIZE / getSpriteSize().width(); }
 

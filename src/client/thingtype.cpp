@@ -37,6 +37,19 @@
 
 const static TexturePtr m_textureNull;
 
+namespace {
+std::string_view categoryName(const ThingCategory category)
+{
+    switch (category) {
+        case ThingCategoryItem: return "item";
+        case ThingCategoryCreature: return "creature";
+        case ThingCategoryEffect: return "effect";
+        case ThingCategoryMissile: return "missile";
+        default: return "unknown";
+    }
+}
+}
+
 void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCategory category, const appearances::Appearance& appearance)
 {
     m_null = false;
@@ -744,21 +757,24 @@ void ThingType::loadTexture(const int animationPhase)
                             if (isLoading)
                                 return;
 
+                            if (!spriteImage) {
+                                g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, animationPhase);
+                                return;
+                            }
+
                             // verifies that the first block in the lower right corner is transparent.
                             if (!spriteImage || spriteImage->hasTransparentPixel()) {
                                 fullImage->setTransparentPixel(true);
                             }
 
-                            if (spriteImage) {
-                                if (spriteMask) {
-                                    spriteImage->overwriteMask(maskColors[(l - 1)]);
-                                }
-
-                                auto spriteSize = spriteImage->getSize() / g_gameConfig.getSpriteSize();
-
-                                const Point& spritePos = Point(m_size.width() - spriteSize.width(), m_size.height() - spriteSize.height()) * g_gameConfig.getSpriteSize();
-                                fullImage->blit(framePos + spritePos, spriteImage);
+                            if (spriteMask) {
+                                spriteImage->overwriteMask(maskColors[(l - 1)]);
                             }
+
+                            auto spriteSize = spriteImage->getSize() / g_gameConfig.getSpriteSize();
+
+                            const Point& spritePos = Point(m_size.width() - spriteSize.width(), m_size.height() - spriteSize.height()) * g_gameConfig.getSpriteSize();
+                            fullImage->blit(framePos + spritePos, spriteImage);
                         } else {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
@@ -770,19 +786,22 @@ void ThingType::loadTexture(const int animationPhase)
                                     if (isLoading)
                                         return;
 
+                                    if (!spriteImage) {
+                                        g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
+                                        return;
+                                    }
+
                                     // verifies that the first block in the lower right corner is transparent.
                                     if (h == 0 && w == 0 && (!spriteImage || spriteImage->hasTransparentPixel())) {
                                         fullImage->setTransparentPixel(true);
                                     }
 
-                                    if (spriteImage) {
-                                        if (spriteMask) {
-                                            spriteImage->overwriteMask(maskColors[(l - 1)]);
-                                        }
-
-                                        const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * g_gameConfig.getSpriteSize();
-                                        fullImage->blit(framePos + spritePos, spriteImage);
+                                    if (spriteMask) {
+                                        spriteImage->overwriteMask(maskColors[(l - 1)]);
                                     }
+
+                                    const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * g_gameConfig.getSpriteSize();
+                                    fullImage->blit(framePos + spritePos, spriteImage);
                                 }
                             }
                         }
