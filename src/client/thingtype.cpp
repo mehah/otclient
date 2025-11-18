@@ -38,7 +38,7 @@
 const static TexturePtr m_textureNull;
 
 namespace {
-static std::string_view categoryName(const ThingCategory category)
+std::string_view categoryName(const ThingCategory category)
 {
     switch (category) {
         case ThingCategoryItem: return "item";
