@@ -29,6 +29,11 @@ using DelayedSoundEffects = std::vector<DelayedSoundEffect>;
 using ItemCountSoundEffect = std::pair<uint32_t, uint32_t>;
 using ItemCountSoundEffects = std::vector<ItemCountSoundEffect>;
 
+class StreamSoundSource;
+class CombinedSoundSource;
+class SoundFile;
+class SoundBuffer;
+
 enum ClientSoundType
 {
     NUMERIC_SOUND_TYPE_UNKNOWN = 0,
