@@ -80,7 +80,8 @@ extern "C" {
             g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
 
         // initialize application framework and otclient
-        g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
+        const auto drawEvents = ApplicationDrawEventsPtr(&g_client, [](ApplicationDrawEvents*) {});
+        g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), drawEvents));
 
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
