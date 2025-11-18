@@ -661,6 +661,18 @@ int LuaInterface::luaCppFunctionCallback(lua_State*)
         numRets = 0;
         g_lua.pushString(fmt::format("C++ call failed: {}", g_lua.traceback(e.what())));
         g_lua.error();
+    } catch (const std::exception& e) {
+        while (g_lua.stackSize() > 0)
+            g_lua.pop();
+        numRets = 0;
+        g_lua.pushString(fmt::format("C++ std::exception: {}", g_lua.traceback(e.what())));
+        g_lua.error();
+    } catch (...) {
+        while (g_lua.stackSize() > 0)
+            g_lua.pop();
+        numRets = 0;
+        g_lua.pushString(g_lua.traceback("Unknown C++ exception"));
+        g_lua.error();
     }
 
     return numRets;
