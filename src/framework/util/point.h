@@ -96,7 +96,7 @@ public:
 
 template <class T>
 struct fmt::formatter<TPoint<T>, char> {
-    constexpr auto parse(format_parse_context& ctx)
+    constexpr auto parse(format_parse_context& ctx) const
         -> decltype(ctx.begin()) { return ctx.begin(); }
 
     template <typename FormatContext>
