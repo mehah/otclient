@@ -628,7 +628,7 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
 end
 
 function PreyController:onGameStart()
-    if g_game.getClientVersion() >= 1149 then
+    if g_game.getFeature(GamePrey) then
         check()
     else
         PreyController:scheduleEvent(function()
