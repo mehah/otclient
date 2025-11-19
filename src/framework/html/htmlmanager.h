@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include "cssparser.h"
 #include "declarations.h"
 #include <framework/ui/declarations.h>
-#include "cssparser.h"
 
 struct DataRoot
 {

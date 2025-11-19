@@ -21,15 +21,15 @@
  */
 
 #include "texturemanager.h"
-#include "animatedtexture.h"
-#include "graphics.h"
-#include "image.h"
 
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/resourcemanager.h>
-#include <framework/graphics/apngloader.h>
-#include <framework/graphics/drawpool.h>
+#include "animatedtexture.h"
+#include "apngloader.h"
+#include "drawpool.h"
+#include "image.h"
+#include "texture.h"
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/core/resourcemanager.h"
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocolhttp.h>
@@ -112,7 +112,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
 
 #ifdef FRAMEWORK_NET
     // load texture from "virtual directory"
-    if (filePath.starts_with("/downloads/")) {
+    if (filePath.substr(0, 11) == "/downloads/") {
         std::string _filePath = filePath;
         const auto& fileDownload = g_http.getFile(_filePath.erase(0, 11));
         if (fileDownload) {

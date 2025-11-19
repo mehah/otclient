@@ -23,7 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include "particletype.h"
 
 class ParticleManager
 {
@@ -39,7 +38,7 @@ public:
     ParticleTypePtr getParticleType(const std::string& name) { return m_particleTypes[name]; }
     ParticleEffectTypePtr getParticleEffectType(const std::string& name) { return m_effectsTypes[name]; }
 
-    [[nodiscard]] const stdext::map<std::string, ParticleTypePtr>& getParticleTypes() const { return m_particleTypes; }
+    const stdext::map<std::string, ParticleTypePtr>& getParticleTypes() const { return m_particleTypes; }
     const stdext::map<std::string, ParticleEffectTypePtr>& getEffectsTypes() { return m_effectsTypes; }
 
 private:

@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 namespace stdext
 {
     template<class T> struct replace_extent

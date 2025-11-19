@@ -63,14 +63,14 @@ public:
 
     std::vector<uint8_t>& getPixels() { return m_pixels; }
     uint8_t* getPixelData() { return &m_pixels[0]; }
-    [[nodiscard]] int getPixelCount() const { return m_size.area(); }
-    [[nodiscard]] const Size& getSize() const { return m_size; }
-    [[nodiscard]] int getWidth() const { return m_size.width(); }
-    [[nodiscard]] int getHeight() const { return m_size.height(); }
-    [[nodiscard]] int getBpp() const { return m_bpp; }
+    int getPixelCount() const { return m_size.area(); }
+    const Size& getSize() const { return m_size; }
+    int getWidth() const { return m_size.width(); }
+    int getHeight() const { return m_size.height(); }
+    int getBpp() const { return m_bpp; }
     uint8_t* getPixel(const int x, const int y) { return &m_pixels[static_cast<size_t>(y * m_size.width() + x) * m_bpp]; }
 
-    [[nodiscard]] bool hasTransparentPixel() const { return m_transparentPixel; }
+    bool hasTransparentPixel() const { return m_transparentPixel; }
     void setTransparentPixel(const bool value) { m_transparentPixel = value; }
 
 private:

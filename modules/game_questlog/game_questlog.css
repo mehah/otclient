@@ -1,7 +1,7 @@
 .questLog-window {
   position: relative;
   width: 790px;
-  height: 639px;
+  height: 619px;
   font: verdana-11px-antialised;
   display: block;
   color: #929292
@@ -81,7 +81,7 @@
 #trackerButton {
   float: right;
   margin-right: 2px;
-  width: 35px;
+  width: 85px;
 }
 
 #closeButton {

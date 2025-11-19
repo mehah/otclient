@@ -21,9 +21,9 @@
  */
 
 #include <framework/net/outputmessage.h>
-#include <framework/util/crypt.h>
 
 #include "client/game.h"
+#include "framework/util/crypt.h"
 
 OutputMessage::OutputMessage() {
     m_maxHeaderSize = g_game.getClientVersion() >= 1405 ? 7 : 8;
@@ -93,6 +93,15 @@ void OutputMessage::addString(const std::string_view buffer)
     m_messageSize += len;
 }
 
+void OutputMessage::addBytes(const std::string_view buffer)
+{
+    const int len = buffer.length();
+    checkWrite(len);
+    memcpy(m_buffer + m_writePos, buffer.data(), len);
+    m_writePos += len;
+    m_messageSize += len;
+}
+
 void OutputMessage::addPaddingBytes(const int bytes, const uint8_t byte)
 {
     if (bytes <= 0)
@@ -106,7 +115,7 @@ void OutputMessage::addPaddingBytes(const int bytes, const uint8_t byte)
 void OutputMessage::encryptRsa()
 {
     const int size = g_crypt.rsaGetSize();
-    if (std::cmp_less(m_messageSize, size))
+    if (m_messageSize < size)
         throw stdext::exception("insufficient bytes in buffer to encrypt");
 
     if (!g_crypt.rsaEncrypt(static_cast<uint8_t*>(m_buffer) + m_writePos - size, size))

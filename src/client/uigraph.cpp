@@ -1,8 +1,10 @@
 #include "uigraph.h"
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/platform/platformwindow.h>
 
-#include <algorithm>
+#include "framework/graphics/bitmapfont.h"
+#include "framework/graphics/painter.h"
+#include "framework/otml/otmlnode.h"
+#include <framework/platform/platformwindow.h>
 
 void UIGraph::drawSelf(const DrawPoolType drawPane)
 {

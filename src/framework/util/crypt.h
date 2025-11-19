@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "../global.h"
-
 #include <stduuid/uuid.h>
 #include <string>
 
@@ -65,7 +63,7 @@ public:
 private:
     std::string _encrypt(const std::string& decrypted_string, bool useMachineUUID);
     std::string _decrypt(const std::string& encrypted_string, bool useMachineUUID);
-    [[nodiscard]] std::string getCryptKey(bool useMachineUUID) const;
+    std::string getCryptKey(bool useMachineUUID) const;
 
     uuids::uuid m_machineUUID;
 

@@ -36,7 +36,7 @@ private:
     void update(bool focusCursor = false, bool disableAreaUpdate = false);
 
 public:
-    void setCursorPos(int pos);
+    void setCursorPos(int pos, bool focusCursor = true);
     void setSelection(int start, int end);
     void setCursorVisible(const bool enable) { setProp(PropCursorVisible, enable); }
     void setChangeCursorImage(const bool enable) { setProp(PropChangeCursorImage, enable); }
@@ -108,6 +108,7 @@ protected:
     bool onMouseRelease(const Point& mousePos, Fw::MouseButton button) override;
     bool onMouseMove(const Point& mousePos, const Point& mouseMoved) override;
     bool onDoubleClick(const Point& mousePos) override;
+    void onTextChange(std::string_view text, std::string_view oldText) override;
     virtual void onTextAreaUpdate(const Point& vitualOffset, const Size& visibleSize, const Size& totalSize);
 
 private:
@@ -130,6 +131,7 @@ private:
     void disableUpdates() { setProp(PropUpdatesEnabled, false); }
     void enableUpdates() { setProp(PropUpdatesEnabled, true); }
     void recacheGlyphs() { setProp(PropGlyphsMustRecache, true); }
+    void setCursorPosEx(int pos, bool preservePreferredX, bool focusCursor);
 
     std::string m_validCharacters;
     uint32_t m_maxLength{ 0 };
@@ -148,6 +150,10 @@ private:
     int m_selectionStart{ 0 };
     int m_selectionEnd{ 0 };
     int m_cursorPos{ 0 };
+    int m_cursorPreferredX{ -1 };
+
+    std::vector<int> m_srcToVis;
+    std::vector<int> m_visToSrc;;
 
     Color m_selectionColor{ Color::white };
     Color m_selectionBackgroundColor{ Color::black };

@@ -161,7 +161,7 @@ StoreFlatLabel < UILabel
 storeCategory < UIWidget
   size: 180 22
 
-  image-source: /images/game/actionbar/1pixel-down-frame
+  image-source: /images/ui/1pixel_down_frame
   image-border: 5
   
   UIWidget

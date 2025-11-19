@@ -15,7 +15,12 @@ on:
       - "src/**"
       - ".github/workflows/build-ubuntu.yml"
 
+permissions:
+  contents: read
+  pull-requests: read
+
 env:
+  LUKKA_RUN_VCPKG_SHA: "${{ vars.LUKKA_RUN_VCPKG_SHA != '' && vars.LUKKA_RUN_VCPKG_SHA || 'b3dd708d38df5c856fe1c18dc0d59ab771f93921' }}"
   CMAKE_BUILD_PARALLEL_LEVEL: 2
   MAKEFLAGS: "-j 2"
 
@@ -33,6 +38,9 @@ jobs:
     if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
     name: ${{ matrix.os }}-${{ matrix.buildtype }}
     runs-on: ${{ matrix.os }}
+    env:
+      ACTIONS_RUNTIME_TOKEN: ${{ secrets.ACTIONS_RUNTIME_TOKEN }}
+      ACTIONS_CACHE_URL: ${{ secrets.ACTIONS_CACHE_URL }}
 
     concurrency:
       group: otclient-${{ github.workflow }}-${{ github.ref }}-${{ matrix.buildtype }}
@@ -52,6 +60,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+        with:
+          repository: ${{ github.event_name == 'push' && github.repository || (github.event.pull_request.head.repo.fork && github.repository || github.event.pull_request.head.repo.full_name) }}
+          ref: ${{ github.event_name == 'push' && github.ref || (github.event.pull_request.head.repo.fork && github.event.pull_request.base.ref || github.event.pull_request.head.ref) }}
+          fetch-depth: 0
       - name: Install Linux Dependencies
         run: |
           sudo apt-get update
@@ -92,12 +104,23 @@ jobs:
           key: vcpkg-${{ matrix.os }}-${{ matrix.buildtype }}-${{ steps.hash.outputs.hash }}
           restore-keys: |
             vcpkg-${{ matrix.buildtype }}-
-
       - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
+        uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
         with:
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
+
+      - name: Validate vcpkg baseline SHA
+        run: |
+          SHAS="${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}"
+          if [ -z "${SHAS}" ]; then
+            echo "::error title=Missing vcpkg baseline::Provide a full 40-char vcpkgGitCommitId."
+            exit 1
+          fi
+          if ! echo "${SHAS}" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error title=Invalid vcpkg baseline::vcpkgGitCommitId must be a full 40-char commit SHA."
+            exit 1
+          fi
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@v3.31.6
 

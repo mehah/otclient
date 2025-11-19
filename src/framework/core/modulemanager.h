@@ -21,8 +21,7 @@
  */
 
 #pragma once
-
-#include "module.h"
+#include "declarations.h"
 
  // @bindsingleton g_modules
 class ModuleManager
@@ -41,7 +40,7 @@ public:
     std::deque<ModulePtr> getModules() { return m_modules; }
     ModulePtr getCurrentModule() { return m_currentModule; }
     void enableAutoReload();
-    [[nodiscard]] bool isAutoReloadEnabled() const { return m_reloadEnable; }
+    bool isAutoReloadEnabled() const { return m_reloadEnable; }
 
 protected:
     void updateModuleLoadOrder(const ModulePtr& module);

@@ -47,6 +47,7 @@ public:
     void addU32(uint32_t value);
     void addU64(uint64_t value);
     void addString(std::string_view buffer);
+    void addBytes(std::string_view buffer);
     void addPaddingBytes(int bytes, uint8_t byte = 0);
     void prependU8(uint8_t value);
     void prependU16(uint16_t value);
@@ -79,7 +80,7 @@ private:
     bool canWrite(int bytes) const;
     void checkWrite(int bytes);
 
-    uint8_t m_maxHeaderSize{ 8 };
+    uint8_t m_maxHeaderSize { 8 };
     uint16_t m_headerPos{ m_maxHeaderSize };
     uint16_t m_writePos{ m_maxHeaderSize };
     uint16_t m_messageSize{ 0 };

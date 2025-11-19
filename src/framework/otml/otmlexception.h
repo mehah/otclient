@@ -32,7 +32,7 @@ public:
     OTMLException(const OTMLDocumentPtr& doc, std::string_view error, int line = -1);
     ~OTMLException() noexcept override = default;
 
-    [[nodiscard]] const char* what() const noexcept override { return m_what.data(); }
+    const char* what() const noexcept override { return m_what.data(); }
 
 protected:
     std::string m_what;

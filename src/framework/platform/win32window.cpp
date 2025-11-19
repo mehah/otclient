@@ -23,20 +23,13 @@
 #ifdef WIN32
 
 #include "win32window.h"
-#include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
-#include <framework/util/color.h>
-#include "framework/core/graphicalapplication.h"
 
-#ifdef NDEBUG
 #include <timeapi.h>
-#endif
 
  // Include for DWM API
 #include <dwmapi.h>
-
 #pragma comment(lib, "dwmapi.lib")
 
 #define HSB_BIT_SET(p, n) (p[(n)/8] |= (128 >>((n)%8)))
@@ -894,8 +887,7 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
 void WIN32Window::setMouseCursor(int cursorId)
 {
     g_mainDispatcher.addEvent([&, cursorId] {
-        if (std::cmp_greater_equal(cursorId, m_cursors.size())
-        || cursorId < 0)
+        if (cursorId >= static_cast<int>(m_cursors.size()) || cursorId < 0)
             return;
 
         m_cursor = m_cursors[cursorId];

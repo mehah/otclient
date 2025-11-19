@@ -21,9 +21,9 @@
  */
 
 #include "drawpoolmanager.h"
-#include "declarations.h"
-#include "drawpool.h"
+
 #include "graphics.h"
+#include "painter.h"
 #include "textureatlas.h"
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
@@ -75,6 +75,7 @@ bool DrawPoolManager::isValid() const { return CURRENT_POOL < static_cast<uint8_
 DrawPool* DrawPoolManager::getCurrentPool() const { return m_pools[CURRENT_POOL]; }
 void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uint8_t>(type); }
 bool DrawPoolManager::isPreDrawing() const { return CURRENT_POOL != static_cast<uint8_t>(DrawPoolType::LAST); }
+bool DrawPoolManager::shaderNeedFramebuffer() const { return getCurrentPool()->getCurrentState().shaderProgram && getCurrentPool()->getCurrentState().shaderProgram->useFramebuffer(); }
 
 void DrawPoolManager::draw()
 {

@@ -35,42 +35,42 @@ public:
     void terminate();
 
     uint8_t getSpriteSize() { return m_spriteSize; }
-    [[nodiscard]] uint16_t getLastSupportedVersion() const { return m_lastSupportedVersion; }
-    [[nodiscard]] bool drawTyping() const { return m_drawTyping; }
-    [[nodiscard]] std::string getTypingIcon() const { return m_typingIcon; }
+    uint16_t getLastSupportedVersion() const { return m_lastSupportedVersion; }
+    bool drawTyping() const { return m_drawTyping; }
+    std::string getTypingIcon() const { return m_typingIcon; }
 
-    [[nodiscard]] Size getMapViewPort() const { return m_mapViewPort; }
-    [[nodiscard]] uint8_t getMapMaxZ() const { return m_mapMaxZ; }
-    [[nodiscard]] uint8_t getMapSeaFloor() const { return m_mapSeaFloor; }
-    [[nodiscard]] uint8_t getMapUndergroundFloorRange() const { return m_mapUndergroundFloorRange; }
-    [[nodiscard]] uint8_t getMapAwareUndergroundFloorRange() const { return m_mapAwareUndergroundFloorRange; }
+    Size getMapViewPort() const { return m_mapViewPort; }
+    uint8_t getMapMaxZ() const { return m_mapMaxZ; }
+    uint8_t getMapSeaFloor() const { return m_mapSeaFloor; }
+    uint8_t getMapUndergroundFloorRange() const { return m_mapUndergroundFloorRange; }
+    uint8_t getMapAwareUndergroundFloorRange() const { return m_mapAwareUndergroundFloorRange; }
 
-    [[nodiscard]] uint8_t getTileMaxElevation() const { return m_tileMaxElevation; }
-    [[nodiscard]] uint8_t getTileMaxThings() const { return m_tileMaxThings; }
-    [[nodiscard]] uint8_t getTileTransparentFloorViewRange() const { return m_tileTransparentFloorViewRange; }
+    uint8_t getTileMaxElevation() const { return m_tileMaxElevation; }
+    uint8_t getTileMaxThings() const { return m_tileMaxThings; }
+    uint8_t getTileTransparentFloorViewRange() const { return m_tileTransparentFloorViewRange; }
 
     bool isDrawingInformationByWidget() { return m_drawInformationByWidget; }
-    [[nodiscard]] bool isForcingNewWalkingFormula() const { return m_forceNewWalkingFormula; }
+    bool isForcingNewWalkingFormula() const { return m_forceNewWalkingFormula; }
     bool isAdjustCreatureInformationBasedCropSize() { return m_adjustCreatureInformationBasedCropSize; }
     bool isUseCropSizeForUIDraw() { return m_useCropSizeForUIDraw; }
     uint16_t getShieldBlinkTicks() { return m_shieldBlinkTicks; }
-    [[nodiscard]] uint16_t getVolatileSquareDuration() const { return m_volatileSquareDuration; }
+    uint16_t getVolatileSquareDuration() const { return m_volatileSquareDuration; }
 
-    [[nodiscard]] uint16_t getInvisibleTicksPerFrame() const { return m_invisibleTicksPerFrame; }
-    [[nodiscard]] uint16_t getItemTicksPerFrame() const { return m_itemTicksPerFrame; }
-    [[nodiscard]] uint16_t getEffectTicksPerFrame() const { return m_effectTicksPerFrame; }
-    [[nodiscard]] uint16_t getMissileTicksPerFrame() const { return m_missileTicksPerFrame; }
-    [[nodiscard]] uint16_t getAnimatedTextDuration() const { return m_animatedTextDuration; }
-    [[nodiscard]] uint16_t getStaticDurationPerCharacter() const { return m_staticDurationPerCharacter; }
-    [[nodiscard]] uint16_t getMinStatictextDuration() const { return m_minStatictextDuration; }
+    uint16_t getInvisibleTicksPerFrame() const { return m_invisibleTicksPerFrame; }
+    uint16_t getItemTicksPerFrame() const { return m_itemTicksPerFrame; }
+    uint16_t getEffectTicksPerFrame() const { return m_effectTicksPerFrame; }
+    uint16_t getMissileTicksPerFrame() const { return m_missileTicksPerFrame; }
+    uint16_t getAnimatedTextDuration() const { return m_animatedTextDuration; }
+    uint16_t getStaticDurationPerCharacter() const { return m_staticDurationPerCharacter; }
+    uint16_t getMinStatictextDuration() const { return m_minStatictextDuration; }
 
-    [[nodiscard]] double getPlayerDiagonalWalkSpeed() const { return m_playerDiagonalWalkSpeed; }
-    [[nodiscard]] double getCreatureDiagonalWalkSpeed() const { return m_creatureDiagonalWalkSpeed; }
+    double getPlayerDiagonalWalkSpeed() const { return m_playerDiagonalWalkSpeed; }
+    double getCreatureDiagonalWalkSpeed() const { return m_creatureDiagonalWalkSpeed; }
 
-    [[nodiscard]] BitmapFontPtr getCreatureNameFont()  const { return m_creatureNameFont; }
-    [[nodiscard]] BitmapFontPtr getAnimatedTextFont()  const { return m_animatedTextFont; }
-    [[nodiscard]] BitmapFontPtr getStaticTextFont()  const { return m_staticTextFont; }
-    [[nodiscard]] BitmapFontPtr getWidgetTextFont()  const { return m_widgetTextFont; }
+    BitmapFontPtr getCreatureNameFont()  const { return m_creatureNameFont; }
+    BitmapFontPtr getAnimatedTextFont()  const { return m_animatedTextFont; }
+    BitmapFontPtr getStaticTextFont()  const { return m_staticTextFont; }
+    BitmapFontPtr getWidgetTextFont()  const { return m_widgetTextFont; }
 
     std::string getCreatureNameFontName() { return m_creatureNameFont->getName(); }
     std::string getAnimatedTextFontName() { return m_animatedTextFont->getName(); }

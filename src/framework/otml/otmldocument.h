@@ -21,7 +21,6 @@
  */
 
 #pragma once
-
 #include "otmlnode.h"
 
 class OTMLDocument final : public OTMLNode

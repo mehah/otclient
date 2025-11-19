@@ -2504,3 +2504,7 @@ function clearTabByName(tabName)
         consoleBuffer:destroyChildren()
     end
 end
+
+function getConsole()
+    return consoleTextEdit
+end

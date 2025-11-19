@@ -29,7 +29,7 @@ bool AdaptativeFrameCounter::update()
     if (maxFps > 0) {
         const int32_t sleepPeriod = (getMaxPeriod(maxFps) - 1000) - m_timer.elapsed_micros();
         if (sleepPeriod > 0)
-            stdext::microsleep(std::min<int32_t>(sleepPeriod, DrawPool::FPS10 * 1000));
+            stdext::microsleep(std::min<int32_t>(sleepPeriod, DrawPool::FPS1 * 1000));
     }
 
     m_timer.restart();

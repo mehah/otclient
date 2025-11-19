@@ -24,8 +24,6 @@
 
 #include "platformwindow.h"
 
-#include <windows.h>
-
 #ifdef OPENGL_ES
 #include <EGL/egl.h>
 #endif
@@ -83,9 +81,9 @@ protected:
     int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) override;
 
 private:
-    [[nodiscard]] Rect getClientRect() const;
+    Rect getClientRect() const;
     Rect getWindowRect();
-    [[nodiscard]] Rect adjustWindowRect(const Rect& rect) const;
+    Rect adjustWindowRect(const Rect& rect) const;
 
     std::vector<HCURSOR> m_cursors;
     HWND m_window;

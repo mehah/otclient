@@ -21,7 +21,6 @@
  */
 
 #include "player.h"
-#include "game.h"
 
 bool Player::isMage() const {
     switch (m_vocation) {

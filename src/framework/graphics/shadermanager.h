@@ -23,7 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include <framework/graphics/paintershaderprogram.h>
 
  //@bindsingleton g_shaders
 class ShaderManager
@@ -58,8 +57,7 @@ public:
     void addMultiTexture(std::string_view name, std::string_view file);
 
     PainterShaderProgramPtr getShader(std::string_view name);
-
-    [[nodiscard]] PainterShaderProgramPtr getShaderById(const uint8_t id) const {
+    PainterShaderProgramPtr getShaderById(const uint8_t id) const {
         return id > 0 && id <= m_shadersVector.size() ? m_shadersVector[id - 1] : nullptr;
     }
 

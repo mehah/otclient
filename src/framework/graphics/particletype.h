@@ -23,15 +23,13 @@
 #pragma once
 
 #include "declarations.h"
-#include <framework/graphics/animatedtexture.h>
-#include <framework/graphics/painter.h>
-#include <framework/otml/otml.h>
+#include "framework/otml/declarations.h"
 
 class ParticleType
 {
 public:
     void load(const OTMLNodePtr& node);
-    [[nodiscard]] std::string getName() const { return pName; }
+    std::string getName() const { return pName; }
 
 protected:
 

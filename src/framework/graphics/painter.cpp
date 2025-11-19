@@ -24,8 +24,8 @@
 
 #include "framework/graphics/texture.h"
 #include "framework/graphics/texturemanager.h"
-#include <framework/platform/platformwindow.h>
 #include "shader/shadersources.h"
+#include <framework/platform/platformwindow.h>
 
 std::unique_ptr<Painter> g_painter = nullptr;
 

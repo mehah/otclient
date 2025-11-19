@@ -20,13 +20,15 @@
 
 .footer {
   position: absolute;
-  right: 0;
-  bottom: 0;
+  left: 5;
+  right: 10;
+  bottom: 10;
 }
 
 .equalizerEffect {
   position: absolute;
-  bottom: 0;
+  bottom: 5;
+  left: 0;
   right: 0;
   text-align: center;
   height: 100px;

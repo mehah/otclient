@@ -23,7 +23,6 @@
 #pragma once
 #include "declarations.h"
 #include <framework/ui/declarations.h>
-#include <framework/otml/declarations.h>
 
 inline void ascii_tolower_inplace(std::string& s) { for (auto& c : s) if (c >= 'A' && c <= 'Z') c = char(c - 'A' + 'a'); }
 inline std::string ascii_tolower_copy(std::string s) { ascii_tolower_inplace(s); return s; }
