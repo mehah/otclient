@@ -349,6 +349,8 @@ function toggleChat()
     else
         consoleToggleChat:setText(tr('Chat On'))
     end
+    
+    updateChatMode()
 end
 
 -- id of object first and then action
@@ -424,8 +426,6 @@ function switchChatOnCall()
             toggleChat()
         end
     end
-
-    updateChatMode()
 end
 
 function disableChatOnCall()
@@ -436,8 +436,6 @@ function disableChatOnCall()
     if isChatEnabled() and not consoleToggleChat.isChecked then
         toggleChat()
     end
-
-    updateChatMode()
 end
 
 function isChatEnabled()
