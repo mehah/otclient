@@ -804,12 +804,16 @@ void UIWidget::drawIcon(const Rect& screenCoords) const
 
 void UIWidget::setIcon(const std::string& iconFile)
 {
-    g_dispatcher.addEvent([&, iconFile = iconFile] {
-        m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
-        if (m_icon && !m_iconClipRect.isValid()) {
-            m_iconClipRect = Rect(0, 0, m_icon->getSize());
+     const auto self = static_self_cast<UIWidget>();
+    g_dispatcher.addEvent([self, iconFile = iconFile] {
+        if (self->isDestroyed())
+            return;
+
+        self->m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
+        if (self->m_icon && !self->m_iconClipRect.isValid()) {
+            self->m_iconClipRect = Rect(0, 0, self->m_icon->getSize());
         }
 
-        repaint();
+        self->repaint();
     });
 }

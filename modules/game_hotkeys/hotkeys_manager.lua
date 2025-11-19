@@ -689,10 +689,10 @@ function updateHotkeyForm(reset, dontUpdateCombo)
             hotkeyText:enable()
             hotkeyText:focus()
             hotKeyTextLabel:enable()
+            hotkeyText:setText(currentHotkeyLabel.value)
             if reset then
                 hotkeyText:setCursorPos(-1)
             end
-            hotkeyText:setText(currentHotkeyLabel.value)
             sendAutomatically:setChecked(currentHotkeyLabel.autoSend)
             sendAutomatically:setEnabled(currentHotkeyLabel.value and #currentHotkeyLabel.value > 0)
             selectObjectButton:enable()
@@ -741,7 +741,7 @@ function onHotkeyTextChange(value)
         currentHotkeyLabel.autoSend = false
     end
     updateHotkeyLabel(currentHotkeyLabel)
-    updateHotkeyForm()
+    updateHotkeyForm(false, true)
 end
 
 function onSendAutomaticallyChange(autoSend)
@@ -756,7 +756,7 @@ function onSendAutomaticallyChange(autoSend)
     end
     currentHotkeyLabel.autoSend = autoSend
     updateHotkeyLabel(currentHotkeyLabel)
-    updateHotkeyForm()
+    updateHotkeyForm(false, true)
 end
 
 function onChangeUseType(useTypeWidget)

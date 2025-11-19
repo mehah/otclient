@@ -821,9 +821,14 @@ void Creature::setOutfit(const Outfit& outfit, bool fireEvent)
     if (m_outfit == outfit)
         return;
 
+    Outfit newOutfit = outfit;
+    if (newOutfit.isInvalid()) {
+        newOutfit.setCategory(newOutfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);
+    }
+
     const Outfit oldOutfit = m_outfit;
 
-    m_outfit = outfit;
+    m_outfit = newOutfit;
     m_numPatternZ = 0;
     m_exactSize = 0;
     if (m_walkingAnimationSpeed == 0) {
@@ -833,9 +838,14 @@ void Creature::setOutfit(const Outfit& outfit, bool fireEvent)
     if (m_outfit.isInvalid())
         m_outfit.setCategory(m_outfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);
 
-    if (const auto thingType = getThingType())
-        m_clientId = thingType->getId();
-    else m_clientId = 0;
+    const auto thingType = getThingType();
+    if (!thingType) {
+        g_logger.error("Creature::setOutfit - Invalid thing type for creature {}.", getId());
+        m_outfit = oldOutfit;
+        return;
+    }
+
+    m_clientId = thingType->getId();
 
     if (m_outfit.hasMount()) {
         m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
