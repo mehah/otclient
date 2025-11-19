@@ -396,6 +396,7 @@ function show()
     rewardWallController.ui:show()
     rewardWallController.ui:raise()
     rewardWallController.ui:focus()
+    rewardWallController.ui:centerIn('parent')
     connectOnServerError()
     premiumStatusWindwos(g_game.getLocalPlayer():isPremium())
 end
@@ -489,11 +490,9 @@ end
 -- =============================================*/
 function rewardWallController:onClickshowHistory()
     visibleHistory(not rewardWallController.ui.historyPanel:isVisible())
-    if rewardWallController.ui.historyPanel:isVisible() then
-        g_game.requestOpenRewardHistory()
-    end
+    g_game.requestOpenRewardHistory()
     rewardWallController.ui.footerPanel.historyButton:setText(
-    rewardWallController.ui.historyPanel:isVisible() and "back" or "history")
+        rewardWallController.ui.historyPanel:isVisible() and "back" or "history")
 end
 
 function rewardWallController:onClickToggle()

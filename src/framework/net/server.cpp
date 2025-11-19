@@ -22,8 +22,9 @@
 
 #ifndef __EMSCRIPTEN__
 
-#include "connection.h"
 #include "server.h"
+#include "connection.h"
+#include <asio/io_service.hpp>
 
 extern asio::io_service g_ioService;
 

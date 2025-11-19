@@ -23,7 +23,7 @@
 #pragma once
 
 #include "declarations.h"
-#include <framework/core/declarations.h>
+#include <framework/core/filestream.h>
 
 class SoundFile : public std::enable_shared_from_this<SoundFile>
 {
@@ -35,7 +35,7 @@ public:
 
     virtual int read(void* /*buffer*/, int /*bufferSize*/) { return -1; }
     virtual void reset() {}
-    bool eof() const;
+    bool eof() const { return m_file->eof(); }
 
     ALenum getSampleFormat() const;
 
@@ -43,7 +43,7 @@ public:
     int getRate() const { return m_rate; }
     int getBps() const { return m_bps; }
     int getSize() const { return m_size; }
-    std::string getName() const;
+    std::string getName() const { return m_file ? m_file->name() : std::string(); }
 
 protected:
     FileStreamPtr m_file;

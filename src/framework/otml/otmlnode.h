@@ -33,7 +33,7 @@ public:
     static OTMLNodePtr create(std::string_view tag, std::string_view value);
 
     std::string tag() { return m_tag; }
-    size_t size() const { return m_children.size(); }
+    int size() const { return m_children.size(); }
     std::string source() { return m_source; }
     std::string rawValue() { return m_value; }
 

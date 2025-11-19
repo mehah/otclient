@@ -35,9 +35,9 @@ namespace stdext
     struct timer
     {
         timer() { restart(); }
-        float elapsed_seconds() const { return (micros() - m_start) / 1000000.f; }
-        ticks_t elapsed_millis() const { return (micros() - m_start) / 1000; }
-        ticks_t elapsed_micros() const { return micros() - m_start; }
+        [[nodiscard]] float elapsed_seconds() const { return (micros() - m_start) / 1000000.f; }
+        [[nodiscard]] ticks_t elapsed_millis() const { return (micros() - m_start) / 1000; }
+        [[nodiscard]] ticks_t elapsed_micros() const { return micros() - m_start; }
         void restart(const int shift = 0) { m_start = micros() - shift; }
 
     private:

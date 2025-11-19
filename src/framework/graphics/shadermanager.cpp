@@ -22,10 +22,11 @@
 
 #include "shadermanager.h"
 
-#include "paintershaderprogram.h"
-#include "framework/core/eventdispatcher.h"
-#include "framework/core/resourcemanager.h"
-#include "shader/shadersources.h"
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/graphics/graphics.h>
+#include <framework/graphics/paintershaderprogram.h>
+#include <framework/graphics/shader/shadersources.h>
 
 ShaderManager g_shaders;
 

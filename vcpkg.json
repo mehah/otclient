@@ -22,7 +22,6 @@
     "zlib",
     "bshoshany-thread-pool",
     "fmt",
-    "gtest",
     {
       "name": "luajit",
       "platform": "!android & !wasm32"

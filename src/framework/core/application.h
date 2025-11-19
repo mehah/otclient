@@ -28,7 +28,6 @@ class ApplicationContext
 {
 public:
     ApplicationContext() = default;
-    virtual ~ApplicationContext() = default;
 };
 
 //@bindsingleton g_app
@@ -57,7 +56,7 @@ public:
 
     bool isRunning() { return m_running; }
     bool isStopping() { return m_stopping; }
-    bool isTerminated() const { return m_terminated; }
+    [[nodiscard]] bool isTerminated() const { return m_terminated; }
     const std::string& getName() { return m_appName; }
     const std::string& getCompactName() { return m_appCompactName; }
     const std::string& getOrganizationName() { return m_organizationName; }

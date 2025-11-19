@@ -49,7 +49,6 @@ controller:registerEvents(g_game, {
         if version >= 841 then
             g_game.enableFeature(GameChallengeOnLogin)
             g_game.enableFeature(GameMessageSizeCheck)
-            g_game.enableFeature(GameTileAddThingWithStackpos)
         end
 
         if version >= 854 then

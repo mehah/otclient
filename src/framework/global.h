@@ -26,10 +26,8 @@
 
 #include "stdext/compiler.h"
 
-// common C/C++ headers
+ // common C/C++ headers
 #include "pch.h"
-
-using namespace std::literals;
 
 // global constants
 #include "const.h"

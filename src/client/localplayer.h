@@ -30,7 +30,7 @@ class LocalPlayer final : public Player
 public:
     void unlockWalk() { m_walkLockExpiration = 0; }
     void lockWalk(uint16_t millis = 250);
-    bool isWalkLocked();
+    bool isWalkLocked() { return m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration; }
     void stopAutoWalk();
 
     bool autoWalk(const Position& destination, bool retry = false);
@@ -53,7 +53,6 @@ public:
     void setKnown(const bool known) { m_known = known; }
     void setPendingGame(const bool pending) { m_pending = pending; }
     void setInventoryItem(Otc::InventorySlot inventory, const ItemPtr& item);
-    void setInventoryCountCache(std::map<std::pair<uint16_t, uint8_t>, uint16_t> counts);
     void setPremium(bool premium);
     void setRegenerationTime(uint16_t regenerationTime);
     void setOfflineTrainingTime(uint16_t offlineTrainingTime);
@@ -101,8 +100,6 @@ public:
 
     const std::vector<uint16_t>& getSpells() { return m_spells; }
     ItemPtr getInventoryItem(const Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
-    bool hasEquippedItemId(uint16_t itemId, uint8_t tier);
-    uint16_t getInventoryCount(uint16_t itemId, uint8_t tier);
 
     uint64_t getResourceBalance(const Otc::ResourceTypes_t type)
     {
@@ -128,7 +125,7 @@ public:
     bool isParalyzed() const { return (m_states & Otc::IconParalyze) == Otc::IconParalyze; }
 
     LocalPlayerPtr asLocalPlayer() { return static_self_cast<LocalPlayer>(); }
-    bool isLocalPlayer() const override { return true; }
+    bool isLocalPlayer() override { return true; }
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
@@ -179,7 +176,6 @@ private:
     stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
     std::map<uint8_t, double> m_combatAbsorbValues;
     std::map<Otc::ExperienceRate_t, uint16_t> m_experienceRates;
-    std::map<std::pair<uint16_t, uint8_t>, uint16_t> m_inventoryCountCache;
 
     uint8_t m_autoWalkRetries{ 0 };
 

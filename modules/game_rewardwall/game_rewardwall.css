@@ -134,14 +134,8 @@
 }
 
 .premium-panel {
-  height: 55px;
+  height: 35px;
   width: 22px;
-  --image-source: /images/ui/2pixel_up_frame_borderimage; 
-  --image-border: 3; 
-  --text-offset: 15 -15;
-  text-wrap: true; 
-  padding: 10 10 10 10;
-  display: block; 
 }
 
 .info-label {
@@ -226,15 +220,3 @@
   width: 60px;
   height: 70px;
 }
-
-
-.bottom-panel { 
-  text-wrap: true; 
-  --image-source: /images/ui/2pixel_up_frame_borderimage; 
-  --image-border: 3; 
-  display: block; 
-  margin-top: 10px; 
-  height: 95px; 
-  width: 100%; 
-  --text-offset: 10 2;
- }

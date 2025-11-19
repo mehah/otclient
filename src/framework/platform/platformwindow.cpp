@@ -22,9 +22,6 @@
 
 #include "platformwindow.h"
 
-#include "framework/core/clock.h"
-#include "framework/graphics/image.h"
-
 #ifdef WIN32
 #include "win32window.h"
 WIN32Window window;
@@ -39,6 +36,10 @@ BrowserWindow window;
 #include <framework/core/clock.h>
 X11Window window;
 #endif
+
+#include <framework/core/clock.h>
+#include <framework/graphics/image.h>
+#include <framework/util/color.h>
 
 PlatformWindow& g_window = window;
 

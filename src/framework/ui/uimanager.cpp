@@ -19,18 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "uimanager.h"
-#include <framework/graphics/drawpoolmanager.h>
 
-#include "uiwidget.h"
-#include "framework/core/eventdispatcher.h"
-#include "framework/core/modulemanager.h"
-#include "framework/core/resourcemanager.h"
-#include "framework/graphics/graphics.h"
-#include "framework/otml/otmldocument.h"
-#include "framework/otml/otmlexception.h"
-#include "framework/otml/otmlnode.h"
+#include "uimanager.h"
+#include "ui.h"
+
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/modulemanager.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/graphics/drawpoolmanager.h>
+#include <framework/otml/otml.h>
 #include <framework/platform/platformwindow.h>
+
+#include "framework/graphics/graphics.h"
+#include <framework/html/htmlmanager.h>
+
+#include <algorithm>
 
 UIManager g_ui;
 
@@ -285,8 +288,8 @@ void UIManager::updateHoveredWidget(const bool now)
             for (const auto& p : std::views::reverse(m_hoveredWidgets)) {
                 const auto w = p.get();
 
-                bool still = std::any_of(newHovered.begin(), newHovered.end(),
-                                         [&](const UIWidgetPtr& p) { return p.get() == w; });
+                bool still = std::ranges::any_of(newHovered,
+                                                 [&](const UIWidgetPtr& p) { return p.get() == w; });
                 if (!still) {
                     w->updateState(Fw::HoverState, false);
                     w->onHoverChange(false);
@@ -298,8 +301,8 @@ void UIManager::updateHoveredWidget(const bool now)
                 if (!w->isEnabled())
                     continue;
 
-                bool was = std::any_of(m_hoveredWidgets.begin(), m_hoveredWidgets.end(),
-                                       [&](const UIWidgetPtr& q) { return q.get() == w; });
+                bool was = std::ranges::any_of(m_hoveredWidgets,
+                                               [&](const UIWidgetPtr& q) { return q.get() == w; });
                 if (!was) {
                     w->updateState(Fw::HoverState, true);
                     w->onHoverChange(true);
@@ -367,13 +370,13 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
 
     if (widget->isOnHtml()) {
         { // Pressed Widgets
-            auto it = std::find(m_pressedWidgets.begin(), m_pressedWidgets.end(), widget);
+            auto it = std::ranges::find(m_pressedWidgets, widget);
             if (it != m_pressedWidgets.end()) {
                 m_pressedWidgets.erase(it);
             }
         }
         {  // Hovered Widgets
-            auto it = std::find(m_hoveredWidgets.begin(), m_hoveredWidgets.end(), widget);
+            auto it = std::ranges::find(m_hoveredWidgets, widget);
             if (it != m_hoveredWidgets.end()) {
                 m_hoveredWidgets.erase(it);
             }
@@ -554,7 +557,7 @@ OTMLNodePtr UIManager::findMainWidgetNode(const OTMLDocumentPtr& doc)
     return mainNode;
 }
 
-OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const OperatingSystem os)
+OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::OperatingSystem os)
 {
     const auto rawName = file.substr(0, file.find("."));
     const auto osName = g_platform.getOsShortName(os);
@@ -568,7 +571,7 @@ OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const OperatingSyst
     return nullptr;
 }
 
-OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const DeviceType deviceType)
+OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::DeviceType deviceType)
 {
     const auto rawName = file.substr(0, file.find("."));
     const auto deviceName = g_platform.getDeviceShortName(deviceType);

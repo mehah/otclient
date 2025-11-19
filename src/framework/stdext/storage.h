@@ -66,7 +66,7 @@ namespace stdext
 
         bool has(const Key& k) const { return m_data.contains(k); }
 
-        size_t size() const { return m_data.count(); }
+        [[nodiscard]] size_t size() const { return m_data.count(); }
 
         void clear() { m_data.clear(); }
 

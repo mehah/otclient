@@ -21,18 +21,22 @@
  */
 
 #include "graphicalapplication.h"
-
-#include "asyncdispatcher.h"
-#include "clock.h"
-#include "eventdispatcher.h"
 #include "garbagecollection.h"
-#include "framework/graphics/drawpoolmanager.h"
-#include "framework/graphics/graphics.h"
-#include "framework/graphics/image.h"
-#include "framework/graphics/particlemanager.h"
-#include "framework/graphics/texturemanager.h"
-#include "framework/input/mouse.h"
-#include "framework/ui/uimanager.h"
+
+#include "framework/stdext/time.h"
+#include <framework/core/asyncdispatcher.h>
+#include <framework/core/clock.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/graphics/drawpool.h>
+#include <framework/graphics/drawpoolmanager.h>
+#include <framework/graphics/graphics.h>
+#include <framework/graphics/image.h>
+#include <framework/graphics/particlemanager.h>
+#include <framework/graphics/texturemanager.h>
+#include <framework/input/mouse.h>
+#include <framework/platform/platformwindow.h>
+#include <framework/ui/uimanager.h>
+#include <framework/ui/uiwidget.h>
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>
@@ -42,7 +46,6 @@
 #include <emscripten/emscripten.h>
 #endif
 #include <framework/html/htmlmanager.h>
-#include <framework/platform/platformwindow.h>
 
 GraphicalApplication g_app;
 
@@ -301,7 +304,7 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 }
 
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
-bool GraphicalApplication::isScaled() { return g_window.getDisplayDensity() != 1.f; }
+
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     if (m_drawEvents && m_drawEvents->isUsingProtobuf())
         v = true;

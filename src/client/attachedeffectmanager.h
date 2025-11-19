@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include "thingtype.h"
 
 class AttachedEffectManager
 {

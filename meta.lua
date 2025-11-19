@@ -5791,9 +5791,6 @@ function OutputMessage:addU64(value) end
 ---@param value string
 function OutputMessage:addString(value) end
 
----@param value string
-function OutputMessage:addBytes(value) end
-
 ---@param bytes integer
 ---@param byte integer
 function OutputMessage:addPaddingBytes(bytes, byte) end

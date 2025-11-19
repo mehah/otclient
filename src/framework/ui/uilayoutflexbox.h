@@ -1,5 +1,5 @@
 #pragma once
 
-#include "declarations.h"
+#include "uiwidget.h"
 
 void layoutFlex(UIWidget& container);

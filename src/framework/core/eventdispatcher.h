@@ -45,19 +45,19 @@ enum class DispatcherType : uint8_t
 
 struct DispatcherContext
 {
-    bool isGroup(const TaskGroup _group) const {
+    [[nodiscard]] bool isGroup(const TaskGroup _group) const {
         return group == _group;
     }
 
-    bool isAsync() const {
+    [[nodiscard]] bool isAsync() const {
         return type == DispatcherType::AsyncEvent;
     }
 
-    auto getGroup() const {
+    [[nodiscard]] auto getGroup() const {
         return group;
     }
 
-    auto getType() const {
+    [[nodiscard]] auto getType() const {
         return type;
     }
 
@@ -88,7 +88,7 @@ public:
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
 
-    const auto& context() const {
+    [[nodiscard]] const auto& context() const {
         return dispacherContext;
     }
 
@@ -122,7 +122,7 @@ private:
     inline void executeDeferEvents();
     inline void executeScheduledEvents();
 
-    const std::unique_ptr<ThreadTask>& getThreadTask() const {
+    [[nodiscard]] const std::unique_ptr<ThreadTask>& getThreadTask() const {
         return m_threads[stdext::getThreadId() % m_threads.size()];
     }
 

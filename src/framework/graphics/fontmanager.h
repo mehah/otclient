@@ -36,8 +36,8 @@ public:
     bool fontExists(std::string_view fontName);
     BitmapFontPtr getFont(std::string_view fontName);
 
-    BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
-    BitmapFontPtr getDefaultWidgetFont() const { return m_defaultWidgetFont; }
+    [[nodiscard]] BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
+    [[nodiscard]] BitmapFontPtr getDefaultWidgetFont() const { return m_defaultWidgetFont; }
 
     void setDefaultFont(const BitmapFontPtr& font) { m_defaultFont = font; }
     void setDefaultWidgetFont(const BitmapFontPtr& font) { m_defaultWidgetFont = font; }

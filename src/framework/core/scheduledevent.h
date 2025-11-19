@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "declarations.h"
+#include "clock.h"
 #include "event.h"
 
  // @bindclass
@@ -31,11 +31,11 @@ class ScheduledEvent final : public Event
 public:
     ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles = 0);
     void execute() override;
-    void postpone();
+    void postpone() { m_ticks = g_clock.millis() + m_delay; }
     bool nextCycle();
 
     int ticks() { return m_ticks; }
-    int remainingTicks();
+    int remainingTicks() { return m_ticks - g_clock.millis(); }
     int delay() { return m_delay; }
     int cyclesExecuted() { return m_cyclesExecuted; }
     int maxCycles() { return m_maxCycles; }

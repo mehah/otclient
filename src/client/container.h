@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include "item.h"
 
 #include <framework/luaengine/luaobject.h>
 

@@ -23,16 +23,15 @@
 #pragma once
 
 #include "declarations.h"
+#include "client/game.h"
+#include "soundsource.h"
+#include <framework/util/point.h>
+#include <future>
 
 using DelayedSoundEffect = std::pair<uint32_t, uint32_t>;
 using DelayedSoundEffects = std::vector<DelayedSoundEffect>;
 using ItemCountSoundEffect = std::pair<uint32_t, uint32_t>;
 using ItemCountSoundEffects = std::vector<ItemCountSoundEffect>;
-
-class StreamSoundSource;
-class CombinedSoundSource;
-class SoundFile;
-class SoundBuffer;
 
 enum ClientSoundType
 {

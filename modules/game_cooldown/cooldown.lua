@@ -33,7 +33,6 @@ function init()
     -- preload cooldown images
     for k, v in pairs(SpelllistSettings) do
         g_textures.preload(v.iconFile)
-        g_textures.preload(v.iconsForGameCooldown)
     end
 
     if g_game.isOnline() then
@@ -56,12 +55,18 @@ end
 function loadIcon(iconId)
     local spell, profile, spellName = Spells.getSpellByIcon(iconId)
     if not spellName then
-        print('[WARNING] loadIcon: empty spellName for server spell id: ' .. iconId)
-        return nil, nil
+        print('[WARNING] loadIcon: empty spellName for tfs spell id: ' .. iconId)
+        return
     end
     if not profile then
-        print('[WARNING] loadIcon: empty profile for server spell id: ' .. iconId)
-        return nil, nil
+        print('[WARNING] loadIcon: empty profile for tfs spell id: ' .. iconId)
+        return
+    end
+
+    clientIconId = Spells.getClientId(spellName)
+    if not clientIconId then
+        print('[WARNING] loadIcon: empty clientIconId for tfs spell id: ' .. iconId)
+        return
     end
 
     local icon = cooldownPanel:getChildById(iconId)
@@ -72,27 +77,13 @@ function loadIcon(iconId)
 
     local spellSettings = SpelllistSettings[profile]
     if spellSettings then
-        icon:setImageSource(spellSettings.iconsForGameCooldown)
-        icon:setImageClip(Spells.getImageClipCooldown(spell.clientId, profile))
-        icon.spellName = spellName
-        local progressRect = icon:getChildById(iconId)
-        local isNewProgressRect = false
-        if not progressRect then
-            progressRect = g_ui.createWidget('SpellProgressRect', icon)
-            progressRect:setId(iconId)
-            progressRect:fill('parent')
-            isNewProgressRect = true
-        end
-        progressRect.icon = icon
-        progressRect:setTooltip(spellName .. " (" .. (spell.exhaustion / 1000) .. " sec. cooldown)")
-        if isNewProgressRect then
-            progressRect:setPercent(0)
-        end
+        icon:setImageSource(spellSettings.iconFile)
+        icon:setImageClip(Spells.getImageClip(clientIconId, profile))
     else
-        print('[WARNING] loadIcon: empty spell icon for server spell id: ' .. iconId)
+        print('[WARNING] loadIcon: empty spell icon for tfs spell id: ' .. iconId)
         icon = nil
     end
-    return icon, spellName
+    return icon
 end
 
 function onMiniWindowOpen()
@@ -148,8 +139,6 @@ end
 
 function turnOffCooldown(progressRect)
     removeEvent(progressRect.event)
-    progressRect.event = nil
-    progressRect.callback = nil
     if progressRect.icon then
         progressRect.icon:setOn(false)
         progressRect.icon = nil
@@ -174,32 +163,16 @@ function initCooldown(progressRect, updateCallback, finishCallback)
 end
 
 function updateCooldown(progressRect, duration)
-    if not progressRect or progressRect:isDestroyed() then
-        return
-    end
-
-    local callbacks = progressRect.callback
-    if not callbacks then
-        return
-    end
     progressRect:setPercent(progressRect:getPercent() + 10000 / duration)
 
     if progressRect:getPercent() < 100 then
         removeEvent(progressRect.event)
-        local updateCallback = callbacks[ProgressCallback.update]
-        if not updateCallback then
-            return
-        end
+
         progressRect.event = scheduleEvent(function()
-            if progressRect and not progressRect:isDestroyed() and progressRect.callback then
-                updateCallback()
-            end
+            progressRect.callback[ProgressCallback.update]()
         end, 100)
     else
-        local finishCallback = callbacks[ProgressCallback.finish]
-        if finishCallback then
-            finishCallback()
-        end
+        progressRect.callback[ProgressCallback.finish]()
     end
 end
 
@@ -215,7 +188,7 @@ function onSpellCooldown(iconId, duration)
     if not cooldownWindow:isVisible() then
         return
     end
-    local icon, spellName = loadIcon(iconId)
+    local icon = loadIcon(iconId)
     if not icon then
         print('[WARNING] Can not load cooldown icon on spell with id: ' .. iconId)
         return
@@ -226,10 +199,12 @@ function onSpellCooldown(iconId, duration)
     if not progressRect then
         progressRect = g_ui.createWidget('SpellProgressRect', icon)
         progressRect:setId(iconId)
+        progressRect.icon = icon
         progressRect:fill('parent')
+    else
+        progressRect:setPercent(0)
     end
-    progressRect.icon = icon
-    progressRect:setPercent(0)
+    progressRect:setTooltip(spellName)
 
     local updateFunc = function()
         updateCooldown(progressRect, duration)

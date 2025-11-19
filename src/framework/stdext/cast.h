@@ -25,6 +25,10 @@
 #include "demangle.h"
 #include "exception.h"
 
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
+
 namespace stdext
 {
     // cast a type to another type
@@ -142,7 +146,7 @@ namespace stdext
             m_what = ss.str();
         }
 
-        const char* what() const noexcept override { return m_what.c_str(); }
+        [[nodiscard]] const char* what() const noexcept override { return m_what.c_str(); }
     private:
         std::string m_what;
     };

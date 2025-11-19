@@ -21,14 +21,15 @@
 */
 
 #pragma once
-#include "declarations.h"
-#include "framework/luaengine/luaobject.h"
+
+#include <framework/net/inputmessage.h>
+#include <framework/net/outputmessage.h>
 
 class PacketRecorder : public LuaObject
 {
 public:
     PacketRecorder(const std::string_view& file);
-    virtual ~PacketRecorder();
+    ~PacketRecorder() override;
 
     void addInputPacket(const InputMessagePtr& packet);
     void addOutputPacket(const OutputMessagePtr& packet);

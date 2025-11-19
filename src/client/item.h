@@ -23,7 +23,7 @@
 #pragma once
 
 #include "thing.h"
-#include "framework/core/declarations.h"
+#include <framework/global.h>
 
 enum ItemAttr : uint8_t
 {
@@ -75,8 +75,8 @@ class Item final : public Thing
 public:
     static ItemPtr create(int id);
 
-    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
-    void drawLight(const Point& dest, LightView* lightView) override;
+    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr) override;
+    void drawLight(const Point& dest, const LightViewPtr& lightView) override;
 
     void setId(uint32_t id) override;
 
@@ -100,16 +100,11 @@ public:
 
     bool isValid() { return getThingType() != nullptr; }
 
-    bool hasWearOut() { return Thing::hasWearOut(); }
-    bool hasClockExpire() { return Thing::hasClockExpire(); }
-    bool hasExpire() { return Thing::hasExpire(); }
-    bool hasExpireStop() { return Thing::hasExpireStop(); }
-
     void setAsync(const bool enable) { m_async = enable; }
 
     ItemPtr clone();
     ItemPtr asItem() { return static_self_cast<Item>(); }
-    bool isItem() const override { return true; }
+    bool isItem() override { return true; }
 
     void updatePatterns();
     int calculateAnimationPhase();
@@ -148,7 +143,7 @@ public:
 
     bool isHouseDoor() { return m_attribs.has(ATTR_HOUSEDOORID); }
     bool isDepot() { return m_attribs.has(ATTR_DEPOT_ID); }
-    bool isContainer() const override { return m_attribs.has(ATTR_CONTAINER_ITEMS) || Thing::isContainer(); }
+    bool isContainer() override { return m_attribs.has(ATTR_CONTAINER_ITEMS) || Thing::isContainer(); }
     bool isDoor() { return m_attribs.has(ATTR_HOUSEDOORID); }
     bool isTeleport() { return m_attribs.has(ATTR_TELE_DEST); }
 
@@ -163,7 +158,7 @@ public:
 private:
     ThingType* getThingType() const override;
 
-    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, LightView* lightView = nullptr);
+    void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, const LightViewPtr& lightView = nullptr);
 
     uint16_t m_countOrSubType{ 0 };
     uint32_t m_durationTime{ 0 };

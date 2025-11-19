@@ -21,29 +21,23 @@
  */
 
 #include "creature.h"
-
-#include "animator.h"
-#include "attachedeffect.h"
 #include "game.h"
-#include "gameconfig.h"
 #include "lightview.h"
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
-#include "framework/graphics/texturemanager.h"
-#include "protocolcodes.h"
-#include "statictext.h"
-#include "thingtype.h"
 #include "thingtypemanager.h"
 #include "tile.h"
-#include "framework/core/clock.h"
-#include "framework/core/eventdispatcher.h"
-#include "framework/core/scheduledevent.h"
-#include "framework/graphics/drawpoolmanager.h"
-#include "framework/graphics/painter.h"
-#include "framework/graphics/shadermanager.h"
-#include "framework/ui/uiwidget.h"
+
+#include <framework/core/clock.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include <framework/graphics/drawpoolmanager.h>
+#include <framework/graphics/shadermanager.h>
+#include <framework/graphics/texturemanager.h>
+#include <framework/ui/uiwidget.h>
+
+#include "statictext.h"
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -64,9 +58,9 @@ void Creature::onCreate() {
     callLuaField("onCreate");
 }
 
-void Creature::draw(const Point& dest, const bool drawThings, LightView* /*lightView*/)
+void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr& /*lightView*/)
 {
-    if (!canBeSeen() || !canDraw() || isDead())
+    if (!canBeSeen() || !canDraw())
         return;
 
     if (drawThings) {
@@ -101,7 +95,7 @@ void Creature::draw(const Point& dest, const bool drawThings, LightView* /*light
     // drawLight(dest, lightView);
 }
 
-void Creature::drawLight(const Point& dest, LightView* lightView) {
+void Creature::drawLight(const Point& dest, const LightViewPtr& lightView) {
     if (!lightView) return;
 
     auto light = getLight();
@@ -189,7 +183,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     const int cropSizeText = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? getExactSize() : 12;
     const int cropSizeBackGround = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? cropSizeText - nameSize.height() : 0;
 
-    const bool isScaled = g_app.getCreatureInformationScale() != DEFAULT_DISPLAY_DENSITY;
+    const bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
     if (isScaled) {
         p.scale(g_app.getCreatureInformationScale());
     }
@@ -219,7 +213,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
 
     Rect barsRect = backgroundRect;
 
-    if ((drawFlags & Otc::DrawBars) && (g_game.getClientVersion() >= 1100 ? !isNpc() : true)) {
+    if (drawFlags & Otc::DrawBars) {
         g_drawPool.addFilledRect(backgroundRect, Color::black);
         g_drawPool.addFilledRect(healthRect, fillColor);
 
@@ -526,7 +520,7 @@ void Creature::updateJump()
 
 void Creature::onPositionChange(const Position& newPos, const Position& oldPos)
 {
-    callLuaFieldUnchecked("onPositionChange", newPos, oldPos);
+    callLuaField("onPositionChange", newPos, oldPos);
 }
 
 void Creature::onAppear()
@@ -630,7 +624,7 @@ void Creature::updateWalkAnimation()
     const int footDelay = std::clamp<int>(walkSpeed / footAnimDelay, minFootDelay, maxFootDelay);
 
     if (m_footTimer.ticksElapsed() >= footDelay) {
-        if (m_walkAnimationPhase == footAnimPhases) m_walkAnimationPhase = 1;
+        if (std::cmp_equal(m_walkAnimationPhase, footAnimPhases)) m_walkAnimationPhase = 1;
         else ++m_walkAnimationPhase;
 
         m_footTimer.restart();
@@ -821,31 +815,19 @@ void Creature::setOutfit(const Outfit& outfit, bool fireEvent)
     if (m_outfit == outfit)
         return;
 
-    Outfit newOutfit = outfit;
-    if (newOutfit.isInvalid()) {
-        newOutfit.setCategory(newOutfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);
-    }
-
     const Outfit oldOutfit = m_outfit;
 
-    m_outfit = newOutfit;
+    m_outfit = outfit;
     m_numPatternZ = 0;
     m_exactSize = 0;
-    if (m_walkingAnimationSpeed == 0) {
-        m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
-    }
+    m_walkAnimationPhase = 0; // might happen when player is walking and outfit is changed.
 
     if (m_outfit.isInvalid())
         m_outfit.setCategory(m_outfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);
 
-    const auto thingType = getThingType();
-    if (!thingType) {
-        g_logger.error("Creature::setOutfit - Invalid thing type for creature {}.", getId());
-        m_outfit = oldOutfit;
-        return;
-    }
-
-    m_clientId = thingType->getId();
+    if (const auto thingType = getThingType())
+        m_clientId = thingType->getId();
+    else m_clientId = 0;
 
     if (m_outfit.hasMount()) {
         m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
@@ -934,7 +916,8 @@ void Creature::setIconsTexture(const std::string& filename, const Rect& clip, co
         m_icons->numberText.setAlign(Fw::AlignCenter);
     }
 
-    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{ g_textures.getTexture(filename), clip, count });
+    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{ .texture = g_textures.getTexture(filename),
+        .clip = clip, .count = count });
 }
 void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }
 void Creature::setEmblemTexture(const std::string& filename) { m_emblemTexture = g_textures.getTexture(filename); }
@@ -1032,7 +1015,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
     if (groundSpeed == 0)
         groundSpeed = 150;
 
-    if (groundSpeed != m_stepCache.groundSpeed || m_speed != m_stepCache.speed) {
+    if (std::cmp_not_equal(groundSpeed, m_stepCache.groundSpeed) || m_speed != m_stepCache.speed) {
         m_stepCache.speed = m_speed;
         m_stepCache.groundSpeed = groundSpeed;
 

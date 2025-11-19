@@ -27,8 +27,6 @@
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/declarations.h>
 
-#include "framework/platform/staticdata.h"
-
  // @bindclass
 class Module final : public LuaObject
 {
@@ -47,7 +45,7 @@ public:
     bool isDependent() const;
     bool isSandboxed() { return m_sandboxed; }
     bool hasDependency(std::string_view name, bool recursive = false);
-    bool hasSupportedDevice(Device device);
+    bool hasSupportedDevice(Platform::Device device);
     int getSandbox(LuaInterface* lua);
 
     std::string getDescription() { return m_description; }
@@ -86,5 +84,5 @@ private:
     std::list<std::string> m_dependencies;
     std::list<std::string> m_scripts;
     std::list<std::string> m_loadLaterModules;
-    std::list<Device> m_supportedDevices;
+    std::list<Platform::Device> m_supportedDevices;
 };

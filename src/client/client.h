@@ -21,8 +21,12 @@
  */
 
 #pragma once
-#include "declarations.h"
-#include "framework/core/graphicalapplication.h"
+
+#include "global.h"
+
+#include "uimap.h"
+
+#include <framework/core/graphicalapplication.h>
 
 class Client : public ApplicationDrawEvents
 {
@@ -34,7 +38,7 @@ public:
     void preLoad() override;
     void draw(DrawPoolType type) override;
 
-    bool canDraw(DrawPoolType type) const override;
+    [[nodiscard]] bool canDraw(DrawPoolType type) const override;
     bool isLoadingAsyncTexture() override;
     bool isUsingProtobuf() override;
 
@@ -43,10 +47,10 @@ public:
 
     UIMapPtr getMapWidget() { return m_mapWidget; }
 
-    float getEffectAlpha() const { return m_effectAlpha; }
+    [[nodiscard]] float getEffectAlpha() const { return m_effectAlpha; }
     void setEffectAlpha(const float v) { m_effectAlpha = v; }
 
-    float getMissileAlpha() const { return m_missileAlpha; }
+    [[nodiscard]] float getMissileAlpha() const { return m_missileAlpha; }
     void setMissileAlpha(const float v) { m_missileAlpha = v; }
 
 private:

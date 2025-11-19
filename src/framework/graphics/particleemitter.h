@@ -24,8 +24,7 @@
 
 #include "declarations.h"
 #include <framework/global.h>
-
-#include "framework/otml/declarations.h"
+#include <framework/otml/otml.h>
 
 class ParticleEmitter
 {
@@ -35,7 +34,7 @@ public:
 
     void update(float elapsedTime, const ParticleSystemPtr& system);
 
-    bool hasFinished() const { return m_finished; }
+    [[nodiscard]] bool hasFinished() const { return m_finished; }
 
 private:
     // self related

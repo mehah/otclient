@@ -50,6 +50,8 @@ class PlatformWindow
     using OnInputEventCallback = std::function<void(const InputEvent&)>;
 
 public:
+    static constexpr float DEFAULT_DISPLAY_DENSITY = 1.f;
+
     virtual void init() = 0;
     virtual void terminate() = 0;
 
@@ -79,7 +81,7 @@ public:
     // is only supported on Windows 10/11 via the DWM API. On other platforms,
     // or when not implemented in the derived class, this method does nothing.
     // Derived classes should override this method to provide platform-specific behavior.
-    virtual void setTitleBarColor(const Color& /*color*/) {}
+    virtual void setTitleBarColor(const Color& color) {}
 
     // Convenience methods for setting title bar color
     // Usage examples:
@@ -98,13 +100,7 @@ public:
     int getDisplayWidth() { return getDisplaySize().width(); }
     int getDisplayHeight() { return getDisplaySize().height(); }
     float getDisplayDensity() { return m_displayDensity; }
-    void setDisplayDensity(const float v) { 
-        if (m_displayDensity == v) {
-            return;
-        }
-        m_displayDensity = v; 
-        onDisplayDensityChanged(v);
-    }
+    void setDisplayDensity(const float v) { m_displayDensity = v; }
 
     Size getUnmaximizedSize() { return m_unmaximizedSize; }
     Size getSize() { return m_size; }
@@ -126,7 +122,7 @@ public:
     bool isFullscreen() { return m_fullscreen; }
     bool hasFocus() { return m_focused; }
 
-    bool vsyncEnabled() const { return m_vsync; }
+    [[nodiscard]] bool vsyncEnabled() const { return m_vsync; }
 
     void setOnClose(const std::function<void()>& onClose) { m_onClose = onClose; }
     void setOnResize(const OnResizeCallback& onResize) { m_onResize = onResize; }
@@ -139,8 +135,6 @@ public:
 protected:
 
     virtual int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) = 0;
-
-    virtual void onDisplayDensityChanged(float /*newDensity*/) {}
 
     void updateUnmaximizedCoords();
 

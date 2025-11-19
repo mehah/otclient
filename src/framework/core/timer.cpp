@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "clock.h"
 #include "timer.h"
+#include "clock.h"
 
 void Timer::restart(const int shift)
 {

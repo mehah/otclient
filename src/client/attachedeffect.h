@@ -21,18 +21,17 @@
  */
 
 #pragma once
-#include "framework/core/timer.h"
-#include "framework/graphics/declarations.h"
-#include "framework/luaengine/luaobject.h"
-#include "staticdata.h"
+
+#include "outfit.h"
+#include "thingtype.h"
 
 class AttachedEffect final : public LuaObject
 {
 public:
     static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
 
-    void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr, bool drawThing = true);
-    void drawLight(const Point& /*dest*/, LightView*);
+    void draw(const Point& /*dest*/, bool /*isOnTop*/, const LightViewPtr & = nullptr, bool drawThing = true);
+    void drawLight(const Point& /*dest*/, const LightViewPtr&);
 
     uint16_t getId() { return m_id; }
 

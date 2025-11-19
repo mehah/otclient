@@ -23,6 +23,7 @@
 #pragma once
 
 #include <exception>
+#include <string>
 
 #include <fmt/format.h>
 
@@ -39,7 +40,7 @@ namespace stdext
         exception(fmt::format_string<Args...> fmtStr, Args&&... args) : m_what(fmt::format(fmtStr, std::forward<Args>(args)...)) {}
 
         ~exception() noexcept override = default;
-        const char* what() const noexcept override { return m_what.data(); }
+        [[nodiscard]] const char* what() const noexcept override { return m_what.data(); }
     protected:
         std::string m_what;
     };

@@ -21,13 +21,15 @@
  */
 
 #include "htmlmanager.h"
-#include "htmlparser.h"
+#include <framework/ui/uimanager.h>
+#include <framework/ui/ui.h>
+
 #include "htmlnode.h"
-#include "framework/core/resourcemanager.h"
-#include "framework/luaengine/luainterface.h"
-#include "framework/otml/otmlnode.h"
-#include "framework/ui/uimanager.h"
-#include "framework/ui/uiwidget.h"
+#include "htmlparser.h"
+#include <framework/core/resourcemanager.h>
+#include <ranges>
+#include <framework/core/modulemanager.h>
+#include <framework/core/eventdispatcher.h>
 
 HtmlManager g_html;
 
@@ -99,9 +101,7 @@ namespace {
         /*"visibility",*/
         "white-space",
         "word-spacing",
-        "writing-mode",
-        "hyphens",
-        "text-lang"
+        "writing-mode"
     };
 
     static inline bool isInheritable(std::string_view prop) noexcept {
@@ -118,7 +118,7 @@ namespace {
             auto& styleMap = child->getStyles()[style];
             auto it = styleMap.find(prop);
             if (it == styleMap.end() || !it->second.important) {
-                child->getStyles()[style][prop] = { value , std::string{htmlId} };
+                child->getStyles()[style][prop] = { .value = value , .inheritedFromId = std::string{htmlId} };
                 setChildrenStyles(htmlId, child.get(), style, prop, value);
             }
         }
@@ -231,7 +231,8 @@ namespace {
                                 auto& styleMap = node->getStyles()[style];
                                 auto it = styleMap.find(decl.property);
                                 if (it == styleMap.end() || !it->second.important) {
-                                    styleMap[decl.property] = { decl.value , "", decl.important };
+                                    styleMap[decl.property] = { .value = decl.value , .inheritedFromId = "",
+                                        .important = decl.important };
                                     if (!is_all && isInheritable(decl.property)) {
                                         setChildrenStyles(widget->getHtmlId(), node.get(), style, decl.property, decl.value);
                                     }
@@ -248,7 +249,7 @@ namespace {
                         auto& styleMap = node->getStyles()["styles"];
                         auto it = styleMap.find(decl.property);
                         if (it == styleMap.end() || !it->second.important) {
-                            styleMap[decl.property] = { decl.value , "", decl.important };
+                            styleMap[decl.property] = { .value = decl.value , .inheritedFromId = "", .important = decl.important };
                             if (!is_all && isInheritable(decl.property)) {
                                 setChildrenStyles(widget->getHtmlId(), node.get(), "styles", decl.property, decl.value);
                             }
@@ -299,7 +300,6 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     if (node->getType() == NodeType::Text) {
         textNodes.emplace_back(node);
-        widget->setTextAlign(Fw::AlignTopLeft);
         widget->setFocusable(false);
         widget->setPhantom(true);
     }
@@ -355,7 +355,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
     }
 
     for (const auto& [prop, value] : node->getAttrStyles()) {
-        stylesMerge[prop] = { value , "", false };
+        stylesMerge[prop] = { .value = value , .inheritedFromId = "", .important = false };
     }
 
     for (const auto [prop, value] : stylesMerge) {
@@ -449,7 +449,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
                     n->getInheritableStyles() = parent->getHtmlNode()->getInheritableStyles();
                     for (const auto& [styleName, styleMap] : n->getInheritableStyles()) {
                         for (auto& [style, value] : styleMap)
-                            n->getStyles()[styleName][style] = { value , parent->getHtmlId() };
+                            n->getStyles()[styleName][style] = { .value = value , .inheritedFromId = parent->getHtmlId() };
                     }
                 }
                 widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName, widgets);
@@ -503,7 +503,7 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
     auto path = "/modules/" + moduleName + "/";
     auto htmlContent = g_resources.readFileContents(path + htmlPath);
 
-    auto root = DataRoot{ parseHtml(htmlContent), nullptr, moduleName };
+    auto root = DataRoot{ .node = parseHtml(htmlContent), .dynamicNode = nullptr, .moduleName = moduleName };
 
     if (root.node->getChildren().empty())
         return 0;

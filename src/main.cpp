@@ -20,17 +20,16 @@
  * THE SOFTWARE.
  */
 
-#include "client/client.h"
-#include "client/gameconfig.h"
-#include "framework/core/graphicalapplication.h"
-#include "framework/core/resourcemanager.h"
-#include "framework/luaengine/luainterface.h"
-#include "framework/platform/platform.h"
+#include <client/client.h>
+#include <client/game.h>
+#include <client/gameconfig.h>
+#include <client/localplayer.h>
+#include <framework/core/application.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/luaengine/luainterface.h>
 
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
-#include "client/game.h"
-#include "client/localplayer.h"
 #include <framework/discord/discord.h>
 #endif
 #endif
@@ -80,8 +79,7 @@ extern "C" {
             g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
 
         // initialize application framework and otclient
-        const auto drawEvents = ApplicationDrawEventsPtr(&g_client, [](ApplicationDrawEvents*) {});
-        g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), drawEvents));
+        g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
 
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1

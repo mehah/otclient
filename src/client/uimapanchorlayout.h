@@ -21,9 +21,9 @@
  */
 
 #pragma once
-#include <framework/ui/uianchorlayout.h>
 
-#include "position.h"
+#include "declarations.h"
+#include <framework/ui/uianchorlayout.h>
 
 class UIPositionAnchor final : public UIAnchor
 {

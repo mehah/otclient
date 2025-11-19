@@ -22,6 +22,10 @@
 
 #pragma once
 
+#include "types.h"
+#include <string>
+#include <vector>
+
 namespace stdext
 {
     std::string ip_to_string(uint32_t ip);

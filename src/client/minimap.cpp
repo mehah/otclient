@@ -21,14 +21,13 @@
  */
 
 #include "minimap.h"
-
-#include "gameconfig.h"
 #include "tile.h"
-#include "framework/core/filestream.h"
-#include "framework/core/resourcemanager.h"
-#include "framework/graphics/drawpoolmanager.h"
-#include "framework/graphics/image.h"
-#include "framework/graphics/texture.h"
+
+#include <framework/core/filestream.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/graphics/drawpoolmanager.h>
+#include <framework/graphics/image.h>
+#include <framework/graphics/texture.h>
 
 Minimap g_minimap;
 static MinimapTile nulltile;

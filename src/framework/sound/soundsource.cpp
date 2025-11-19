@@ -21,9 +21,10 @@
  */
 
 #include "soundsource.h"
-
 #include "soundbuffer.h"
 #include "soundeffect.h"
+
+#include "framework/stdext/time.h"
 
 SoundSource::SoundSource()
 {

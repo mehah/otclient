@@ -20,13 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "game.h"
-#include "item.h"
-#include "protocolgame.h"
 #include "framework/net/outputmessage.h"
-#include "protocolcodes.h"
-#include "thingtypemanager.h"
-#include "framework/util/crypt.h"
+#include "game.h"
+#include "protocolgame.h"
+#include <framework/util/crypt.h>
 
 void ProtocolGame::onSend() {}
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)

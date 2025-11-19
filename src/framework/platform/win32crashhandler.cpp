@@ -23,7 +23,11 @@
 #include "framework/core/application.h"
 #if defined(WIN32) && defined(CRASH_HANDLER)
 
+#include "crashhandler.h"
+#include <framework/global.h>
+
 #include <windows.h>
+#include <winsock2.h>
 
 #ifdef _MSC_VER
 
@@ -110,14 +114,8 @@ void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
         dwModBase = SymGetModuleBase(process, sf.AddrPC.Offset);
         if (dwModBase)
             GetModuleFileName(reinterpret_cast<HINSTANCE>(dwModBase), modname, MAX_PATH);
-        else {
-#ifdef _MSC_VER
-            strcpy_s(modname, sizeof(modname), "Unknown");
-#else
-            strncpy(modname, "Unknown", sizeof(modname));
-            modname[sizeof(modname) - 1] = '\0';
-#endif
-        }
+        else
+            strcpy(modname, "Unknown");
 
         Disp = 0;
         pSym->SizeOfStruct = sizeof(symBuffer);

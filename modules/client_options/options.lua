@@ -40,9 +40,6 @@ local buttons = { {
     }, {
         text = "Console",
         open = "interfaceConsole"
-    }, {
-        text = "Action Bars",
-        open = "actionbars"
     } }
 }, {
     text = "Graphics",
@@ -298,7 +295,6 @@ function controller:onInit()
     panels.interface = g_ui.loadUI('styles/interface/interface', controller.ui.optionsTabContent)
     panels.interfaceConsole = g_ui.loadUI('styles/interface/console', controller.ui.optionsTabContent)
     panels.interfaceHUD = g_ui.loadUI('styles/interface/HUD', controller.ui.optionsTabContent)
-    panels.actionbars = g_ui.loadUI('styles/interface/actionbars', controller.ui.optionsTabContent)
 
     panels.soundPanel = g_ui.loadUI('styles/sound/audio', controller.ui.optionsTabContent)
 
@@ -405,12 +401,7 @@ function setOption(key, value, force)
     end
 
     local option = options[key]
-    if option == nil then
-        g_logger.warning(string.format("[client_options] Attempted to set unknown option: '%s'", key))
-        return
-    end
-    
-    if not force and option.value == value then
+    if option == nil or not force and option.value == value then
         return
     end
 
@@ -448,12 +439,7 @@ function setupOptionsMainButton()
 end
 
 function getOption(key)
-    local option = options[key]
-    if option == nil then
-        g_logger.warning(string.format("[client_options] Attempted to get unknown option: '%s'", key))
-        return nil
-    end
-    return option.value
+    return options[key].value
 end
 
 function show()

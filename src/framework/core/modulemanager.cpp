@@ -21,14 +21,15 @@
  */
 
 #include "modulemanager.h"
-
-#include "asyncdispatcher.h"
-#include "eventdispatcher.h"
-#include "graphicalapplication.h"
-#include "module.h"
 #include "resourcemanager.h"
-#include "framework/otml/otmldocument.h"
-#include "framework/platform/platformwindow.h"
+#include "graphicalapplication.h"
+#include <framework/platform/platformwindow.h>
+#include <framework/core/application.h>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/otml/otml.h>
+
+#include <algorithm>
 
 ModuleManager g_modules;
 
@@ -174,7 +175,7 @@ void ModuleManager::enableAutoReload() {
         for (const auto& path : g_resources.listDirectoryFiles("/" + module->getName(), true, false, true)) {
             ticks_t time = g_resources.getFileTime(path);
             if (time > 0) {
-                data.files.emplace_back(std::make_shared<FileInfo>(FileInfo{ path, time }));
+                data.files.emplace_back(std::make_shared<FileInfo>(FileInfo{ .path = path, .time = time }));
                 hasFile = true;
             }
         }

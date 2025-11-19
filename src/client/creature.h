@@ -22,15 +22,20 @@
 
 #pragma once
 
+#include "mapview.h"
 #include "outfit.h"
 #include "thing.h"
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 
-#include "staticdata.h"
+struct PreyMonster
+{
+    std::string name;
+    Outfit outfit;
+};
 
- // @bindclass
+// @bindclass
 class Creature : public Thing
 {
 public:
@@ -48,9 +53,9 @@ public:
     void onAppear() override;
     void onDisappear() override;
 
-    void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
+    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr) override;
     void draw(const Rect& destRect, uint8_t size, bool center = false);
-    void drawLight(const Point& dest, LightView* lightView) override;
+    void drawLight(const Point& dest, const LightViewPtr& lightView) override;
 
     void internalDraw(Point dest, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags);
@@ -148,13 +153,11 @@ public:
     bool isWalking() { return m_walking; }
 
     bool isRemoved() { return m_removed; }
-    bool isRemoved() const { return m_removed; }
-    const Position& getOldPosition() const { return m_oldPosition; }
     bool isInvisible() { return m_outfit.isEffect() && m_outfit.getAuxId() == 13; }
     bool isDead() { return m_healthPercent <= 0; }
     bool isFullHealth() { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
-    bool isCreature() const override { return true; }
+    bool isCreature() override { return true; }
     bool isCovered() { return m_isCovered; }
 
     void setCovered(bool covered);
@@ -200,16 +203,13 @@ minHeight,
     }
 
     void setVocation(uint8_t vocation) { m_vocation = vocation; }
-    uint8_t getVocation() { return m_vocation; }
+    const uint8_t getVocation() { return m_vocation; }
 
 protected:
     virtual void terminateWalk();
     virtual void onWalking() {};
     void updateWalkOffset(uint8_t totalPixelsWalked);
     void updateWalk();
-
-    void setOldPositionSilently(const Position& pos) { m_oldPosition = pos; }
-    void setRemovedSilently(const bool removed) { m_removed = removed; }
 
     ThingType* getThingType() const override;
     ThingType* getMountThingType() const;
@@ -244,7 +244,7 @@ private:
         uint16_t walkDuration{ 0 };
         uint16_t diagonalDuration{ 0 };
 
-        uint16_t getDuration(const Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
+        [[nodiscard]] uint16_t getDuration(const Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
     struct IconRenderData
@@ -362,12 +362,12 @@ private:
 class Npc final : public Creature
 {
 public:
-    bool isNpc() const override { return true; }
+    bool isNpc() override { return true; }
 };
 
 // @bindclass
 class Monster final : public Creature
 {
 public:
-    bool isMonster() const override { return true; }
+    bool isMonster() override { return true; }
 };

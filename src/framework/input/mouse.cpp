@@ -21,10 +21,9 @@
  */
 
 #include "mouse.h"
-
-#include "framework/core/resourcemanager.h"
-#include "framework/otml/otmldocument.h"
-#include "framework/platform/platformwindow.h"
+#include <framework/core/resourcemanager.h>
+#include <framework/platform/platformwindow.h>
+#include <framework/ui/uiwidget.h>
 
 Mouse g_mouse;
 

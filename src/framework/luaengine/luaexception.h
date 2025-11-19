@@ -32,7 +32,7 @@ public:
 
     void generateLuaErrorMessage(std::string_view error, int traceLevel);
 
-    const char* what() const noexcept override { return m_what.data(); }
+    [[nodiscard]] const char* what() const noexcept override { return m_what.data(); }
 
 protected:
     LuaException() = default;

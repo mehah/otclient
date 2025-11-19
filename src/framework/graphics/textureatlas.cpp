@@ -1,7 +1,7 @@
-#include "framebuffer.h"
 #include "textureatlas.h"
-
-#include "painter.h"
+#include "texturemanager.h"
+#include "graphics.h"
+#include "framebuffer.h"
 
 constexpr uint8_t SMOOTH_PADDING = 2;
 
@@ -93,7 +93,7 @@ void TextureAtlas::createNewLayer(bool smooth) {
     fbo->setSmooth(smooth);
     fbo->resize(m_size);
 
-    FreeRegion newRegion = { 0, 0, m_size.width(), m_size.height(), static_cast<int>(m_filterGroups[smooth].layers.size()) };
+    FreeRegion newRegion = { .x = 0, .y = 0, .width = m_size.width(), .height = m_size.height(), .layer = static_cast<int>(m_filterGroups[smooth].layers.size()) };
 
     m_filterGroups[smooth].layers.emplace_back(std::move(fbo));
     m_filterGroups[smooth].freeRegions.insert(newRegion);

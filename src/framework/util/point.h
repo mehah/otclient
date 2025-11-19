@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include <cmath>
+#include <ostream>
+
 template<class T>
 class TSize;
 
@@ -35,12 +38,12 @@ public:
     constexpr TPoint(T x, T y) : x{ x }, y{ y } {}
     constexpr TPoint(T xy) : x{ xy }, y{ xy } {}
 
-    constexpr bool isNull() const noexcept { return x == 0 && y == 0; }
-    constexpr T manhattanLength() const noexcept { return std::abs(x) + std::abs(y); }
-    constexpr float length() const noexcept { return std::sqrt(static_cast<float>(x * x + y * y)); }
-    constexpr float distanceFrom(const TPoint& other) const noexcept { return (*this - other).length(); }
-    constexpr TPoint translated(T dx, T dy) const noexcept { return { x + dx, y + dy }; }
-    constexpr TSize<T> toSize() const noexcept { return { x, y }; }
+    [[nodiscard]] constexpr bool isNull() const noexcept { return x == 0 && y == 0; }
+    [[nodiscard]] constexpr T manhattanLength() const noexcept { return std::abs(x) + std::abs(y); }
+    [[nodiscard]] constexpr float length() const noexcept { return std::sqrt(static_cast<float>(x * x + y * y)); }
+    [[nodiscard]] constexpr float distanceFrom(const TPoint& other) const noexcept { return (*this - other).length(); }
+    [[nodiscard]] constexpr TPoint translated(T dx, T dy) const noexcept { return { x + dx, y + dy }; }
+    [[nodiscard]] constexpr TSize<T> toSize() const noexcept { return { x, y }; }
     constexpr TPoint scale(float v) noexcept {
         if (v != 1.f) {
             float factor = (1.f - (1.f / v));
@@ -83,7 +86,7 @@ public:
     constexpr bool operator==(const TPoint& other) const { return other.x == x && other.y == y; }
     constexpr bool operator!=(const TPoint& other) const { return other.x != x || other.y != y; }
 
-    constexpr std::size_t hash() const noexcept { return (7 * 15 + x) * 15 + y; }
+    [[nodiscard]] constexpr std::size_t hash() const noexcept { return (7 * 15 + x) * 15 + y; }
 
     friend std::ostream& operator<<(std::ostream& out, const TPoint& point) {
         return out << point.x << " " << point.y;
@@ -91,18 +94,6 @@ public:
 
     friend std::istream& operator>>(std::istream& in, TPoint& point) {
         return in >> point.x >> point.y;
-    }
-};
-
-template <class T>
-struct fmt::formatter<TPoint<T>, char> {
-    constexpr auto parse(format_parse_context& ctx) const
-        -> decltype(ctx.begin()) { return ctx.begin(); }
-
-    template <typename FormatContext>
-    auto format(const TPoint<T>& p, FormatContext& ctx) const
-        -> decltype(ctx.out()) {
-        return fmt::format_to(ctx.out(), "{} {}", p.x, p.y);
     }
 };
 

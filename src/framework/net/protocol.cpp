@@ -21,12 +21,14 @@
  */
 
 #include "protocol.h"
+#include <algorithm>
+#include <framework/core/application.h>
+#include <random>
 
-#include "client/game.h"
-#include "framework/core/graphicalapplication.h"
-#include "framework/proxy/proxy.h"
 #include "inputmessage.h"
 #include "outputmessage.h"
+#include "framework/core/graphicalapplication.h"
+#include "client/game.h"
 #ifdef __EMSCRIPTEN__
 #include "webconnection.h"
 #else
@@ -459,6 +461,7 @@ void Protocol::playRecord(PacketPlayerPtr player)
     return onConnect();
 }
 
-void Protocol::setRecorder(PacketRecorderPtr recorder) { m_recorder = recorder; }
-
-ticks_t Protocol::getElapsedTicksSinceLastRead() const { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }
+void Protocol::setRecorder(PacketRecorderPtr recorder)
+{
+    m_recorder = recorder;
+}

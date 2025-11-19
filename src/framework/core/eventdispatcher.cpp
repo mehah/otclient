@@ -20,8 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include "asyncdispatcher.h"
 #include "eventdispatcher.h"
+#include "asyncdispatcher.h"
+
+#include "timer.h"
 
 thread_local DispatcherContext EventDispatcher::dispacherContext;
 

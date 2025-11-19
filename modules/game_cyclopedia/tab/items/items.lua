@@ -1162,19 +1162,20 @@ function Cyclopedia.Items.sendPartyLootItems()
     
     local totalList = {}
     for i, category in pairs(Cyclopedia.ItemList) do
-        local skipCategory = (i == 1000 or i == 30) -- Skip WeaponsAll and Gold categories
+        if i == 1000 or i == 30 then -- Skip WeaponsAll and Gold categories
+            goto continue
+        end
 
-        if not skipCategory then
-            for _, itemInfo in ipairs(category) do
-                if itemInfo then
-                    local item = Item.create(itemInfo:getId())
-                    if item then
-                        local itemValue = Cyclopedia.Items.getCurrentItemValue(item)
-                        totalList[tonumber(itemInfo:getId())] = itemValue
-                    end
+        for _, itemInfo in ipairs(category) do
+            if itemInfo then
+                local item = Item.create(itemInfo:getId())
+                if item then
+                    local itemValue = Cyclopedia.Items.getCurrentItemValue(item)
+                    totalList[tonumber(itemInfo:getId())] = itemValue
                 end
             end
         end
+        :: continue ::
     end
 
 	if g_game.sendPartyLootPrice then

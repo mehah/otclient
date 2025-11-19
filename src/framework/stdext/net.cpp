@@ -21,6 +21,7 @@
  */
 
 #include "net.h"
+#include <asio.hpp>
 
 namespace stdext
 {

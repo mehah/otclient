@@ -24,7 +24,7 @@
 #include <framework/core/eventdispatcher.h>
 
 #include "uiwidget.h"
-#include "framework/otml/otmlnode.h"
+#include <ranges>
 
 void UIHorizontalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
