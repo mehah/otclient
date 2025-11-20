@@ -61,8 +61,9 @@ namespace {
 
         std::string latin1All;
         latin1All.reserve(256);
-        for(int i = 0; i < 256; ++i)
+        for(int i = 0; i < 256; ++i) {
             latin1All += static_cast<char>(i);
+        }
 
         const auto utf8Result = stdext::latin1_to_utf8(latin1All);
         EXPECT_FALSE(utf8Result.empty());
