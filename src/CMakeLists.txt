@@ -26,7 +26,7 @@ option(SPEED_UP_BUILD_UNITY "Compile using build unity for speed up build" ON)
 # Cmake Features
 # *****************************************************************************
 set(GNUCXX_MINIMUM_VERSION 9)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -135,6 +135,7 @@ find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(utf8cpp REQUIRED)
 
 find_path(CPPCODEC_INCLUDE_DIRS "cppcodec/base32_crockford.hpp")
 
@@ -551,6 +552,7 @@ if(MSVC)
           winmm.lib
           pugixml::pugixml
           fmt::fmt-header-only
+          utf8cpp::utf8cpp
   )
 elseif(ANDROID)
   target_include_directories(otclient_core
@@ -600,6 +602,7 @@ elseif(ANDROID)
           log
           pugixml::pugixml
           fmt::fmt-header-only
+          utf8cpp::utf8cpp
   )
 
 elseif(WASM)
@@ -652,6 +655,7 @@ elseif(WASM)
           OpenSSL::Crypto
           httplib::httplib
           fmt::fmt
+          utf8cpp::utf8cpp
           Ogg::ogg
           Vorbis::vorbisfile
           Vorbis::vorbis
@@ -736,6 +740,7 @@ else() # Linux
           OpenSSL::Crypto
           httplib::httplib
           fmt::fmt-header-only
+          utf8cpp::utf8cpp
           Ogg::ogg
           Vorbis::vorbisfile
           Vorbis::vorbis
