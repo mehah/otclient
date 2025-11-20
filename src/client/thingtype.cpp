@@ -762,7 +762,6 @@ void ThingType::loadTexture(const int animationPhase)
                                     g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, animationPhase);
                                     return;
                                 }
-                                // sprite id 0 represents empty/transparent sprite, skip blitting but continue processing
                             } else {
                                 // verifies that the first block in the lower right corner is transparent.
                                 if (spriteImage->hasTransparentPixel()) {
@@ -794,7 +793,6 @@ void ThingType::loadTexture(const int animationPhase)
                                             g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
                                             return;
                                         }
-                                        // sprite id 0 represents empty/transparent sprite, skip blitting but continue processing
                                     } else {
                                         // verifies that the first block in the lower right corner is transparent.
                                         if (h == 0 && w == 0 && spriteImage->hasTransparentPixel()) {
