@@ -219,6 +219,7 @@ tags
 *.dat
 *.pic
 config.otml
+*.patch
 
 ## Cmake cache
 CMakeLists.txt.user
