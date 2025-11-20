@@ -6,6 +6,13 @@ The string encoding functions in `src/framework/stdext/string.cpp` have been upd
 
 ## Invalid Data Policy
 
+### Error Handling Strategy
+All conversion functions follow a consistent error handling approach:
+- On invalid input, functions return an empty string (or empty wstring)
+- This allows callers to easily check for errors with `.empty()` checks
+- Invalid input includes: malformed UTF-8/UTF-16, unpaired surrogates, or encoding errors
+- Note: Empty string result is ambiguous between "empty input" and "error" - callers should validate input before conversion if this distinction matters
+
 ### UTF-8 Validation (`is_valid_utf8`)
 - Returns `true` only if the entire input is valid UTF-8
 - Invalid sequences return `false`
@@ -14,7 +21,9 @@ The string encoding functions in `src/framework/stdext/string.cpp` have been upd
 ### UTF-8 to Latin-1 Conversion (`utf8_to_latin1`)
 - Maps representable code points (0x00-0xFF) to Latin-1
 - Skips unrepresentable code points (> 0xFF)
-- Filters out control characters except tab (0x09), CR (0x0D), and LF (0x0A)
+- Filters out ASCII control characters (0x00-0x1F) except tab (0x09), CR (0x0D), and LF (0x0A)
+- Filters out C1 control characters (0x80-0x9F)
+- Allows all printable Latin-1 characters (0x20-0x7F and 0xA0-0xFF)
 - On invalid UTF-8 input, returns an empty string
 
 ### Latin-1 to UTF-8 Conversion (`latin1_to_utf8`)

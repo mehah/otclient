@@ -92,12 +92,19 @@ namespace stdext
             while (it != end) {
                 const uint32_t codepoint = utf8::next(it, end);
 
+                // Only convert code points that fit in Latin-1 (0x00-0xFF)
                 if (codepoint <= 0xFF) {
+                    // Filter control characters (0x00-0x1F and 0x80-0x9F) except:
+                    // - 0x09 (tab)
+                    // - 0x0A (line feed)
+                    // - 0x0D (carriage return)
+                    // This ensures text compatibility with Latin-1 displays and avoids unprintable characters
                     if ((codepoint >= 32 && codepoint < 128) || codepoint == 0x0d || codepoint == 0x0a || codepoint == 0x09 || codepoint >= 0xA0)
                         out += static_cast<char>(codepoint);
                 }
             }
         } catch (const utf8::exception&) {
+            // Return empty string on invalid UTF-8 input
             return "";
         }
 
@@ -112,6 +119,7 @@ namespace stdext
             for (const unsigned char c : src)
                 utf8::append(static_cast<uint32_t>(c), std::back_inserter(out));
         } catch (const utf8::exception&) {
+            // Return empty string on encoding error (should not occur with valid Latin-1 input)
             return "";
         }
 
@@ -126,6 +134,7 @@ namespace stdext
         try {
             utf8::utf8to16(src.begin(), src.end(), std::back_inserter(out));
         } catch (const utf8::exception&) {
+            // Return empty string on invalid UTF-8 input
             return L"";
         }
 
@@ -139,6 +148,7 @@ namespace stdext
         try {
             utf8::utf16to8(src.begin(), src.end(), std::back_inserter(out));
         } catch (const utf8::exception&) {
+            // Return empty string on invalid UTF-16 input (e.g., unpaired surrogates)
             return "";
         }
 

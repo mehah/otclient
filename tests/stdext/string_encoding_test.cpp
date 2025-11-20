@@ -42,6 +42,14 @@ namespace {
         EXPECT_EQ(stdext::utf8_to_latin1("\x01\x02\x03"), "");
         EXPECT_EQ(stdext::utf8_to_latin1("\x1F"), "");
         EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u0080\u0090\u009F")), "");
+
+        // Additional edge cases
+        EXPECT_EQ(stdext::utf8_to_latin1(""), "");  // Empty string
+        EXPECT_EQ(stdext::utf8_to_latin1("\x00", 1), "");  // NULL byte (control char)
+        
+        // Test boundary of printable Latin-1 range
+        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u00A0")), "\xA0");  // Non-breaking space (first valid at 0xA0)
+        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u00FF")), "\xFF");  // ÿ (last Latin-1 char)
     }
 
     TEST(StringEncoding, Latin1ToUtf8)

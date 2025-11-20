@@ -47,14 +47,21 @@ namespace stdext
     void replace_all(std::string& str, std::string_view search, std::string_view replacement);
     std::string join(const std::vector<std::string>& vec, const std::string& sep = ",");
 
+    /// Validate if a string is valid UTF-8
     [[nodiscard]] bool is_valid_utf8(std::string_view src);
+    /// Convert UTF-8 to Latin-1, filtering control characters. Returns empty string on invalid UTF-8.
     [[nodiscard]] std::string utf8_to_latin1(std::string_view src);
+    /// Convert Latin-1 to UTF-8. Returns empty string on encoding error.
     [[nodiscard]] std::string latin1_to_utf8(std::string_view src);
 
 #ifdef WIN32
+    /// Convert UTF-8 to UTF-16. Returns empty string on invalid UTF-8.
     [[nodiscard]] std::wstring utf8_to_utf16(std::string_view src);
+    /// Convert UTF-16 to UTF-8. Returns empty string on invalid UTF-16.
     [[nodiscard]] std::string utf16_to_utf8(std::wstring_view src);
+    /// Convert Latin-1 to UTF-16 via UTF-8 intermediate. Returns empty string on error.
     std::string utf16_to_latin1(std::wstring_view src);
+    /// Convert UTF-16 to Latin-1 via UTF-8 intermediate. Returns empty string on error.
     std::wstring latin1_to_utf16(std::string_view src);
 #endif
 
