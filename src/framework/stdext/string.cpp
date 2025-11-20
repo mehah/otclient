@@ -33,13 +33,19 @@
 
 namespace stdext
 {
+    class string_error : public exception
+    {
+    public:
+        using exception::exception;
+    };
+
     [[nodiscard]] std::string resolve_path(std::string_view filePath, std::string_view sourcePath) {
         if (filePath.starts_with("/"))
             return std::string(filePath);
 
         auto slashPos = sourcePath.find_last_of('/');
         if (slashPos == std::string::npos)
-            throw std::runtime_error("Invalid source path '" + std::string(sourcePath) + "' for file '" + std::string(filePath) + "'");
+            throw string_error("Invalid source path '" + std::string(sourcePath) + "' for file '" + std::string(filePath) + "'");
 
         return std::string(sourcePath.substr(0, slashPos + 1)) + std::string(filePath);
     }
@@ -57,7 +63,7 @@ namespace stdext
 
         char date[20];
         if (std::strftime(date, sizeof(date), format, &ts) == 0)
-            throw std::runtime_error("Failed to format date-time string");
+            throw string_error("Failed to format date-time string");
 
         return std::string(date);
     }
@@ -73,7 +79,7 @@ namespace stdext
         uint64_t num = 0;
         auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), num, 16);
         if (ec != std::errc())
-            throw std::runtime_error("Invalid hexadecimal input");
+            throw string_error("Invalid hexadecimal input");
         return num;
     }
 

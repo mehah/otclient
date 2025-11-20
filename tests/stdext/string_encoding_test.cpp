@@ -70,7 +70,7 @@ namespace {
         const std::string ascii = "Hello World 123!";
         EXPECT_EQ(stdext::latin1_to_utf8(stdext::utf8_to_latin1(ascii)), ascii);
 
-        const std::string latin1 = "Caf\xe9 na\xefve";
+        const std::string latin1 = "Caf\xE9 na\xEFve";
         EXPECT_EQ(stdext::utf8_to_latin1(stdext::latin1_to_utf8(latin1)), latin1);
     }
 
@@ -91,8 +91,8 @@ namespace {
         const std::wstring invalidSurrogate = L"\xD800";
         EXPECT_TRUE(stdext::utf16_to_utf8(invalidSurrogate).empty());
 
-        EXPECT_EQ(stdext::latin1_to_utf16("Caf\xe9"), L"Café");
-        EXPECT_EQ(stdext::utf16_to_latin1(L"Café"), "Caf\xe9");
+        EXPECT_EQ(stdext::latin1_to_utf16("Caf\xE9"), L"Café");
+        EXPECT_EQ(stdext::utf16_to_latin1(L"Café"), "Caf\xE9");
     }
 #endif
 
