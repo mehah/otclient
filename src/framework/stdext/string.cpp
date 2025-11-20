@@ -235,14 +235,18 @@ namespace stdext
 
         while (p < end) {
             const char* token_start = p;
-            while (p < end && separators.find(*p) == std::string_view::npos)
-                ++p;
 
-            if (p > token_start)
+            while (p < end && !separators.contains(*p)) {
+                ++p;
+            }
+
+            if (p > token_start) {
                 result.emplace_back(token_start, p - token_start);
+            }
 
-            while (p < end && separators.find(*p) != std::string_view::npos)
+            while (p < end && separators.contains(*p)) {
                 ++p;
+            }
         }
 
         return result;

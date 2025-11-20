@@ -26,7 +26,7 @@ option(SPEED_UP_BUILD_UNITY "Compile using build unity for speed up build" ON)
 # Cmake Features
 # *****************************************************************************
 set(GNUCXX_MINIMUM_VERSION 9)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
