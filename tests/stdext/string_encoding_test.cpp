@@ -42,6 +42,11 @@ namespace {
         EXPECT_EQ(stdext::utf8_to_latin1("\x01\x02\x03"), "");
         EXPECT_EQ(stdext::utf8_to_latin1("\x1F"), "");
         EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u0080\u0090\u009F")), "");
+
+        EXPECT_EQ(stdext::utf8_to_latin1(""), ""); // empty string
+        EXPECT_EQ(stdext::utf8_to_latin1(std::string("\x00", 1)), ""); // NULL = control → removed
+        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u00A0")), "\xA0"); // NBSP boundary
+        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u00FF")), "\xFF"); // ÿ boundary
     }
 
     TEST(StringEncoding, Latin1ToUtf8)
@@ -56,13 +61,15 @@ namespace {
 
         std::string latin1All;
         latin1All.reserve(256);
-        for(int i = 0; i < 256; ++i) {
+        for(int i = 0; i < 256; ++i)
             latin1All += static_cast<char>(i);
-        }
 
         const auto utf8Result = stdext::latin1_to_utf8(latin1All);
         EXPECT_FALSE(utf8Result.empty());
         EXPECT_TRUE(stdext::is_valid_utf8(utf8Result));
+
+        EXPECT_EQ(stdext::latin1_to_utf8(""), ""); // empty string
+        EXPECT_TRUE(stdext::is_valid_utf8(stdext::latin1_to_utf8(std::string("\x00", 1))));
     }
 
     TEST(StringEncoding, Roundtrip)
@@ -72,6 +79,8 @@ namespace {
 
         const std::string latin1 = "Caf\xE9 na\xEFve";
         EXPECT_EQ(stdext::utf8_to_latin1(stdext::latin1_to_utf8(latin1)), latin1);
+
+        EXPECT_EQ(stdext::utf8_to_latin1(stdext::latin1_to_utf8("")), "");
     }
 
 #ifdef WIN32
@@ -93,6 +102,9 @@ namespace {
 
         EXPECT_EQ(stdext::latin1_to_utf16("Caf\xE9"), L"Café");
         EXPECT_EQ(stdext::utf16_to_latin1(L"Café"), "Caf\xE9");
+
+        EXPECT_EQ(stdext::utf8_to_utf16(""), L"");
+        EXPECT_EQ(stdext::utf16_to_utf8(L""), "");
     }
 #endif
 
