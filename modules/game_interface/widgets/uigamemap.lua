@@ -22,7 +22,7 @@ function UIGameMap:onDragEnter(mousePos)
         return false
     end
 
-    if not thing:isNotMoveable() then
+    if thing:isItem() and not thing:isNotMoveable() then
         UIDragIcon:display(thing)
     end
 
