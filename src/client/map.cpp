@@ -21,26 +21,46 @@
  */
 
 #include "map.h"
+
+#include "animatedtext.h"
+#include "creatures.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "item.h"
 #include "localplayer.h"
 #include "mapview.h"
 #include "minimap.h"
 #include "missile.h"
-#include "statictext.h"
+#include "thing.h"
 #include "tile.h"
 
-#include <algorithm>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
 #include <framework/ui/uiwidget.h>
-#include <queue>
+
+namespace
+{
+void cleanNewSpectators(std::vector<CreaturePtr>& creatures, std::unordered_set<uint32_t>& seenIds, const std::size_t startIndex)
+{
+    auto it = creatures.begin() + startIndex;
+    while (it != creatures.end()) {
+        if (const auto& creature = *it; !creature || !seenIds.insert(creature->getId()).second) {
+            it = creatures.erase(it);
+            continue;
+        }
+        ++it;
+    }
+}
+}
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
 #include "towns.h"
 #endif
+#include <framework/platform/platformwindow.h>
+#include <framework/core/graphicalapplication.h>
 
 const static TilePtr m_nulltile;
 
@@ -110,7 +130,7 @@ void Map::clean()
 {
     cleanDynamicThings();
 
-    for (auto i = -1; std::cmp_less_equal(++i, g_gameConfig.getMapMaxZ());)
+    for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].tileBlocks.clear();
 
 #ifdef FRAMEWORK_EDITOR
@@ -144,7 +164,7 @@ void Map::cleanDynamicThings()
     for (const auto& widget : widgets)
         widget->destroy();
 
-    for (auto i = -1; std::cmp_less_equal(++i, g_gameConfig.getMapMaxZ());)
+    for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].missiles.clear();
 
     for (auto& floor : m_floors) {
@@ -374,12 +394,12 @@ const TilePtr& Map::getTile(const Position& pos)
 TileList Map::getTiles(const int8_t floor/* = -1*/)
 {
     TileList tiles;
-    if (std::cmp_greater(floor, g_gameConfig.getMapMaxZ()))
+    if (floor > g_gameConfig.getMapMaxZ())
         return tiles;
 
     if (floor < 0) {
         // Search all floors
-        for (auto z = -1; std::cmp_less_equal(++z, g_gameConfig.getMapMaxZ());) {
+        for (auto z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
             for (const auto& [key, block] : m_floors[z].tileBlocks) {
                 for (const auto& tile : block.getTiles()) {
                     if (tile != nullptr)
@@ -553,7 +573,7 @@ void Map::removeUnawareThings()
         } : m_awareRange;
 
         // remove tiles that we are not aware anymore
-        for (auto z = -1; std::cmp_less_equal(++z, g_gameConfig.getMapMaxZ());) {
+        for (auto z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
             auto& tileBlocks = m_floors[z].tileBlocks;
             for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
                 auto& block = it->second;
@@ -630,6 +650,10 @@ void Map::setLight(const Light& light)
 std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, const bool multiFloor, const int32_t minXRange, const int32_t maxXRange, const int32_t minYRange, const int32_t maxYRange)
 {
     std::vector<CreaturePtr> creatures;
+    creatures.reserve(m_knownCreatures.size());
+    std::unordered_set<uint32_t> seenIds;
+    seenIds.reserve(m_knownCreatures.size());
+
     uint8_t minZRange = 0;
     uint8_t maxZRange = 0;
 
@@ -638,19 +662,31 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
         maxZRange = getLastAwareFloor() - centerPos.z;
     }
 
-    //TODO: optimize
-    //TODO: delivery creatures in distance order
-    for (int iz = -minZRange; std::cmp_less_equal(iz, maxZRange); ++iz) {
-        for (int iy = -minYRange; iy <= maxYRange; ++iy) {
-            for (int ix = -minXRange; ix <= maxXRange; ++ix) {
-                if (const auto& tile = getTile(centerPos.translated(ix, iy, iz))) {
-                    const auto& tileCreatures = tile->getCreatures();
-                    creatures.insert(creatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
+    const int startZ = centerPos.z - minZRange;
+    const int endZ = centerPos.z + maxZRange;
+    const int startY = centerPos.y - minYRange;
+    const int endY = centerPos.y + maxYRange;
+    const int startX = centerPos.x - minXRange;
+    const int endX = centerPos.x + maxXRange;
+
+    const auto appendSpectatorsFromLayer = [&](const int z) {
+        for (int y = startY; y <= endY; ++y) {
+            for (int x = startX; x <= endX; ++x) {
+                const auto tile = getTile(Position(x, y, z));
+                if (!tile || !tile->hasCreatures()) {
+                    continue;
                 }
+
+                const auto sizeBeforeAppend = creatures.size();
+                tile->appendSpectators(creatures);
+                cleanNewSpectators(creatures, seenIds, sizeBeforeAppend);
             }
         }
-    }
+    };
 
+    for (int z = startZ; z <= endZ; ++z) {
+        appendSpectatorsFromLayer(z);
+    }
     return creatures;
 }
 
@@ -744,7 +780,7 @@ bool Map::isAwareOfPosition(const Position& pos, const AwareRange& awareRange) c
     Position groundedPos = pos;
     while (groundedPos.z != m_centralPosition.z) {
         if (groundedPos.z > m_centralPosition.z) {
-            if (std::cmp_equal(groundedPos.x, UINT16_MAX) || std::cmp_equal(groundedPos.y, UINT16_MAX)) // When pos == 65535,65535,15 we cant go up to 65536,65536,14
+            if (groundedPos.x == UINT16_MAX || groundedPos.y == UINT16_MAX) // When pos == 65535,65535,15 we cant go up to 65536,65536,14
                 break;
             groundedPos.coveredUp();
         } else {
@@ -851,7 +887,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
     nodes[startPos] = currentNode;
     SNode* foundNode = nullptr;
     while (currentNode) {
-        if (std::cmp_greater(nodes.size(), maxComplexity)) {
+        if (static_cast<int>(nodes.size()) > maxComplexity) {
             result = Otc::PathFindResultTooFar;
             break;
         }
@@ -1321,7 +1357,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
     std::unordered_map<Position, Node*, Position::Hasher> nodes;
     std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
 
-    Node* initNode = new Node{ .cost = 1, .totalCost = 0, .pos = start, .prev = nullptr, .distance = 0, .unseen = 0 };
+    Node* initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
     nodes[start] = initNode;
     searchList.push(initNode);
 
@@ -1387,9 +1423,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
                                                                        node->pos.toString());
                         }
                     } else {
-                        it = nodes.emplace(neighbor, new Node{ .cost = (float)speed, .totalCost = 10000000.0f,
-                                               .pos = neighbor, .prev = node, .distance = node->distance + 1,
-                                               .unseen = wasSeen ? 0 : 1 }).first;
+                        it = nodes.emplace(neighbor, new Node{ (float)speed, 10000000.0f, neighbor, node, node->distance + 1, wasSeen ? 0 : 1 }).first;
                     }
                 }
 
@@ -1469,16 +1503,39 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
     }
 
     p = 0;
+    std::unordered_set<uint32_t> seenIds;
+    seenIds.reserve(m_knownCreatures.size());
     for (int y = centerPos.y - height / 2, endy = centerPos.y + height / 2; y <= endy; ++y) {
         for (int x = centerPos.x - width / 2, endx = centerPos.x + width / 2; x <= endx; ++x) {
-            if (!finalPattern[p++])
+            const auto enabled = finalPattern[p];
+            ++p;
+            if (!enabled) {
                 continue;
-            TilePtr tile = getTile(Position(x, y, centerPos.z));
-            if (!tile)
+            }
+
+            const auto tile = getTile(Position(x, y, centerPos.z));
+            if (!tile || !tile->hasCreatures()) {
                 continue;
-            auto tileCreatures = tile->getCreatures();
-            creatures.insert(creatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
+            }
+
+            const auto sizeBeforeAppend = creatures.size();
+            tile->appendSpectators(creatures);
+            cleanNewSpectators(creatures, seenIds, sizeBeforeAppend);
         }
     }
     return creatures;
+}
+
+const TilePtr& TileBlock::create(const Position& pos)
+{
+    auto& tile = m_tiles[getTileIndex(pos)];
+    tile = std::make_shared<Tile>(pos);
+    return tile;
+}
+const TilePtr& TileBlock::getOrCreate(const Position& pos)
+{
+    auto& tile = m_tiles[getTileIndex(pos)];
+    if (!tile)
+        tile = std::make_shared<Tile>(pos);
+    return tile;
 }

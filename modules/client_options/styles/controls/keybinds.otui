@@ -213,7 +213,7 @@ UIWidget
     anchors.top: prev.bottom
     height: 305
     margin-top: 5
-    image-source: /images/game/actionbar/1pixel-down-frame
+    image-source: /images/ui/1pixel_down_frame
     image-border: 1
     background: #404040
 

@@ -25,11 +25,6 @@
 #include <framework/global.h>
 #include <framework/stdext/uri.h>
 
-#include <queue>
-
-#include <asio.hpp>
-#include <asio/ssl.hpp>
-
  //  result
 class HttpSession;
 
@@ -212,7 +207,7 @@ public:
     bool wsClose(int operationId);
     bool cancel(int id);
 
-    [[nodiscard]] const std::unordered_map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
+    const std::unordered_map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
 
     void clearDownloads() { m_downloads.clear(); }
 

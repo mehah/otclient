@@ -21,14 +21,19 @@
  */
 
 #include "effect.h"
-#include "game.h"
-#include "map.h"
-#include <client/client.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/graphics/shadermanager.h>
 
-void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
+#include "animator.h"
+#include "client.h"
+#include "game.h"
+#include "gameconfig.h"
+#include "map.h"
+#include "thingtype.h"
+#include "thingtypemanager.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/shadermanager.h"
+
+void Effect::draw(const Point& dest, const bool drawThings, LightView* lightView)
 {
     if (!canDraw() || isHided())
         return;
@@ -118,7 +123,7 @@ bool Effect::waitFor(const EffectPtr& effect)
     uint16_t minDuration = getIdleAnimator() ? getIdleAnimator()->getMinDuration() : g_gameConfig.getEffectTicksPerFrame();
     minDuration = minDuration * std::max<uint8_t>(getAnimationPhases() / 3, 1);
 
-    if (std::cmp_less_equal(ticksElapsed, minDuration))
+    if (ticksElapsed <= minDuration)
         return false;
 
     const int duration = effect->m_duration / (g_app.mustOptimize() || g_app.isForcedEffectOptimization() ? 1.5 : 3);

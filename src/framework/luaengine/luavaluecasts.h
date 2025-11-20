@@ -26,10 +26,8 @@
 
 #include "declarations.h"
 #include <framework/otml/declarations.h>
-#include <framework/platform/platform.h>
 
-#include <set>
-#include <type_traits>
+#include "framework/platform/staticdata.h"
 
 template<typename T>
 int push_internal_luavalue(T v);
@@ -127,17 +125,15 @@ inline bool luavalue_cast(const int index, unsigned long& v)
     return r;
 }
 
-template<typename T = lua_u64>
+template<typename T = lua_u64, std::enable_if_t<!std::is_same_v<T, unsigned long>, int> = 0>
 inline int push_luavalue(lua_u64 v)
-    requires (!std::is_same_v<T, unsigned long>)
 {
     push_luavalue(static_cast<double>(v));
     return 1;
 }
 
-template<typename T = lua_u64>
+template<typename T = lua_u64, std::enable_if_t<!std::is_same_v<T, unsigned long>, int> = 0>
 inline bool luavalue_cast(const int idx, lua_u64& v)
-    requires (!std::is_same_v<T, unsigned long>)
 {
     double d;
     const bool r = luavalue_cast(idx, d);
@@ -170,8 +166,8 @@ int push_luavalue(const Size& size);
 bool luavalue_cast(int index, Size& size);
 
 // device
-int push_luavalue(const Platform::Device& device);
-bool luavalue_cast(int index, Platform::Device& device);
+int push_luavalue(const Device& device);
+bool luavalue_cast(int index, Device& device);
 
 // otml nodes
 int push_luavalue(const OTMLNodePtr& node);

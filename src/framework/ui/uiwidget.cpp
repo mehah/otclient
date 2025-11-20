@@ -21,19 +21,19 @@
  */
 
 #include "uiwidget.h"
+
 #include "uianchorlayout.h"
 #include "uimanager.h"
 #include "uitranslator.h"
-
-#include <framework/core/eventdispatcher.h>
-#include <framework/luaengine/luainterface.h>
-#include <framework/otml/otmlnode.h>
-#include <framework/html/htmlnode.h>
-
-#include <framework/platform/platformwindow.h>
+#include "framework/core/eventdispatcher.h"
+#include <framework/core/graphicalapplication.h>
+#include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
-#include <framework/html/htmlmanager.h>
+#include "framework/html/htmlmanager.h"
+#include "framework/html/htmlnode.h"
+#include "framework/otml/otmlnode.h"
+#include <framework/platform/platformwindow.h>
 
 UIWidget::UIWidget()
 {
@@ -1414,8 +1414,7 @@ UIWidgetPtr UIWidget::getRootParent()
 
 UIWidgetPtr UIWidget::getChildAfter(const UIWidgetPtr& relativeChild)
 {
-    return std::cmp_equal(relativeChild->m_childIndex, m_children.size())
-        ?
+    return relativeChild->m_childIndex == static_cast<int32_t>(m_children.size()) ?
         nullptr : m_children[relativeChild->m_childIndex];
 }
 
@@ -1966,6 +1965,9 @@ bool UIWidget::onDoubleClick(const Point& mousePos)
     return callLuaField<bool>("onDoubleClick", mousePos);
 }
 
+int UIWidget::getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
+int UIWidget::getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
+std::string UIWidget::getStyleName() { return m_style->tag(); }
 UIWidgetPtr UIWidget::getHoveredChild()
 {
     const auto& hovered = g_ui.getHoveredWidget();
@@ -2035,7 +2037,7 @@ bool UIWidget::propagateOnKeyPress(const uint8_t keyCode, const int keyboardModi
             return true;
     }
 
-    if (autoRepeatTicks == 0 || std::cmp_greater_equal(autoRepeatTicks, m_autoRepeatDelay))
+    if (autoRepeatTicks == 0 || autoRepeatTicks >= m_autoRepeatDelay)
         return onKeyPress(keyCode, keyboardModifiers, autoRepeatTicks);
     return false;
 }
@@ -2357,4 +2359,9 @@ void UIWidget::setAlignSelf(AlignSelf align)
         return;
     m_flexItem.alignSelf = align;
     updateParentLayout();
+}
+
+void UIWidget::setPlacement(const std::string& placement) {
+    m_placement = Fw::translatePlacement(placement);
+    scheduleHtmlTask(PropApplyAnchorAlignment);
 }

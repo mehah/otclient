@@ -26,8 +26,7 @@
 
 ItemPtr Container::getItem(const int slot)
 {
-    if (slot < 0 || std::cmp_greater_equal(slot, m_items.size())
-        )
+    if (slot < 0 || slot >= static_cast<int>(m_items.size()))
         return nullptr;
     return m_items[slot];
 }
@@ -48,7 +47,7 @@ void Container::onAddItem(const ItemPtr& item, int slot)
     slot -= m_firstIndex;
 
     // indicates that there is a new item on next page
-    if (m_hasPages && std::cmp_greater(slot, m_capacity)) {
+    if (m_hasPages && slot > m_capacity) {
         callLuaField("onSizeChange", ++m_size);
         return;
     }
@@ -85,8 +84,7 @@ void Container::onAddItems(const std::vector<ItemPtr>& items)
 void Container::onUpdateItem(int slot, const ItemPtr& item)
 {
     slot -= m_firstIndex;
-    if (slot < 0 || std::cmp_greater_equal(slot, m_items.size())
-        ) {
+    if (slot < 0 || slot >= static_cast<int>(m_items.size())) {
         g_logger.traceError("slot not found");
         return;
     }
@@ -103,14 +101,12 @@ void Container::onRemoveItem(int slot, const ItemPtr& lastItem)
     slot -= m_firstIndex;
 
     // indicates that there has been deleted an item on next page
-    if (m_hasPages && std::cmp_greater_equal(slot, m_items.size())
-    ) {
+    if (m_hasPages && slot >= static_cast<int>(m_items.size())) {
         callLuaField("onSizeChange", --m_size);
         return;
     }
 
-    if (slot < 0 || std::cmp_greater_equal(slot, m_items.size())
-    ) {
+    if (slot < 0 || slot >= static_cast<int>(m_items.size())) {
         g_logger.traceError("slot not found");
         return;
     }
@@ -133,6 +129,6 @@ void Container::onRemoveItem(int slot, const ItemPtr& lastItem)
 
 void Container::updateItemsPositions()
 {
-    for (int slot = 0; std::cmp_less(slot, m_items.size()); ++slot)
+    for (int slot = 0; slot < static_cast<int>(m_items.size()); ++slot)
         m_items[slot]->setPosition(getSlotPosition(slot));
 }

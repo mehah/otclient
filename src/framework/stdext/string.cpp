@@ -20,14 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include <algorithm>
-#include <ranges>
-#include <vector>
-#include <charconv>
-
-#include "exception.h"
-#include "types.h"
-
 #ifdef _MSC_VER
 #pragma warning(disable:4267) // '?' : conversion from 'A' to 'B', possible loss of data
 #endif
@@ -125,8 +117,8 @@ namespace stdext
     }
 
 #ifdef WIN32
-#include <winsock2.h>
 #include <windows.h>
+#include <winsock2.h>
 
     std::wstring utf8_to_utf16(const std::string_view src)
     {

@@ -20,23 +20,24 @@
 * THE SOFTWARE.
 */
 
-#include "protocolgame.h"
-
-#include "effect.h"
-#include "framework/net/inputmessage.h"
-
+#include "animatedtext.h"
+#include "attachedeffect.h"
 #include "attachedeffectmanager.h"
+#include "effect.h"
+#include "game.h"
+#include "gameconfig.h"
 #include "item.h"
 #include "localplayer.h"
+#include "protocolgame.h"
+#include "protocolcodes.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
+#include "mapview.h"
 #include "missile.h"
-#include "outfit.h"
+#include "thingtype.h"
 #include "thingtypemanager.h"
-#include "tile.h"
-#include <ctime>
-
-#include <framework/core/eventdispatcher.h>
+#include "framework/core/eventdispatcher.h"
+#include "framework/net/inputmessage.h"
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {
@@ -607,21 +608,46 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerStoreCompletePurchase:
                     parseCompleteStorePurchase(msg);
                     break;
-                default:
-                    throw Exception("unhandled opcode {}", opcode);
+                default: {
+                    const auto unreadSize = msg->getUnreadSize();
+                    const auto previewSize = std::min<size_t>(unreadSize, 32);
+                    const auto remainingBytes = msg->peekBytes(previewSize);
+
+                    std::stringstream hexDump;
+                    for (const auto byte : remainingBytes) {
+                        hexDump << fmt::format("{:02X} ", byte);
+                    }
+
+                    g_logger.warning(
+                        "Unhandled opcode 0x{:02X} ({}) with {} unread bytes; previous opcode: 0x{:02X} ({}); next bytes: {}",
+                        opcode, opcode, unreadSize, prevOpcode, prevOpcode, hexDump.str());
+                    msg->setReadPos(msg->getMessageSize());
+                    break;
+                }
             }
             prevOpcode = opcode;
         }
     } catch (const stdext::exception& e) {
+        const auto unread = msg->getUnreadSize();
+        const auto readPos = msg->getReadPos();
+        const auto remainingBytes = msg->peekBytes(unread);
+
+        std::stringstream hexDump;
+        for (const auto byte : remainingBytes) {
+            hexDump << fmt::format("{:02X} ", byte);
+        }
+
         g_logger.error(
-            "ProtocolGame parse message exception ({} bytes, {} unread, last opcode is 0x{:02X} ({}), prev opcode is 0x{:02X} ({})): {}\n"
-            "Packet has been saved to packet.log, you can use it to find what was wrong. (Protocol: {})",
+            "ProtocolGame parse message exception ({} bytes, {} unread at pos {}, last opcode: 0x{:02X} ({:d}), prev opcode: 0x{:02X} ({:d}), protocol: {}): {}\n"
+            "Next unread bytes: {}\n",
             msg->getMessageSize(),
-            msg->getUnreadSize(),
+            unread,
+            readPos,
             opcode, opcode,
             prevOpcode, prevOpcode,
+            g_game.getProtocolVersion(),
             e.what(),
-            g_game.getProtocolVersion()
+            hexDump.str()
         );
 
         std::ofstream packet("packet.log", std::ios::app);
@@ -630,15 +656,13 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
         }
 
         packet << fmt::format(
-            "ProtocolGame parse message exception ({} bytes, {} unread, last opcode is 0x{:02X} ({}), prev opcode is 0x{:02X} ({}), proto: {}): {}\n",
-            msg->getMessageSize(),
-            msg->getUnreadSize(),
-            opcode,
-            opcode,
-            prevOpcode,
-            prevOpcode,
+            "[EXCEPTION] {} unread bytes at pos: {}, protocol: {}, current: 0x{:02X} ({:d}), prev: 0x{:02X} ({:d}), error: {}\nBytes: {}\n",
+            unread, readPos,
             g_game.getProtocolVersion(),
-            e.what()
+            opcode, opcode,
+            prevOpcode, prevOpcode,
+            e.what(),
+            hexDump.str()
         );
     }
 }
@@ -783,7 +807,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
     const uint16_t categoryCount = msg->getU16();
     std::vector<StoreCategory> categories;
 
-    for (auto i = 0; std::cmp_less(i, categoryCount); ++i) {
+    for (auto i = 0; i < categoryCount; ++i) {
         StoreCategory category;
         category.name = msg->getString();
 
@@ -798,7 +822,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
         }
 
         const uint8_t iconCount = msg->getU8();
-        for (auto j = 0; std::cmp_less(j, iconCount); ++j) {
+        for (auto j = 0; j < iconCount; ++j) {
             category.icons.push_back(msg->getString());
         }
 
@@ -916,7 +940,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
 
     const uint8_t entries = msg->getU8();
     std::vector<std::tuple<uint32_t, uint8_t, int32_t, uint8_t, std::string>> historyData;
-    for (auto i = 0; std::cmp_less(i, entries); ++i) {
+    for (auto i = 0; i < entries; ++i) {
         if (g_game.getClientVersion() >= 1291) {
             msg->getU32(); // transactionId
             const uint32_t time = msg->getU32();
@@ -953,7 +977,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 
         msg->getU8(); //  -- sort by 0 - most popular, 1 - alphabetically, 2 - newest
         const uint8_t dropMenuShowAll = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, dropMenuShowAll); ++i) {
+        for (auto i = 0; i < dropMenuShowAll; ++i) {
             const auto& menu = msg->getString();
             storeData.menuFilter.push_back(menu);
         }
@@ -964,7 +988,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
         if (g_game.getClientVersion() >= 1310) {
             const uint16_t disableReasonsSize = msg->getU16();
 
-            for (auto i = 0; std::cmp_less(i, disableReasonsSize); ++i) {
+            for (auto i = 0; i < disableReasonsSize; ++i) {
                 const auto& reason = msg->getString();
                 storeData.disableReasons.push_back(reason);
             }
@@ -972,7 +996,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 
         const uint16_t offersCount = msg->getU16();
         if (storeData.categoryName == "Home") {
-            for (auto i = 0; std::cmp_less(i, offersCount); ++i) {
+            for (auto i = 0; i < offersCount; ++i) {
                 HomeOffer offer;
                 offer.name = msg->getString();
                 offer.unknownByte = msg->getU8();
@@ -1020,7 +1044,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 
             const uint8_t bannerCount = msg->getU8();
 
-            for (auto i = 0; std::cmp_less(i, bannerCount); ++i) {
+            for (auto i = 0; i < bannerCount; ++i) {
                 Banner banner;
                 banner.image = msg->getString();
                 banner.bannerType = msg->getU8();
@@ -1036,12 +1060,12 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
             return;
         }
 
-        for (auto i = 0; std::cmp_less(i, offersCount); ++i) {
+        for (auto i = 0; i < offersCount; ++i) {
             StoreOffer offer;
             offer.name = msg->getString();
 
             const uint8_t subOffersCount = msg->getU8();
-            for (auto j = 0; std::cmp_less(j, subOffersCount); ++j) {
+            for (auto j = 0; j < subOffersCount; ++j) {
                 SubOffer subOffer{};
                 subOffer.id = msg->getU32();
                 subOffer.count = msg->getU16();
@@ -1050,7 +1074,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
                 subOffer.disabled = msg->getU8() == 1;
                 if (subOffer.disabled) {
                     const uint8_t reason = msg->getU8();
-                    for (auto k = 0; std::cmp_less(k, reason); ++k) {
+                    for (auto k = 0; k < reason; ++k) {
                         if (g_game.getClientVersion() >= 1300) {
                             subOffer.reasonIdDisable = msg->getU16();
                         } else {
@@ -1102,7 +1126,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
             offer.stateNewUntil = msg->getU32();
             offer.configurable = msg->getU8() == 1;
             offer.productsCapacity = msg->getU16();
-            for (auto j = 0; std::cmp_less(j, offer.productsCapacity); ++j) {
+            for (auto j = 0; j < offer.productsCapacity; ++j) {
                 msg->getString();
                 msg->getU8(); // info in description?
                 msg->getU16();
@@ -1120,7 +1144,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
         storeData.categoryName = msg->getString(); // categoryName
 
         const uint16_t offersCount = msg->getU16();
-        for (auto i = 0; std::cmp_less(i, offersCount); ++i) {
+        for (auto i = 0; i < offersCount; ++i) {
             StoreOffer offer;
             offer.id = msg->getU32(); // offerId
             offer.name = msg->getString(); // offerName
@@ -1142,19 +1166,19 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
             }
 
             const uint8_t iconCount = msg->getU8();
-            for (auto j = 0; std::cmp_less(j, iconCount); ++j) {
+            for (auto j = 0; j < iconCount; ++j) {
                 offer.icon = msg->getString(); // icon
             }
 
             const uint16_t subOffersCount = msg->getU16();
 
-            for (auto j = 0; std::cmp_less(j, subOffersCount); ++j) {
+            for (auto j = 0; j < subOffersCount; ++j) {
                 SubOffer subOffer;
                 subOffer.name = msg->getString(); // name
                 subOffer.description = msg->getString(); // description
 
                 const uint8_t subIconsCount = msg->getU8();
-                for (auto k = 0; std::cmp_less(k, subIconsCount); ++k) {
+                for (auto k = 0; k < subIconsCount; ++k) {
                     subOffer.icons.push_back(msg->getString()); // icon
                 }
                 subOffer.parent = msg->getString(); // serviceType
@@ -1225,7 +1249,7 @@ void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
 
     std::vector<uint8_t> actions;
 
-    for (auto i = 0; std::cmp_less(i, numViolationReasons); ++i) {
+    for (auto i = 0; i < numViolationReasons; ++i) {
         actions.push_back(msg->getU8());
     }
 
@@ -1399,7 +1423,7 @@ void ProtocolGame::parseUpdateTile(const InputMessagePtr& msg)
 void ProtocolGame::parseTileAddThing(const InputMessagePtr& msg)
 {
     const auto& pos = getPosition(msg);
-    const int stackPos = g_game.getClientVersion() >= 841 ? msg->getU8() : -1;
+    const int stackPos = g_game.getFeature(Otc::GameTileAddThingWithStackpos) ? msg->getU8() : -1;
     const auto& thing = getThing(msg);
 
     g_map.addThing(thing, pos, stackPos);
@@ -1487,14 +1511,14 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     std::vector<ItemPtr> items;
     items.reserve(itemCount);
 
-    for (auto i = 0; std::cmp_less(i, itemCount); i++) {
+    for (auto i = 0; i < itemCount; i++) {
         items.push_back(getItem(msg));
     }
 
     if (g_game.getFeature(Otc::GameContainerFilter)) {
         msg->getU8(); // category
         const uint8_t categoriesSize = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, categoriesSize); ++i) {
+        for (auto i = 0; i < categoriesSize; ++i) {
             msg->getU8(); // id
             msg->getString(); // name
         }
@@ -1557,7 +1581,7 @@ void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg)
     const uint16_t bosstiaryRaceLast = msg->getU16();
     std::vector<BosstiaryData> bossData;
 
-    for (auto i = 0; std::cmp_less(i, bosstiaryRaceLast); ++i) {
+    for (auto i = 0; i < bosstiaryRaceLast; ++i) {
         BosstiaryData boss;
         boss.raceId = msg->getU32();
         boss.category = msg->getU8();
@@ -1588,7 +1612,7 @@ void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
     std::vector<std::tuple<std::string, std::string>> descriptions;
     descriptions.reserve(descriptionsSize);
 
-    for (auto i = 0; std::cmp_less(i, descriptionsSize); ++i) {
+    for (auto i = 0; i < descriptionsSize; ++i) {
         const auto& firstDescription = msg->getString();
         const auto& secondDescription = msg->getString();
         descriptions.emplace_back(firstDescription, secondDescription);
@@ -1625,7 +1649,7 @@ void ProtocolGame::parseOpenNpcTrade(const InputMessagePtr& msg)
     const uint16_t listCount = g_game.getClientVersion() >= 900 ? msg->getU16() : msg->getU8();
     std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>> items;
 
-    for (auto i = 0; std::cmp_less(i, listCount); ++i) {
+    for (auto i = 0; i < listCount; ++i) {
         const uint16_t itemId = msg->getU16();
         const uint8_t itemCount = msg->getU8();
 
@@ -1656,7 +1680,7 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
     const uint8_t itemsListSize = g_game.getClientVersion() >= 1334 ? msg->getU16() : msg->getU8();
     std::vector<std::tuple<ItemPtr, uint16_t>> goods;
 
-    for (auto i = 0; std::cmp_less(i, itemsListSize); ++i) {
+    for (auto i = 0; i < itemsListSize; ++i) {
         const uint16_t itemId = msg->getU16();
         const uint16_t itemAmount = g_game.getFeature(Otc::GameDoubleShopSellAmount) ? msg->getU16() : msg->getU8();
 
@@ -1676,7 +1700,7 @@ void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
     std::vector<ItemPtr> items;
     items.reserve(count);
 
-    for (auto i = 0; std::cmp_less(i, count); i++) {
+    for (auto i = 0; i < count; i++) {
         items.push_back(getItem(msg));
     }
 
@@ -1691,7 +1715,7 @@ void ProtocolGame::parseCounterTrade(const InputMessagePtr& msg)
     std::vector<ItemPtr> items;
     items.reserve(count);
 
-    for (auto i = 0; std::cmp_less(i, count); i++) {
+    for (auto i = 0; i < count; i++) {
         items.push_back(getItem(msg));
     }
 
@@ -1851,12 +1875,12 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
 void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 {
     const uint8_t classSize = msg->getU8();
-    for (auto i = 0; std::cmp_less(i, classSize); ++i) {
+    for (auto i = 0; i < classSize; ++i) {
         msg->getU8(); // class id
 
         // tiers
         const uint8_t tiersSize = msg->getU8();
-        for (auto j = 0; std::cmp_less(j, tiersSize); ++j) {
+        for (auto j = 0; j < tiersSize; ++j) {
             msg->getU8(); // tier id
             msg->getU64(); // upgrade cost
         }
@@ -1864,7 +1888,7 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 
     if (g_game.getFeature(Otc::GameDynamicForgeVariables)) {
         const uint8_t grades = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, grades); ++i) {
+        for (auto i = 0; i < grades; ++i) {
             msg->getU8(); // Tier
             msg->getU8(); // Exalted cores
         }
@@ -1872,14 +1896,14 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
         if (g_game.getFeature(Otc::GameForgeConvergence)) {
             // Convergence fusion prices per tier
             const uint8_t totalConvergenceFusion = msg->getU8(); // total size count
-            for (auto i = 0; std::cmp_less(i, totalConvergenceFusion); ++i) {
+            for (auto i = 0; i < totalConvergenceFusion; ++i) {
                 msg->getU8(); // tier id
                 msg->getU64(); // upgrade cost
             }
 
             // Convergence transfer prices per tier
             const uint8_t totalConvergenceTransfer = msg->getU8(); // total size count
-            for (auto i = 0; std::cmp_less(i, totalConvergenceTransfer); ++i) {
+            for (auto i = 0; i < totalConvergenceTransfer; ++i) {
                 msg->getU8(); // tier id
                 msg->getU64(); // upgrade cost
             }
@@ -1917,7 +1941,7 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
             totalForgeValues = totalForgeValues + 2;
         }
 
-        for (auto i = 0; std::cmp_less(i, totalForgeValues); ++i) {
+        for (auto i = 0; i < totalForgeValues; ++i) {
             msg->getU8(); // Forge values
         }
     }
@@ -1945,7 +1969,7 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
         g_logger.traceError("ProtocolGame::parseTrappers: too many trappers");
     }
 
-    for (auto i = 0; std::cmp_less(i, numTrappers); ++i) {
+    for (auto i = 0; i < numTrappers; ++i) {
         const uint32_t creatureId = msg->getU32();
         const auto& creature = g_map.getCreatureById(creatureId);
         if (!creature) {
@@ -1962,7 +1986,7 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
 
     const uint16_t fusionCount = msg->getU16();
     data.fusionItems.reserve(fusionCount);
-    for (auto i = 0; std::cmp_less(i, fusionCount); ++i) {
+    for (auto i = 0; i < fusionCount; ++i) {
         ForgeItemInfo item;
         msg->getU8(); // unknown count of friend items
         item.id = msg->getU16();
@@ -1973,11 +1997,11 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
 
     const uint16_t convergenceFusionCount = msg->getU16();
     data.convergenceFusion.reserve(convergenceFusionCount);
-    for (auto i = 0; std::cmp_less(i, convergenceFusionCount); ++i) {
+    for (auto i = 0; i < convergenceFusionCount; ++i) {
         const uint8_t items = msg->getU8();
         std::vector<ForgeItemInfo> slotItems;
         slotItems.reserve(items);
-        for (auto j = 0; std::cmp_less(j, items); ++j) {
+        for (auto j = 0; j < items; ++j) {
             ForgeItemInfo item;
             item.id = msg->getU16();
             item.tier = msg->getU8();
@@ -1989,11 +2013,11 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
 
     const uint8_t transferTotalCount = msg->getU8();
     data.transfers.reserve(transferTotalCount);
-    for (auto i = 0; std::cmp_less(i, transferTotalCount); ++i) {
+    for (auto i = 0; i < transferTotalCount; ++i) {
         ForgeTransferData transfer;
         const uint16_t donorCount = msg->getU16();
         transfer.donors.reserve(donorCount);
-        for (auto j = 0; std::cmp_less(j, donorCount); ++j) {
+        for (auto j = 0; j < donorCount; ++j) {
             ForgeItemInfo donor;
             donor.id = msg->getU16();
             donor.tier = msg->getU8();
@@ -2002,7 +2026,7 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
         }
         const uint16_t receiverCount = msg->getU16();
         transfer.receivers.reserve(receiverCount);
-        for (auto j = 0; std::cmp_less(j, receiverCount); ++j) {
+        for (auto j = 0; j < receiverCount; ++j) {
             ForgeItemInfo receiver;
             receiver.id = msg->getU16();
             receiver.count = msg->getU16();
@@ -2014,11 +2038,11 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
 
     const uint8_t convergenceTransferCount = msg->getU8();
     data.convergenceTransfers.reserve(convergenceTransferCount);
-    for (auto i = 0; std::cmp_less(i, convergenceTransferCount); ++i) {
+    for (auto i = 0; i < convergenceTransferCount; ++i) {
         ForgeTransferData transfer;
         const uint16_t donorCount = msg->getU16();
         transfer.donors.reserve(donorCount);
-        for (auto j = 0; std::cmp_less(j, donorCount); ++j) {
+        for (auto j = 0; j < donorCount; ++j) {
             ForgeItemInfo donor;
             donor.id = msg->getU16();
             donor.tier = msg->getU8();
@@ -2027,7 +2051,7 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
         }
         const uint16_t receiverCount = msg->getU16();
         transfer.receivers.reserve(receiverCount);
-        for (auto j = 0; std::cmp_less(j, receiverCount); ++j) {
+        for (auto j = 0; j < receiverCount; ++j) {
             ForgeItemInfo receiver;
             receiver.id = msg->getU16();
             receiver.count = msg->getU16();
@@ -2060,7 +2084,7 @@ void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const uint32_t cr
 
     const uint8_t sizeIcons = msg->getU8();
     std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> icons; // icon, category, count
-    for (auto i = 0; std::cmp_less(i, sizeIcons); ++i) {
+    for (auto i = 0; i < sizeIcons; ++i) {
         const uint8_t icon = msg->getU8(); // icon.serialize()
         const uint8_t category = msg->getU8(); // icon.category -- 0x00 = monster // 0x01 = player?
         const uint16_t count = msg->getU16(); // icon.count
@@ -2248,7 +2272,7 @@ void ProtocolGame::parsePremiumTrigger(const InputMessagePtr& msg)
     const uint8_t triggerCount = msg->getU8();
     std::vector<uint8_t> triggers;
 
-    for (auto i = 0; std::cmp_less(i, triggerCount); ++i) {
+    for (auto i = 0; i < triggerCount; ++i) {
         triggers.push_back(msg->getU8());
     }
 
@@ -2274,7 +2298,7 @@ void ProtocolGame::parsePlayerInfo(const InputMessagePtr& msg) const
     const uint16_t spellCount = msg->getU16();
     std::vector<uint16_t> spells;
 
-    for (auto i = 0; std::cmp_less(i, spellCount); ++i) {
+    for (auto i = 0; i < spellCount; ++i) {
         if (g_game.getFeature(Otc::GameUshortSpell)) {
             spells.push_back(msg->getU16()); // spell id
         } else {
@@ -2436,7 +2460,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 
     if (g_game.getFeature(Otc::GameForgeSkillStats)) {
         const uint8_t lastSkill = g_game.getClientVersion() >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
-        for (int_fast32_t skill = Otc::Fatal; std::cmp_less(skill, lastSkill); ++skill) {
+        for (int_fast32_t skill = Otc::Fatal; skill < lastSkill; ++skill) {
             const uint16_t level = msg->getU16();
             const uint16_t baseLevel = msg->getU16();
             m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, 0);
@@ -2488,7 +2512,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         // Combat absorb values
         const uint8_t combatsCount = msg->getU8();
         std::map<uint8_t, double> absorbValues;
-        for (int i = 0; std::cmp_less(i, combatsCount); i++) {
+        for (int i = 0; i < combatsCount; i++) {
             const uint8_t combatType = msg->getU8();
             const double value = msg->getDouble();
             absorbValues[combatType] = value;
@@ -2621,7 +2645,7 @@ void ProtocolGame::parseChannelList(const InputMessagePtr& msg)
     const uint8_t channelListSize = msg->getU8();
     std::vector<std::tuple<uint16_t, std::string>> channelList;
 
-    for (auto i = 0; std::cmp_less(i, channelListSize); ++i) {
+    for (auto i = 0; i < channelListSize; ++i) {
         const uint16_t channelId = msg->getU16();
         const auto& channelName = msg->getString();
         channelList.emplace_back(channelId, channelName);
@@ -2637,12 +2661,12 @@ void ProtocolGame::parseOpenChannel(const InputMessagePtr& msg)
 
     if (g_game.getFeature(Otc::GameChannelPlayerList)) {
         const uint16_t joinedPlayers = msg->getU16();
-        for (auto i = 0; std::cmp_less(i, joinedPlayers); ++i) {
+        for (auto i = 0; i < joinedPlayers; ++i) {
             g_game.formatCreatureName(msg->getString()); // player name
         }
 
         const uint16_t invitedPlayers = msg->getU16();
-        for (auto i = 0; std::cmp_less(i, invitedPlayers); ++i) {
+        for (auto i = 0; i < invitedPlayers; ++i) {
             g_game.formatCreatureName(msg->getString()); // player name
         }
     }
@@ -2855,7 +2879,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
 
     if (g_game.getFeature(Otc::GameNewOutfitProtocol)) {
         const uint16_t outfitCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
-        for (auto i = 0; std::cmp_less(i, outfitCount); ++i) {
+        for (auto i = 0; i < outfitCount; ++i) {
             const uint16_t outfitId = msg->getU16();
             const auto& outfitName = msg->getString();
             const uint8_t outfitAddons = msg->getU8();
@@ -2889,7 +2913,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
 
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
         const uint16_t mountCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
-        for (auto i = 0; std::cmp_less(i, mountCount); ++i) {
+        for (auto i = 0; i < mountCount; ++i) {
             const uint16_t mountId = msg->getU16(); // mount type
             const auto& mountName = msg->getString(); // mount name
             uint8_t mountMode = 0;
@@ -2907,7 +2931,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
     std::vector<std::tuple<uint16_t, std::string> > familiarList;
     if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
         const uint16_t familiarCount = msg->getU16();
-        for (auto i = 0; std::cmp_less(i, familiarCount); ++i) {
+        for (auto i = 0; i < familiarCount; ++i) {
             const uint16_t familiarLookType = msg->getU16(); // familiar lookType
             const auto& familiarName = msg->getString(); // familiar name
             const uint8_t familiarMode = msg->getU8(); // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
@@ -2931,28 +2955,28 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
 
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
         const uint8_t wingCount = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, wingCount); ++i) {
+        for (auto i = 0; i < wingCount; ++i) {
             const uint16_t wingId = msg->getU16();
             const auto& wingName = msg->getString();
             wingList.emplace_back(wingId, wingName);
         }
 
         const uint8_t auraCount = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, auraCount); ++i) {
+        for (auto i = 0; i < auraCount; ++i) {
             const uint16_t auraId = msg->getU16();
             const auto& auraName = msg->getString();
             auraList.emplace_back(auraId, auraName);
         }
 
         const uint8_t effectCount = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, effectCount); ++i) {
+        for (auto i = 0; i < effectCount; ++i) {
             const uint16_t effectId = msg->getU16();
             const auto& effectName = msg->getString();
             effectList.emplace_back(effectId, effectName);
         }
 
         const uint8_t shaderCount = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, shaderCount); ++i) {
+        for (auto i = 0; i < shaderCount; ++i) {
             const uint16_t shaderId = msg->getU16();
             const auto& shaderName = msg->getString();
             shaderList.emplace_back(shaderId, shaderName);
@@ -3009,7 +3033,7 @@ void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
     std::vector<ItemPtr> dropItems;
 
     dropItems.reserve(corpseItemsSize);
-    for (auto i = 0; std::cmp_less(i, corpseItemsSize); ++i) {
+    for (auto i = 0; i < corpseItemsSize; ++i) {
         dropItems.push_back(getItem(msg));
     }
 
@@ -3036,7 +3060,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     if (g_game.getFeature(Otc::GameVipGroups)) {
         const uint8_t vipGroupSize = msg->getU8();
         groupIDs.reserve(vipGroupSize);
-        for (auto i = 0; std::cmp_less(i, vipGroupSize); ++i) {
+        for (auto i = 0; i < vipGroupSize; ++i) {
             const uint8_t groupID = msg->getU8();
             groupIDs.push_back(groupID);
         }
@@ -3059,7 +3083,7 @@ void ProtocolGame::parseVipLogout(const InputMessagePtr& msg)
     if (g_game.getFeature(Otc::GameVipGroups)) {
         const uint8_t vipGroupSize = msg->getU8();
         std::vector<std::tuple<uint8_t, std::string, bool>> vipGroups;
-        for (auto i = 0; std::cmp_less(i, vipGroupSize); ++i) {
+        for (auto i = 0; i < vipGroupSize; ++i) {
             const uint8_t groupId = msg->getU8();
             const auto& groupName = msg->getString();
             const bool canEditGroup = static_cast<bool>(msg->getU8());
@@ -3078,7 +3102,7 @@ void ProtocolGame::parseBestiaryRaces(const InputMessagePtr& msg)
     std::vector<CyclopediaBestiaryRace> bestiaryData;
 
     const uint16_t bestiaryRaceLast = msg->getU16();
-    for (auto i = 0; std::cmp_less(i, bestiaryRaceLast); ++i) {
+    for (auto i = 0; i < bestiaryRaceLast; ++i) {
         CyclopediaBestiaryRace race;
         race.race = i;
         race.bestClass = msg->getString();
@@ -3097,7 +3121,7 @@ void ProtocolGame::parseBestiaryOverview(const InputMessagePtr& msg)
     const uint16_t raceSize = msg->getU16();
     std::vector<BestiaryOverviewMonsters> data;
 
-    for (auto i = 0; std::cmp_less(i, raceSize); ++i) {
+    for (auto i = 0; i < raceSize; ++i) {
         const uint16_t raceId = msg->getU16();
         const uint8_t progress = msg->getU8();
         uint8_t occurrence = 0;
@@ -3147,7 +3171,7 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
     data.ocorrence = msg->getU8();
 
     const uint8_t lootCount = msg->getU8();
-    for (auto i = 0; std::cmp_less(i, lootCount); ++i) {
+    for (auto i = 0; i < lootCount; ++i) {
         LootItem lootItem;
         lootItem.itemId = msg->getU16();
         lootItem.diffculty = msg->getU8();
@@ -3174,7 +3198,7 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
 
     if (data.currentLevel > 2) {
         const uint8_t elementsCount = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, elementsCount); ++i) {
+        for (auto i = 0; i < elementsCount; ++i) {
             const uint8_t elementId = msg->getU8();
             const uint16_t elementValue = msg->getU16();
             data.combat[elementId] = elementValue;
@@ -3211,7 +3235,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
     const uint8_t charmsAmount = msg->getU8();
     charmData.charms.reserve(charmsAmount);
 
-    for (auto i = 0; std::cmp_less(i, charmsAmount); ++i) {
+    for (auto i = 0; i < charmsAmount; ++i) {
         CharmData charm;
         charm.id = msg->getU8();
         charm.asignedStatus = false;
@@ -3255,7 +3279,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
     const uint16_t finishedMonstersSize = msg->getU16();
     charmData.finishedMonsters.reserve(finishedMonstersSize);
 
-    for (auto i = 0; std::cmp_less(i, finishedMonstersSize); ++i) {
+    for (auto i = 0; i < finishedMonstersSize; ++i) {
         uint32_t raceId;
         if (g_game.getClientVersion() >= 1410) {
             raceId = msg->getU32();
@@ -3293,7 +3317,7 @@ void ProtocolGame::parseQuestLog(const InputMessagePtr& msg)
     const uint16_t questsCount = msg->getU16();
     std::vector<std::tuple<uint16_t, std::string, bool>> questList;
 
-    for (auto i = 0; std::cmp_less(i, questsCount); ++i) {
+    for (auto i = 0; i < questsCount; ++i) {
         const uint16_t id = msg->getU16();
         const auto& questName = msg->getString();
         const bool questCompleted = static_cast<bool>(msg->getU8());
@@ -3310,7 +3334,7 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
     const uint8_t missionCount = msg->getU8();
     std::vector<std::tuple<std::string, std::string, uint16_t>> questMissions;
 
-    for (auto i = 0; std::cmp_less(i, missionCount); ++i) {
+    for (auto i = 0; i < missionCount; ++i) {
         auto missionId = 0;
         if (g_game.getClientVersion() >= 1200) {
             missionId = msg->getU16();
@@ -3337,7 +3361,7 @@ void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
     const uint8_t listCount = msg->getU8();
     std::vector<std::tuple<ItemPtr, std::string>> itemList;
 
-    for (auto i = 0; std::cmp_less(i, listCount); ++i) {
+    for (auto i = 0; i < listCount; ++i) {
         const auto& item = std::make_shared<Item>();
         item->setId(msg->getU16());
         item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
@@ -3351,10 +3375,34 @@ void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
 void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 {
     const uint16_t size = msg->getU16();
-    for (auto i = 0; std::cmp_less(i, size); ++i) {
-        msg->getU16(); // id
-        msg->getU8(); // subtype
-        msg->getU16(); // count
+    constexpr uint16_t MAX_INVENTORY_TYPES = 10000;
+    if (size > MAX_INVENTORY_TYPES) {
+        g_logger.warning("[game_actionBar][parsePlayerInventory]: inventory size {} exceeds maximum allowed {}", size, MAX_INVENTORY_TYPES);
+        return;
+    }
+    std::map<std::pair<uint16_t, uint8_t>, uint16_t> inventoryCounts;
+
+    for (uint16_t i = 0; std::cmp_less(i, size); ++i) {
+        const uint16_t itemId = msg->getU16();
+        const uint8_t attribute = msg->getU8();
+        const uint16_t amount = msg->getU16();
+
+        uint8_t tier = 0;
+        if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem)) {
+            if (std::cmp_greater(thingType->getClassification(), 0)) {
+                tier = attribute;
+            }
+        }
+
+        const auto key = std::make_pair(itemId, tier);
+        auto& entry = inventoryCounts[key];
+        const uint32_t sum = static_cast<uint32_t>(entry) + amount;
+        entry = static_cast<uint16_t>(std::min<uint32_t>(sum, (std::numeric_limits<uint16_t>::max)()));
+    }
+
+    if (const auto& localPlayer = g_game.getLocalPlayer()) {
+        localPlayer->setInventoryCountCache(std::move(inventoryCounts));
+        g_lua.callGlobalField("g_game", "updateInventoryItems");
     }
 }
 
@@ -3367,7 +3415,7 @@ void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
     const uint8_t buttonsCount = msg->getU8();
     std::vector<std::tuple<uint8_t, std::string>> buttonList;
 
-    for (auto i = 0; std::cmp_less(i, buttonsCount); ++i) {
+    for (auto i = 0; i < buttonsCount; ++i) {
         const auto& value = msg->getString();
         const uint8_t buttonId = msg->getU8();
         buttonList.emplace_back(buttonId, value);
@@ -3376,7 +3424,7 @@ void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
     const uint8_t choicesCount = msg->getU8();
     std::vector<std::tuple<uint8_t, std::string>> choiceList;
 
-    for (auto i = 0; std::cmp_less(i, choicesCount); ++i) {
+    for (auto i = 0; i < choicesCount; ++i) {
         const auto& value = msg->getString();
         const uint8_t choideId = msg->getU8();
         choiceList.emplace_back(choideId, value);
@@ -3469,7 +3517,7 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, const int x, co
     int endz;
     int zstep;
 
-    if (std::cmp_greater(z, g_gameConfig.getMapSeaFloor())) {
+    if (z > g_gameConfig.getMapSeaFloor()) {
         startz = z - g_gameConfig.getMapAwareUndergroundFloorRange();
         endz = std::min<int>(z + g_gameConfig.getMapAwareUndergroundFloorRange(), g_gameConfig.getMapMaxZ());
         zstep = 1;
@@ -3519,7 +3567,7 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
             continue;
         }
 
-        if (std::cmp_greater(stackPos, g_gameConfig.getTileMaxThings())) {
+        if (stackPos > g_gameConfig.getTileMaxThings()) {
             g_logger.traceError("ProtocolGame::setTileDescription: too many things, pos={}, stackpos={}", position, stackPos);
         }
 
@@ -3811,7 +3859,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         std::vector<uint16_t> attachedEffectList;
         if (g_game.getFeature(Otc::GameCreatureAttachedEffect)) {
             const uint8_t listSize = msg->getU8();
-            for (auto i = -1; std::cmp_less(++i, listSize);) {
+            for (auto i = -1; ++i < listSize;) {
                 attachedEffectList.push_back(msg->getU16());
             }
         }
@@ -4060,7 +4108,7 @@ void ProtocolGame::parseBestiaryTracker(const InputMessagePtr& msg)
     const uint8_t size = msg->getU8();
     std::vector<std::tuple<uint16_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t>> trackerData;
 
-    for (auto i = 0; std::cmp_less(i, size); ++i) {
+    for (auto i = 0; i < size; ++i) {
         const uint16_t raceID = msg->getU16();
         const uint32_t killCount = msg->getU32();
         const uint16_t firstUnlock = msg->getU16();
@@ -4076,13 +4124,13 @@ void ProtocolGame::parseBestiaryTracker(const InputMessagePtr& msg)
 void ProtocolGame::parseTaskHuntingBasicData(const InputMessagePtr& msg)
 {
     const uint16_t preys = msg->getU16();
-    for (auto i = 0; std::cmp_less(i, preys); ++i) {
+    for (auto i = 0; i < preys; ++i) {
         msg->getU16(); // RaceID
         msg->getU8(); // Difficult
     }
 
     const uint8_t options = msg->getU8();
-    for (auto i = 0; std::cmp_less(i, options); ++i) {
+    for (auto i = 0; i < options; ++i) {
         msg->getU8(); // Difficult
         msg->getU8(); // Stars
         msg->getU16(); // First kill
@@ -4108,7 +4156,7 @@ void ProtocolGame::parseTaskHuntingData(const InputMessagePtr& msg)
         case Otc::PREY_TASK_STATE_SELECTION:
         {
             const uint16_t creatures = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, creatures); ++i) {
+            for (auto i = 0; i < creatures; ++i) {
                 msg->getU16(); // RaceID
                 msg->getU8(); // Is unlocked
             }
@@ -4117,7 +4165,7 @@ void ProtocolGame::parseTaskHuntingData(const InputMessagePtr& msg)
         case Otc::PREY_TASK_STATE_LIST_SELECTION:
         {
             const uint16_t creatures = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, creatures); ++i) {
+            for (auto i = 0; i < creatures; ++i) {
                 msg->getU16(); // RaceID
                 msg->getU8(); // Is unlocked
             }
@@ -4158,7 +4206,7 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     const uint8_t containersCount = msg->getU8();
     std::vector<std::tuple<uint8_t, uint16_t, uint16_t>> lootList;
 
-    for (auto i = 0; std::cmp_less(i, containersCount); ++i) {
+    for (auto i = 0; i < containersCount; ++i) {
         const uint8_t categoryType = msg->getU8();
         const uint16_t lootContainerId = msg->getU16();
         uint16_t obtainerContainerId = 0;
@@ -4201,7 +4249,7 @@ void ProtocolGame::parseCyclopediaHousesInfo(const InputMessagePtr& msg)
     msg->getU32(); // houseClientId
 
     const uint16_t housesList = msg->getU16(); // g_game().map.houses.getHouses()
-    for (auto i = 0; std::cmp_less(i, housesList); ++i) {
+    for (auto i = 0; i < housesList; ++i) {
         msg->getU32(); // getClientId
     }
     // TO-DO Lua // Otui
@@ -4210,7 +4258,7 @@ void ProtocolGame::parseCyclopediaHousesInfo(const InputMessagePtr& msg)
 void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
 {
     const uint16_t housesCount = msg->getU16(); // housesCount
-    for (auto i = 0; std::cmp_less(i, housesCount); ++i) {
+    for (auto i = 0; i < housesCount; ++i) {
         msg->getU32(); // clientId
         msg->getU8(); // 0x00 = Renovation, 0x01 = Available
 
@@ -4291,7 +4339,7 @@ void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)
     const uint16_t itemsCount = msg->getU16();
     std::vector<std::vector<uint32_t>> stashItems;
 
-    for (auto i = 0; std::cmp_less(i, itemsCount); ++i) {
+    for (auto i = 0; i < itemsCount; ++i) {
         uint16_t itemId = msg->getU16();
         uint32_t amount = msg->getU32();
         stashItems.push_back({ itemId, amount });
@@ -4324,7 +4372,7 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
 
     const uint8_t partyMembersSize = msg->getU8();
     std::vector<PartyMemberData> membersData;
-    for (auto i = 0; std::cmp_less(i, partyMembersSize); ++i) {
+    for (auto i = 0; i < partyMembersSize; ++i) {
         const uint32_t memberID = msg->getU32(); // party member id
         const uint8_t highlight = msg->getU8(); // highlight
         const uint64_t loot = msg->getU64(); // loot
@@ -4341,7 +4389,7 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
     const bool hasNamesBool = static_cast<bool>(msg->getU8());
     if (hasNamesBool) {
         const uint8_t membersNameSize = msg->getU8();
-        for (auto i = 0; std::cmp_less(i, membersNameSize); ++i) {
+        for (auto i = 0; i < membersNameSize; ++i) {
             const uint32_t memberID = msg->getU32(); // party member id
             const std::string memberName = msg->getString(); // party member name
             if (shouldExecuteCallback) {
@@ -4362,7 +4410,7 @@ void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
     const uint8_t itemListCount = msg->getU8(); // amount of items to display
     std::vector<ImbuementTrackerItem> itemList;
 
-    for (auto i = 0; std::cmp_less(i, itemListCount); ++i) {
+    for (auto i = 0; i < itemListCount; ++i) {
         ImbuementTrackerItem item(msg->getU8()); // slot
         item.item = getItem(msg);
 
@@ -4375,7 +4423,7 @@ void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
             continue;
         }
 
-        for (auto slotIndex = 0; std::cmp_less(slotIndex, slotsCount); ++slotIndex) {
+        for (auto slotIndex = 0; slotIndex < slotsCount; ++slotIndex) {
             const bool slotImbued = static_cast<bool>(msg->getU8()); // 0 - empty, 1 - imbued
             if (!slotImbued) {
                 continue;
@@ -4398,13 +4446,13 @@ void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePassiveCooldown(const InputMessagePtr& msg)
 {
-    msg->getU8(); // passive id
-
+    msg->getU8();
     const uint8_t unknownType = msg->getU8();
     if (unknownType == 0) {
-        msg->getU32(); // timestamp (partial)
-        msg->getU32(); // timestamp (total)
-        msg->getU8(); // (bool) timer is running?
+        uint32_t currentCooldown = msg->getU32(); // timestamp (partial) - current cooldown
+        uint32_t maxCooldown = msg->getU32();     // timestamp (total) - max cooldown
+        bool canDecay = msg->getU8();             // (bool) timer is running? => used as canDecay
+        g_lua.callGlobalField("g_game", "onPassiveData", currentCooldown, maxCooldown, canDecay);
     } else if (unknownType == 1) {
         msg->getU8(); // unknown
         msg->getU8(); // unknown
@@ -4432,7 +4480,7 @@ void ProtocolGame::parseBlessDialog(const InputMessagePtr& msg)
     BlessDialogData data;
 
     data.totalBless = msg->getU8();
-    for (auto i = 0; std::cmp_less(i, data.totalBless); ++i) {
+    for (auto i = 0; i < data.totalBless; ++i) {
         BlessData bless{};
         bless.blessBitwise = msg->getU16();
         bless.playerBlessCount = msg->getU8();
@@ -4451,7 +4499,7 @@ void ProtocolGame::parseBlessDialog(const InputMessagePtr& msg)
     data.aol = msg->getU8();
 
     const uint8_t logCount = msg->getU8();
-    for (auto i = 0; std::cmp_less(i, logCount); ++i) {
+    for (auto i = 0; i < logCount; ++i) {
         LogData log;
         log.timestamp = msg->getU32();
         log.colorMessage = msg->getU8();
@@ -4494,7 +4542,7 @@ void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
 {
     const uint16_t priceCount = msg->getU16(); // count
 
-    for (auto i = 0; std::cmp_less(i, priceCount); ++i) {
+    for (auto i = 0; i < priceCount; ++i) {
         const uint16_t itemId = msg->getU16(); // item client id
         if (g_game.getClientVersion() >= 1281) {
             const auto& item = Item::create(itemId);
@@ -4613,7 +4661,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             const uint8_t combatCount = msg->getU8();
             std::vector<std::tuple<uint8_t, uint16_t>> combats;
 
-            for (auto i = 0; std::cmp_less(i, combatCount); ++i) {
+            for (auto i = 0; i < combatCount; ++i) {
                 const uint8_t element = msg->getU8();
                 const uint16_t specializedMagicLevel = msg->getU16();
                 combats.emplace_back(element, specializedMagicLevel);
@@ -4681,7 +4729,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             const uint8_t combatCount = msg->getU8();
             std::vector<std::tuple<uint8_t, uint16_t>> combatsArray;
 
-            for (auto i = 0; std::cmp_less(i, combatCount); ++i) {
+            for (auto i = 0; i < combatCount; ++i) {
                 const uint8_t element = msg->getU8();
                 const uint16_t clientModifier = msg->getU16();
                 combatsArray.emplace_back(element, clientModifier);
@@ -4690,7 +4738,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             const uint8_t concoctionsCount = msg->getU8();
             std::vector<std::tuple<uint16_t, uint16_t>> concoctionsArray;
 
-            for (auto i = 0; std::cmp_less(i, concoctionsCount); ++i) {
+            for (auto i = 0; i < concoctionsCount; ++i) {
                 const uint16_t concoctionFirst = msg->getU16();
                 const uint16_t concoctionSecond = msg->getU16();
                 concoctionsArray.emplace_back(concoctionFirst, concoctionSecond);
@@ -4706,7 +4754,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             msg->getU16();
 
             const uint16_t entriesCount = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, entriesCount); ++i) {
+            for (auto i = 0; i < entriesCount; ++i) {
                 RecentDeathEntry entry;
                 entry.timestamp = msg->getU32();
                 entry.cause = msg->getString();
@@ -4723,7 +4771,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             msg->getU16();
 
             const uint16_t entriesCount = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, entriesCount); ++i) {
+            for (auto i = 0; i < entriesCount; ++i) {
                 RecentPvPKillEntry entry;
                 entry.timestamp = msg->getU32();
                 entry.description = msg->getString();
@@ -4743,7 +4791,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             CyclopediaCharacterItemSummary data;
 
             const uint16_t inventoryItemsCount = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, inventoryItemsCount); ++i) {
+            for (auto i = 0; i < inventoryItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
                 const auto& itemCreated = Item::create(itemId);
@@ -4761,7 +4809,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             }
 
             const uint16_t storeItemsCount = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, storeItemsCount); ++i) {
+            for (auto i = 0; i < storeItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
                 const auto& itemCreated = Item::create(itemId);
@@ -4779,7 +4827,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             }
 
             const uint16_t stashItemsCount = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, stashItemsCount); ++i) {
+            for (auto i = 0; i < stashItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
                 const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
@@ -4800,7 +4848,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             }
 
             const uint16_t depotItemsCount = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, depotItemsCount); ++i) {
+            for (auto i = 0; i < depotItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
                 const auto& itemCreated = Item::create(itemId);
@@ -4818,7 +4866,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             }
 
             const uint16_t inboxItemsCount = msg->getU16();
-            for (auto i = 0; std::cmp_less(i, inboxItemsCount); ++i) {
+            for (auto i = 0; i < inboxItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
                 const auto& itemCreated = Item::create(itemId);
@@ -4843,7 +4891,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             const uint16_t outfitsSize = msg->getU16();
             std::vector<CharacterInfoOutfits> outfits;
 
-            for (auto i = 0; std::cmp_less(i, outfitsSize); ++i) {
+            for (auto i = 0; i < outfitsSize; ++i) {
                 CharacterInfoOutfits outfit;
                 outfit.lookType = msg->getU16();
                 outfit.name = msg->getString();
@@ -4864,7 +4912,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             const uint16_t mountsSize = msg->getU16();
             std::vector<CharacterInfoMounts> mounts;
 
-            for (auto i = 0; std::cmp_less(i, mountsSize); ++i) {
+            for (auto i = 0; i < mountsSize; ++i) {
                 CharacterInfoMounts mount;
                 mount.mountId = msg->getU16();
                 mount.name = msg->getString();
@@ -4883,7 +4931,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             const uint16_t familiarsSize = msg->getU16();
             std::vector<CharacterInfoFamiliar> familiars;
 
-            for (auto i = 0; std::cmp_less(i, familiarsSize); ++i) {
+            for (auto i = 0; i < familiarsSize; ++i) {
                 CharacterInfoFamiliar familiar;
                 familiar.lookType = msg->getU16();
                 familiar.name = msg->getString();
@@ -4903,7 +4951,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             std::vector<std::tuple<std::string, uint8_t>> blessings;
             const uint8_t blessingCount = msg->getU8();
 
-            for (auto i = 0; std::cmp_less(i, blessingCount); ++i) {
+            for (auto i = 0; i < blessingCount; ++i) {
                 const auto& blessingName = msg->getString();
                 const uint8_t blessingObtained = msg->getU8();
                 blessings.emplace_back(blessingName, blessingObtained);
@@ -4918,7 +4966,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             std::vector<uint16_t> hirelingSkills;
             const uint8_t hirelingSkillsCount = msg->getU8();
 
-            for (auto i = 0; std::cmp_less(i, hirelingSkillsCount); ++i) {
+            for (auto i = 0; i < hirelingSkillsCount; ++i) {
                 const uint8_t skill = msg->getU8();
                 hirelingSkills.emplace_back(static_cast<uint16_t>(skill + 1000));
             }
@@ -4928,7 +4976,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             std::vector<std::tuple<uint16_t, std::string, uint8_t>> houseItems;
             const uint16_t houseItemsCount = msg->getU16();
 
-            for (auto i = 0; std::cmp_less(i, houseItemsCount); ++i) {
+            for (auto i = 0; i < houseItemsCount; ++i) {
                 const uint16_t itemId = msg->getU16();
                 const auto& itemName = msg->getString();
                 const uint8_t count = msg->getU8();
@@ -4951,7 +4999,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             const uint8_t badgesSize = msg->getU8();
             std::vector<std::tuple<uint32_t, std::string>> badgesVector;
 
-            for (auto i = 0; std::cmp_less(i, badgesSize); ++i) {
+            for (auto i = 0; i < badgesSize; ++i) {
                 const uint32_t badgeId = msg->getU32();
                 const auto& badgeName = msg->getString();
                 badgesVector.emplace_back(badgeId, badgeName);
@@ -4964,7 +5012,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
         {
             msg->getU8(); // current title
             const uint8_t titlesSize = msg->getU8();
-            for (auto i = 0; std::cmp_less(i, titlesSize); ++i) {
+            for (auto i = 0; i < titlesSize; ++i) {
                 msg->getString(); // title name
                 msg->getString(); // title description
                 msg->getU8(); // bool title permanent
@@ -5030,7 +5078,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             data.weaponElementType = msg->getU8();
 
             const uint8_t accuracyCount = msg->getU8();
-            for (int i = 0; std::cmp_less(i, accuracyCount); i++) {
+            for (int i = 0; i < accuracyCount; i++) {
                 msg->getU8(); // range
                 data.weaponAccuracy.push_back(msg->getDouble());
             }
@@ -5069,7 +5117,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             data.mitigationWheel = msg->getDouble();
             data.mitigationCombatTactics = msg->getDouble();
             const uint8_t combatsCount = msg->getU8();
-            for (int i = 0; std::cmp_less(i, combatsCount); ++i) {
+            for (int i = 0; i < combatsCount; ++i) {
                 uint8_t elementType = msg->getU8();
                 if (elementType == 0x04) {
                     CyclopediaCharacterDefenceStats::ElementalResistance resistance;
@@ -5105,7 +5153,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             data.totalBlesses = msg->getU8();
 
             const uint8_t concoctionsCount = msg->getU8();
-            for (int i = 0; std::cmp_less(i, concoctionsCount); ++i) {
+            for (int i = 0; i < concoctionsCount; ++i) {
                 CyclopediaCharacterMiscStats::Concoction concoction;
                 concoction.id = msg->getU16();
                 msg->getU8(); // unused
@@ -5167,7 +5215,7 @@ namespace {
             // select x items from the list
             day.itemsToSelect = msg->getU8(); // reward type
             const uint8_t itemListSize = msg->getU8();
-            for (auto listIndex = 0; std::cmp_less(listIndex, itemListSize); ++listIndex) {
+            for (auto listIndex = 0; listIndex < itemListSize; ++listIndex) {
                 DailyRewardItem item;
                 item.itemId = msg->getU16(); // Item ID
                 item.name = msg->getString(); // Item name
@@ -5177,7 +5225,7 @@ namespace {
         } else if (day.redeemMode == 2) {
             // no choice, click to redeem all
             const uint8_t itemListSize = msg->getU8();
-            for (auto listIndex = 0; std::cmp_less(listIndex, itemListSize); ++listIndex) {
+            for (auto listIndex = 0; listIndex < itemListSize; ++listIndex) {
                 const uint8_t bundleType = msg->getU8(); // type of reward
                 DailyRewardBundle bundle;
                 bundle.bundleType = bundleType;
@@ -5221,13 +5269,13 @@ void ProtocolGame::parseDailyReward(const InputMessagePtr& msg)
     DailyRewardData data;
     data.days = msg->getU8(); // Reward count (7 days)
 
-    for (auto i = 1; std::cmp_less_equal(i, data.days); ++i) {
+    for (auto i = 1; i <= data.days; ++i) {
         data.freeRewards.push_back(parseRewardDay(msg)); // Free account
         data.premiumRewards.push_back(parseRewardDay(msg)); // Premium account
     }
 
     const uint8_t bonusCount = msg->getU8();
-    for (auto i = 0; std::cmp_less(i, bonusCount); ++i) {
+    for (auto i = 0; i < bonusCount; ++i) {
         DailyRewardBonus bonus;
         bonus.name = msg->getString(); // Bonus name
         bonus.id = msg->getU8(); // Bonus ID
@@ -5243,7 +5291,7 @@ void ProtocolGame::parseRewardHistory(const InputMessagePtr& msg)
 {
     const uint8_t historyCount = msg->getU8();
     std::vector<std::tuple<uint32_t, bool, std::string, uint16_t>> rewardHistory;
-    for (auto i = 0; std::cmp_less(i, historyCount); ++i) {
+    for (auto i = 0; i < historyCount; ++i) {
         const uint32_t timestamp = msg->getU32();
         const bool isPremium = static_cast<bool>(msg->getU8());
         const auto& description = msg->getString();
@@ -5282,7 +5330,7 @@ std::vector<PreyMonster> ProtocolGame::getPreyMonsters(const InputMessagePtr& ms
     const uint8_t monsterListCount = msg->getU8();
     std::vector<PreyMonster> monsterList;
 
-    for (auto i = 0; std::cmp_less(i, monsterListCount); ++i) {
+    for (auto i = 0; i < monsterListCount; ++i) {
         const auto& monster = getPreyMonster(msg);
         monsterList.emplace_back(monster);
     }
@@ -5385,7 +5433,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             const uint16_t raceListCount = msg->getU16();
             std::vector<uint16_t> raceList;
 
-            for (auto i = 0; std::cmp_less(i, raceListCount); ++i) {
+            for (auto i = 0; i < raceListCount; ++i) {
                 raceList.push_back(msg->getU16()); // RaceID
             }
 
@@ -5406,7 +5454,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             const uint16_t raceListCount = msg->getU16();
             std::vector<uint16_t> raceList;
 
-            for (auto i = 0; std::cmp_less(i, raceListCount); ++i) {
+            for (auto i = 0; i < raceListCount; ++i) {
                 raceList.push_back(msg->getU16()); // RaceID
             }
 
@@ -5451,7 +5499,7 @@ Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
     imbuement.premiumOnly = msg->getU8(); // is premium
 
     const uint8_t itemsSize = msg->getU8(); // items size
-    for (auto i = 0; std::cmp_less(i, itemsSize); ++i) {
+    for (auto i = 0; i < itemsSize; ++i) {
         const uint16_t id = msg->getU16(); // item client ID
         const auto& description = msg->getString(); // item name
         const uint16_t count = msg->getU16(); // count
@@ -5487,7 +5535,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
     const uint8_t slot = msg->getU8();
     std::unordered_map<int, std::tuple<Imbuement, uint32_t, uint32_t>> activeSlots;
 
-    for (auto i = 0; std::cmp_less(i, slot); i++) {
+    for (auto i = 0; i < slot; i++) {
         const uint8_t firstByte = msg->getU8();
         if (firstByte == 0x01) {
             Imbuement imbuement = getImbuementInfo(msg);
@@ -5500,7 +5548,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
     const uint16_t imbuementsSize = msg->getU16();
     std::vector<Imbuement> imbuements;
 
-    for (auto i = 0; std::cmp_less(i, imbuementsSize); ++i) {
+    for (auto i = 0; i < imbuementsSize; ++i) {
         imbuements.push_back(getImbuementInfo(msg));
     }
 
@@ -5538,7 +5586,7 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
     const uint16_t itemsSentCount = msg->getU16();
     std::vector<std::vector<uint16_t>> depotItems;
 
-    for (auto i = 0; std::cmp_less(i, itemsSentCount); ++i) {
+    for (auto i = 0; i < itemsSentCount; ++i) {
         const uint16_t itemId = msg->getU16();
         uint8_t itemTier = 0;
         const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
@@ -5565,7 +5613,7 @@ void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
     const uint16_t itemsSent = msg->getU16();
 
     std::vector<std::vector<uint16_t>> depotItems;
-    for (auto i = 0; std::cmp_less(i, itemsSent); ++i) {
+    for (auto i = 0; i < itemsSent; ++i) {
         const uint16_t itemId = msg->getU16();
         const uint16_t count = msg->getU16();
         depotItems.push_back({ itemId, count });
@@ -5621,7 +5669,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
     const uint8_t purchaseStatsListCount = msg->getU8();
     std::vector<std::vector<uint64_t>> purchaseStatsList;
 
-    for (auto i = 0; std::cmp_less(i, purchaseStatsListCount); ++i) {
+    for (auto i = 0; i < purchaseStatsListCount; ++i) {
         uint32_t transactions = msg->getU32();
         uint64_t totalPrice = 0;
         uint64_t highestPrice = 0;
@@ -5643,7 +5691,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
     const uint8_t saleStatsListCount = msg->getU8();
     std::vector<std::vector<uint64_t>> saleStatsList;
 
-    for (auto i = 0; std::cmp_less(i, saleStatsListCount); ++i) {
+    for (auto i = 0; i < saleStatsListCount; ++i) {
         const uint32_t transactions = msg->getU32();
         uint64_t totalPrice = 0;
         uint64_t highestPrice = 0;
@@ -5817,7 +5865,7 @@ void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
     data.bossesUnlocked = msg->getU8();
     if (data.bossesUnlocked) {
         const uint16_t bossesUnlockedSize = msg->getU16();
-        for (auto i = 0; std::cmp_less(i, bossesUnlockedSize); ++i) {
+        for (auto i = 0; i < bossesUnlockedSize; ++i) {
             BossUnlocked boss;
             boss.bossId = msg->getU32();
             boss.bossRace = msg->getU8();
@@ -5833,7 +5881,7 @@ void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg)
     const uint16_t bossesOnTrackerSize = msg->getU16();
     std::vector<BossCooldownData> cooldownData;
 
-    for (auto i = 0; std::cmp_less(i, bossesOnTrackerSize); ++i) {
+    for (auto i = 0; i < bossesOnTrackerSize; ++i) {
         const uint32_t bossRaceId = msg->getU32(); // bossRaceId
         const uint64_t cooldownTime = msg->getU64(); // Boss cooldown in seconds
 
@@ -5929,7 +5977,7 @@ void ProtocolGame::parseCreatureTyping(const InputMessagePtr& msg)
 void ProtocolGame::parseFeatures(const InputMessagePtr& msg)
 {
     const uint16_t features = msg->getU16();
-    for (auto i = 0; std::cmp_less(i, features); ++i) {
+    for (auto i = 0; i < features; ++i) {
         const auto feature = static_cast<Otc::GameFeature>(msg->getU8());
         const auto enabled = static_cast<bool>(msg->getU8());
         if (enabled) {
@@ -5970,7 +6018,7 @@ void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
     const uint8_t sizeCategories = msg->getU8();
     std::vector<std::tuple<uint8_t, std::string>> categories;
 
-    for (auto i = 0; std::cmp_less(i, sizeCategories); ++i) {
+    for (auto i = 0; i < sizeCategories; ++i) {
         const uint8_t id = msg->getU8();
         const auto& categoryName = msg->getString();
         categories.emplace_back(id, categoryName);
@@ -5983,7 +6031,7 @@ void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
     const uint8_t sizeEntries = msg->getU8();
     std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>> highscores;
 
-    for (auto i = 0; std::cmp_less(i, sizeEntries); ++i) {
+    for (auto i = 0; i < sizeEntries; ++i) {
         const uint32_t rank = msg->getU32();
         const auto& name = msg->getString();
         const auto& title = msg->getString();

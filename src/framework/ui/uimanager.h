@@ -23,9 +23,9 @@
 #pragma once
 
 #include "declarations.h"
-#include <framework/core/inputevent.h>
-#include <framework/otml/declarations.h>
-#include <framework/platform/platform.h>
+#include "framework/core/inputevent.h"
+#include "framework/otml/declarations.h"
+#include "framework/platform/platform.h"
 
  //@bindsingleton g_ui
 class UIManager
@@ -54,8 +54,8 @@ public:
 
     UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);
     UIWidgetPtr loadUIFromString(const std::string& data, const UIWidgetPtr& parent);
-    OTMLNodePtr loadDeviceUI(const std::string& file, Platform::OperatingSystem os);
-    OTMLNodePtr loadDeviceUI(const std::string& file, Platform::DeviceType deviceType);
+    OTMLNodePtr loadDeviceUI(const std::string& file, OperatingSystem os);
+    OTMLNodePtr loadDeviceUI(const std::string& file, DeviceType deviceType);
     UIWidgetPtr displayUI(const std::string& file) { return loadUI(file, m_rootWidget); }
     UIWidgetPtr createWidget(std::string_view styleName, const UIWidgetPtr& parent);
     UIWidgetPtr createWidgetFromOTML(const OTMLNodePtr& widgetNode, const UIWidgetPtr& parent);

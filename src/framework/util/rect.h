@@ -111,11 +111,10 @@ public:
     constexpr void moveCenterLeft(const TPoint<T>& p) noexcept { moveLeft(p.x); moveVerticalCenter(p.y); }
     constexpr void moveCenterRight(const TPoint<T>& p) noexcept { moveRight(p.x); moveVerticalCenter(p.y); }
 
-    [[nodiscard]] constexpr TRect translated(T x, T y) const noexcept { return TRect(TPoint<T>(x1 + x, y1 + y), TPoint<T>(x2 + x, y2 + y)); }
-    [[nodiscard]] constexpr TRect translated(const TPoint<T>& p) const noexcept { return TRect(TPoint<T>(x1 + p.x, y1 + p.y), TPoint<T>(x2 + p.x, y2 + p.y)); }
-    [[nodiscard]] constexpr TRect expanded(T add) const noexcept { return TRect(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
-
-    [[nodiscard]] constexpr TRect clamp(const TSize<T>& min, const TSize<T>& max) const noexcept {
+    constexpr TRect translated(T x, T y) const noexcept { return TRect(TPoint<T>(x1 + x, y1 + y), TPoint<T>(x2 + x, y2 + y)); }
+    constexpr TRect translated(const TPoint<T>& p) const noexcept { return TRect(TPoint<T>(x1 + p.x, y1 + p.y), TPoint<T>(x2 + p.x, y2 + p.y)); }
+    constexpr TRect expanded(T add) const noexcept { return TRect(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
+    constexpr TRect clamp(const TSize<T>& min, const TSize<T>& max) const noexcept {
         return TRect(x1, y1,
             std::min<T>(max.width(), std::max<T>(min.width(), width())),
             std::min<T>(max.height(), std::max<T>(min.height(), height())));
@@ -140,33 +139,33 @@ public:
         y2 = y1 + h;
     }
 
-    [[nodiscard]] constexpr std::size_t hash() const noexcept {
+    constexpr std::size_t hash() const noexcept {
         std::size_t h = 37;
         h = (h * 54059) ^ (x1 * 76963);
         h = (h * 54059) ^ (y1 * 76963);
         return h;
     }
 
-    [[nodiscard]] constexpr bool contains(const TPoint<T>& p, bool insideOnly = false) const noexcept {
+    constexpr bool contains(const TPoint<T>& p, bool insideOnly = false) const noexcept {
         return (insideOnly ? (p.x > x1 && p.x < x2) : (p.x >= x1 && p.x <= x2)) &&
             (insideOnly ? (p.y > y1 && p.y < y2) : (p.y >= y1 && p.y <= y2));
     }
 
-    [[nodiscard]] constexpr bool contains(const TRect& r, bool insideOnly = false) const noexcept {
+    constexpr bool contains(const TRect& r, bool insideOnly = false) const noexcept {
         return contains(r.topLeft(), insideOnly) && contains(r.bottomRight(), insideOnly);
     }
 
-    [[nodiscard]] constexpr bool intersects(const TRect& r) const noexcept {
+    constexpr bool intersects(const TRect& r) const noexcept {
         return !(r.x2 < x1 || r.x1 > x2 || r.y2 < y1 || r.y1 > y2);
     }
 
-    [[nodiscard]] constexpr TRect united(const TRect& r) const noexcept {
+    constexpr TRect united(const TRect& r) const noexcept {
         return { std::min<T>(x1, r.x1), std::min<T>(y1, r.y1),
                 std::max<T>(x2, r.x2) - std::min<T>(x1, r.x1) + 1,
                 std::max<T>(y2, r.y2) - std::min<T>(y1, r.y1) + 1 };
     }
 
-    [[nodiscard]] constexpr TRect intersection(const TRect& r) const noexcept {
+    constexpr TRect intersection(const TRect& r) const noexcept {
         if (!intersects(r)) return {};
         return { std::max<T>(x1, r.x1), std::max<T>(y1, r.y1),
                 std::min<T>(x2, r.x2) - std::max<T>(x1, r.x1) + 1,

@@ -21,18 +21,22 @@
  */
 
 #include "item.h"
-#include "container.h"
+
+#include "animator.h"
 #include "game.h"
-#include "spritemanager.h"
-#include "thing.h"
+#include "gameconfig.h"
+
+#include "thingtype.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "framework/core/clock.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
+#include "framework/graphics/shadermanager.h"
 
-#include <framework/core/clock.h>
-#include <framework/core/filestream.h>
-#include <framework/graphics/shadermanager.h>
 #ifdef FRAMEWORK_EDITOR
 #include <framework/core/binarytree.h>
+#include "itemtype.h"
 #endif
 
 ItemPtr Item::create(const int id)
@@ -43,7 +47,7 @@ ItemPtr Item::create(const int id)
     return item;
 }
 
-void Item::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
+void Item::draw(const Point& dest, const bool drawThings, LightView* lightView)
 {
     if (!canDraw(m_color) || isHided())
         return;
@@ -59,7 +63,7 @@ void Item::draw(const Point& dest, const bool drawThings, const LightViewPtr& li
         internalDraw(animationPhase, dest, getHighlightColor(), drawThings, true);
 }
 
-void Item::internalDraw(const int animationPhase, const Point& dest, const Color& color, const bool drawThings, const bool replaceColorShader, const LightViewPtr& lightView)
+void Item::internalDraw(const int animationPhase, const Point& dest, const Color& color, const bool drawThings, const bool replaceColorShader, LightView* lightView)
 {
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader(), true);
@@ -84,7 +88,7 @@ void Item::internalDraw(const int animationPhase, const Point& dest, const Color
     }
 }
 
-void Item::drawLight(const Point& dest, const LightViewPtr& lightView) {
+void Item::drawLight(const Point& dest, LightView* lightView) {
     if (!lightView) return;
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, 0, Color::white, false, lightView);
     drawAttachedLightEffect(dest, lightView);

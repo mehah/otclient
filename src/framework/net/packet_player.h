@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include <deque>
-#include <framework/core/eventdispatcher.h>
 #include <framework/net/outputmessage.h>
+
+#include "framework/core/declarations.h"
 
 class PacketPlayer : public LuaObject
 {
 public:
     PacketPlayer(const std::string_view& file);
-    ~PacketPlayer() override;
+    virtual ~PacketPlayer();
 
     void start(std::function<void(std::shared_ptr<std::vector<uint8_t>>)> recvCallback, std::function<void(std::error_code)> disconnectCallback);
     void stop();

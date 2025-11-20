@@ -495,7 +495,6 @@ function show()
     if not questLogController.ui then
         return
     end
-    questLogController.ui:centerIn('parent')
     g_game.requestQuestLog()
     questLogController.ui:show()
     questLogController.ui:raise()

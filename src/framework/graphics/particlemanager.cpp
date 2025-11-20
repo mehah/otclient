@@ -21,10 +21,10 @@
  */
 
 #include "particlemanager.h"
-#include <framework/core/resourcemanager.h>
-#include <framework/otml/otml.h>
 
 #include "particleeffect.h"
+#include "particletype.h"
+#include "framework/core/resourcemanager.h"
 
 ParticleManager g_particles;
 

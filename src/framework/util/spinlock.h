@@ -1,17 +1,11 @@
 #pragma once
 
-#include <atomic>
-#include <thread>
-#include <chrono>
-
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
-#include <immintrin.h>
 #endif
 
 class SpinLock
 {
     alignas(64) std::atomic_bool m_flag{ false };
-    char m_padding[64 - sizeof(std::atomic_bool)];
 
 public:
     SpinLock() noexcept = default;

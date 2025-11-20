@@ -20,12 +20,10 @@
  * THE SOFTWARE.
  */
 
-#include <framework/core/eventdispatcher.h>
-#include <framework/util/crypt.h>
-
-#include <openssl/ssl.h>
-
 #include "protocolhttp.h"
+
+#include "framework/core/eventdispatcher.h"
+#include "framework/util/crypt.h"
 
 Http g_http;
 
@@ -1050,7 +1048,7 @@ void WebsocketSession::send(const std::string& data, const uint8_t ws_opcode)
             ws_frame.push_back(127 + 128);
         }
 
-        for (auto c = num_bytes - 1; std::cmp_not_equal(c, -1); c--)
+        for (auto c = num_bytes - 1; c != static_cast<size_t>(-1); c--)
             ws_frame.push_back((static_cast<unsigned long long>(length) >> (8 * c)) % 256);
     }
 

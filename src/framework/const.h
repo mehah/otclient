@@ -22,9 +22,6 @@
 
 #pragma once
 
-#include <cstdint>
-#include <numbers>
-
 #define DEG_TO_RAD (std::acos(-1.f)/180.f)
 #define RAD_TO_DEC (180.f/std::acos(-1.f))
 

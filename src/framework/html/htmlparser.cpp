@@ -20,9 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "htmlparser.h"
 #include "htmlnode.h"
-#include <ranges>
+#include "htmlparser.h"
 #include <stack>
 
 static inline bool is_space(unsigned char c) { return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f'; }
@@ -402,8 +401,8 @@ HtmlNodePtr parseHtml(const std::string& html) {
     while (st.size() > 1) st.pop();
 
     if (!hoistedRaw.empty()) {
-        for (auto& it : std::ranges::reverse_view(hoistedRaw)) {
-            attach_front(root, it);
+        for (auto it = hoistedRaw.rbegin(); it != hoistedRaw.rend(); ++it) {
+            attach_front(root, *it);
         }
     }
 

@@ -20,11 +20,10 @@
 * THE SOFTWARE.
 */
 
-#include <framework/global.h>
-#include <framework/core/clock.h>
-#include <filesystem>
-
 #include "packet_player.h"
+
+#include "framework/core/clock.h"
+#include "framework/core/eventdispatcher.h"
 
 PacketPlayer::~PacketPlayer()
 {
@@ -53,9 +52,9 @@ PacketPlayer::PacketPlayer(const std::string_view& file)
         }
         auto packet = std::make_shared<std::vector<uint8_t>>(packetStr.begin(), packetStr.end());
         if (type == "<") {
-            m_input.emplace_back(time, packet);
+            m_input.push_back(std::make_pair(time, packet));
         } else if (type == ">") {
-            m_output.emplace_back(time, packet);
+            m_output.push_back(std::make_pair(time, packet));
         }
     }
 }
@@ -66,7 +65,7 @@ void PacketPlayer::start(std::function<void(std::shared_ptr<std::vector<uint8_t>
     m_start = g_clock.millis();
     m_recvCallback = recvCallback;
     m_disconnectCallback = disconnectCallback;
-    m_event = g_dispatcher.scheduleEvent([this] { process(); }, 50);
+    m_event = g_dispatcher.scheduleEvent(std::bind(&PacketPlayer::process, this), 50);
 }
 
 void PacketPlayer::stop()
@@ -97,7 +96,7 @@ void PacketPlayer::process()
     }
 
     if (!m_input.empty() && nextPacket > 1) {
-        m_event = g_dispatcher.scheduleEvent([this] { process(); }, nextPacket);
+        m_event = g_dispatcher.scheduleEvent(std::bind(&PacketPlayer::process, this), nextPacket);
     } else {
         m_disconnectCallback(asio::error::eof);
         stop();
