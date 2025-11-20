@@ -363,6 +363,9 @@ return {
             panels.gameMapPanel:setDrawHighlightTarget(value)
         end
     },
+    showDragIcon        = {
+        value = true,
+    },
     antialiasingMode                  = {
         value = 1,
         action = function(value, options, controller, panels, extraWidgets)
