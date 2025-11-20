@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <string>
-
 #include <framework/stdext/string.h>
 
 namespace {
@@ -11,9 +10,9 @@ namespace {
         EXPECT_TRUE(stdext::is_valid_utf8("Hello World"));
         EXPECT_TRUE(stdext::is_valid_utf8(""));
         EXPECT_TRUE(stdext::is_valid_utf8("ASCII 123"));
-        EXPECT_TRUE(stdext::is_valid_utf8(reinterpret_cast<const char*>(u8"Café")));
-        EXPECT_TRUE(stdext::is_valid_utf8(reinterpret_cast<const char*>(u8"日本語")));
-        EXPECT_TRUE(stdext::is_valid_utf8(reinterpret_cast<const char*>(u8"🎉🎊")));
+        EXPECT_TRUE(stdext::is_valid_utf8("Café"));
+        EXPECT_TRUE(stdext::is_valid_utf8("日本語"));
+        EXPECT_TRUE(stdext::is_valid_utf8("🎉🎊"));
 
         EXPECT_FALSE(stdext::is_valid_utf8("\x80"));
         EXPECT_FALSE(stdext::is_valid_utf8("\xFF"));
@@ -29,24 +28,25 @@ namespace {
         EXPECT_EQ(stdext::utf8_to_latin1("123"), "123");
         EXPECT_EQ(stdext::utf8_to_latin1("\t\r\n"), "\t\r\n");
 
-        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"Café")), "Caf\xe9");
-        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"Über")), "\xDC" "ber");
-        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"naïve")), "na\xefve");
+        EXPECT_EQ(stdext::utf8_to_latin1("Café"), "Caf\xE9");
+        EXPECT_EQ(stdext::utf8_to_latin1("Über"), "\xDC""ber");
+        EXPECT_EQ(stdext::utf8_to_latin1("naïve"), "na\xEF""ve");
 
-        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"Hello 世界")), "Hello ");
-        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"🎉")), "");
+        EXPECT_EQ(stdext::utf8_to_latin1("Hello 世界"), "Hello ");
+        EXPECT_EQ(stdext::utf8_to_latin1("🎉"), "");
 
         EXPECT_EQ(stdext::utf8_to_latin1("\xFF\xFE"), "");
         EXPECT_EQ(stdext::utf8_to_latin1("\xC0\x80"), "");
 
         EXPECT_EQ(stdext::utf8_to_latin1("\x01\x02\x03"), "");
         EXPECT_EQ(stdext::utf8_to_latin1("\x1F"), "");
-        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u0080\u0090\u009F")), "");
+        EXPECT_EQ(stdext::utf8_to_latin1("\x80\x90\x9F"), "");
 
-        EXPECT_EQ(stdext::utf8_to_latin1(""), ""); // empty string
-        EXPECT_EQ(stdext::utf8_to_latin1(std::string("\x00", 1)), ""); // NULL = control → removed
-        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u00A0")), "\xA0"); // NBSP boundary
-        EXPECT_EQ(stdext::utf8_to_latin1(reinterpret_cast<const char*>(u8"\u00FF")), "\xFF"); // ÿ boundary
+        EXPECT_EQ(stdext::utf8_to_latin1(""), "");
+        EXPECT_EQ(stdext::utf8_to_latin1(std::string("\x00", 1)), "");
+
+        EXPECT_EQ(stdext::utf8_to_latin1(std::string("\xC2\xA0")), "\xA0");
+        EXPECT_EQ(stdext::utf8_to_latin1("ÿ"), "\xFF");   // U+00FF
     }
 
     TEST(StringEncoding, Latin1ToUtf8)
@@ -55,13 +55,13 @@ namespace {
         EXPECT_EQ(stdext::latin1_to_utf8("123"), "123");
         EXPECT_EQ(stdext::latin1_to_utf8("\t\r\n"), "\t\r\n");
 
-        EXPECT_EQ(stdext::latin1_to_utf8("Caf\xe9"), reinterpret_cast<const char*>(u8"Café"));
-        EXPECT_EQ(stdext::latin1_to_utf8("\xDC" "ber"), reinterpret_cast<const char*>(u8"Über"));
-        EXPECT_EQ(stdext::latin1_to_utf8("na\xefve"), reinterpret_cast<const char*>(u8"naïve"));
+        EXPECT_EQ(stdext::latin1_to_utf8("Caf\xE9"), "Café");
+        EXPECT_EQ(stdext::latin1_to_utf8("\xDC""ber"), "Über");
+        EXPECT_EQ(stdext::latin1_to_utf8("na\xEF""ve"), "naïve");
 
         std::string latin1All;
         latin1All.reserve(256);
-        for(int i = 0; i < 256; ++i) {
+        for (int i = 0; i < 256; ++i) {
             latin1All += static_cast<char>(i);
         }
 
@@ -69,7 +69,7 @@ namespace {
         EXPECT_FALSE(utf8Result.empty());
         EXPECT_TRUE(stdext::is_valid_utf8(utf8Result));
 
-        EXPECT_EQ(stdext::latin1_to_utf8(""), ""); // empty string
+        EXPECT_EQ(stdext::latin1_to_utf8(""), "");
         EXPECT_TRUE(stdext::is_valid_utf8(stdext::latin1_to_utf8(std::string("\x00", 1))));
     }
 
@@ -78,7 +78,7 @@ namespace {
         const std::string ascii = "Hello World 123!";
         EXPECT_EQ(stdext::latin1_to_utf8(stdext::utf8_to_latin1(ascii)), ascii);
 
-        const std::string latin1 = "Caf\xE9 na\xEFve";
+        const std::string latin1 = "Caf\xE9 naïve";
         EXPECT_EQ(stdext::utf8_to_latin1(stdext::latin1_to_utf8(latin1)), latin1);
 
         EXPECT_EQ(stdext::utf8_to_latin1(stdext::latin1_to_utf8("")), "");
@@ -90,11 +90,11 @@ namespace {
         EXPECT_EQ(stdext::utf8_to_utf16("Hello"), L"Hello");
         EXPECT_EQ(stdext::utf16_to_utf8(L"Hello"), "Hello");
 
-        EXPECT_EQ(stdext::utf8_to_utf16(reinterpret_cast<const char*>(u8"Café")), L"Café");
-        EXPECT_EQ(stdext::utf16_to_utf8(L"Café"), reinterpret_cast<const char*>(u8"Café"));
+        EXPECT_EQ(stdext::utf8_to_utf16("Café"), L"Café");
+        EXPECT_EQ(stdext::utf16_to_utf8(L"Café"), "Café");
 
-        EXPECT_EQ(stdext::utf8_to_utf16(reinterpret_cast<const char*>(u8"🎉")), L"🎉");
-        EXPECT_EQ(stdext::utf16_to_utf8(L"🎉"), reinterpret_cast<const char*>(u8"🎉"));
+        EXPECT_EQ(stdext::utf8_to_utf16("🎉"), L"🎉");
+        EXPECT_EQ(stdext::utf16_to_utf8(L"🎉"), "🎉");
 
         EXPECT_TRUE(stdext::utf8_to_utf16("\xFF\xFE").empty());
 
