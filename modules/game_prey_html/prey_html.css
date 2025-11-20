@@ -31,7 +31,7 @@
 }
 
 .prey-slot-wrapper {
-  height: 315px;
+  height: 320px;
   width: 216px;
   --image-source: "/modules/game_prey_html/images/2pixel-up-frame-borderimage";
   --onHoverChange: modules.game_prey_html.onHover(self);
@@ -99,11 +99,13 @@
   position: relative;
   margin: 0 6px;
   margin-top: 4px;
+  height: 20px;
+  width: 204px;
   --image-source: "/modules/game_prey_html/images/progress.png";
 }
 
 .progress-bar {
-  height: 100%;
+  height: 18px;
   max-width: 202px;
   --image-source: "/modules/game_prey_html/images/prey-timer-progress.png";
   margin-top: 1px;
@@ -111,14 +113,14 @@
 }
 
 .progress-value {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   height: 20px;
   width: 204px;
   text-align: center;
   align-items: center;
   color: #c0c0c0;
+  margin-top: -20px;
+  pointer-events: none;
 }
 
 .buttons {
@@ -136,6 +138,8 @@
 
 .prey-reroll-wrapper {
   position: relative;
+  width: 66px;
+  height: 66px;
 }
 
 .progress-bar-time-next-reroll {
@@ -145,6 +149,7 @@
   position: absolute;
   bottom: 3px;
   left: 3px;
+  pointer-events: none;
 }
 
 .base-img-clip {
@@ -164,6 +169,7 @@
   left: 18%;
   position: absolute;
   color: #c0c0c0;
+  pointer-events: none;
 }
 
 .prey-reroll-cost {
@@ -288,15 +294,15 @@
   position: relative;
   margin-left: 6px;
   margin-top: 4px;
-  display: flex;
   width: 202px;
 }
 
 .search-placeholder {
-  position: absolute;
+  position: relative;
   color: #c0c0c0;
   top: 2px;
   left: 4px;
+  pointer-events: none;
 }
 
 .monster-preview {
@@ -395,13 +401,14 @@
   --image-source: "/modules/game_prey_html/images/player-gold-bg.png";
   width: 130px;
   height: 20px;
-  text-align: center;
+  display: flex;
   align-items: center;
+  justify-content: center;
   color: #c0c0c0;
 }
 
 .gold-container img {
-  margin-left: 4px;
+  margin-left: 2px;
 }
 
 .wildcard-container {
@@ -409,8 +416,9 @@
   width: 52px;
   height: 20px;
   margin-left: 8px;
-  text-align: center;
+  display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .store-icon-clip {

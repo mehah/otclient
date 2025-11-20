@@ -1,5 +1,16 @@
 PreyController = Controller:new()
 
+-- Initialize default values
+PreyController.wildcards = 0
+PreyController.playerGold = "0"
+PreyController.rawPlayerGold = 0
+PreyController.rerollGoldPrice = "Free"
+PreyController.rawRerollGoldPrice = 0
+PreyController.rerollBonusPrice = 1
+PreyController.pickSpecificPrice = 5
+PreyController.lockPreyPrice = 5
+PreyController.description = ""
+
 local RACE_LIST_CHUNK_SIZE = 30
 
 local PREY_BONUS_DAMAGE_BOOST = 0
@@ -28,13 +39,12 @@ local SLOT_STATE_LIST_SELECTION = 5
 function PreyController:handleResources(options)
     options = options or {}
 
-    if not options.skipRequest then
-        g_game.preyRequest()
-    end
-
     local player = g_game.getLocalPlayer()
     if not player then return end
 
+    if not options.skipRequest then
+        g_game.preyRequest()
+    end
 
     self.wildcards = player:getResourceBalance(ResourceTypes.PREY_WILDCARDS)
     self.bankGold = player:getResourceBalance(ResourceTypes.BANK_BALANCE)
@@ -70,18 +80,20 @@ function PreyController:updateSlotResourceAvailability()
 end
 
 function show()
+    if not PreyController.ui then
+        return
+    end
     PreyController:handleResources()
-    PreyController:loadHtml('prey_html.html')
     PreyController.ui:show()
     PreyController.ui:raise()
     PreyController.ui:focus()
-    PreyController:scheduleEvent(function()
-        PreyController.ui:centerIn('parent')
-    end, 1, "LazyHtml")
 end
 
 function toggle()
-    if PreyController.ui and PreyController.ui:isVisible() then
+    if not PreyController.ui then
+        return
+    end
+    if PreyController.ui:isVisible() then
         PreyController:hide()
     else
         show()
@@ -89,16 +101,15 @@ function toggle()
 end
 
 function PreyController:hide()
-    PreyController:handleResources()
     if PreyController.ui then
-        PreyController:unloadHtml()
+        PreyController.ui:hide()
     end
 end
 
 PreyController.preyData = {
-    { previewMonster = { raceId = nil, outfit = nil }, slotId = 0, monsterName = "Hydra", raceId = 34, rerollCost = "197 k", pickCost = "5", bonusCost = "1", autoRerollCost = "1", lockCost = "5", preyType = "/images/game/prey/prey_bigxp.png",     stars = 5 },
-    { previewMonster = { raceId = nil, outfit = nil }, slotId = 1, monsterName = "Hydra", raceId = 34, rerollCost = "197 k", pickCost = "5", bonusCost = "1", autoRerollCost = "1", lockCost = "5", preyType = "/images/game/prey/prey_bigdamage.png", stars = 3 },
-    { previewMonster = { raceId = nil, outfit = nil }, slotId = 2, monsterName = "Hydra", raceId = 34, rerollCost = "197 k", pickCost = "5", bonusCost = "1", autoRerollCost = "1", lockCost = "5", preyType = "/images/game/prey/prey_bigloot.png",   stars = 10 },
+    { previewMonster = { raceId = nil, outfit = nil }, slotId = 0, monsterName = "Locked", type = 0, stars = 0, preyType = "/images/game/prey/prey_bignobonus" },
+    { previewMonster = { raceId = nil, outfit = nil }, slotId = 1, monsterName = "Locked", type = 0, stars = 0, preyType = "/images/game/prey/prey_bignobonus" },
+    { previewMonster = { raceId = nil, outfit = nil }, slotId = 2, monsterName = "Locked", type = 0, stars = 0, preyType = "/images/game/prey/prey_bignobonus" },
 }
 
 function PreyController:clearSlotTypeHistory(slotIndex)
@@ -219,8 +230,15 @@ function check()
     end
 end
 
-function PreyController:onInit()
+local function onResourcesBalanceChange()
     PreyController:handleResources()
+end
+
+function PreyController:onInit()
+    PreyController:loadHtml('prey_html.html')
+    if PreyController.ui then
+        PreyController.ui:hide()
+    end
     check()
 
     self:registerEvents(g_game, {
@@ -231,9 +249,7 @@ function PreyController:onInit()
         onPreyInactive = onPreyInactive,
         onPreySelectionChangeMonster = onPreySelectionChangeMonster,
         onPreyLocked = onPreyLocked,
-        onResourcesBalanceChange = function()
-            PreyController:handleResources()
-        end,
+        onResourcesBalanceChange = onResourcesBalanceChange,
     })
 end
 
