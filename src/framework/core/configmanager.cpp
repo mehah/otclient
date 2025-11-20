@@ -117,3 +117,9 @@ bool ConfigManager::unload(const std::string& file)
 }
 
 void ConfigManager::remove(const ConfigPtr& config) { m_configs.remove(config); }
+
+void ConfigManager::saveSettings()
+{
+    if (m_settings)
+        m_settings->save();
+}
