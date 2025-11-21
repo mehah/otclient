@@ -39,7 +39,7 @@ function UIItem:onDrop(widget, mousePos)
         return false
     end
 
-    if self.isVirtual() then
+    if self:isVirtual() then
         UIDragIcon:hide()
     end
 
@@ -83,7 +83,7 @@ function UIItem:onDestroy()
         self.hoveredWho:setBorderWidth(0)
     end
 
-    if self.isVirtual() then
+    if self:isVirtual() then
         UIDragIcon:hide()
     end
 
