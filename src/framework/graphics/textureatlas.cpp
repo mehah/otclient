@@ -121,7 +121,7 @@ void TextureAtlas::flush() {
         for (auto& layer : group.layers) {
             if (!layer.textures.empty()) {
                 layer.framebuffer->bind();
-                g_painter->resetClipRect();
+                glDisable(GL_SCISSOR_TEST);
                 glDisable(GL_BLEND);
                 for (const auto& texture : layer.textures) {
                     const int x = texture->x;
