@@ -9,6 +9,10 @@ static constexpr uint8_t SMOOTH_PADDING = 2;
 // Limit texture size based on atlas size (Default: 50%)
 static constexpr float MAX_ATLAS_TEXTURE_COVERAGE = 0.5f;
 
+// Minimum texture size (including padding) to be cached in the atlas
+// With SMOOTH_PADDING = 2 this results in 8 (4 + 2*2)
+static constexpr int MIN_PADDED_ATLAS_TEXTURE_SIZE = 4 + SMOOTH_PADDING * 2;
+
 TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :
     m_type(type),
     m_size({ std::min<int>(size, 8192) }) {
@@ -45,9 +49,15 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
         return; // don't cache
     }
 
+    if (paddedWidth < MIN_PADDED_ATLAS_TEXTURE_SIZE ||
+        paddedHeight < MIN_PADDED_ATLAS_TEXTURE_SIZE) {
+        return; // too small for atlas
+    }
+
     const int64_t atlasPixelArea = static_cast<int64_t>(m_size.width()) * m_size.height();
     const int64_t texturePixelArea = static_cast<int64_t>(paddedWidth) * paddedHeight;
 
+    // Maximum texture area relative to the atlas
     if (texturePixelArea > static_cast<int64_t>(atlasPixelArea * MAX_ATLAS_TEXTURE_COVERAGE)) {
         return;
     }
