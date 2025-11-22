@@ -101,8 +101,6 @@ void TextureAtlas::createNewLayer(bool smooth) {
 }
 
 void TextureAtlas::flush() {
-    g_painter->resetState();
-
     static CoordsBuffer buffer;
     for (auto i = -1; ++i < AtlasFilter::ATLAS_FILTER_COUNT;) {
         auto& group = m_filterGroups[i];
@@ -112,6 +110,7 @@ void TextureAtlas::flush() {
         for (auto& layer : group.layers) {
             if (!layer.textures.empty()) {
                 layer.framebuffer->bind();
+                g_painter->resetState();
                 glDisable(GL_BLEND);
                 for (const auto& texture : layer.textures) {
                     const int x = texture->x;
