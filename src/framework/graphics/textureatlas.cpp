@@ -101,6 +101,8 @@ void TextureAtlas::createNewLayer(bool smooth) {
 }
 
 void TextureAtlas::flush() {
+    g_painter->resetState();
+
     static CoordsBuffer buffer;
     for (auto i = -1; ++i < AtlasFilter::ATLAS_FILTER_COUNT;) {
         auto& group = m_filterGroups[i];
