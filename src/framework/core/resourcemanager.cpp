@@ -31,6 +31,10 @@
 #include "framework/platform/platform.h"
 #include "framework/util/crypt.h"
 
+#if ENABLE_ENCRYPTION == 1
+#include "client/game.h"
+#endif
+
 ResourceManager g_resources;
 
 void ResourceManager::init(const char* argv0)
