@@ -231,22 +231,22 @@ void ModuleManager::updateModulesByClientVersion(int clientVersion)
         return;
     }
     std::vector<ModulePtr> modulesToProcess;
-    for (const auto& module : m_modules) {
-        if (module && module->getMinClientVersion() > 0) {
-            modulesToProcess.push_back(module);
+    for (const auto& mod : m_modules) {
+        if (mod && mod->getMinClientVersion() > 0) {
+            modulesToProcess.push_back(mod);
         }
     }
-    for (const auto& module : modulesToProcess) {
-        const int minVersion = module->getMinClientVersion();
+    for (const auto& mod : modulesToProcess) {
+        const int minVersion = mod->getMinClientVersion();
         const bool shouldBeLoaded = clientVersion >= minVersion;
-        const bool isLoaded = module->isLoaded();
+        const bool isLoaded = mod->isLoaded();
         if (shouldBeLoaded && !isLoaded) {
-            if (!module->load()) {
+            if (!mod->load()) {
                 g_logger.error("Failed to load module '{}' (version requirement met: {} >= {})",
-                    module->getName(), clientVersion, minVersion);
+                    mod->getName(), clientVersion, minVersion);
             }
         } else if (!shouldBeLoaded && isLoaded) {
-            module->unload();
+            mod->unload();
         }
     }
 }

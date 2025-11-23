@@ -57,7 +57,7 @@ public:
     std::string getVersion() { return m_version; }
     bool isAutoLoad() { return m_autoLoad; }
     int getAutoLoadPriority() { return m_autoLoadPriority; }
-    int getMinClientVersion() { return m_minClientVersion; }
+    int getMinClientVersion() const { return m_minClientVersion; }
 
     // @dontbind
     ModulePtr asModule() { return static_self_cast<Module>(); }
