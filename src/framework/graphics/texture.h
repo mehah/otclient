@@ -68,6 +68,9 @@ public:
     bool setupSize(const Size& size);
 
     virtual void allowAtlasCache();
+    virtual void disallowAtlasCache() { setProp(Prop::_allowAtlasCache, false); }
+    virtual void setCached(bool cached) noexcept { setProp(Prop::cached, cached); }
+    bool isCached() const { return getProp(Prop::cached); };
 
 protected:
     void bind();
@@ -101,7 +104,8 @@ protected:
         repeat = 1 << 3,
         compress = 1 << 4,
         buildMipmaps = 1 << 5,
-        _allowAtlasCache = 1 << 6
+        _allowAtlasCache = 1 << 6,
+        cached = 1 << 7
     };
 
     uint16_t m_props{ 0 };

@@ -6,8 +6,8 @@
 // Extra padding around smooth textures to avoid sampling artifacts (in pixels)
 static constexpr uint8_t SMOOTH_PADDING = 2;
 
-// Limit texture size based on atlas size (Default: 50%)
-static constexpr float MAX_ATLAS_TEXTURE_COVERAGE = 0.5f;
+// Limit texture size based on atlas size (Default: 35%)
+static constexpr float MAX_ATLAS_TEXTURE_COVERAGE = 0.35f;
 
 // Minimum texture size (including padding) to be cached in the atlas
 // With SMOOTH_PADDING = 2 this results in 8 (4 + 2*2)
@@ -36,7 +36,6 @@ void TextureAtlas::removeTexture(uint32_t id, bool smooth) {
 }
 
 void TextureAtlas::addTexture(const TexturePtr& texture) {
-    const auto textureId = texture->getId();
     const auto textureWidth = texture->getWidth();
     const auto textureHeight = texture->getHeight();
 
@@ -46,11 +45,13 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
     if (paddedWidth <= 0 || paddedHeight <= 0 ||
         paddedWidth > m_size.width() || paddedHeight > m_size.height()) {
+        texture->disallowAtlasCache();
         return; // don't cache
     }
 
     if (paddedWidth < MIN_PADDED_ATLAS_TEXTURE_SIZE ||
         paddedHeight < MIN_PADDED_ATLAS_TEXTURE_SIZE) {
+        texture->disallowAtlasCache();
         return; // too small for atlas
     }
 
@@ -59,11 +60,13 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
     // Maximum texture area relative to the atlas
     if (texturePixelArea > static_cast<int64_t>(atlasPixelArea * MAX_ATLAS_TEXTURE_COVERAGE)) {
+        texture->disallowAtlasCache();
         return;
     }
 
     auto& filterGroup = m_filterGroups[texture->isSmooth()];
 
+    const auto textureId = texture->getId();
     const auto sizeKey = std::make_pair(textureWidth, textureHeight);
     if (auto it = filterGroup.inactiveTextures.find(sizeKey);
         it != filterGroup.inactiveTextures.end()) {

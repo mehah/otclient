@@ -38,16 +38,16 @@
 const static TexturePtr m_textureNull;
 
 namespace {
-std::string_view categoryName(const ThingCategory category)
-{
-    switch (category) {
-        case ThingCategoryItem: return "item";
-        case ThingCategoryCreature: return "creature";
-        case ThingCategoryEffect: return "effect";
-        case ThingCategoryMissile: return "missile";
-        default: return "unknown";
+    std::string_view categoryName(const ThingCategory category)
+    {
+        switch (category) {
+            case ThingCategoryItem: return "item";
+            case ThingCategoryCreature: return "creature";
+            case ThingCategoryEffect: return "effect";
+            case ThingCategoryMissile: return "missile";
+            default: return "unknown";
+        }
     }
-}
 }
 
 void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCategory category, const appearances::Appearance& appearance)
@@ -841,6 +841,7 @@ void ThingType::loadTexture(const int animationPhase)
 
     textureData.source = std::make_shared<Texture>(fullImage, true, false);
     textureData.source->allowAtlasCache();
+    textureData.source->setCached(true);
 }
 
 Size ThingType::getBestTextureDimension(int w, int h, const int count)

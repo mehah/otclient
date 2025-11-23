@@ -138,6 +138,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
         if (texture) {
             texture->setTime(stdext::time());
             texture->allowAtlasCache();
+            texture->setCached(true);
             std::unique_lock l(m_mutex);
             m_textures[filePath] = texture;
         }

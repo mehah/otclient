@@ -63,6 +63,7 @@ void UISprite::setSpriteId(const int id)
     if (const auto& image = g_sprites.getSpriteImage(id)) {
         m_sprite = std::make_shared<Texture>(image);
         m_sprite->allowAtlasCache();
+        m_sprite->setCached(true);
     }
 }
 
