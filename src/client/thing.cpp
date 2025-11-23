@@ -260,7 +260,7 @@ bool Thing::blockProjectile() const {
     return false;
 }
 
-bool Thing::isContainer() {
+bool Thing::isContainer() const {
     if (const auto t = getThingType(); t)
         return t->isContainer();
     return false;
