@@ -161,9 +161,6 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         if (!clipAndTranslateGlyph(glyphScreenCoords, glyphTextureCoords, screenCoords))
             continue;
 
-        if (region)
-            glyphTextureCoords.translate(region->x, region->y);
-
         list.emplace_back(glyphScreenCoords, glyphTextureCoords);
     }
 
