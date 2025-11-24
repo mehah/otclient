@@ -56,9 +56,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
 
     if (m_atlas && texture) {
         if (const auto region = texture->getAtlasRegion(m_atlas->getType())) {
+            if (!method.src.isValid() && (!coordsBuffer || coordsBuffer->size() == 0)) {
+                return; // invalid draw: texture is in the atlas but there is no source rect or coords to render
+            }
+
             textureAtlas = region->atlas;
-            if (method.src.isValid())
-                method.src.translate(region->x, region->y);
+            method.src.translate(region->x, region->y);
         }
     }
 
