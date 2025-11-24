@@ -170,7 +170,9 @@ DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, Texture* textu
         copy.textureId = textureAtlas->getId();
         copy.textureMatrixId = textureAtlas->getTransformMatrixId();
     } else if (texture) {
-        if (texture->isEmpty() || !texture->isCached() || (texture->canCacheInAtlas() && m_atlas)) {
+        const bool canCache = texture->canCacheInAtlas();
+
+        if (texture->isEmpty() || !canCache || (canCache && m_atlas)) {
             copy.texture = texture;
         } else {
             copy.textureId = texture->getId();

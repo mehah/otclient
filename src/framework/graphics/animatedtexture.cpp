@@ -91,16 +91,6 @@ void AnimatedTexture::allowAtlasCache() {
         frame->allowAtlasCache();
 }
 
-void AnimatedTexture::disallowAtlasCache() {
-    for (const auto& frame : m_frames)
-        frame->disallowAtlasCache();
-}
-
-void AnimatedTexture::setCached(bool cached) noexcept {
-    for (const auto& frame : m_frames)
-        frame->setCached(cached);
-}
-
 void AnimatedTexture::create() {
     if (getCurrentFrame()->isEmpty()) {
         for (const auto& frame : m_frames)
