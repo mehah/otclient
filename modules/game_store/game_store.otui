@@ -357,6 +357,7 @@ StoreWindow
       margin-top: 7
       text-auto-resize: true
       text-wrap: true
+      clipping: true
 
   QtPanel
     id: transferHistory
