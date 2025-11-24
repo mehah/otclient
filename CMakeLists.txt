@@ -105,9 +105,7 @@ add_subdirectory(src/protobuf)
 # Src
 add_subdirectory(src)
 
-option(OTCLIENT_BUILD_TESTS "Build unit tests" ON)
-
-if(OTCLIENT_BUILD_TESTS)
+if(NOT WASM)
     enable_testing()
     add_subdirectory(tests)
     log_option_enabled("Build tests")
