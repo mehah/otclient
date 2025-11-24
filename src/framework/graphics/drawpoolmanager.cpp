@@ -40,7 +40,7 @@ void DrawPoolManager::init(const uint16_t spriteSize)
         m_spriteSize = spriteSize;
 
     auto atlasMap = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::MAP, g_graphics.getMaxTextureSize());
-    auto atlasForeground = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::FOREGROUND, 2048/*, true*/);
+    auto atlasForeground = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::FOREGROUND, 2048, true);
 
     // Create Pools
     for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
@@ -51,13 +51,13 @@ void DrawPoolManager::init(const uint16_t spriteSize)
                 pool->m_atlas = atlasMap;
                 break;
 
-                // for now atlas in the UI will be disabled,
-                // there are some rendering bugs.
-                // case DrawPoolType::FOREGROUND:
+            case DrawPoolType::FOREGROUND:
             case DrawPoolType::FOREGROUND_MAP:
             case DrawPoolType::CREATURE_INFORMATION:
                 pool->m_atlas = atlasForeground;
                 break;
+
+            default: break;
         }
     }
 }
