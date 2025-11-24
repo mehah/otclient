@@ -99,7 +99,7 @@ public:
 
     bool blockProjectile() const;
 
-    virtual bool isContainer();
+    virtual bool isContainer() const;
 
     bool isTopGround();
     bool isTopGroundBorder();
