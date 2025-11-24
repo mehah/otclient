@@ -164,17 +164,22 @@ DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, Texture* textu
 {
     PoolState copy = getCurrentState();
 
-    if (copy.color != color) copy.color = color;
+    if (copy.color != color)
+        copy.color = color;
 
     if (textureAtlas) {
+        // Texture is batched inside an atlas
         copy.textureId = textureAtlas->getId();
         copy.textureMatrixId = textureAtlas->getTransformMatrixId();
     } else if (texture) {
-        const bool canCache = texture->canCacheInAtlas();
-
-        if (texture->isEmpty() || !canCache || (canCache && m_atlas)) {
+        if (texture->isEmpty() || // Texture not initialized in the current OpenGL context
+            !texture->canCacheInAtlas() || // Texture is marked as non-atlas-cacheable (short-lived/temporary, e.g. minimap)
+            (m_atlas && m_atlas->canAdd(texture)) // Force this texture to be packed into the current pool atlas,
+                                                  // even if it might already belong to another DrawPool's atlas
+        ) {
             copy.texture = texture;
         } else {
+            // Standalone GL texture cached in memory (non-atlased)
             copy.textureId = texture->getId();
             copy.textureMatrixId = texture->getTransformMatrixId();
         }
