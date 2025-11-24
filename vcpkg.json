@@ -21,6 +21,7 @@
     "zlib",
     "bshoshany-thread-pool",
     "fmt",
+    "utfcpp",
     {
       "name": "gtest",
       "platform": "!wasm32"

@@ -97,7 +97,7 @@ public:
     bool isGroundBorder() { return (m_flags & ThingFlagAttrGroundBorder); }
     bool isOnBottom() { return (m_flags & ThingFlagAttrOnBottom); }
     bool isOnTop() { return (m_flags & ThingFlagAttrOnTop); }
-    bool isContainer() { return (m_flags & ThingFlagAttrContainer); }
+    bool isContainer() const { return (m_flags & ThingFlagAttrContainer); }
     bool isStackable() { return (m_flags & ThingFlagAttrStackable); }
     bool isForceUse() { return (m_flags & ThingFlagAttrForceUse); }
     bool isMultiUse() { return (m_flags & ThingFlagAttrMultiUse); }

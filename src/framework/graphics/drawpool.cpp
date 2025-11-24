@@ -54,11 +54,18 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
 {
     Texture* textureAtlas = nullptr;
 
-    if (m_atlas && texture) {
-        if (const auto region = texture->getAtlasRegion(m_atlas->getType())) {
-            textureAtlas = region->atlas;
-            if (method.src.isValid())
-                method.src.translate(region->x, region->y);
+    if (texture) {
+        if (!method.src.isValid() && (!coordsBuffer || coordsBuffer->size() == 0)) {
+            return; // invalid draw: texture has no source rect and no vertex coordinates
+        }
+
+        if (m_atlas) {
+            if (const auto region = texture->getAtlasRegion(m_atlas->getType())) {
+                textureAtlas = region->atlas;
+
+                if (method.src.isValid())
+                    method.src.translate(region->x, region->y);
+            }
         }
     }
 
@@ -70,19 +77,16 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
 
     if (!list.empty() && list.back().state == state) {
         auto& last = list.back();
-        coordsBuffer ? last.coords->append(coordsBuffer.get())
-            : addCoords(*last.coords, method);
+        coordsBuffer ? last.coords->append(coordsBuffer.get()) : addCoords(*last.coords, method);
     } else if (m_alwaysGroupDrawings) {
         auto& coords = m_coords.try_emplace(state.hash, nullptr).first->second;
         if (!coords) {
             coords = list.emplace_back(getState(texture, textureAtlas, color), getCoordsBuffer()).coords.get();
         }
-        coordsBuffer ? coords->append(coordsBuffer.get())
-            : addCoords(*coords, method);
+        coordsBuffer ? coords->append(coordsBuffer.get()) : addCoords(*coords, method);
     } else {
         auto& draw = list.emplace_back(getState(texture, textureAtlas, color), getCoordsBuffer());
-        coordsBuffer ? draw.coords->append(coordsBuffer.get())
-            : addCoords(*draw.coords, method);
+        coordsBuffer ? draw.coords->append(coordsBuffer.get()) : addCoords(*draw.coords, method);
     }
 
     resetOnlyOnceParameters();
@@ -164,15 +168,22 @@ DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, Texture* textu
 {
     PoolState copy = getCurrentState();
 
-    if (copy.color != color) copy.color = color;
+    if (copy.color != color)
+        copy.color = color;
 
     if (textureAtlas) {
+        // Texture is batched inside an atlas
         copy.textureId = textureAtlas->getId();
         copy.textureMatrixId = textureAtlas->getTransformMatrixId();
     } else if (texture) {
-        if (texture->isEmpty() || !texture->canCacheInAtlas() || texture->canCacheInAtlas() && m_atlas) {
+        if (texture->isEmpty() || // Texture not initialized in the current OpenGL context
+            !texture->canCacheInAtlas() || // Texture is marked as non-atlas-cacheable (short-lived/temporary, e.g. minimap)
+            (m_atlas && m_atlas->canAdd(texture)) // Force this texture to be packed into the current pool atlas,
+                                                  // even if it might already belong to another DrawPool's atlas
+        ) {
             copy.texture = texture;
         } else {
+            // Standalone GL texture cached in memory (non-atlased)
             copy.textureId = texture->getId();
             copy.textureMatrixId = texture->getTransformMatrixId();
         }

@@ -26,6 +26,9 @@
 
 #include "binarytree.h"
 #include "graphicalapplication.h"
+#if ENABLE_ENCRYPTION == 1
+#include "resourcemanager.h"
+#endif
 
 inline void grow(std::vector<uint8_t>& data, const size_t size) {
     if (size > data.size())

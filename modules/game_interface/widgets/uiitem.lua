@@ -8,6 +8,7 @@ function UIItem:onDragEnter(mousePos)
         return false
     end
 
+    UIDragIcon:display(item)
     self:setBorderWidth(1)
     self.currentDragThing = item
     g_mouse.pushCursor('target')
@@ -20,6 +21,7 @@ function UIItem:onDragLeave(droppedWidget, mousePos)
     end
     self.currentDragThing = nil
     g_mouse.popCursor('target')
+    UIDragIcon:hide()
     self:setBorderWidth(0)
     self.hoveredWho = nil
     return true
@@ -35,6 +37,10 @@ function UIItem:onDrop(widget, mousePos)
     local item = widget.currentDragThing
     if not item:isItem() then
         return false
+    end
+
+    if self:isVirtual() then
+        UIDragIcon:hide()
     end
 
     local itemPos = item:getPosition()
@@ -77,6 +83,10 @@ function UIItem:onDestroy()
         self.hoveredWho:setBorderWidth(0)
     end
 
+    if self:isVirtual() then
+        UIDragIcon:hide()
+    end
+
     if self.hoveredWho then
         self.hoveredWho = nil
     end
@@ -86,6 +96,7 @@ function UIItem:onHoverChange(hovered)
     UIWidget.onHoverChange(self, hovered)
 
     if self:isVirtual() or not self:isDraggable() then
+        UIDragIcon:hide()
         return
     end
 
@@ -141,6 +152,7 @@ function UIItem:onMouseRelease(mousePosition, mouseButton)
     end
 
     if self:isVirtual() then
+        UIDragIcon:hide()
         return false
     end
 
