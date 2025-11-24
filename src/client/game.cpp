@@ -175,7 +175,6 @@ void Game::processGameStart()
 
     // NOTE: the entire map description and local player information is not known yet (bot call is allowed here)
     enableBotCall();
-    g_lua.callGlobalField("g_game", "onGameStart");
     disableBotCall();
 
     if (g_game.getFeature(Otc::GameClientPing) || g_game.getFeature(Otc::GameExtendedClientPing)) {
@@ -191,6 +190,8 @@ void Game::processGameStart()
             m_connectionFailWarned = false;
         }
     }, 1000);
+
+    g_dispatcher.scheduleEvent([] { g_lua.callGlobalField("g_game", "onGameStart"); }, 1000);
 }
 
 void Game::processGameEnd()
