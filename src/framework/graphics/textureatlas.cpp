@@ -35,7 +35,7 @@ void TextureAtlas::removeTexture(uint32_t id, bool smooth) {
     m_texturesCached.erase(it);
 }
 
-bool TextureAtlas::canAdd(const TexturePtr& texture) {
+bool TextureAtlas::canAdd(const TexturePtr& texture) const {
     const auto textureWidth = texture->getWidth();
     const auto textureHeight = texture->getHeight();
 
