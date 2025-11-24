@@ -62,7 +62,9 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
         if (m_atlas) {
             if (const auto region = texture->getAtlasRegion(m_atlas->getType())) {
                 textureAtlas = region->atlas;
-                method.src.translate(region->x, region->y);
+
+                if (method.src.isValid())
+                    method.src.translate(region->x, region->y);
             }
         }
     }
