@@ -172,8 +172,6 @@ void Game::processGameStart()
     // synchronize fight modes with the server
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
 
-    g_lua.callGlobalField("g_game", "onGameStart");
-
     if (g_game.getFeature(Otc::GameClientPing) || g_game.getFeature(Otc::GameExtendedClientPing)) {
         m_pingEvent = g_dispatcher.scheduleEvent([] { g_game.ping(); }, m_pingDelay);
     }
@@ -187,6 +185,8 @@ void Game::processGameStart()
             m_connectionFailWarned = false;
         }
     }, 1000);
+
+    g_dispatcher.scheduleEvent([] { g_lua.callGlobalField("g_game", "onGameStart"); }, 1000);
 }
 
 void Game::processGameEnd()
