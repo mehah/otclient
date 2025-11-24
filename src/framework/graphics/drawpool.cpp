@@ -77,19 +77,16 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
 
     if (!list.empty() && list.back().state == state) {
         auto& last = list.back();
-        coordsBuffer ? last.coords->append(coordsBuffer.get())
-            : addCoords(*last.coords, method);
+        coordsBuffer ? last.coords->append(coordsBuffer.get()) : addCoords(*last.coords, method);
     } else if (m_alwaysGroupDrawings) {
         auto& coords = m_coords.try_emplace(state.hash, nullptr).first->second;
         if (!coords) {
             coords = list.emplace_back(getState(texture, textureAtlas, color), getCoordsBuffer()).coords.get();
         }
-        coordsBuffer ? coords->append(coordsBuffer.get())
-            : addCoords(*coords, method);
+        coordsBuffer ? coords->append(coordsBuffer.get()) : addCoords(*coords, method);
     } else {
         auto& draw = list.emplace_back(getState(texture, textureAtlas, color), getCoordsBuffer());
-        coordsBuffer ? draw.coords->append(coordsBuffer.get())
-            : addCoords(*draw.coords, method);
+        coordsBuffer ? draw.coords->append(coordsBuffer.get()) : addCoords(*draw.coords, method);
     }
 
     resetOnlyOnceParameters();
