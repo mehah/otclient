@@ -57,11 +57,7 @@ bool TextureAtlas::canAdd(const TexturePtr& texture) {
     const int64_t texturePixelArea = static_cast<int64_t>(paddedWidth) * paddedHeight;
 
     // Maximum texture area relative to the atlas
-    if (texturePixelArea > static_cast<int64_t>(atlasPixelArea * MAX_ATLAS_TEXTURE_COVERAGE)) {
-        return false;
-    }
-
-    return true;
+    return texturePixelArea <= static_cast<int64_t>(atlasPixelArea * MAX_ATLAS_TEXTURE_COVERAGE);
 }
 
 void TextureAtlas::addTexture(const TexturePtr& texture) {
