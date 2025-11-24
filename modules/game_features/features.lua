@@ -1,7 +1,6 @@
 controller = Controller:new()
 controller:registerEvents(g_game, {
     onClientVersionChange = function(version)
-        g_modules.updateModulesByClientVersion(version)
         -- g_game.enableFeature(GameKeepUnawareTiles)
         -- g_game.enableFeature(GameNegativeOffset)
         -- g_game.enableFeature(GameWingsAurasEffectsShader)
