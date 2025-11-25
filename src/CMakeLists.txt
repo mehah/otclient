@@ -3,10 +3,6 @@ project(otclient)
 # *****************************************************************************
 # Options
 # *****************************************************************************
-if(CMAKE_BASE_NAME STREQUAL "em++")
-  set(WASM ON)
-  message(STATUS "WASM: ON")
-endif()
 
 option(TOGGLE_FRAMEWORK_GRAPHICS "Use Graphics " ON)
 option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
