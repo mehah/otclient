@@ -9,6 +9,7 @@
     "liblzma",
     "libobfuscate",
     "libogg",
+    "abseil",
     "libvorbis",
     "nlohmann-json",
     "openal-soft",
