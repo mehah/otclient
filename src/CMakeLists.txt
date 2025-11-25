@@ -649,7 +649,6 @@ elseif(WASM)
           ${HTTPLIB_LIBRARY}
 
           protobuf::libprotobuf protobuf
-          Threads::Threads
           asio::asio
           # OpenAL::OpenAL (using emscripten openal api)
           LibLZMA::LibLZMA
