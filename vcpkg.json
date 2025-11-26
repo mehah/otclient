@@ -13,7 +13,10 @@
     "libvorbis",
     "nlohmann-json",
     "openal-soft",
-    "openssl",
+    {
+      "name": "openssl",
+      "platform": "!wasm32"
+    },
     "parallel-hashmap",
     "physfs",
     "protobuf",
@@ -44,5 +47,5 @@
       "platform": "windows"
     }
   ],
-  "builtin-baseline":"b322364f06308bdd24823f9d8f03fe0cc86fd46f"
+  "builtin-baseline": "b322364f06308bdd24823f9d8f03fe0cc86fd46f"
 }
