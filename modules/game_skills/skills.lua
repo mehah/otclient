@@ -825,7 +825,6 @@ function refresh()
     update()
     updateHeight()
     if g_game.getClientVersion() >= 1410 then
-        -- Always show default Offence, Defence, and Misc stats when loading window
         onFlatDamageHealingChange(player, statsCache.flatDamageHealing)
         onAttackInfoChange(player, statsCache.attackValue, statsCache.attackElement)
         onConvertedDamageChange(player, statsCache.convertedDamage, statsCache.convertedElement)
