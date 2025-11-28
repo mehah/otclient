@@ -648,7 +648,7 @@ function setSkillValue(id, value)
             widget:setText(((id == 'skillId8') and "+" or "") .. value .. "%")
         end
     else
-        widget:setText(value .. "%")
+        widget:setText(value)
         widget:setColor('#C0C0C0')
     end
 end
