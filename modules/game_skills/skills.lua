@@ -629,8 +629,28 @@ function setSkillValue(id, value)
         return
     end
     local widget = skill:getChildById('value')
-    local isSmallSkillButton = isSkillInGroups(id, {'GameAdditionalSkills'})
-    widget:setText(isSmallSkillButton and value .. "%" or value)
+    local GameAdditionalSkills = isSkillInGroups(id, {'GameAdditionalSkills'})
+    if GameAdditionalSkills then
+        local usePercentage = g_game.getFeature(GameEnterGameShowAppearance)
+        if usePercentage then
+            local needsDecimals = (id == 'skillId10' or id == 'skillId12')
+            local displayValue = needsDecimals and (value / 100) or value
+            local text = needsDecimals
+                and string.format("%.2f%%", displayValue)
+                or (displayValue .. "%")
+        
+            widget:setText(text)
+            local color = (displayValue > 0 and 'green')
+                or (displayValue == 0 and '#C0C0C0')
+                or 'red'
+            widget:setColor(color)
+        else
+            widget:setText(((id == 'skillId8') and "+" or "") .. value .. "%")
+        end
+    else
+        widget:setText(value .. "%")
+        widget:setColor('#C0C0C0')
+    end
 end
 
 function isSkillInGroups(skillId, groupNames)
