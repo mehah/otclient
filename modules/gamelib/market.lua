@@ -177,7 +177,9 @@ MarketItemDescriptionStrings = {
     [20] = 'Reflection',
     [21] = 'Perfect Show',
     [22] = 'Upgrade Classification',
-    [23] = 'Tier'
+    [24] = 'Elemental Bond',
+    [25] = 'Mantra',
+    [26] = 'Tier',
 }
 
 function getMarketDescriptionName(id)

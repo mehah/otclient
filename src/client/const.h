@@ -730,7 +730,10 @@ namespace Otc
         ITEM_DESC_REFLECTION = 20,
         ITEM_DESC_PERFECT = 21,
         ITEM_DESC_UPGRADECLASS = 22,
-        ITEM_DESC_CURRENTTIER = 23,
+        ITEM_DESC_ELEMENTALBOND = 24,
+        ITEM_DESC_MANTRA = 25,
+        ITEM_DESC_IMBUEMENTEFFECT = 26,
+        ITEM_DESC_CURRENTTIER = 27,
 
         ITEM_DESC_FIRST = ITEM_DESC_ARMOR,
         ITEM_DESC_LAST = ITEM_DESC_CURRENTTIER,
@@ -859,12 +862,14 @@ namespace Otc
         PALADIN = 2,
         SORCERER = 3,
         DRUID = 4,
+        MONK = 5,
         ELITE_KNIGHT = 11,
         ROYAL_PALADIN = 12,
         MASTER_SORCERER = 13,
         ELDER_DRUID = 14,
+        EXALTED_MONK = 15,
         FIRST = KNIGHT,
-        LAST = DRUID,
+        LAST = MONK,
     };
 
     enum PartyAnalyzerAction_t : uint8_t

@@ -618,21 +618,31 @@ struct DailyRewardData
 
 struct CyclopediaCharacterOffenceStats
 {
-    double critChance;
-    double critDamage;
-    double critDamageBase;
+    double critChanceTotal;
+    double critChanceFlat;
+    double critChanceEquipament;
+    double critChanceImbuement;
+    double critChanceWheel;
+    double critChanceConcoction;
+
+    double critDamageTotal;
+    double critDamageFlat;
+    double critDamageEquipament;
     double critDamageImbuement;
     double critDamageWheel;
+    double critDamageConcoction;
 
-    double lifeLeech;
-    double lifeLeechBase;
+    double lifeLeechTotal;
+    double lifeLeechEquipament;
     double lifeLeechImbuement;
     double lifeLeechWheel;
+    double lifeLeechEventBonus;
 
-    double manaLeech;
-    double manaLeechBase;
+    double manaLeechTotal;
+    double manaLeechEquipament;
     double manaLeechImbuement;
     double manaLeechWheel;
+    double manaLeechEventBonus;
 
     double onslaught;
     double onslaughtBase;

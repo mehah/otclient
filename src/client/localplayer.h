@@ -184,6 +184,7 @@ private:
     uint8_t m_autoWalkRetries{ 0 };
 
     uint64_t m_states{ 0 };
+    uint8_t m_vocation{ 0 };
     uint16_t m_blessings{ Otc::BlessingNone };
 
     uint32_t m_freeCapacity{ 0 };
