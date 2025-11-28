@@ -1,0 +1,67 @@
+AuthenticatorTokenWindow < MainWindow
+  id: tokenWindow
+  !text: tr('Two-Factor Authentication')
+  size: 360 130
+  image-source: /images/ui/miniwindow
+  image-border: 10
+  draggable: true
+  moveable: true
+  focusable: true
+  @onEnter: EnterGame.doLoginWithToken()
+  @onEscape: |
+    EnterGame.destroyToken()
+    EnterGame.show()
+
+  Label
+    id: authTokenLabel
+    !text: tr('Please enter your authentication code:')
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 1
+    margin-left: 15
+    margin-right: 15
+    font: verdana-11px-monochrome
+    color: white
+    text-auto-resize: true
+
+  TextEdit
+    id: authenticatorTokenTextEdit
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 2
+    margin-left: 15
+    margin-right: 15
+    height: 22
+    font: verdana-11px-monochrome
+    max-length: 8
+    background-color: #1e1e1e
+    border: 1 #000000
+    border-color: #888888
+    text-color: white
+
+  Button
+    id: cancelButton
+    !text: tr('Cancel')
+    width: 60
+    height: 18
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 2
+    margin-left: 15
+    font: verdana-11px
+    @onClick: |
+      EnterGame.destroyToken()
+      EnterGame.show()
+
+  Button
+    id: confirmButton
+    !text: tr('Ok')
+    width: 60
+    height: 18
+    anchors.top: cancelButton.top
+    anchors.right: parent.right
+    margin-right: 15
+    font: verdana-11px
+    @onClick: EnterGame.doLoginWithToken()

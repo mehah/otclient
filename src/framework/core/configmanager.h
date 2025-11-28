@@ -41,6 +41,8 @@ public:
     bool unload(const std::string& file);
     void remove(const ConfigPtr& config);
 
+    void saveSettings();
+
 protected:
     ConfigPtr m_settings;
 
