@@ -457,7 +457,7 @@ void LocalPlayer::setInventoryItem(const Otc::InventorySlot inventory, const Ite
     callLuaField("onInventoryChange", inventory, item, oldItem);
 }
 
-void LocalPlayer::setInventoryCountCache(std::map<std::pair<uint16_t, uint8_t>, uint16_t> counts)
+void LocalPlayer::setInventoryCountCache(std::map<std::pair<uint16_t, uint8_t>, uint32_t> counts)
 {
     m_inventoryCountCache = std::move(counts);
 }
@@ -483,7 +483,7 @@ bool LocalPlayer::hasEquippedItemId(const uint16_t itemId, const uint8_t tier)
     return false;
 }
 
-uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tier)
+uint32_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tier)
 {
     if (std::cmp_equal(itemId, 0))
         return 0;
@@ -513,11 +513,11 @@ uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tie
             accumulate(item);
     }
 
-    constexpr uint32_t maxUint16 = 65535;
-    if (total > maxUint16) {
-        total = maxUint16;
+    constexpr uint64_t maxUint32 = 4294967295;
+    if (total > maxUint32) {
+        total = maxUint32;
     }
-    return static_cast<uint16_t>(total);
+    return static_cast<uint32_t>(total);
 }
 
 void LocalPlayer::setPremium(const bool premium)

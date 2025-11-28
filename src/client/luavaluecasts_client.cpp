@@ -1299,13 +1299,13 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
 {
     g_lua.createTable(0, 30);
 
-    g_lua.pushNumber(data.critChance);
+    g_lua.pushNumber(data.critChanceTotal);
     g_lua.setField("critChance");
 
-    g_lua.pushNumber(data.critDamage);
+    g_lua.pushNumber(data.critDamageTotal);
     g_lua.setField("critDamage");
 
-    g_lua.pushNumber(data.critDamageBase);
+    g_lua.pushNumber(data.critDamageEquipament);
     g_lua.setField("critDamageBase");
 
     g_lua.pushNumber(data.critDamageImbuement);
@@ -1314,10 +1314,10 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     g_lua.pushNumber(data.critDamageWheel);
     g_lua.setField("critDamageWheel");
 
-    g_lua.pushNumber(data.lifeLeech);
+    g_lua.pushNumber(data.lifeLeechTotal);
     g_lua.setField("lifeLeech");
 
-    g_lua.pushNumber(data.lifeLeechBase);
+    g_lua.pushNumber(data.lifeLeechEquipament);
     g_lua.setField("lifeLeechBase");
 
     g_lua.pushNumber(data.lifeLeechImbuement);
@@ -1326,10 +1326,10 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     g_lua.pushNumber(data.lifeLeechWheel);
     g_lua.setField("lifeLeechWheel");
 
-    g_lua.pushNumber(data.manaLeech);
+    g_lua.pushNumber(data.manaLeechTotal);
     g_lua.setField("manaLeech");
 
-    g_lua.pushNumber(data.manaLeechBase);
+    g_lua.pushNumber(data.manaLeechEquipament);
     g_lua.setField("manaLeechBase");
 
     g_lua.pushNumber(data.manaLeechImbuement);

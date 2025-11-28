@@ -444,6 +444,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerLootContainers:
                     parseLootContainers(msg);
                     break;
+                case Proto::GameServerVirtue: 
+                    parseVirtue(msg);
+                    break;
                 case Proto::GameServerCyclopediaHouseAuctionMessage:
                     parseCyclopediaHouseAuctionMessage(msg);
                     break;
@@ -2504,6 +2507,9 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         // Defense info
         const uint16_t defense = msg->getU16();
         const uint16_t armor = msg->getU16();
+        if (g_game.getClientVersion() >= 1500) {
+            msg->getU16(); // getMantraTotal
+        }
         const double mitigation = msg->getDouble();
         const double dodge = msg->getDouble();
         const uint16_t damageReflection = msg->getU16();
@@ -3372,20 +3378,38 @@ void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
     g_lua.callGlobalField("g_game", "onItemInfo", itemList);
 }
 
+static inline uint32_t readPackedCount1500(const InputMessagePtr& msg) {
+    const uint8_t b1 = msg->getU8();
+    if (b1 < 0x40) {
+        return b1;
+    } else if (b1 < 0x80) {
+        const uint8_t b2 = msg->getU8();
+        return (static_cast<uint32_t>(b1 - 0x40) << 8) | static_cast<uint32_t>(b2);
+    } else {
+        const uint8_t b2 = msg->getU8();
+        const uint8_t b3 = msg->getU8();
+        const uint8_t b4 = msg->getU8();
+        return (static_cast<uint32_t>(b2) << 16) | (static_cast<uint32_t>(b3) << 8) | static_cast<uint32_t>(b4);
+    }
+}
+
 void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 {
     const uint16_t size = msg->getU16();
+
     constexpr uint16_t MAX_INVENTORY_TYPES = 10000;
     if (size > MAX_INVENTORY_TYPES) {
         g_logger.warning("[game_actionBar][parsePlayerInventory]: inventory size {} exceeds maximum allowed {}", size, MAX_INVENTORY_TYPES);
         return;
     }
-    std::map<std::pair<uint16_t, uint8_t>, uint16_t> inventoryCounts;
+
+    std::map<std::pair<uint16_t, uint8_t>, uint32_t> inventoryCounts;
 
     for (uint16_t i = 0; std::cmp_less(i, size); ++i) {
         const uint16_t itemId = msg->getU16();
         const uint8_t attribute = msg->getU8();
-        const uint16_t amount = msg->getU16();
+
+        const uint32_t amount = readPackedCount1500(msg);
 
         uint8_t tier = 0;
         if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem)) {
@@ -3396,8 +3420,8 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 
         const auto key = std::make_pair(itemId, tier);
         auto& entry = inventoryCounts[key];
-        const uint32_t sum = static_cast<uint32_t>(entry) + amount;
-        entry = static_cast<uint16_t>(std::min<uint32_t>(sum, (std::numeric_limits<uint16_t>::max)()));
+        const uint64_t sum = static_cast<uint64_t>(entry) + amount;
+        entry = static_cast<uint32_t>(std::min<uint64_t>(sum, (std::numeric_limits<uint32_t>::max)()));
     }
 
     if (const auto& localPlayer = g_game.getLocalPlayer()) {
@@ -4222,6 +4246,31 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     g_lua.callGlobalField("g_game", "onQuickLootContainers", quickLootFallbackToMainContainer, lootList);
 }
 
+void ProtocolGame::parseVirtue(const InputMessagePtr& msg) { // @note: improve name
+    const uint8_t subtype = msg->getU8();
+
+    switch (subtype) {
+        case 0x00: { // Harmony
+            const uint8_t harmonyValue = msg->getU8();
+            g_lua.callGlobalField("g_game", "onHarmonyProtocol", harmonyValue);
+            break;
+        }
+        case 0x01: { // Serene
+            const bool isSerene = msg->getU8() == 0x01;
+            g_lua.callGlobalField("g_game", "onSereneProtocol", isSerene);
+            break;
+        }
+        case 0x02: { // Virtue
+            const uint8_t virtueValue = msg->getU8();
+            g_lua.callGlobalField("g_game", "onVirtueProtocol", virtueValue);
+            break;
+        }
+        default:
+            g_logger.error("Unknown virtue subtype: {}", subtype);
+            break;
+    }
+}
+
 void ProtocolGame::parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg)
 {
     msg->getU32(); // houseId
@@ -5025,32 +5074,36 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
         case Otc::CYCLOPEDIA_CHARACTERINFO_OFFENCESTATS:
         {
             CyclopediaCharacterOffenceStats data;
-            data.critChance = msg->getDouble();
-            msg->getDouble(); // unused
-            msg->getDouble(); // unused
-            msg->getDouble(); // unused
-            msg->getDouble(); // unused
+
+            // Critical hit chance
+            data.critChanceTotal = msg->getDouble();
+            data.critChanceFlat = msg->getDouble(); 
+            data.critChanceEquipament = msg->getDouble();
+            data.critChanceImbuement = msg->getDouble();
+            data.critChanceWheel = msg->getDouble();
+            data.critChanceConcoction = msg->getDouble();
 
             // Critical hit damage
-            data.critDamage = msg->getDouble();
-            data.critDamageBase = msg->getDouble();
+            data.critDamageTotal = msg->getDouble();
+            data.critDamageFlat = msg->getDouble();
+            data.critDamageEquipament = msg->getDouble();
             data.critDamageImbuement = msg->getDouble();
             data.critDamageWheel = msg->getDouble();
-            msg->getDouble(); // unused
+            data.critDamageConcoction = msg->getDouble();
 
             // Life leech amount
-            data.lifeLeech = msg->getDouble();
-            data.lifeLeechBase = msg->getDouble();
+            data.lifeLeechTotal = msg->getDouble();
+            data.lifeLeechEquipament = msg->getDouble();
             data.lifeLeechImbuement = msg->getDouble();
             data.lifeLeechWheel = msg->getDouble();
-            msg->getDouble(); // unused
+            data.lifeLeechEventBonus = msg->getDouble();
 
             // Mana leech amount
-            data.manaLeech = msg->getDouble();
-            data.manaLeechBase = msg->getDouble();
+            data.manaLeechTotal = msg->getDouble();
+            data.manaLeechEquipament = msg->getDouble();
             data.manaLeechImbuement = msg->getDouble();
             data.manaLeechWheel = msg->getDouble();
-            msg->getDouble(); // unused
+            data.manaLeechEventBonus = msg->getDouble();
 
             // Onslaught
             data.onslaught = msg->getDouble();
@@ -5061,7 +5114,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             data.cleavePercent = msg->getDouble();
 
             // Perfect shot range
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 7; i++) {
                 data.perfectShotDamage.push_back(msg->getU16());
             }
 
@@ -5085,6 +5138,22 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 data.weaponAccuracy.push_back(msg->getDouble());
             }
 
+            msg->getDouble(); // unused
+            msg->getU16(); // unused
+            msg->getU8(); // unused
+            msg->getDouble(); // unused
+            msg->getDouble(); // unused
+            msg->getU8(); // unused
+            msg->getDouble(); // unused
+            msg->getDouble(); // unused
+            msg->getU16(); // unused
+            msg->getU16(); // unused
+            msg->getU16(); // unused
+            msg->getU16(); // unused
+            msg->getU8(); // unused
+            msg->getU8(); // unused
+            msg->getU8(); // unused
+
             g_game.processCyclopediaCharacterOffenceStats(data);
             break;
         }
@@ -5104,6 +5173,9 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             data.reflectPhysical = msg->getU16();
             data.armor = msg->getU16();
+            if (g_game.getClientVersion() >= 1500) {
+                msg->getU16(); // MANTRA
+            }
 
             data.defense = msg->getU16();
             data.defenseEquipment = msg->getU16();
@@ -5164,6 +5236,9 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 data.concoctions.push_back(concoction);
             }
 
+            msg->getU8(); // unused
+            msg->getU8(); // unused
+            msg->getU8(); // unused
             msg->getU8(); // unused
 
             g_game.processCyclopediaCharacterMiscStats(data);
@@ -5655,6 +5730,14 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
 
     for (int_fast32_t i = Otc::ITEM_DESC_FIRST; i <= lastAttribute; i++) {
         if (i == Otc::ITEM_DESC_AUGMENT && !g_game.getFeature(Otc::GameItemAugment)) {
+            continue;
+        }
+
+        if (g_game.getClientVersion() < 1500 && (i == Otc::ITEM_DESC_ELEMENTALBOND || i == Otc::ITEM_DESC_MANTRA)) {
+            continue;
+        }
+
+        if (g_game.getClientVersion() < 1510 && (i == Otc::ITEM_DESC_IMBUEMENTEFFECT)) {
             continue;
         }
 
