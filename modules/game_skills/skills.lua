@@ -2,6 +2,7 @@ skillsWindow = nil
 skillsButton = nil
 skillsSettings = nil
 local ExpRating = {}
+local smallSkillsCache = {}
 
 -- Cache for stats data when UI elements are hidden
 local statsCache = {
@@ -37,8 +38,6 @@ local statsCache = {
     transcendence = 0,
     amplification = 0
 }
-
-
 
 local function setupUIButtons()
     local toggleFilterButton = skillsWindow:recursiveGetChildById('toggleFilterButton')
@@ -123,6 +122,7 @@ function init()
     refresh()
     skillsWindow:setup()
     if g_game.isOnline() then
+        online()
         skillsWindow:setupOnStart()
     end
 end
@@ -169,26 +169,24 @@ end
 
 local SKILL_GROUPS = {
     offence = {
-        'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
-        'skillId13', 'skillId14', 'skillId15', 'skillId16', 'separadorOnOffenceInfoChange',
         'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
-        'criticalHit', 'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
+        'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
     },
     defence = {
         'physicalResist', 'fireResist', 'earthResist', 'energyResist', 'IceResist', 
         'HolyResist', 'deathResist', 'HealingResist', 'drowResist', 'lifedrainResist', 
         'manadRainResist', 'defenceValue', 'armorValue', 'mitigation', 'dodge', 
-        'damageReflection', 'separadorOnDefenseInfoChange'
+        'damageReflection'
     },
     misc = {
-        'momentum', 'transcendence', 'amplification', 'separadorOnForgeBonusesChange'
+        'momentum', 'transcendence', 'amplification'
     },
     individual = {
         'level', 'stamina', 'offlineTraining', 'magiclevel', 'skillId0', 'skillId1', 
         'skillId2', 'skillId3', 'skillId4', 'skillId5', 'skillId6'
     },
     GameAdditionalSkills = {
-        'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 'separadorOnOffenceInfoChange'
+        'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12'
     },
     GameForgeSkillStats = {
         'skillId13', 'skillId14', 'skillId15'
@@ -205,7 +203,18 @@ local function setSkillGroupVisibility(groupName, visible)
     for _, skillId in pairs(skills) do
         local skill = skillsWindow:recursiveGetChildById(skillId)
         if skill then
-            skill:setVisible(visible)
+            if visible then
+                local valueWidget = skill:getChildById('value')
+                local text = valueWidget and valueWidget:getText() or ""
+                if g_game.getClientVersion() >= 1410 then
+                    skill:setVisible(text ~= "" and text ~= "0" and text ~= "0%" and 
+                        text ~= "+ 0%" and text ~= "0.0%" and text ~= "+ 0.0%")
+                else
+                    skill:setVisible(true)
+                end
+            else
+                skill:setVisible(false)
+            end
         end
     end
 end
@@ -276,18 +285,23 @@ local function toggleGroupVisibility(groupName)
 end
 
 local function hideOldClientStats()
-    local version = g_game.getClientVersion()
-    if g_game.getClientVersion() >= 1412 then
-        return
+    local features = {
+        newAppearance = g_game.getFeature(GameEnterGameShowAppearance),
+        charSkills = g_game.getFeature(GameCharacterSkillStats),
+        additionalSkills = g_game.getFeature(GameAdditionalSkills),
+        forgeSkills = g_game.getFeature(GameForgeSkillStats)
+    }
+    if features.newAppearance then
+        skillsWindow:recursiveGetChildById('regenerationTime'):getChildByIndex(1):setText('Food')
+        skillsWindow:recursiveGetChildById('experience'):getChildByIndex(1):setText('XP')
     end
-    
-    setSkillGroupVisibility('offence', false)
-    setSkillGroupVisibility('defence', false)
-    setSkillGroupVisibility('misc', false)
-    setSkillGroupVisibility('misc', false)
-    setSkillGroupVisibility('GameAdditionalSkills', g_game.getFeature(GameAdditionalSkills))
-    setSkillGroupVisibility('GameForgeSkillStats', g_game.getFeature(GameForgeSkillStats))
-    setSkillGroupVisibility('GameForgeSkillStats1332', g_game.getFeature(GameForgeSkillStats1332) and version >= 1332)
+    local version = g_game.getClientVersion()
+    setSkillGroupVisibility('offence', features.charSkills)
+    setSkillGroupVisibility('defence', features.charSkills)
+    setSkillGroupVisibility('misc', features.charSkills)
+    setSkillGroupVisibility('GameAdditionalSkills', features.additionalSkills)
+    setSkillGroupVisibility('GameForgeSkillStats1332', features.forgeSkills and version >= 1332)
+    setSkillGroupVisibility('GameForgeSkillStats', features.forgeSkills)
 end
 
 local function hideMenuOptionsForOldClients(menu)
@@ -612,17 +626,31 @@ end
 
 function setSkillValue(id, value)
     local skill = skillsWindow:recursiveGetChildById(id)
-    if skill then
-        local widget = skill:getChildById('value')
-        if id == "skillId7" or id == "skillId8" or id == "skillId9" or id == "skillId11" or id == "skillId13" or id == "skillId14" or id == "skillId15" or id == "skillId16" then
-            if g_game.getFeature(GameEnterGameShowAppearance) then
-                value = value / 100
+    if not skill then return end
+    
+    local widget = skill:getChildById('value')
+    local isSmallSkillButton = isSkillInGroups(id, {'GameAdditionalSkills'})
+    
+    widget:setText(isSmallSkillButton and value .. "%" or value)
+end
+
+function isSkillInGroups(skillId, groupNames)
+    if smallSkillsCache[skillId] ~= nil then
+        return smallSkillsCache[skillId]
+    end
+    for _, groupName in ipairs(groupNames) do
+        local skills = SKILL_GROUPS[groupName]
+        if skills then
+            for _, id in ipairs(skills) do
+                if id == skillId then
+                    smallSkillsCache[skillId] = true
+                    return true
+                end
             end
-            widget:setText(value .. "%")
-        else
-            widget:setText(value)
         end
     end
+    smallSkillsCache[skillId] = false
+    return false
 end
 
 function setSkillColor(id, value)
@@ -735,13 +763,7 @@ end
 
 function online()
     skillsWindow:setupOnStart()
-    setupUIButtons()
     refresh()
-    hideOldClientStats()
-    if g_game.getFeature(GameEnterGameShowAppearance) then
-        skillsWindow:recursiveGetChildById('regenerationTime'):getChildByIndex(1):setText('Food')
-        skillsWindow:recursiveGetChildById('experience'):getChildByIndex(1):setText('XP')
-    end
 
     local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
     if g_game.getClientVersion() < 1310 and newWindowButton then
@@ -754,7 +776,6 @@ function online()
         if sepDefense and sepDefense:isVisible() then
             sepDefense:setVisible(false)
         end
-
 
         local lockButton = skillsWindow:recursiveGetChildById('lockButton')
         local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
@@ -771,6 +792,8 @@ function online()
     scheduleEvent(function() 
         loadSkillsVisibilitySettings() 
     end, 100)
+    hideOldClientStats()
+    updateHeight()
 end
 
 function refresh()
@@ -800,11 +823,9 @@ function refresh()
     for i = Skill.Fist, Skill.Transcendence do
         onSkillChange(player, i, player:getSkillLevel(i), player:getSkillLevelPercent(i))
     end
-
     update()
     updateHeight()
-    loadSkillsVisibilitySettings()
-    if g_game.getClientVersion() >= 1412 then
+    if g_game.getClientVersion() >= 1410 then
         -- Always show default Offence, Defence, and Misc stats when loading window
         onFlatDamageHealingChange(player, statsCache.flatDamageHealing)
         onAttackInfoChange(player, statsCache.attackValue, statsCache.attackElement)
@@ -897,12 +918,42 @@ function updateHeight()
     skillsWindow:setContentMaximumHeight(maximumHeight)
 end
 
+local function resetTable(t)
+    for k, v in pairs(t) do
+        if type(v) == "table" then
+            resetTable(v)
+        else
+            t[k] = 0
+        end
+    end
+end
+
 function offline()
     skillsWindow:setParent(nil, true)
     if expSpeedEvent then
         expSpeedEvent:cancel()
         expSpeedEvent = nil
     end
+    
+    local allGroups = {'offence', 'defence', 'misc', 'GameAdditionalSkills', 'GameForgeSkillStats', 'GameForgeSkillStats1332'}
+    for _, groupName in pairs(allGroups) do
+        local skills = SKILL_GROUPS[groupName]
+        if skills then
+            for _, skillId in pairs(skills) do
+                local skill = skillsWindow:recursiveGetChildById(skillId)
+                if skill then
+                    if not string.find(skillId, "separador") then
+                        local valueWidget = skill:getChildById('value')
+                        if valueWidget then
+                            valueWidget:setText("0")
+                        end
+                        skill:setVisible(false)
+                    end
+                end
+            end
+        end
+    end
+    resetTable(statsCache)
     g_settings.setNode('skills-hide', skillSettings)
 end
 
@@ -918,8 +969,6 @@ function toggle()
             end
             panel:addChild(skillsWindow)
         end
-        
-        setupUIButtons()
         skillsWindow:open()
         skillsButton:setOn(true)
         updateHeight()
@@ -1296,6 +1345,18 @@ local function setSkillValueWithTooltips(id, value, tooltip, showPercentage, col
     end
     
     if value ~= nil then
+        local shouldHide = false
+        if value == 0 or (type(value) == "number" and math.abs(value) < 0.0001) then
+            shouldHide = true
+        elseif showPercentage then
+            local percentValue = math.floor(value * 10000) / 100
+            shouldHide = (percentValue == 0 or math.abs(percentValue) < 0.01)
+        end
+        if shouldHide then
+            skill:setVisible(false)
+            return
+        end
+        
         skill:show()
         local widget = skill:getChildById('value')
         if not widget then
@@ -1387,12 +1448,22 @@ function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critD
         critDamage = "You get +1% of the damage dealt as mana",
         onslaught = "You get +1% of the damage dealt as hit points"
     }
-    skillsWindow:recursiveGetChildById("criticalHit"):setVisible(true)
+    
     setSkillValueWithTooltips('lifeLeech', lifeLeech, tooltips.lifeLeech, true)
     setSkillValueWithTooltips('manaLeech', manaLeech, tooltips.manaLeech, true)
     setSkillValueWithTooltips('criticalChance', critChance, tooltips.critChance, true)
     setSkillValueWithTooltips('criticalExtraDamage', critDamage, tooltips.critDamage, true)
     setSkillValueWithTooltips('onslaught', onslaught, tooltips.onslaught, true)
+    local criticalHitWidget = skillsWindow:recursiveGetChildById("criticalHit")
+    if criticalHitWidget then
+        local critChanceWidget = skillsWindow:recursiveGetChildById("criticalChance")
+        local critDamageWidget = skillsWindow:recursiveGetChildById("criticalExtraDamage")
+        local shouldShowCriticalHit = false
+        if (critChanceWidget and critChanceWidget:isVisible()) or (critDamageWidget and critDamageWidget:isVisible()) then
+            shouldShowCriticalHit = true
+        end
+        criticalHitWidget:setVisible(shouldShowCriticalHit)
+    end
 end
 
 local combatIdToWidgetId = {
@@ -1425,6 +1496,7 @@ function onCombatAbsorbValuesChange(localPlayer, absorbValues)
         end
     end
 end
+
 function onDefenseInfoChange(localPlayer, defense, armor, mitigation, dodge, damageReflection)
     -- Cache the data regardless of visibility
     statsCache.defense = defense or 0
