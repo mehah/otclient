@@ -1535,6 +1535,19 @@ int push_luavalue(const CyclopediaCharacterMiscStats& data)
     return 1;
 }
 
+int push_luavalue(const ForgeHistory& item) {
+    g_lua.createTable(0, 4);
+    g_lua.pushInteger(item.createdAt);
+    g_lua.setField("createdAt");
+    g_lua.pushInteger(item.actionType);
+    g_lua.setField("actionType");
+    g_lua.pushString(item.description);
+    g_lua.setField("description");
+    g_lua.pushInteger(item.bonus);
+    g_lua.setField("bonus");
+    return 1;
+}
+
 int push_luavalue(const ForgeItemInfo& item) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(item.id);
@@ -1543,6 +1556,38 @@ int push_luavalue(const ForgeItemInfo& item) {
     g_lua.setField("tier");
     g_lua.pushInteger(item.count);
     g_lua.setField("count");
+    return 1;
+}
+
+int push_luavalue(const ForgeTierPrice& data) {
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(data.tier);
+    g_lua.setField("tier");
+    g_lua.pushInteger(data.price);
+    g_lua.setField("price");
+    return 1;
+}
+
+int push_luavalue(const ForgeGradeData& data) {
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(data.tier);
+    g_lua.setField("tier");
+    g_lua.pushInteger(data.exaltedCores);
+    g_lua.setField("exaltedCores");
+    return 1;
+}
+
+int push_luavalue(const ForgeClassTierPrices& data) {
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(data.classId);
+    g_lua.setField("classId");
+
+    g_lua.createTable(data.tiers.size(), 0);
+    for (size_t i = 0; i < data.tiers.size(); ++i) {
+        push_luavalue(data.tiers[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("tiers");
     return 1;
 }
 
@@ -1604,6 +1649,108 @@ int push_luavalue(const ForgeOpenData& data) {
     return 1;
 }
 
+int push_luavalue(const ForgeResultData& data) {
+    g_lua.createTable(0, 8);
+    g_lua.pushInteger(data.actionType);
+    g_lua.setField("actionType");
+    g_lua.pushBoolean(data.convergence);
+    g_lua.setField("convergence");
+    g_lua.pushBoolean(data.success);
+    g_lua.setField("success");
+    g_lua.pushInteger(data.leftItemId);
+    g_lua.setField("leftItemId");
+    g_lua.pushInteger(data.leftTier);
+    g_lua.setField("leftTier");
+    g_lua.pushInteger(data.rightItemId);
+    g_lua.setField("rightItemId");
+    g_lua.pushInteger(data.rightTier);
+    g_lua.setField("rightTier");
+    g_lua.pushInteger(data.bonus);
+    g_lua.setField("bonus");
+    g_lua.pushInteger(data.coreCount);
+    g_lua.setField("coreCount");
+    return 1;
+}
+
+int push_luavalue(const ForgeConfigData& data) {
+    g_lua.createTable(0, 14);
+
+    g_lua.createTable(data.classPrices.size(), 0);
+    for (size_t i = 0; i < data.classPrices.size(); ++i) {
+        push_luavalue(data.classPrices[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("classPrices");
+
+    g_lua.createTable(data.fusionGrades.size(), 0);
+    for (size_t i = 0; i < data.fusionGrades.size(); ++i) {
+        push_luavalue(data.fusionGrades[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("fusionGrades");
+
+    g_lua.createTable(data.convergenceFusionPrices.size(), 0);
+    for (size_t i = 0; i < data.convergenceFusionPrices.size(); ++i) {
+        push_luavalue(data.convergenceFusionPrices[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("convergenceFusionPrices");
+
+    g_lua.createTable(data.convergenceTransferPrices.size(), 0);
+    for (size_t i = 0; i < data.convergenceTransferPrices.size(); ++i) {
+        push_luavalue(data.convergenceTransferPrices[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("convergenceTransferPrices");
+
+    g_lua.pushInteger(data.dustPercent);
+    g_lua.setField("dustPercent");
+
+    g_lua.pushInteger(data.dustToSliver);
+    g_lua.setField("dustToSliver");
+
+    g_lua.pushInteger(data.sliverToCore);
+    g_lua.setField("sliverToCore");
+
+    g_lua.pushInteger(data.dustPercentUpgrade);
+    g_lua.setField("dustPercentUpgrade");
+
+    g_lua.pushInteger(data.maxDustLevel);
+    g_lua.setField("maxDustLevel");
+
+    g_lua.pushInteger(data.maxDustCap);
+    g_lua.setField("maxDustCap");
+
+    g_lua.pushInteger(data.normalDustFusion);
+    g_lua.setField("normalDustFusion");
+
+    if (data.hasConvergence) {
+        g_lua.pushInteger(data.convergenceDustFusion);
+        g_lua.setField("convergenceDustFusion");
+    }
+
+    g_lua.pushInteger(data.normalDustTransfer);
+    g_lua.setField("normalDustTransfer");
+
+    if (data.hasConvergence) {
+        g_lua.pushInteger(data.convergenceDustTransfer);
+        g_lua.setField("convergenceDustTransfer");
+    }
+
+    g_lua.pushInteger(data.fusionChanceBase);
+    g_lua.setField("fusionChanceBase");
+
+    g_lua.pushInteger(data.fusionChanceImproved);
+    g_lua.setField("fusionChanceImproved");
+
+    g_lua.pushInteger(data.fusionReduceTierLoss);
+    g_lua.setField("fusionReduceTierLoss");
+
+    g_lua.pushBoolean(data.hasConvergence);
+    g_lua.setField("hasConvergence");
+
+    return 1;
+}
 // Custom structs implementations
 int push_luavalue(const BossCooldownData& data) {
     g_lua.createTable(0, 2);
