@@ -3396,31 +3396,20 @@ static inline uint32_t readPackedCount1500(const InputMessagePtr& msg) {
 void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 {
     const uint16_t size = msg->getU16();
-    /*for (auto i = 1; i <= size; ++i) {
-        msg->getU16(); // id
-        msg->getU8(); // subtype
-        if (g_game.getClientVersion() >= 1500) {
-            if (i <= 11) {
-                msg->getU8(); // count
-            } else {
-                readPackedCount1500(msg);
-            }
-        } else {
-            msg->getU16(); // count
-        }
-    }*/
 
     constexpr uint16_t MAX_INVENTORY_TYPES = 10000;
     if (size > MAX_INVENTORY_TYPES) {
         g_logger.warning("[game_actionBar][parsePlayerInventory]: inventory size {} exceeds maximum allowed {}", size, MAX_INVENTORY_TYPES);
         return;
     }
-    std::map<std::pair<uint16_t, uint8_t>, uint16_t> inventoryCounts;
+
+    std::map<std::pair<uint16_t, uint8_t>, uint32_t> inventoryCounts;
 
     for (uint16_t i = 0; std::cmp_less(i, size); ++i) {
         const uint16_t itemId = msg->getU16();
         const uint8_t attribute = msg->getU8();
-        const uint16_t amount = msg->getU16();
+
+        const uint32_t amount = readPackedCount1500(msg);
 
         uint8_t tier = 0;
         if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem)) {
@@ -3431,8 +3420,8 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 
         const auto key = std::make_pair(itemId, tier);
         auto& entry = inventoryCounts[key];
-        const uint32_t sum = static_cast<uint32_t>(entry) + amount;
-        entry = static_cast<uint16_t>(std::min<uint32_t>(sum, (std::numeric_limits<uint16_t>::max)()));
+        const uint64_t sum = static_cast<uint64_t>(entry) + amount;
+        entry = static_cast<uint32_t>(std::min<uint64_t>(sum, (std::numeric_limits<uint32_t>::max)()));
     }
 
     if (const auto& localPlayer = g_game.getLocalPlayer()) {
