@@ -626,11 +626,11 @@ end
 
 function setSkillValue(id, value)
     local skill = skillsWindow:recursiveGetChildById(id)
-    if not skill then return end
-    
+    if not skill then
+        return
+    end
     local widget = skill:getChildById('value')
     local isSmallSkillButton = isSkillInGroups(id, {'GameAdditionalSkills'})
-    
     widget:setText(isSmallSkillButton and value .. "%" or value)
 end
 
