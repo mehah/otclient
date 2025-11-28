@@ -186,6 +186,15 @@ local SKILL_GROUPS = {
     individual = {
         'level', 'stamina', 'offlineTraining', 'magiclevel', 'skillId0', 'skillId1', 
         'skillId2', 'skillId3', 'skillId4', 'skillId5', 'skillId6'
+    },
+    GameAdditionalSkills = {
+        'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 'separadorOnOffenceInfoChange'
+    },
+    GameForgeSkillStats = {
+        'skillId13', 'skillId14', 'skillId15'
+    },
+    GameForgeSkillStats1332 = {
+        'skillId16'
     }
 }
 
@@ -267,6 +276,7 @@ local function toggleGroupVisibility(groupName)
 end
 
 local function hideOldClientStats()
+    local version = g_game.getClientVersion()
     if g_game.getClientVersion() >= 1412 then
         return
     end
@@ -274,26 +284,10 @@ local function hideOldClientStats()
     setSkillGroupVisibility('offence', false)
     setSkillGroupVisibility('defence', false)
     setSkillGroupVisibility('misc', false)
-    
-    local function hideUnnamedSeparators(widget)
-        if not widget then return end
-        
-        local children = widget:getChildren()
-        for _, child in pairs(children) do
-            if child:getClassName() == 'HorizontalSeparator' and (not child:getId() or child:getId() == '') then
-                child:setVisible(false)
-            elseif child:getClassName() == 'UIWidget' and (not child:getId() or child:getId() == '') then
-                local childHeight = child:getHeight()
-                local childChildrenCount = #child:getChildren()
-                if childHeight <= 15 and childChildrenCount == 0 then
-                    child:setVisible(false)
-                end
-            end
-            hideUnnamedSeparators(child)
-        end
-    end
-    
-    hideUnnamedSeparators(skillsWindow)
+    setSkillGroupVisibility('misc', false)
+    setSkillGroupVisibility('GameAdditionalSkills', g_game.getFeature(GameAdditionalSkills))
+    setSkillGroupVisibility('GameForgeSkillStats', g_game.getFeature(GameForgeSkillStats))
+    setSkillGroupVisibility('GameForgeSkillStats1332', g_game.getFeature(GameForgeSkillStats1332) and version >= 1332)
 end
 
 local function hideMenuOptionsForOldClients(menu)
@@ -743,7 +737,7 @@ function online()
     skillsWindow:setupOnStart()
     setupUIButtons()
     refresh()
-    
+    hideOldClientStats()
     if g_game.getFeature(GameEnterGameShowAppearance) then
         skillsWindow:recursiveGetChildById('regenerationTime'):getChildByIndex(1):setText('Food')
         skillsWindow:recursiveGetChildById('experience'):getChildByIndex(1):setText('XP')
@@ -805,41 +799,23 @@ function refresh()
     onRegenerationChange(player, player:getRegenerationTime())
     onSpeedChange(player, player:getSpeed())
 
-    local hasAdditionalSkills = g_game.getFeature(GameAdditionalSkills)
     for i = Skill.Fist, Skill.Transcendence do
         onSkillChange(player, i, player:getSkillLevel(i), player:getSkillLevelPercent(i))
-
-        if i > Skill.Fishing then
-            local ativedAdditionalSkills = hasAdditionalSkills
-            if ativedAdditionalSkills then
-                if g_game.getClientVersion() >= 1281 then
-                    if i == Skill.LifeLeechAmount or i == Skill.ManaLeechAmount then
-                        ativedAdditionalSkills = false
-                    elseif g_game.getClientVersion() < 1332 and Skill.Transcendence then
-                        ativedAdditionalSkills = false
-                    elseif i >= Skill.Fatal and player:getSkillLevel(i) <= 0 then
-                        ativedAdditionalSkills = false
-                    end
-                elseif g_game.getClientVersion() < 1281 and i >= Skill.Fatal then
-                    ativedAdditionalSkills = false
-                end
-            end
-            toggleSkill('skillId' .. i, ativedAdditionalSkills)
-        end
     end
 
     update()
     updateHeight()
-    hideOldClientStats()
     loadSkillsVisibilitySettings()
     -- Always show default Offence, Defence, and Misc stats when loading window
-    onFlatDamageHealingChange(player, statsCache.flatDamageHealing)
-    onAttackInfoChange(player, statsCache.attackValue, statsCache.attackElement)
-    onConvertedDamageChange(player, statsCache.convertedDamage, statsCache.convertedElement)
-    onImbuementsChange(player, statsCache.lifeLeech, statsCache.manaLeech, statsCache.critChance, statsCache.critDamage, statsCache.onslaught)
-    onDefenseInfoChange(player, statsCache.defense, statsCache.armor, statsCache.mitigation, statsCache.dodge, statsCache.damageReflection)
-    onCombatAbsorbValuesChange(player, statsCache.combatAbsorbValues)
-    onForgeBonusesChange(player, statsCache.momentum, statsCache.transcendence, statsCache.amplification)
+    if g_game.getClientVersion() >= 1412 then
+        onFlatDamageHealingChange(player, statsCache.flatDamageHealing)
+        onAttackInfoChange(player, statsCache.attackValue, statsCache.attackElement)
+        onConvertedDamageChange(player, statsCache.convertedDamage, statsCache.convertedElement)
+        onImbuementsChange(player, statsCache.lifeLeech, statsCache.manaLeech, statsCache.critChance, statsCache.critDamage, statsCache.onslaught)
+        onDefenseInfoChange(player, statsCache.defense, statsCache.armor, statsCache.mitigation, statsCache.dodge, statsCache.damageReflection)
+        onCombatAbsorbValuesChange(player, statsCache.combatAbsorbValues)
+        onForgeBonusesChange(player, statsCache.momentum, statsCache.transcendence, statsCache.amplification)
+    end
 end
 
 function loadSkillsVisibilitySettings()
@@ -1414,7 +1390,6 @@ function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critD
         onslaught = "You get +1% of the damage dealt as hit points"
     }
     
-    skillsWindow:recursiveGetChildById("criticalHit"):setVisible(true)
     setSkillValueWithTooltips('lifeLeech', lifeLeech, tooltips.lifeLeech, true)
     setSkillValueWithTooltips('manaLeech', manaLeech, tooltips.manaLeech, true)
     setSkillValueWithTooltips('criticalChance', critChance, tooltips.critChance, true)
