@@ -754,10 +754,7 @@ function online()
         if sepDefense and sepDefense:isVisible() then
             sepDefense:setVisible(false)
         end
-        local sepOffence = skillsWindow:recursiveGetChildById('separadorOnOffenceInfoChange')
-        if sepOffence and sepOffence:isVisible() then
-            sepOffence:setVisible(false)
-        end
+
 
         local lockButton = skillsWindow:recursiveGetChildById('lockButton')
         local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
@@ -784,6 +781,7 @@ function refresh()
 
     if expSpeedEvent then
         expSpeedEvent:cancel()
+        expSpeedEvent = nil
     end
     expSpeedEvent = cycleEvent(checkExpSpeed, 30 * 1000)
 
@@ -806,8 +804,8 @@ function refresh()
     update()
     updateHeight()
     loadSkillsVisibilitySettings()
-    -- Always show default Offence, Defence, and Misc stats when loading window
     if g_game.getClientVersion() >= 1412 then
+        -- Always show default Offence, Defence, and Misc stats when loading window
         onFlatDamageHealingChange(player, statsCache.flatDamageHealing)
         onAttackInfoChange(player, statsCache.attackValue, statsCache.attackElement)
         onConvertedDamageChange(player, statsCache.convertedDamage, statsCache.convertedElement)
@@ -1389,7 +1387,7 @@ function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critD
         critDamage = "You get +1% of the damage dealt as mana",
         onslaught = "You get +1% of the damage dealt as hit points"
     }
-    
+    skillsWindow:recursiveGetChildById("criticalHit"):setVisible(true)
     setSkillValueWithTooltips('lifeLeech', lifeLeech, tooltips.lifeLeech, true)
     setSkillValueWithTooltips('manaLeech', manaLeech, tooltips.manaLeech, true)
     setSkillValueWithTooltips('criticalChance', critChance, tooltips.critChance, true)
