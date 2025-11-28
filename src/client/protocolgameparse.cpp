@@ -4103,8 +4103,10 @@ void ProtocolGame::parseShowDescription(const InputMessagePtr& msg)
 
 void ProtocolGame::parseBestiaryTracker(const InputMessagePtr& msg)
 {
-    const uint8_t trackerType = msg->getU8(); // 0x00 para bestiary, 0x01 para boss
-
+    uint8_t trackerType = 0;
+    if (g_game.getClientVersion() >= 1320) {
+        trackerType = msg->getU8(); // 0x00 for bestiary, 0x01 for boss
+    }
     const uint8_t size = msg->getU8();
     std::vector<std::tuple<uint16_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t>> trackerData;
 
