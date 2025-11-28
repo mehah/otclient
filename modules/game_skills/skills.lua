@@ -119,7 +119,6 @@ function init()
     end
 
     setupUIButtons()
-    refresh()
     skillsWindow:setup()
     if g_game.isOnline() then
         online()
