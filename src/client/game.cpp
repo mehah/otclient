@@ -186,7 +186,7 @@ void Game::processGameStart()
         }
     }, 1000);
 
-    g_dispatcher.scheduleEvent([] { g_lua.callGlobalField("g_game", "onGameStart"); }, 1000);
+    g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onGameStart"); });
 }
 
 void Game::processGameEnd()
