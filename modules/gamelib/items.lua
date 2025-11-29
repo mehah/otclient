@@ -110,7 +110,6 @@ end
 
 function ItemsDatabase.setTier(widget, item, isSmall)
     if not g_game.getFeature(GameThingUpgradeClassification) or not widget or not widget.tier then
-        widget.tier:setImageSource("")
         return
     end
     if isSmall == nil then
@@ -157,7 +156,6 @@ end
 
 function ItemsDatabase.setCharges(widget, item, style)
     if not g_game.getFeature(GameThingCounter) or not widget then
-        widget.charges:setText("")
         return
     end
 
@@ -175,7 +173,6 @@ end
 
 function ItemsDatabase.setDuration(widget, item, style)
     if not g_game.getFeature(GameThingClock) or not widget then
-        widget.duration:setText("")
         return
     end
 
