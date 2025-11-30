@@ -53,7 +53,7 @@ local luaFiles = {
   "cavebot_control_panel"
 }
 
-if g_game.getClientVersion() < 1310 then
+if g_game.getClientVersion() < 1310 and modules.game_analyser then
   table.insert(luaFiles, #luaFiles, "analyzer")
 end
 
