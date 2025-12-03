@@ -19,7 +19,10 @@ WheelController.wheel.hasChanges = false
 WheelController.wheel.originalPointInvested = {}
 WheelController.wheel.trackChanges = false
 WheelController.gem = {
-    clip = baseButtonClip
+    clip = baseButtonClip,
+    revealGemTooltip = helper.gems.revealGemTooltip,
+    revelations = {},
+    data = {},
 }
 WheelController.fragment = {
     clip = baseButtonClip
@@ -35,6 +38,13 @@ function WheelController:toggleMenu(menu)
     self:resetTabs()
     self.currentTab = menu
     self[menu].clip = baseButtonClipped
+
+    if menu == "gem" then
+        WheelController:updateResources()
+        Workshop.createFragments()
+        GemAtelier.resetFields()
+        GemAtelier.showGems(true)
+    end
 end
 
 local quadrantFramesByMaxPoints = {
@@ -536,11 +546,13 @@ end
 
 function WheelController:hide()
     resetValues()
+    self.currentTab = 'wheel'
+    WheelController.currentWindow = "main-window"
+    WheelController:resetTabs()
     if not self.ui then
         return
     end
 
-    WheelController.currentWindow = "main-window"
     self.ui:hide()
     if WheelButton then
         WheelButton:setOn(false)
@@ -1518,14 +1530,19 @@ end
 
 function WheelController:updateResources()
     WheelController.gold = WheelController.gold or "0"
+    WheelController.rawGold = WheelController.rawGold or 0
     WheelController.lesserFragment = WheelController.lesserFragment or 0
     WheelController.greaterFragment = WheelController.greaterFragment or 0
+    WheelController.gem.lesserGems = WheelController.gem.lesserGems or 0
+    WheelController.gem.regularGems = WheelController.gem.regularGems or 0
+    WheelController.gem.greaterGems = WheelController.gem.greaterGems or 0
 
     local player = g_game.getLocalPlayer()
     if player then
         WheelController.lesserFragment = player:getResourceBalance(ResourceTypes.LESSER_FRAGMENT)
         WheelController.greaterFragment = player:getResourceBalance(ResourceTypes.GREATER_FRAGMENT)
         WheelController.gold = comma_value(player:getTotalMoney())
+        WheelController.rawGold = player:getTotalMoney()
     end
 end
 

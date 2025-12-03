@@ -1148,6 +1148,9 @@ local VesselIndex = {
     [GemDomains.PURPLE] = { 21, 29, 33 }
 }
 
+local revealGemTooltip =
+"Revealing a gem gives you a gem of matching quality and\nrandom mods based on the quality:\n\n<ul><li>Lesser gems will have one random basic mod.</li>\n<li>Regular gems will have two random basic mods.</li>\n<li>Greater gems will have two random basic mods and\none supreme mod.</li></ul>"
+
 local gems = {
     FlatSupremeMods = FlatSupremeMods,
     BasicMods = BasicMods,
@@ -1165,6 +1168,7 @@ local gems = {
     WheelIcons = WheelIcons,
     GemVocations = GemVocations,
     RegularGemDescription = RegularGemDescription,
+    revealGemTooltip = revealGemTooltip,
 }
 
 return gems

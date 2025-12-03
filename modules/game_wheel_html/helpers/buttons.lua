@@ -331,6 +331,13 @@ local WheelButtons = {
 	},
 }
 
+WheelSettings = {
+	topLeft = { 1, 2, 7, 3, 8, 13, 9, 14, 15 },
+	topRight = { 6, 5, 12, 4, 11, 18, 10, 17, 16 },
+	bottomLeft = { 31, 25, 32, 33, 26, 19, 27, 20, 21 },
+	bottomRight = { 36, 35, 30, 34, 29, 24, 28, 23, 22 },
+}
+
 local buttons = {
 	BIG_LARGE_CIRCLE = BIG_LARGE_CIRCLE,
 	LARGE_CIRCLE = LARGE_CIRCLE,

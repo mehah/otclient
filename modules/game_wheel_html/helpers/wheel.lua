@@ -923,6 +923,7 @@ local informationButtonClips = {
 
 local baseWheelValues = {
     currentWindow = "main-window",
+    currentTab = "wheel",
     showSummary = false,
     summary = {},
     clip = { x = 0, y = 34, width = 322, height = 34 },
