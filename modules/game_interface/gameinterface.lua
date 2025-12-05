@@ -881,21 +881,24 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         if lookThing and not lookThing:isCreature() and not lookThing:isNotMoveable() and lookThing:isPickupable() then
             local player = g_game.getLocalPlayer()
             if player and player:isSupplyStashAvailable() then
-                menu:addSeparator()
-                menu:addOption(tr("Stow"), function()
-                    stashItem(lookThing)
-                end)
-                menu:addOption(tr("Stow all items of this type"), function()
-                    g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
-                        lookThing:getStackPos(), 2)
-                end)
-
-                local isContainer = lookThing:isContainer()
-                if isContainer then
-                    menu:addOption(tr('Stow container\'s content'), function()
-                        g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
-                            lookThing:getStackPos(), 1)
+                local itemTier = lookThing:getTier() or 0
+                if itemTier <= 0 then
+                    menu:addSeparator()
+                    menu:addOption(tr("Stow"), function()
+                        stashItem(lookThing)
                     end)
+                    menu:addOption(tr("Stow all items of this type"), function()
+                        g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
+                            lookThing:getStackPos(), 2)
+                    end)
+
+                    local isContainer = lookThing:isContainer()
+                    if isContainer then
+                        menu:addOption(tr('Stow container\'s content'), function()
+                            g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
+                                lookThing:getStackPos(), 1)
+                        end)
+                    end
                 end
             end
         end
