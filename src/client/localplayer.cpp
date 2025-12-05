@@ -513,11 +513,11 @@ uint32_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tie
             accumulate(item);
     }
 
-    constexpr uint64_t maxUint32 = 4294967295;
-    if (total > maxUint32) {
+    if (const uint64_t maxUint32 = std::numeric_limits<uint32_t>::max(); total > maxUint32) {
         total = maxUint32;
     }
-    return static_cast<uint32_t>(total);
+
+    return total;
 }
 
 void LocalPlayer::setPremium(const bool premium)
