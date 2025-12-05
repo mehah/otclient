@@ -5114,7 +5114,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             data.cleavePercent = msg->getDouble();
 
             // Perfect shot range
-            for (int i = 0; i < 7; i++) {
+            auto limitRange = (g_game.getClientVersion() >= 1510) ? 7 : 5;
+            for (int i = 0; i < limitRange; i++) {
                 data.perfectShotDamage.push_back(msg->getU16());
             }
 
@@ -5138,21 +5139,23 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 data.weaponAccuracy.push_back(msg->getDouble());
             }
 
-            msg->getDouble(); // unused
-            msg->getU16(); // unused
-            msg->getU8(); // unused
-            msg->getDouble(); // unused
-            msg->getDouble(); // unused
-            msg->getU8(); // unused
-            msg->getDouble(); // unused
-            msg->getDouble(); // unused
-            msg->getU16(); // unused
-            msg->getU16(); // unused
-            msg->getU16(); // unused
-            msg->getU16(); // unused
-            msg->getU8(); // unused
-            msg->getU8(); // unused
-            msg->getU8(); // unused
+            if (g_game.getClientVersion() >= 1510) {
+                msg->getDouble(); // unused
+                msg->getU16(); // unused
+                msg->getU8(); // unused
+                msg->getDouble(); // unused
+                msg->getDouble(); // unused
+                msg->getU8(); // unused
+                msg->getDouble(); // unused
+                msg->getDouble(); // unused
+                msg->getU16(); // unused
+                msg->getU16(); // unused
+                msg->getU16(); // unused
+                msg->getU16(); // unused
+                msg->getU8(); // unused
+                msg->getU8(); // unused
+                msg->getU8(); // unused
+            }
 
             g_game.processCyclopediaCharacterOffenceStats(data);
             break;
