@@ -209,7 +209,7 @@ VocationNames = {
     [7] = 'Royal Paladin',
     [8] = 'Elite Knight',
     [9] = 'Monk',
-    [10] = 'Exhalted Monk'
+    [10] = 'Exalted Monk'
 }
 
 SpellGroups = {
