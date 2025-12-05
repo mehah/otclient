@@ -855,6 +855,21 @@ namespace Otc
         OPEN_SEARCH = 5,
     };
 
+    enum WeaponProficiency_t : uint8_t
+    {
+        WEAPON_PROFICIENCY_ITEM_INFO = 0,
+        WEAPON_PROFICIENCY_LIST_INFO = 1,
+        WEAPON_PROFICIENCY_RESET_PERKS = 2,
+        WEAPON_PROFICIENCY_APPLY_PERKS = 3
+    };
+
+    enum Imbuement_Window_t : uint8_t
+    {
+        IMBUEMENT_WINDOW_CHOICE = 0,
+        IMBUEMENT_WINDOW_SELECT_ITEM = 1,
+        IMBUEMENT_WINDOW_SCROLL = 2
+    };
+
     enum Vocations_t : uint8_t
     {
         NONE = 0,

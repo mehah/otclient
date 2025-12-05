@@ -87,6 +87,7 @@ struct Imbuement
     std::string name;
     std::string description;
     std::string group;
+    uint8_t tier;
     uint16_t imageId;
     uint32_t duration;
     bool premiumOnly;

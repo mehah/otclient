@@ -356,6 +356,10 @@ private:
     void parseBestiaryMonsterData(const InputMessagePtr& msg);
     void parseBestiaryCharmsData(const InputMessagePtr& msg);
 
+    // 15x
+    void parseWeaponProficiencyExperience(const InputMessagePtr& msg);
+    void parseWeaponProficiencyInfo(const InputMessagePtr& msg);
+
     void parseHighscores(const InputMessagePtr& msg);
     void parseAttachedEffect(const InputMessagePtr& msg);
     void parseDetachEffect(const InputMessagePtr& msg);

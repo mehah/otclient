@@ -81,6 +81,7 @@ namespace Proto
         GameServerFloorDescription = 75,
 
         // original tibia ONLY
+        GameServerWeaponProficiencyExperience = 92,
         GameServerImbuementDurations = 93,
         GameServerPassiveCooldown = 94,
         GameServerBosstiaryData = 97,
@@ -174,6 +175,7 @@ namespace Proto
         GameServerLootContainers = 192,
         GameServerVirtue = 193,
         GameServerCyclopediaHouseAuctionMessage = 195,
+        GameServerWeaponProficiencyInfo = 196,
         GameServerCyclopediaHousesInfo = 198,
         GameServerCyclopediaHouseList = 199,
         GameServerChooseOutfit = 200,
