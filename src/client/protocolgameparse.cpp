@@ -5904,23 +5904,17 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
     const uint16_t counter = msg->getU16();
     uint16_t itemId = 0;
     uint8_t itemTier = 0;
+
+    const int clientVersion = g_game.getClientVersion();
     if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS || var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         itemId = msg->getU16();
-        if (g_game.getClientVersion() >= 1281) {
-            const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
-            if (thing) {
-                const uint16_t classification = thing->getClassification();
-                if (classification > 0) {
-                    itemTier = msg->getU8();
-                }
-            }
-        }
+        itemTier = readMarketItemTier(msg, itemId, clientVersion);
     } else {
         itemId = var;
     }
 
     const uint16_t amount = msg->getU16();
-    const uint64_t price = g_game.getClientVersion() >= 1281 ? msg->getU64() : msg->getU32();
+    const uint64_t price = clientVersion >= 1281 ? msg->getU64() : msg->getU32();
 
     std::string playerName;
     uint8_t state = Otc::OFFER_STATE_ACTIVE;
