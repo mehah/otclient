@@ -3415,7 +3415,7 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
         const uint16_t itemId = msg->getU16();
         const uint8_t attribute = msg->getU8();
 
-        const uint32_t amount = readPackedCount1500(msg);
+        const uint32_t amount = g_game.getProtocolVersion() < 1500 ? msg->getU16() : readPackedCount1500(msg);
 
         uint8_t tier = 0;
         if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem)) {
@@ -5790,12 +5790,15 @@ static Otc::MarketItemDescription getMarketLastAttribute(int clientVersion)
     if (clientVersion >= 1282) {
         return Otc::ITEM_DESC_LAST;
     }
+
     if (clientVersion >= 1270) {
         return Otc::ITEM_DESC_UPGRADECLASS;
     }
+
     if (clientVersion >= 1100) {
         return Otc::ITEM_DESC_IMBUINGSLOTS;
     }
+
     return Otc::ITEM_DESC_WEIGHT;
 }
 
@@ -5805,8 +5808,7 @@ static bool shouldSkipMarketAttribute(int attr, int clientVersion)
         return true;
     }
 
-    if (clientVersion < 1500 &&
-        (attr == Otc::ITEM_DESC_ELEMENTALBOND || attr == Otc::ITEM_DESC_MANTRA)) {
+    if (clientVersion < 1500 && (attr == Otc::ITEM_DESC_ELEMENTALBOND || attr == Otc::ITEM_DESC_MANTRA)) {
         return true;
     }
 
