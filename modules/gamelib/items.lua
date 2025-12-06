@@ -42,16 +42,26 @@ local function clipfunction(value)
     return ""
 end
 
-function ItemsDatabase.setRarityItem(widget, item, style)
-    if not g_game.getFeature(GameColorizedLootValue) or not widget then
-        return
+function ItemsDatabase.getClipAndImagePath(item)
+    if not item then
+        return nil, nil, nil
     end
+
     local frameOption = modules.client_options.getOption('framesRarity')
     if frameOption == "none" then
-        return
+        return nil, nil, nil
     end
     local imagePath = '/images/ui/item'
     local clip = nil
+
+    if type(item) == "number" then
+        item = Item.create(item, 1)
+    end
+
+    if not item then
+        return nil, nil, nil
+    end
+
     if item then
         local price = type(item) == "number" and item or (item and item:getMeanPrice()) or 0
         local itemRarity = getColorForValue(price)
@@ -68,6 +78,27 @@ function ItemsDatabase.setRarityItem(widget, item, style)
             end
         end
     end
+
+    local clipObject = nil
+    if clip then
+        local x, y, w, h = clip:match("(%d+) (%d+) (%d+) (%d+)")
+        clipObject = { x = tonumber(x), y = tonumber(y), width = tonumber(w), height = tonumber(h) }
+    end
+
+    return clip, imagePath, clipObject
+end
+
+function ItemsDatabase.setRarityItem(widget, item, style)
+    if not g_game.getFeature(GameColorizedLootValue) or not widget then
+        return
+    end
+
+    local clip, imagePath = ItemsDatabase.getClipAndImagePath(item)
+
+    if not imagePath then
+        return
+    end
+
     widget:setImageClip(clip)
     widget:setImageSource(imagePath)
     if style then
@@ -106,6 +137,16 @@ function ItemsDatabase.setColorLootMessage(text)
         end
     end
     return text:gsub("{(.-)}", coloringLootName)
+end
+
+function ItemsDatabase.getTierClip(tier)
+    local xOffset = (math.min(math.max(tier, 1), 10) - 1) * 9
+    return {
+        x = xOffset,
+        y = 0,
+        width = 10,
+        height = 9
+    }
 end
 
 function ItemsDatabase.setTier(widget, item, isSmall)
@@ -170,15 +211,14 @@ function ItemsDatabase.setCharges(widget, item, style)
     end
 end
 
-
 function ItemsDatabase.setDuration(widget, item, style)
     if not g_game.getFeature(GameThingClock) or not widget then
         return
     end
 
     if item and item:getDurationTime() > 0 then
-            local durationTimeLeft = item:getDurationTime()
-            widget.duration:setText(string.format("%dm%02d", durationTimeLeft / 60, durationTimeLeft % 60))
+        local durationTimeLeft = item:getDurationTime()
+        widget.duration:setText(string.format("%dm%02d", durationTimeLeft / 60, durationTimeLeft % 60))
     else
         widget.duration:setText("")
     end
