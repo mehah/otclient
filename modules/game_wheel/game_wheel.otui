@@ -1,0 +1,118 @@
+MainWindow  
+  size: 997 645  
+  !text: tr('Wheel of Destiny')  
+  visible: false  
+  @onEscape: toggle()  
+  
+  UIWidget  
+    id: buttonContainer  
+    anchors.top: parent.top  
+    anchors.horizontalCenter: parent.horizontalCenter  
+    margin-top: 0  
+    size: 979 34  
+          
+    UIButton  
+      id: wheelOfDestiny  
+      anchors.top: parent.top  
+      anchors.left: parent.left  
+      margin-left: 5  
+      size: 323 34  
+      image-source: /images/game/wheel/wheelMenu
+      icon-align: left  
+      icon-offset: 10 0  
+
+      font: verdana-11px-antialised  
+      text-align: center  
+      text-offset: 15 0  
+      @onClick: SelectWindow("wheelOfDestiny")  
+        
+      $!on:  
+        image-clip: 0 0 323 34  
+        
+      $on:  
+        image-clip: 0 34 323 34  
+        
+      $pressed:  
+        image-clip: 0 0 323 34  
+          
+    UIButton  
+      id: gemAtelier  
+      anchors.top: wheelOfDestiny.top  
+      anchors.left: wheelOfDestiny.right  
+      size: 323 34  
+      image-source: /images/game/wheel/gemMenu 
+      icon-align: left  
+      icon-offset: 10 0  
+      font: verdana-11px-antialised  
+      text-align: center  
+      text-offset: 15 0  
+      @onClick: SelectWindow("gemAtelier")  
+        
+      $!on:  
+        image-clip: 0 0 323 34  
+        
+      $on:  
+        image-clip: 0 34 323 34  
+        
+      $pressed:  
+        image-clip: 0 0 323 34  
+          
+    UIButton  
+      id: fragmentWorkshop  
+      anchors.top: wheelOfDestiny.top  
+      anchors.left: gemAtelier.right  
+      margin-right: 5  
+      size: 323 34  
+      image-source: /images/game/wheel/fragmentMenu 
+      icon-align: left  
+      icon-offset: 10 0  
+      font: verdana-11px-antialised  
+      text-align: center  
+      text-offset: 15 0  
+      @onClick: SelectWindow("fragmentWorkshop")  
+        
+      $!on:  
+        image-clip: 0 0 323 34  
+        
+      $on:  
+        image-clip: 0 34 323 34  
+        
+      $pressed:  
+        image-clip: 0 0 323 34  
+  
+  UIWidget  
+    id: contentContainer  
+    anchors.top: buttonContainer.bottom  
+    anchors.bottom: parent.bottom  
+    anchors.left: parent.left  
+    anchors.right: parent.right  
+    margin-top: 20  
+  
+  Button  
+    id: CloseButton  
+    size: 40 20  
+    anchors.bottom: parent.bottom  
+    anchors.right: parent.right  
+    !text: tr('Close')  
+    text-offset: 0 -1  
+    color: #C0C0C0  
+    @onClick: toggle()  
+  
+  Button  
+    id: BackButton  
+    size: 40 20  
+    anchors.bottom: parent.bottom  
+    anchors.right: CloseButton.left  
+    margin-right: 10  
+    !text: tr('Back')  
+    text-offset: 0 -1  
+    color: #C0C0C0  
+    enabled: false  
+    @onClick: toggleBack()  
+  
+  HorizontalSeparator  
+    id: BottomSep  
+    anchors.bottom: CloseButton.top  
+    anchors.left: parent.left  
+    anchors.right: parent.right  
+    margin-bottom: 10
