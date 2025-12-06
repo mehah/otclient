@@ -33,7 +33,7 @@ struct DrawHashController
 {
     DrawHashController(bool agroup = false) : m_agroup(agroup) {}
 
-    bool put(size_t hash) {
+    bool put(uint64_t hash) {
         if ((m_agroup && m_hashs.emplace(hash).second) || m_lastObjectHash != hash) {
             m_lastObjectHash = hash;
             stdext::hash_union(m_currentHash, hash);
@@ -43,7 +43,7 @@ struct DrawHashController
         return false;
     }
 
-    bool isLast(const size_t hash) const {
+    bool isLast(const uint64_t hash) const {
         return m_lastObjectHash == hash;
     }
 
@@ -63,11 +63,11 @@ struct DrawHashController
     }
 
 private:
-    stdext::set<size_t> m_hashs;
+    stdext::set<uint64_t> m_hashs;
 
-    size_t m_lastHash{ 0 };
-    size_t m_currentHash{ 0 };
-    size_t m_lastObjectHash{ 0 };
+    uint64_t m_lastHash{ 0 };
+    uint64_t m_currentHash{ 0 };
+    uint64_t m_lastObjectHash{ 0 };
     bool m_agroup{ false };
 };
 
@@ -158,7 +158,7 @@ protected:
         TexturePtr texture;
         uint32_t textureId{ 0 };
         uint16_t textureMatrixId{ 0 };
-        size_t hash{ 0 };
+        uint64_t hash{ 0 };
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
         void execute(DrawPool* pool) const;
@@ -199,7 +199,7 @@ private:
 
     void add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    void addAction(const std::function<void()>& action);
+    void addAction(const std::function<void()>& action, uint64_t hash = 0);
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
     void releaseFrameBuffer(const Rect& dest);
 

@@ -52,7 +52,7 @@ public:
     void addFilledRect(const Rect& dest, const Color& color = Color::white) const;
     void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white) const;
     void addBoundingRect(const Rect& dest, const Color& color = Color::white, uint16_t innerLineWidth = 1) const;
-    void addAction(const std::function<void()>& action) const { getCurrentPool()->addAction(action); }
+    void addAction(const std::function<void()>& action, uint64_t hash = 0) const { getCurrentPool()->addAction(action, hash); }
 
     void bindFrameBuffer(const Size& size, const Color& color = Color::white) const { getCurrentPool()->bindFrameBuffer(size, color); }
     void releaseFrameBuffer(const Rect& dest) const { getCurrentPool()->releaseFrameBuffer(dest); };
