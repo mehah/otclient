@@ -269,8 +269,6 @@ void DrawPool::release() {
         return;
     }
 
-    m_shouldRepaint.store(true, std::memory_order_release);
-
     m_refreshTimer.restart();
 
     m_objectsDraw[0].clear();
@@ -312,6 +310,8 @@ void DrawPool::release() {
             objs.clear();
         }
     }
+
+    m_shouldRepaint.store(true, std::memory_order_release);
 }
 
 void DrawPool::flush()
