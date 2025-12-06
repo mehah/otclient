@@ -1176,6 +1176,13 @@ function g_game.isTileThingLuaCallbackEnabled() end
 ---@param stackpos boolean
 function g_game.stashWithdraw(itemId, count, stackpos) end
 
+---@param position Position | string
+---@param itemId integer
+---@param count number
+---@param stackpos boolean
+---@param action number
+function g_game.stashStowItem(position, itemId, count, stackpos, action) end
+
 ---@param action integer
 ---@param category integer
 ---@param vocation number
@@ -2629,6 +2636,9 @@ function LocalPlayer:isKnown() end
 
 ---@return boolean
 function LocalPlayer:isPreWalking() end
+
+---@return boolean
+function LocalPlayer:isSupplyStashAvailable() end
 
 ---@param pos Position | string
 ---@return boolean
