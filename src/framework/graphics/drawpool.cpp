@@ -430,7 +430,7 @@ void DrawPool::removeFramebuffer() {
     m_framebuffer = nullptr;
 }
 
-void DrawPool::addAction(const std::function<void()>& action, uint64_t hash)
+void DrawPool::addAction(const std::function<void()>& action, size_t hash)
 {
     const uint8_t order = m_type == DrawPoolType::MAP ? THIRD : FIRST;
     m_objects[order].emplace_back(action);

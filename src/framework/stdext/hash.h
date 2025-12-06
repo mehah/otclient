@@ -25,7 +25,7 @@
 namespace stdext
 {
     // Robin Hood lib
-    constexpr uint64_t hash_int(uint64_t x) noexcept
+    constexpr size_t hash_int(size_t x) noexcept
     {
         x ^= x >> 33U;
         x *= UINT64_C(0xff51afd7ed558ccd);
@@ -34,13 +34,13 @@ namespace stdext
     }
 
     // Boost Lib
-    constexpr void hash_union(uint64_t& seed, const uint64_t h)
+    constexpr void hash_union(size_t& seed, const size_t h)
     {
         seed ^= h + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
 
     template <class T>
-    void hash_combine(uint64_t& seed, const T& v)
+    void hash_combine(size_t& seed, const T& v)
     {
         std::hash<T> hasher;
         hash_union(seed, hasher(v));
