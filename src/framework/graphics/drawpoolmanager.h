@@ -124,6 +124,15 @@ private:
     void drawPool(DrawPoolType type);
     void drawObjects(DrawPool* pool);
 
+    inline bool isDrawing() const {
+        for (auto pool : m_pools) {
+            if (pool->isEnabled() && pool->shouldRepaint())
+                return true;
+        }
+
+        return false;
+    }
+
     std::array<DrawPool*, static_cast<uint8_t>(DrawPoolType::LAST)> m_pools{};
 
     Size m_size;
