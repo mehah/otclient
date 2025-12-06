@@ -13,7 +13,10 @@
     "libvorbis",
     "nlohmann-json",
     "openal-soft",
-    "openssl",
+    {
+      "name": "openssl",
+      "platform": "!wasm32"
+    },
     "parallel-hashmap",
     "physfs",
     "protobuf",
@@ -23,7 +26,10 @@
     "bshoshany-thread-pool",
     "fmt",
     "utfcpp",
-    "gtest",
+    {
+      "name": "gtest",
+      "platform": "!wasm32"
+    },
     {
       "name": "luajit",
       "platform": "!android & !wasm32"
@@ -41,5 +47,5 @@
       "platform": "windows"
     }
   ],
-  "builtin-baseline":"b322364f06308bdd24823f9d8f03fe0cc86fd46f"
+  "builtin-baseline": "b322364f06308bdd24823f9d8f03fe0cc86fd46f"
 }
