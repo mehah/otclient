@@ -618,6 +618,11 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("canBeSeen", &Creature::canBeSeen);
     g_lua.bindClassMemberFunction<Creature>("jump", &Creature::jump);
     g_lua.bindClassMemberFunction<Creature>("setMountShader", &Creature::setMountShader);
+    // bind via lambdas to avoid ambiguous member-function pointer template resolution
+    g_lua.registerClassMemberFunction(stdext::demangle_class<Creature>(), "setNameShader",
+        luabinder::bind_fun([](const std::shared_ptr<Creature>& obj, const std::string& name) { obj->setNameShader(name); }));
+    g_lua.registerClassMemberFunction(stdext::demangle_class<Creature>(), "getNameShader",
+        luabinder::bind_fun([](const std::shared_ptr<Creature>& obj) { return obj->getNameShader(); }));
     g_lua.bindClassMemberFunction<Creature>("setDrawOutfitColor", &Creature::setDrawOutfitColor);
     g_lua.bindClassMemberFunction<Creature>("setDisableWalkAnimation", &Creature::setDisableWalkAnimation);
     g_lua.bindClassMemberFunction<Creature>("isDisabledWalkAnimation", &Creature::isDisabledWalkAnimation);
