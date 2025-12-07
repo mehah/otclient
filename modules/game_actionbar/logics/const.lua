@@ -69,6 +69,8 @@ function translateVocation(id)
         return VocationsServer.MasterSorcerer -- Master Sorcerer
     elseif id == VocationsClient.Druid or id == VocationsClient.ElderDruid then
         return VocationsServer.ElderDruid -- Elder Druid
+    elseif id == VocationsClient.Monk or id == VocationsClient.ExaltedMonk then
+        return VocationsServer.ExaltedMonk -- Exalted Monk
     end
     return 0
 end

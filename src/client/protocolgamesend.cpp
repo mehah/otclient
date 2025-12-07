@@ -1399,7 +1399,9 @@ void ProtocolGame::sendApplyImbuement(const uint8_t slot, const uint32_t imbueme
     msg->addU8(Proto::ClientApplyImbuement);
     msg->addU8(slot);
     msg->addU32(imbuementId);
-    msg->addU8(protectionCharm);
+    if (g_game.getClientVersion() < 1510) {
+        msg->addU8(protectionCharm);
+    }
     send(msg);
 }
 
