@@ -248,7 +248,7 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1321 then
-            g_game.enableFeature(GameWrapKit)
+            g_game.enableFeature(GameDecoKit)
             g_game.enableFeature(GameContainerFilter)
         end
 
