@@ -163,7 +163,7 @@ namespace {
 
     static inline int parse_byte_or_percent(const std::string& s) {
         if (!s.empty() && s.back() == '%') {
-            const double p = std::strtod(s.c_str(), nullptr);
+            const double p = std::strtod(s.data(), nullptr);
             return clamp255(static_cast<int>(std::lround(p * 255.0 / 100.0)));
         }
         return clamp255(std::stoi(s));
@@ -171,11 +171,11 @@ namespace {
 
     static inline int parse_alpha_any(const std::string& s) {
         if (!s.empty() && s.back() == '%') {
-            const double p = std::strtod(s.c_str(), nullptr);
+            const double p = std::strtod(s.data(), nullptr);
             return clamp255(static_cast<int>(std::lround(p * 255.0 / 100.0)));
         }
         if (s.find_first_of(".eE") != std::string::npos) {
-            double f = std::strtod(s.c_str(), nullptr);
+            double f = std::strtod(s.data(), nullptr);
             if (f < 0) f = 0; if (f > 1) f = 1;
             return clamp255(static_cast<int>(std::lround(f * 255.0)));
         }
@@ -222,7 +222,7 @@ namespace {
 
 Color::Color(const std::string_view coltext)
 {
-    std::stringstream ss(coltext.data());
+    std::stringstream ss(std::string(coltext));
     ss >> *this;
     update();
 }
@@ -263,7 +263,7 @@ std::istream& operator>>(std::istream& in, Color& color)
 
     auto parse_byte_or_percent = [&](const std::string& s) {
         if (!s.empty() && s.back() == '%') {
-            const double p = std::strtod(s.c_str(), nullptr);
+            const double p = std::strtod(s.data(), nullptr);
             return clamp255(static_cast<int>(std::lround(p * 255.0 / 100.0)));
         }
         return clamp255(std::stoi(s));
@@ -271,11 +271,11 @@ std::istream& operator>>(std::istream& in, Color& color)
 
     auto parse_alpha_any = [&](const std::string& s) {
         if (!s.empty() && s.back() == '%') {
-            const double p = std::strtod(s.c_str(), nullptr);
+            const double p = std::strtod(s.data(), nullptr);
             return clamp255(static_cast<int>(std::lround(p * 255.0 / 100.0)));
         }
         if (s.find_first_of(".eE") != std::string::npos) {
-            double f = std::strtod(s.c_str(), nullptr);
+            double f = std::strtod(s.data(), nullptr);
             if (f < 0) f = 0; if (f > 1) f = 1;
             return clamp255(static_cast<int>(std::lround(f * 255.0)));
         }
@@ -372,9 +372,9 @@ std::istream& operator>>(std::istream& in, Color& color)
             if (o != std::string::npos && c != std::string::npos && c > o + 1) {
                 auto parts = split_commas(t.substr(o + 1, c - o - 1));
                 if ((!hasA && parts.size() == 3) || (hasA && parts.size() == 4)) {
-                    const double h = std::strtod(parts[0].c_str(), nullptr);
+                    const double h = std::strtod(parts[0].data(), nullptr);
                     auto pct = [](const std::string& s) {
-                        const double v = std::strtod(s.c_str(), nullptr);
+                        const double v = std::strtod(s.data(), nullptr);
                         return (!s.empty() && s.back() == '%') ? std::clamp(v / 100.0, 0.0, 1.0)
                             : std::clamp(v, 0.0, 1.0);
                     };
