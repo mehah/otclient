@@ -188,20 +188,19 @@ namespace luabinder
     {
         auto mf = std::mem_fn(f);
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
-            if constexpr (std::is_void_v<Ret>) {
-                if (!obj) {
-                    g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
-                    return;
-                }
-                mf(obj.get(), args...);
-                return;
-            } else {
-                if (!obj) {
-                    g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
+            if (!obj) {
+                g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
+                if constexpr (!std::is_void_v<Ret>) {
                     return make_default_return_value<Ret>();
                 }
-                return mf(obj.get(), args...);
+                return;
             }
+
+            if constexpr (std::is_void_v<Ret>) {
+                mf(obj.get(), args...);
+                return;
+            }
+            return mf(obj.get(), args...);
         };
     }
     template<typename C, typename... Args>
@@ -280,11 +279,10 @@ namespace luabinder
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
             if (!obj) {
                 g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
-                if constexpr (std::is_void_v<Ret>) {
-                    return;
-                } else {
+                if constexpr (!std::is_void_v<Ret>) {
                     return make_default_return_value<Ret>();
                 }
+                return;
             }
             if constexpr (std::is_void_v<Ret>) {
                 mf(obj.get(), args...);
