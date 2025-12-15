@@ -216,7 +216,7 @@ namespace luabinder
     std::function<Ret(const Args&...)> make_mem_func_singleton(Ret(C::* f)(Args...), C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable -> Ret {
+        return [mf, instance](Args... args) -> Ret {
             if constexpr (std::is_void_v<Ret>) {
                 mf(instance, args...);
                 return;
@@ -228,7 +228,7 @@ namespace luabinder
     std::function<void(const Args&...)> make_mem_func_singleton(void (C::* f)(Args...), C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable { mf(instance, args...); };
+        return [mf, instance](Args... args) { mf(instance, args...); };
     }
 
     /// Bind member functions
@@ -317,7 +317,7 @@ namespace luabinder
     make_mem_func_singleton(Ret (C::*f)(Args...) const, C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable -> Ret {
+        return [mf, instance](Args... args) -> Ret {
             if constexpr (std::is_void_v<Ret>) {
                 mf(instance, args...);
                 return;
@@ -331,7 +331,7 @@ namespace luabinder
     make_mem_func_singleton(void (C::*f)(Args...) const, C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable { mf(instance, args...); };
+        return [mf, instance](Args... args) { mf(instance, args...); };
     }
 
     template<typename C, typename Ret, class FC, typename... Args>
