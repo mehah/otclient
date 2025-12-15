@@ -43,11 +43,14 @@ include(MessageColors)
 include(LoggingHelper)
 include(GNUInstallDirs)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-	set(THREADS_PREFER_PTHREAD_FLAG ON)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten"
+        OR CMAKE_CXX_COMPILER_ID MATCHES "Emscripten"
+        OR CMAKE_CXX_COMPILER MATCHES "em\+\+"
+        OR WASM)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif()
 
 # *****************************************************************************
