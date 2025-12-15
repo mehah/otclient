@@ -131,14 +131,17 @@ namespace {
         {"yellow",rgb_to_abgr(0xFFFF00)}, {"yellowgreen",rgb_to_abgr(0x9ACD32)},
     };
 
-    inline std::string to_lower(std::string_view s) {
-        std::string out; out.reserve(s.size());
-        for (unsigned char c : s) out.push_back(std::tolower(c));
+    inline std::string to_lower_ascii(std::string_view s) {
+        std::string out(s);
+        for (char &c : out)
+            if (c >= 'A' && c <= 'Z')
+                c |= 0x20;
         return out;
     }
 
+
     inline bool css_lookup(std::string_view name, uint32_t& abgrOut) {
-        const auto key = to_lower(name);
+        const auto key = to_lower_ascii(name);
 
         if (key == "transparent") { abgrOut = 0x00000000u; return true; }
 
