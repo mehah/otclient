@@ -182,11 +182,20 @@ namespace luabinder
     {
         auto mf = std::mem_fn(f);
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
-            if (!obj) {
-                g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
-                return make_default_return_value<Ret>();
+            if constexpr (std::is_void_v<Ret>) {
+                if (!obj) {
+                    g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
+                    return;
+                }
+                mf(obj.get(), args...);
+                return;
+            } else {
+                if (!obj) {
+                    g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
+                    return make_default_return_value<Ret>();
+                }
+                return mf(obj.get(), args...);
             }
-            return mf(obj.get(), args...);
         };
     }
     template<typename C, typename... Args>
@@ -207,7 +216,13 @@ namespace luabinder
     std::function<Ret(const Args&...)> make_mem_func_singleton(Ret(C::* f)(Args...), C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable -> Ret { return mf(instance, args...); };
+        return [=](Args... args) mutable -> Ret {
+            if constexpr (std::is_void_v<Ret>) {
+                mf(instance, args...);
+                return;
+            }
+            return mf(instance, args...);
+        };
     }
     template<typename C, typename... Args>
     std::function<void(const Args&...)> make_mem_func_singleton(void (C::* f)(Args...), C* instance)
