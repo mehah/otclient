@@ -50,6 +50,12 @@ namespace luabinder
         }
     }
 
+    template<>
+    inline void make_default_return_value<void>()
+    {
+        return;
+    }
+
     /// Pack arguments from lua stack into a tuple recursively
     template<int N>
     struct pack_values_into_tuple
