@@ -45,15 +45,11 @@ namespace luabinder
             using ValueType = std::remove_cv_t<std::remove_reference_t<Ret>>;
             static ValueType value{};
             return value;
+        } else if constexpr (std::is_void_v<Ret>) {
+            return;
         } else {
             return std::decay_t<Ret>{};
         }
-    }
-
-    template<>
-    inline void make_default_return_value<void>()
-    {
-        return;
     }
 
     /// Pack arguments from lua stack into a tuple recursively
