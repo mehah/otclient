@@ -188,8 +188,9 @@ namespace luabinder
                 g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
                 if constexpr (!std::is_void_v<Ret>) {
                     return make_default_return_value<Ret>();
+                } else {
+                    return;
                 }
-                return;
             }
 
             if constexpr (std::is_void_v<Ret>) {
@@ -277,8 +278,9 @@ namespace luabinder
                 g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
                 if constexpr (!std::is_void_v<Ret>) {
                     return make_default_return_value<Ret>();
+                } else {
+                    return;
                 }
-                return;
             }
             if constexpr (std::is_void_v<Ret>) {
                 mf(obj.get(), args...);
