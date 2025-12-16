@@ -125,38 +125,6 @@ function getMarketCategoryId(name)
     end
 end
 
-MarketItemDescription = {
-    Armor = 1,
-    Attack = 2,
-    Container = 3,
-    Defense = 4,
-    General = 5,
-    DecayTime = 6,
-    Combat = 7,
-    MinLevel = 8,
-    MinMagicLevel = 9,
-    Vocation = 10,
-    Rune = 11,
-    Ability = 12,
-    Charges = 13,
-    WeaponName = 14,
-    Weight = 15,
-    Augment = 16,
-    ImbuingSlots = 17,
-    MagicShield = 18,
-    Cleave = 19,
-    Reflection = 20,
-    Perfect = 21,
-    UpgradeClassification = 22,
-    CurrentTier = 23,
-    ElementalBond = 24,
-    Mantra = 25,
-    ImbuementEffect = 26
-}
-
-MarketItemDescription.First = MarketItemDescription.Armor
-MarketItemDescription.Last = MarketItemDescription.CurrentTier
-
 MarketItemDescriptionStrings = {
     [1] = 'Armor',
     [2] = 'Attack',
@@ -189,13 +157,6 @@ MarketItemDescriptionStrings = {
 function getMarketDescriptionName(id)
     if table.haskey(MarketItemDescriptionStrings, id) then
         return MarketItemDescriptionStrings[id]
-    end
-end
-
-function getMarketDescriptionId(name)
-    local id = table.find(MarketItemDescriptionStrings, name)
-    if id then
-        return id
     end
 end
 

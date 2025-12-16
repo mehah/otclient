@@ -5792,7 +5792,7 @@ void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
 static Otc::MarketItemDescription getMarketLastAttribute(int clientVersion)
 {
     if (clientVersion >= 1510) {
-        return Otc::ITEM_DESC_IMBUEMENTEFFECT;
+        return Otc::ITEM_DESC_LAST;
     }
 
     if (clientVersion >= 1500) {
@@ -5814,7 +5814,7 @@ static Otc::MarketItemDescription getMarketLastAttribute(int clientVersion)
     return Otc::ITEM_DESC_WEIGHT;
 }
 
-static bool shouldSkipMarketAttribute(int attr, int clientVersion)
+static bool shouldSkipMarketAttribute(int attr)
 {
     if (attr == Otc::ITEM_DESC_AUGMENT && !g_game.getFeature(Otc::GameItemAugment)) {
         return true;
@@ -5828,13 +5828,13 @@ static std::unordered_map<int, std::string> readMarketDescriptions(const InputMe
     std::unordered_map<int, std::string> descriptions;
     const auto lastAttribute = getMarketLastAttribute(clientVersion);
 
-    for (int_fast32_t i = Otc::ITEM_DESC_FIRST; i <= lastAttribute; ++i) {
-        if (shouldSkipMarketAttribute(i, clientVersion)) {
+    for (int_fast32_t attr = Otc::ITEM_DESC_FIRST; attr <= lastAttribute; ++attr) {
+        if (shouldSkipMarketAttribute(attr)) {
             continue;
         }
 
         if (msg->peekU16() != 0x00) {
-            descriptions.try_emplace(i, msg->getString());
+            descriptions.try_emplace(attr, msg->getString());
         } else {
             msg->getU16();
         }

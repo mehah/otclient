@@ -736,7 +736,7 @@ namespace Otc
         ITEM_DESC_IMBUEMENTEFFECT = 26,
 
         ITEM_DESC_FIRST = ITEM_DESC_ARMOR,
-        ITEM_DESC_LAST = ITEM_DESC_CURRENTTIER,
+        ITEM_DESC_LAST = ITEM_DESC_IMBUEMENTEFFECT,
     };
 
     enum MarketAction : uint8_t
