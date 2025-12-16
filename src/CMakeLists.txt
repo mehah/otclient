@@ -673,10 +673,9 @@ elseif(WASM)
     set(linkflags "${linkflags} -sASSERTIONS=1")
   endif()
 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -frtti -pthread -fexceptions")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -frtti -pthread -fexceptions -fwasm-exceptions -sSUPPORT_LONGJMP=wasm")
   set(linkflags "${linkflags}
 			-sINVOKE_RUN=0 -sEXIT_RUNTIME=1 -sTEXTDECODER=0 -sCASE_INSENSITIVE_FS=1
-			-sDISABLE_EXCEPTION_CATCHING=0
 			-lopenal -lidbfs.js -lwebsocket.js -sEXPORTED_RUNTIME_METHODS=ccall -sEXPORTED_FUNCTIONS=_main,_paste_return
 			-sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
 			-sFORCE_FILESYSTEM -sMALLOC=dlmalloc -sSUPPORT_LONGJMP=wasm -sWEBSOCKET_SUBPROTOCOL=binary -sOFFSCREENCANVAS_SUPPORT=1
