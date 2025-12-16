@@ -38,24 +38,43 @@
 /// pushes the result to lua.
 namespace luabinder
 {
+    namespace detail
+    {
+        template<typename Ret, bool IsVoid = std::is_void_v<Ret>, bool IsReference = std::is_reference_v<Ret>>
+        struct default_return_value;
+
+        template<typename Ret>
+        struct default_return_value<Ret, false, true>
+        {
+            static Ret value()
+            {
+                using ValueType = std::remove_cv_t<std::remove_reference_t<Ret>>;
+                static ValueType value{};
+                return value;
+            }
+        };
+
+        template<typename Ret>
+        struct default_return_value<Ret, false, false>
+        {
+            static Ret value()
+            {
+                using ValueType = std::remove_cv_t<Ret>;
+                return ValueType{};
+            }
+        };
+
+        template<typename Ret>
+        struct default_return_value<Ret, true, false>
+        {
+            static void value() {}
+        };
+    }
+
     template<typename Ret>
     Ret make_default_return_value()
     {
-        if constexpr (std::is_reference_v<Ret>) {
-            using ValueType = std::remove_cv_t<std::remove_reference_t<Ret>>;
-            static ValueType value{};
-            return value;
-        } else if constexpr (std::is_void_v<Ret>) {
-            return;
-        } else {
-            return std::decay_t<Ret>{};
-        }
-    }
-
-    template<>
-    inline void make_default_return_value<void>()
-    {
-        return;
+        return detail::default_return_value<Ret>::value();
     }
 
     /// Pack arguments from lua stack into a tuple recursively
