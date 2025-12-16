@@ -38,6 +38,8 @@ jobs:
       ACTIONS_RUNTIME_TOKEN: ${{ secrets.ACTIONS_RUNTIME_TOKEN }}
       ACTIONS_CACHE_URL: ${{ secrets.ACTIONS_CACHE_URL }}
       NODE_OPTIONS: "--max-old-space-size=4096"
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+      VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
       VCPKG_DISABLE_METRICS: "1"
 
     concurrency:
@@ -92,12 +94,19 @@ jobs:
       - name: Prepare vcpkg binary cache
         run: mkdir -p ${{ github.workspace }}/.cache/vcpkg
       - name: Setup vcpkg
+        if: ${{ env.ACT != 'true' }}
         uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
         env:
           RUNNER_WORKSPACE: ${{ github.workspace }}
         with:
+          vcpkgDirectory: ${{ github.workspace }}/vcpkg
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
           binaryCachePath: ${{ github.workspace }}/.cache/vcpkg
+      - name: Setup vcpkg (act fallback)
+        if: ${{ env.ACT == 'true' }}
+        run: |
+          chmod +x ./vcpkg/bootstrap-vcpkg.sh
+          ./vcpkg/bootstrap-vcpkg.sh
 
 
       - name: Validate vcpkg baseline SHA
