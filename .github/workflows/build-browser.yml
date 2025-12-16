@@ -59,8 +59,8 @@ jobs:
         if: ${{ env.ACT != 'true' }}
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event_name == 'push' && github.repository || (github.event.pull_request.head.repo.fork && github.repository || github.event.pull_request.head.repo.full_name) }}
-          ref: ${{ github.event_name == 'push' && github.ref || (github.event.pull_request.head.repo.fork && github.event.pull_request.base.ref || github.event.pull_request.head.ref) }}
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
       - name: Setup Emscripten
