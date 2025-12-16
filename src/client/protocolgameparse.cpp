@@ -5787,8 +5787,16 @@ void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
 
 static Otc::MarketItemDescription getMarketLastAttribute(int clientVersion)
 {
+    if (clientVersion >= 1510) {
+        return Otc::ITEM_DESC_IMBUEMENTEFFECT;
+    }
+
+    if (clientVersion >= 1500) {
+        return Otc::ITEM_DESC_MANTRA;
+    }
+
     if (clientVersion >= 1282) {
-        return Otc::ITEM_DESC_LAST;
+        return Otc::ITEM_DESC_CURRENTTIER;
     }
 
     if (clientVersion >= 1270) {
@@ -5805,14 +5813,6 @@ static Otc::MarketItemDescription getMarketLastAttribute(int clientVersion)
 static bool shouldSkipMarketAttribute(int attr, int clientVersion)
 {
     if (attr == Otc::ITEM_DESC_AUGMENT && !g_game.getFeature(Otc::GameItemAugment)) {
-        return true;
-    }
-
-    if (clientVersion < 1500 && (attr == Otc::ITEM_DESC_ELEMENTALBOND || attr == Otc::ITEM_DESC_MANTRA)) {
-        return true;
-    }
-
-    if (clientVersion < 1510 && attr == Otc::ITEM_DESC_IMBUEMENTEFFECT) {
         return true;
     }
 
