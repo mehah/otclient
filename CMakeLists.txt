@@ -51,6 +51,20 @@ if(DEFINED CMAKE_CXX_COMPILER)
     endif()
 endif()
 
+if(NOT DEFINED WASM)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten"
+            OR CMAKE_CXX_COMPILER_ID MATCHES "Emscripten"
+            OR _OTCLIENT_EMSCRIPTEN_COMPILER)
+        set(WASM ON CACHE BOOL "Build otclient for WebAssembly targets" FORCE)
+    else()
+        set(WASM OFF CACHE BOOL "Build otclient for WebAssembly targets" FORCE)
+    endif()
+endif()
+
+if(WASM)
+    message(STATUS "WASM: ON")
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten"
         OR CMAKE_CXX_COMPILER_ID MATCHES "Emscripten"
         OR _OTCLIENT_EMSCRIPTEN_COMPILER
