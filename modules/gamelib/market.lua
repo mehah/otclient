@@ -148,7 +148,10 @@ MarketItemDescription = {
     Reflection = 20,
     Perfect = 21,
     UpgradeClassification = 22,
-    CurrentTier = 23
+    CurrentTier = 23,
+    ElementalBond = 24,
+    Mantra = 25,
+    ImbuementEffect = 26
 }
 
 MarketItemDescription.First = MarketItemDescription.Armor
@@ -177,9 +180,10 @@ MarketItemDescriptionStrings = {
     [20] = 'Reflection',
     [21] = 'Perfect Show',
     [22] = 'Upgrade Classification',
+    [23] = 'Tier',
     [24] = 'Elemental Bond',
     [25] = 'Mantra',
-    [26] = 'Tier',
+    [25] = 'Imbuement Effect',
 }
 
 function getMarketDescriptionName(id)
