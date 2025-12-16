@@ -222,7 +222,7 @@ namespace {
 
 Color::Color(const std::string_view coltext)
 {
-    std::stringstream ss(std::string(coltext));
+    std::stringstream ss((std::string(coltext)));
     ss >> *this;
     update();
 }
