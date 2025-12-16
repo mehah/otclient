@@ -199,7 +199,7 @@ private:
 
     void add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    void addAction(const std::function<void()>& action);
+    void addAction(const std::function<void()>& action, size_t hash = 0);
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
     void releaseFrameBuffer(const Rect& dest);
 

@@ -2328,7 +2328,11 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
 {
     const uint32_t health = g_game.getFeature(Otc::GameDoubleHealth) ? msg->getU32() : msg->getU16();
     const uint32_t maxHealth = g_game.getFeature(Otc::GameDoubleHealth) ? msg->getU32() : msg->getU16();
-    const uint32_t freeCapacity = g_game.getFeature(Otc::GameDoubleFreeCapacity) ? msg->getU32() / 100.f : msg->getU16() / 100.f;
+    uint32_t freeCapacity = g_game.getFeature(Otc::GameDoubleFreeCapacity) ? msg->getU32() : msg->getU16();
+    if (g_game.getClientVersion() > 772) {
+        // todo: We only know scaling started some time after 7.72; the 772 cutoff is a placeholder until we find the exact version.
+        freeCapacity /= 100;
+    }
 
     uint32_t totalCapacity = 0;
     if (g_game.getClientVersion() < 1281 && g_game.getFeature(Otc::GameTotalCapacity)) {

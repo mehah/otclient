@@ -38,16 +38,16 @@
 const static TexturePtr m_textureNull;
 
 namespace {
-std::string_view categoryName(const ThingCategory category)
-{
-    switch (category) {
-        case ThingCategoryItem: return "item";
-        case ThingCategoryCreature: return "creature";
-        case ThingCategoryEffect: return "effect";
-        case ThingCategoryMissile: return "missile";
-        default: return "unknown";
+    std::string_view categoryName(const ThingCategory category)
+    {
+        switch (category) {
+            case ThingCategoryItem: return "item";
+            case ThingCategoryCreature: return "creature";
+            case ThingCategoryEffect: return "effect";
+            case ThingCategoryMissile: return "missile";
+            default: return "unknown";
+        }
     }
-}
 }
 
 void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCategory category, const appearances::Appearance& appearance)
@@ -645,11 +645,9 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
     // this line fixes a bug that makes them disappear while moving
     int animationFrameId = animationPhase % m_animationPhases;
 
-    TexturePtr texture;
-    if (g_drawPool.getCurrentType() != DrawPoolType::LIGHT) {
-        texture = getTexture(animationFrameId); // texture might not exists, neither its rects.
-        if (!texture)
-            return;
+    const auto& texture = getTexture(animationFrameId);
+    if (!texture) {
+        return; // texture might not exists, neither its rects.
     }
 
     const auto& textureData = m_textureData[animationFrameId];
@@ -685,26 +683,25 @@ const TexturePtr& ThingType::getTexture(const int animationPhase)
 
     auto& textureData = m_textureData[animationPhase];
 
-    auto& animationPhaseTexture = textureData.source;
-
-    if (animationPhaseTexture) return animationPhaseTexture;
-
-    bool async = g_app.isLoadingAsyncTexture();
-    if (g_game.isUsingProtobuf() && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
-        async = false;
-
-    if (!async) {
-        loadTexture(animationPhase);
+    if (textureData.source)
         return textureData.source;
-    }
 
-    if (!m_loading) {
-        m_loading = true;
+    bool expected = false;
+    if (m_loading.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
+        bool async = g_app.isLoadingAsyncTexture();
+        if (g_game.isUsingProtobuf() && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
+            async = false;
+
+        if (!async) {
+            loadTexture(animationPhase);
+            m_loading.store(false, std::memory_order_release);
+            return textureData.source;
+        }
 
         auto action = [this] {
             for (int_fast8_t i = -1; ++i < m_animationPhases;)
                 loadTexture(i);
-            m_loading = false;
+            m_loading.store(false, std::memory_order_release);
         };
 
         g_asyncDispatcher.detach_task(std::move(action));
