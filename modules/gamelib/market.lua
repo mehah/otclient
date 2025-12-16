@@ -183,7 +183,7 @@ MarketItemDescriptionStrings = {
     [23] = 'Tier',
     [24] = 'Elemental Bond',
     [25] = 'Mantra',
-    [25] = 'Imbuement Effect',
+    [26] = 'Imbuement Effect',
 }
 
 function getMarketDescriptionName(id)
