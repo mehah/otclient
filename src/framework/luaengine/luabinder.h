@@ -38,24 +38,41 @@
 /// pushes the result to lua.
 namespace luabinder
 {
+    template<typename Ret, typename Enable = void>
+    struct default_return_value;
+
     template<typename Ret>
-    Ret make_default_return_value()
-        requires std::is_reference_v<Ret>
+    struct default_return_value<Ret, std::enable_if_t<std::is_reference_v<Ret>>>
     {
-        using ValueType = std::remove_cv_t<std::remove_reference_t<Ret>>;
-        static ValueType value{};
-        return value;
-    }
+        static Ret get()
+        {
+            using ValueType = std::remove_cv_t<std::remove_reference_t<Ret>>;
+            static ValueType value{};
+            return value;
+        }
+    };
+
+    template<typename Ret>
+    struct default_return_value<Ret, std::enable_if_t<!std::is_void_v<Ret> && !std::is_reference_v<Ret>>>
+    {
+        static Ret get()
+        {
+            using ValueType = std::remove_cv_t<Ret>;
+            return ValueType{};
+        }
+    };
+
+    template<>
+    struct default_return_value<void, void>
+    {
+        static void get() {}
+    };
 
     template<typename Ret>
     Ret make_default_return_value()
-        requires (!std::is_void_v<Ret> && !std::is_reference_v<Ret>)
     {
-        using ValueType = std::remove_cv_t<Ret>;
-        return ValueType{};
+        return default_return_value<Ret>::get();
     }
-
-    inline void make_default_return_value<void>() {}
 
     /// Pack arguments from lua stack into a tuple recursively
     template<int N>
