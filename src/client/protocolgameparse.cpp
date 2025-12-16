@@ -2321,7 +2321,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
     const uint32_t maxHealth = g_game.getFeature(Otc::GameDoubleHealth) ? msg->getU32() : msg->getU16();
     uint32_t freeCapacity = g_game.getFeature(Otc::GameDoubleFreeCapacity) ? msg->getU32() : msg->getU16();
     if (g_game.getClientVersion() >= 772) {
-        // todo: We only know scaling started some time after 7.6; the 760 cutoff is a placeholder until we find the exact version.
+        // todo: We only know scaling started some time after 7.72; the 772 cutoff is a placeholder until we find the exact version.
         freeCapacity /= 100;
     }
 
