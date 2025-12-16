@@ -71,6 +71,10 @@ namespace luabinder
     template<typename Ret>
     Ret make_default_return_value()
     {
+        if constexpr (std::is_void_v<Ret>) {
+            default_return_value<Ret>::get();
+            return;
+        }
         return default_return_value<Ret>::get();
     }
 

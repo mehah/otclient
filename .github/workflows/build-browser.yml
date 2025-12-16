@@ -84,7 +84,7 @@ jobs:
         with:
           path: |
             ~/.cache/vcpkg/archives
-            ${{ github.workspace }}/vcpkg/installed
+            ${{ github.workspace }}/vcpkg_installed
             ${{ github.workspace }}/vcpkg/buildtrees
             ${{ github.workspace }}/vcpkg/downloads
             ${{ github.workspace }}/.cache/vcpkg
@@ -92,7 +92,9 @@ jobs:
           restore-keys: |
             vcpkg-${{ matrix.buildtype }}-pthreads-
       - name: Prepare vcpkg binary cache
-        run: mkdir -p ${{ github.workspace }}/.cache/vcpkg
+        run: |
+          mkdir -p ${{ github.workspace }}/.cache/vcpkg
+          mkdir -p ${{ github.workspace }}/vcpkg_installed
       - name: Setup vcpkg
         if: ${{ env.ACT != 'true' }}
         uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
