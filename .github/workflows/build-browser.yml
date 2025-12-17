@@ -144,7 +144,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DTOGGLE_BOT_PROTECTION=OFF \
             -DCMAKE_CXX_FLAGS="-fno-lto -std=c++20 -D_LIBCPP_DISABLE_AVAILABILITY -fexperimental-library" \
-            -DCMAKE_EXE_LINKER_FLAGS="-s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s WASM=1 -s NO_EXIT_RUNTIME=1 -fno-lto" \
+            -DCMAKE_EXE_LINKER_FLAGS="-s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s WASM=1 -s SUPPORT_LONGJMP=wasm -s NO_EXIT_RUNTIME=1 -fno-lto" \
             -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF \
             -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG -fno-lto" \
             -DCMAKE_CXX_FLAGS_DEBUG="-O0 -g -fno-lto" \
