@@ -664,21 +664,52 @@ elseif(WASM)
             -Wall -Wextra -Wpedantic
     )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sASSERTIONS=1")
   endif()
 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -frtti -pthread -fexceptions -fwasm-exceptions -sSUPPORT_LONGJMP=wasm")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}
-			-sINVOKE_RUN=0 -sEXIT_RUNTIME=1 -sTEXTDECODER=0 -sCASE_INSENSITIVE_FS=1
-			-lopenal -lidbfs.js -lwebsocket.js -sEXPORTED_RUNTIME_METHODS=ccall -sEXPORTED_FUNCTIONS=_main,_paste_return
-			-sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
-			-sFORCE_FILESYSTEM -sMALLOC=dlmalloc -sSUPPORT_LONGJMP=wasm -sWEBSOCKET_SUBPROTOCOL=binary -sOFFSCREENCANVAS_SUPPORT=1
-			-sOFFSCREEN_FRAMEBUFFER -sENVIRONMENT=web,worker -sPROXY_TO_PTHREAD -sFULL_ES2=1
-			-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sUSE_PTHREADS=1 -sFETCH=1
-			-sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sALLOW_MEMORY_GROWTH=1
-			--preload-file=../otclientrc.lua@otclientrc.lua --preload-file=../init.lua@init.lua
-			--preload-file=../data@data --preload-file=../mods@mods --preload-file=../modules@modules
-			--shell-file=../browser/shell.html --use-preload-cache")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -frtti -pthread -fexceptions -fwasm-exceptions")
+
+  set(WASM_LINK_OPTIONS
+          -sINVOKE_RUN=0
+          -sEXIT_RUNTIME=1
+          -sTEXTDECODER=0
+          -sCASE_INSENSITIVE_FS=1
+          -lopenal
+          -lidbfs.js
+          -lwebsocket.js
+          -sEXPORTED_RUNTIME_METHODS=ccall
+          -sEXPORTED_FUNCTIONS=_main,_paste_return
+          -sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
+          -sFORCE_FILESYSTEM
+          -sMALLOC=dlmalloc
+          -sSUPPORT_LONGJMP=wasm
+          -sWEBSOCKET_SUBPROTOCOL=binary
+          -sOFFSCREENCANVAS_SUPPORT=1
+          -sOFFSCREEN_FRAMEBUFFER
+          -sENVIRONMENT=web,worker
+          -sPROXY_TO_PTHREAD
+          -sFULL_ES2=1
+          -sMIN_WEBGL_VERSION=2
+          -sMAX_WEBGL_VERSION=2
+          -sUSE_PTHREADS=1
+          -sFETCH=1
+          -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency
+          -sALLOW_MEMORY_GROWTH=1
+          --preload-file=../otclientrc.lua@otclientrc.lua
+          --preload-file=../init.lua@init.lua
+          --preload-file=../data@data
+          --preload-file=../mods@mods
+          --preload-file=../modules@modules
+          --shell-file=../browser/shell.html
+          --use-preload-cache
+  )
+
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    list(APPEND WASM_LINK_OPTIONS -sASSERTIONS=1)
+  endif()
+
+  target_link_options(${PROJECT_NAME} PRIVATE ${WASM_LINK_OPTIONS})
+  string(REPLACE ";" " " _WASM_LINK_LOG "${WASM_LINK_OPTIONS}")
+  message(STATUS "WASM link options: ${_WASM_LINK_LOG}")
   set(CMAKE_EXECUTABLE_SUFFIX ".html")
   set(VCPKG_TARGET_TRIPLET "wasm32-emscripten" CACHE STRING "")
 
