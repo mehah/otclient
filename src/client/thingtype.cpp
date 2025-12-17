@@ -352,7 +352,7 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
     }
 
     if (flags.has_deco_kit() && flags.deco_kit()) {
-        m_flags |= ThingFlagAttrExpireStop;
+        m_flags |= ThingFlagAttrDecoKit;
     }
 }
 

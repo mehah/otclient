@@ -550,7 +550,7 @@ namespace Otc
         GameLeechAmount = 109,
         GameItemAugment = 110,
         GameDynamicBugReporter = 111,
-        GameWrapKit = 112,
+        GameDecoKit = 112,
         GameContainerFilter = 113,
         GameEnterGameShowAppearance = 114,
         GameSmoothWalkElevation = 115,
