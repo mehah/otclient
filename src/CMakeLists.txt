@@ -310,6 +310,7 @@ set(SOURCE_FILES
         client/uiminimap.cpp
         client/uiprogressrect.cpp
         client/uisprite.cpp
+        tools/datdump.cpp
 )
 
 if (TOGGLE_FRAMEWORK_GRAPHICS)
