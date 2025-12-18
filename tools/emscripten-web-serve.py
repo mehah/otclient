@@ -154,7 +154,7 @@ def discover_addresses(port: int) -> list[str]:
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.connect(("8.8.8.8", 80))
+            s.connect(("8.8.8.8", 80))  # NOSONAR: harmless probe to discover outbound interface
             add_addr(s.getsockname()[0])
     except OSError:
         pass
@@ -166,7 +166,10 @@ def discover_addresses(port: int) -> list[str]:
     except (CalledProcessError, FileNotFoundError):
         pass
 
-    return [f"http://{addr}:{port}/otclient.html" for addr in sorted(addrs)]
+    return [
+        f"http://{addr}:{port}/otclient.html"  # NOSONAR: dev-only HTTP endpoint for local testing
+        for addr in sorted(addrs)
+    ]
 
 
 def main() -> None:
@@ -176,7 +179,11 @@ def main() -> None:
         print(f"[error] Serve root '{serve_root}' does not exist.", file=sys.stderr)
         sys.exit(1)
 
-    host_origin = f"http://{args.bind}:{args.port}" if args.bind != "0.0.0.0" else None
+    host_origin = (
+        f"http://{args.bind}:{args.port}"  # NOSONAR: local-only origin for debugging server
+        if args.bind != "0.0.0.0"
+        else None
+    )
 
     HeaderInjectorHandler.extra_headers = {
         key: value for key, value in DEFAULT_HEADERS.items() if key != "Content-Type"
@@ -198,7 +205,7 @@ def main() -> None:
 
     with httpd:
         urls = discover_addresses(args.port) if args.bind == "0.0.0.0" else [
-            f"http://{args.bind}:{args.port}/otclient.html"
+            f"http://{args.bind}:{args.port}/otclient.html"  # NOSONAR: debugging server not exposed publicly
         ]
         print(f"Serving {serve_root} with COOP/COEP headers (Ctrl+C to stop)")
         for url in urls:

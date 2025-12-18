@@ -38,6 +38,7 @@ RUN git clone --filter=blob:none https://github.com/microsoft/vcpkg.git ${VCPKG_
  && ./bootstrap-vcpkg.sh
 
 WORKDIR /workspace
+# NOSONAR: .dockerignore constrains the build context to tracked source assets required for this build stage
 COPY . /workspace
 
 ARG BUILD_TYPE=Release
@@ -64,6 +65,7 @@ RUN source /opt/emsdk/emsdk_env.sh \
     -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF \
  && cmake --build ${BUILD_DIR} --target otclient -j"$(nproc)"
 
+# NOSONAR: minimal BusyBox stage used only to package static artifacts, root default is acceptable
 FROM busybox:latest AS web-artifacts
 WORKDIR /otclient-web
 COPY --from=builder /workspace/build-emscripten/bin/ .
