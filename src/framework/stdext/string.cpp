@@ -24,6 +24,7 @@
 #include "exception.h"
 #include "types.h"
 
+#include <charconv>
 #include <utf8cpp/utf8.h>
 #include <iterator>
 

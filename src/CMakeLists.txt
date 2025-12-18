@@ -602,6 +602,17 @@ elseif(ANDROID)
   )
 
 elseif(WASM)
+  option(WASM_USE_WASM_EXCEPTIONS "Use native WebAssembly exception handling" ON)
+
+  set(_WASM_LONGJMP_MODE "emscripten")
+  set(_WASM_EXPORTED_FUNCTIONS "_main,_paste_return")
+  set(_WASM_CXX_FLAGS "-O3 -ffast-math -frtti -pthread -fexceptions")
+  if(WASM_USE_WASM_EXCEPTIONS)
+    set(_WASM_LONGJMP_MODE "wasm")
+    set(_WASM_EXPORTED_FUNCTIONS "${_WASM_EXPORTED_FUNCTIONS},_emscripten_longjmp")
+    string(APPEND _WASM_CXX_FLAGS " -fwasm-exceptions")
+  endif()
+
   target_include_directories(otclient_core
           PUBLIC
           ${CMAKE_SOURCE_DIR}/src
@@ -666,22 +677,22 @@ elseif(WASM)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
   endif()
 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -frtti -pthread -fexceptions -fwasm-exceptions")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_WASM_CXX_FLAGS}")
 
   set(WASM_LINK_OPTIONS
           -sINVOKE_RUN=0
           -sEXIT_RUNTIME=1
-          -sTEXTDECODER=0
+          -sTEXTDECODER=2
           -sCASE_INSENSITIVE_FS=1
           -lopenal
           -lidbfs.js
           -lwebsocket.js
           -sEXPORTED_RUNTIME_METHODS=ccall
-          -sEXPORTED_FUNCTIONS=_main,_paste_return
+          "-sEXPORTED_FUNCTIONS=${_WASM_EXPORTED_FUNCTIONS}"
           -sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
           -sFORCE_FILESYSTEM
           -sMALLOC=dlmalloc
-          -sSUPPORT_LONGJMP=wasm
+          "-sSUPPORT_LONGJMP=${_WASM_LONGJMP_MODE}"
           -sWEBSOCKET_SUBPROTOCOL=binary
           -sOFFSCREENCANVAS_SUPPORT=1
           -sOFFSCREEN_FRAMEBUFFER
@@ -702,6 +713,10 @@ elseif(WASM)
           --shell-file=../browser/shell.html
           --use-preload-cache
   )
+
+  if(WASM_USE_WASM_EXCEPTIONS)
+    list(APPEND WASM_LINK_OPTIONS "-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=['emscripten_longjmp']")
+  endif()
 
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     list(APPEND WASM_LINK_OPTIONS -sASSERTIONS=1)
