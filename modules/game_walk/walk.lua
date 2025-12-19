@@ -58,8 +58,8 @@ local function canChangeFloor(pos, deltaZ)
     local toTile = g_map.getTile(toPos)
 
     if deltaZ > 0 then
-        -- Going DOWN: just check if destination is walkable (can step down onto it)
-        return toTile and toTile:isWalkable() and toTile:hasElevation(3)
+        -- Going DOWN
+        return toTile and toTile:isWalkable() and (toTile:hasElevation(3) or toTile:hasFloorChange())
     elseif deltaZ < 0 then
         -- Going UP: check if current tile has elevation (stairs to climb) AND destination is walkable
         return fromTile and fromTile:hasElevation(3) and toTile and toTile:isWalkable()
