@@ -283,15 +283,3 @@ std::string Crypt::crc32(const std::string& decoded_string, const bool upperCase
         std::ranges::transform(result, result.begin(), tolower);
     return result;
 }
-
-// NOSONAR - Intentional use of SHA-1 as there is no security impact in this context
-std::string Crypt::sha1Encrypt(const std::string& input) {
-    unsigned char hash[SHA_DIGEST_LENGTH];
-    SHA1(reinterpret_cast<const unsigned char*>(input.data()), input.size(), hash);
-
-    std::ostringstream oss;
-    for (unsigned char byte : hash)
-        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
-
-    return oss.str();
-}
