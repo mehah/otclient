@@ -702,6 +702,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("isTranslucent", &ThingType::isTranslucent);
     g_lua.bindClassMemberFunction<ThingType>("hasDisplacement", &ThingType::hasDisplacement);
     g_lua.bindClassMemberFunction<ThingType>("hasElevation", &ThingType::hasElevation);
+    g_lua.bindClassMemberFunction<ThingType>("hasFloorChange", &ThingType::hasFloorChange);
     g_lua.bindClassMemberFunction<ThingType>("isLyingCorpse", &ThingType::isLyingCorpse);
     g_lua.bindClassMemberFunction<ThingType>("isAnimateAlways", &ThingType::isAnimateAlways);
     g_lua.bindClassMemberFunction<ThingType>("hasMiniMapColor", &ThingType::hasMiniMapColor);
@@ -926,6 +927,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("getGround", &Tile::getGround);
     g_lua.bindClassMemberFunction<Tile>("isWalkable", &Tile::isWalkable);
     g_lua.bindClassMemberFunction<Tile>("hasElevation", &Tile::hasElevation);
+    g_lua.bindClassMemberFunction<Tile>("hasFloorChange", &Tile::hasFloorChange);
 
     g_lua.bindClassMemberFunction<Tile>("isCovered", &Tile::isCovered);
     g_lua.bindClassMemberFunction<Tile>("isCompletelyCovered", &Tile::isCompletelyCovered);

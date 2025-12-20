@@ -113,6 +113,10 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
 
 void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 {
+    if (flags.floorchange()) {
+        m_flags |= ThingFlagAttrFloorChange;
+    }
+
     if (flags.has_bank()) {
         m_groundSpeed = flags.bank().waypoints();
         m_flags |= ThingFlagAttrGround;
@@ -946,6 +950,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr) {
         case ThingAttrDisplacement: return ThingFlagAttrDisplacement;
         case ThingAttrLight: return ThingFlagAttrLight;
         case ThingAttrElevation: return ThingFlagAttrElevation;
+        case ThingAttrFloorChange: return ThingFlagAttrFloorChange;
         case ThingAttrGround: return ThingFlagAttrGround;
         case ThingAttrWritable: return ThingFlagAttrWritable;
         case ThingAttrWritableOnce: return ThingFlagAttrWritableOnce;

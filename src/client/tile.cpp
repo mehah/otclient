@@ -484,6 +484,14 @@ ThingPtr Tile::getTopThing()
 
 bool Tile::hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & HAS_GROUND_BORDER; };
 bool Tile::hasTopGround(const bool ignoreBorder) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & HAS_TOP_GROUND_BORDER); }
+bool Tile::hasFloorChange()
+{
+    for (const auto& thing : m_things) {
+        if (thing->hasFloorChange())
+            return true;
+    }
+    return false;
+}
 ItemPtr Tile::getGround() { const auto& ground = getThing(0); return ground && ground->isGround() ? ground->static_self_cast<Item>() : nullptr; }
 
 std::vector<ItemPtr> Tile::getItems()
