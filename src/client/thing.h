@@ -149,7 +149,7 @@ public:
     bool hasLensHelp() const;
     bool hasDisplacement() const;
     bool hasElevation() const;
-    bool hasFloorChange();
+    bool hasFloorChange() const;
     bool hasAction() const;
     bool hasWearOut() const;
     bool hasClockExpire() const;
