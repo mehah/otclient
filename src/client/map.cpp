@@ -42,17 +42,17 @@
 
 namespace
 {
-void cleanNewSpectators(std::vector<CreaturePtr>& creatures, std::unordered_set<uint32_t>& seenIds, const std::size_t startIndex)
-{
-    auto it = creatures.begin() + startIndex;
-    while (it != creatures.end()) {
-        if (const auto& creature = *it; !creature || !seenIds.insert(creature->getId()).second) {
-            it = creatures.erase(it);
-            continue;
+    void cleanNewSpectators(std::vector<CreaturePtr>& creatures, std::unordered_set<uint32_t>& seenIds, const std::size_t startIndex)
+    {
+        auto it = creatures.begin() + startIndex;
+        while (it != creatures.end()) {
+            if (const auto& creature = *it; !creature || !seenIds.insert(creature->getId()).second) {
+                it = creatures.erase(it);
+                continue;
+            }
+            ++it;
         }
-        ++it;
     }
-}
 }
 
 #ifdef FRAMEWORK_EDITOR
@@ -1291,6 +1291,11 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
         p.x -= widget->getMarginRight();
         p.y += widget->getMarginTop();
         p.y -= widget->getMarginBottom();
+
+        const bool isScaled = g_app.getHUDScale() != DEFAULT_DISPLAY_DENSITY;
+        if (isScaled) {
+            p.scale(g_app.getHUDScale());
+        }
 
         const auto& widgetRect = widget->getRect();
         const auto& newWidgetRect = Rect(p, widgetRect.width(), widgetRect.height());

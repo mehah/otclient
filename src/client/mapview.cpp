@@ -442,7 +442,12 @@ void MapView::updateRect(const Rect& rect) {
         m_posInfo.horizontalStretchFactor = rect.width() / static_cast<float>(m_posInfo.srcRect.width());
         m_posInfo.verticalStretchFactor = rect.height() / static_cast<float>(m_posInfo.srcRect.height());
 
-        const auto& mousePos = getPosition(g_window.getMousePosition() * g_window.getDisplayDensity());
+        auto mousePoint = g_window.getMousePosition();
+        if (g_app.getHUDScale() != DEFAULT_DISPLAY_DENSITY) {
+            mousePoint.scale(g_app.getHUDScale());
+        }
+
+        const auto& mousePos = getPosition(mousePoint * g_window.getDisplayDensity());
         if (mousePos != m_mousePosition)
             onMouseMove(m_mousePosition = mousePos, true);
     }

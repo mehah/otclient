@@ -93,7 +93,7 @@ void LocalPlayer::onWalking() {
         if (const auto& tile = g_map.getTile(getPosition())) {
             for (const auto& creature : tile->getWalkingCreatures()) {
                 // Cancel pre-walk movement if the local player tries to walk on an unwalkable tile.
-                if (creature.get() != this && creature->getPosition() == getPosition()) {
+                if (creature.get() != this && creature->getPosition() == getPosition() && !creature->isPassable()) {
                     cancelWalk();
                     g_map.notificateTileUpdate(getPosition(), asLocalPlayer(), Otc::OPERATION_CLEAN);
                     break;

@@ -269,8 +269,6 @@ void DrawPool::release() {
         return;
     }
 
-    m_shouldRepaint.store(true, std::memory_order_release);
-
     m_refreshTimer.restart();
 
     m_objectsDraw[0].clear();
@@ -312,6 +310,8 @@ void DrawPool::release() {
             objs.clear();
         }
     }
+
+    m_shouldRepaint.store(true, std::memory_order_release);
 }
 
 void DrawPool::flush()
@@ -430,10 +430,13 @@ void DrawPool::removeFramebuffer() {
     m_framebuffer = nullptr;
 }
 
-void DrawPool::addAction(const std::function<void()>& action)
+void DrawPool::addAction(const std::function<void()>& action, size_t hash)
 {
     const uint8_t order = m_type == DrawPoolType::MAP ? THIRD : FIRST;
     m_objects[order].emplace_back(action);
+    if (hasFrameBuffer() && hash > 0 && !m_hashCtrl.isLast(hash)) {
+        m_hashCtrl.put(hash);
+    }
 }
 
 void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
