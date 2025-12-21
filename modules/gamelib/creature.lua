@@ -22,7 +22,9 @@ VocationsServer = {
     MasterSorcerer = 5,
     ElderDruid = 6,
     RoyalPaladin = 7,
-    EliteKnight = 8
+    EliteKnight = 8,
+    Monk = 9,
+    ExaltedMonk = 10,
 }
 
 VocationsClient = {
