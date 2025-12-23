@@ -28,11 +28,6 @@
 #include "framework/platform/platform.h"
 #include "tools/datdump.h"
 
-#include <algorithm>
-#include <array>
-#include <iostream>
-#include <optional>
-
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
 #include "client/game.h"
