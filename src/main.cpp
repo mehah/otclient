@@ -26,6 +26,7 @@
 #include "framework/core/resourcemanager.h"
 #include "framework/luaengine/luainterface.h"
 #include "framework/platform/platform.h"
+#include "tools/datdump.h"
 
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
@@ -43,12 +44,39 @@
 extern "C" {
 #endif
 
+namespace {
+
+bool shouldShowHelp(const std::vector<std::string>& args)
+{
+    for (const auto& arg : args) {
+        if (arg == "--help" || arg == "-h" || arg == "/?")
+            return true;
+    }
+    return false;
+}
+
+void printHelp(const std::string& executableName)
+{
+    std::cout << "Usage: " << executableName << " [options]\n\n"
+                 "General options:\n"
+                 "  --help, -h, /?              Show this help message and exit\n"
+                 "  --encrypt <password>        Encrypt assets (requires builder build)\n\n"
+                 "DAT debugging:\n"
+                 "  --dump-dat-to-json=<path>   Dump the specified Tibia DAT file as JSON\n"
+                 "    --dump-dat-output=<path>  Write JSON to file instead of stdout\n"
+                 "    --dump-dat-client-version=<ver>  Decode flags using that client version\n"
+                 "    --dump-dat-compact        Emit compact (single-line) JSON\n";
+}
+
+} // namespace
+
     int main(const int argc, const char* argv[])
     {
         std::vector<std::string> args(argv, argv + argc);
 
         // process args encoding
         g_platform.init(args);
+
 
         // initialize resources
 #ifdef ANDROID
@@ -78,6 +106,15 @@ extern "C" {
         // find script init.lua and run it
         if (!g_resources.discoverWorkDir("init.lua"))
             g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
+
+        if (shouldShowHelp(args)) {
+            printHelp(args[0]);
+            return 0;
+        }
+
+        if (const auto dumpRequest = datdump::parseRequest(args); dumpRequest) {
+            return datdump::run(*dumpRequest) ? 0 : 1;
+        }
 
         // initialize application framework and otclient
         const auto drawEvents = ApplicationDrawEventsPtr(&g_client, [](ApplicationDrawEvents*) {});
