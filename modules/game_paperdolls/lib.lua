@@ -8,11 +8,16 @@ local executeConfig = function(paperdoll, config)
 
     local x = 0
     local y = 0
-    local onTop = config.onTop or true
+    local onTop = true
+    if config.onTop ~= nil then
+        onTop = config.onTop
+    end
 
     if config.speed then
         paperdoll:setSpeed(config.speed)
     end
+
+    paperdoll:reset()
 
     if config.drawOnUI == false then
         paperdoll:setCanDrawOnUI(false)
@@ -38,21 +43,49 @@ local executeConfig = function(paperdoll, config)
         paperdoll:setAddon(config.addon)
     end
 
-    if config.size then
-        paperdoll:setSize({
-            width = config.size[1],
-            height = config.size[2]
-        })
+    if config.sizeFactor then
+        paperdoll:setSizeFactor(config.sizeFactor)
+    end
+
+    if config.color then
+        paperdoll:setColor(config.color)
+    end
+
+    if config.headColor then
+        paperdoll:setHeadColor(config.headColor)
+    end
+
+    if config.bodyColor then
+        paperdoll:setBodyColor(config.bodyColor)
+    end
+
+    if config.legsColor then
+        paperdoll:setLegsColor(config.legsColor)
+    end
+
+    if config.feetColor then
+        paperdoll:setFeetColor(config.feetColor)
+    end
+
+    if config.useMountPattern ~= nil then
+        paperdoll:setUseMountPattern(config.useMountPattern)
+    end
+
+    if config.showOnMount ~= nil then
+        paperdoll:setShowOnMount(config.showOnMount)
     end
 
     if config.offset then
         x = config.offset[1] or 0
         y = config.offset[2] or 0
-        onTop = config.offset[3] or false
-    end
+        local _onTop = config.offset[3]
+        if _onTop == nil then _onTop = onTop end
 
-    if x ~= 0 or y ~= 0 then
-        paperdoll:setOffset(x, y)
+        onTop = _onTop
+
+        if x ~= 0 or y ~= 0 then
+            paperdoll:setOffset(x, y)
+        end
     end
 
     if onTop ~= nil then
@@ -63,12 +96,37 @@ local executeConfig = function(paperdoll, config)
         for dir, offset in pairs(config.dirOffset) do
             local _x = offset[1] or x
             local _y = offset[2] or y
-            local _onTop = offset[3] or onTop
+            local _onTop = offset[3]
+            if _onTop == nil then _onTop = onTop end
 
-            if type(x) == 'boolean' then -- onTop Config
+            if type(_x) == 'boolean' then -- onTop Config
                 paperdoll:setOnTopByDir(dir, _x)
             else
                 paperdoll:setDirOffset(dir, _x, _y, _onTop)
+            end
+        end
+    end
+
+    if config.mountOffset then
+        x = config.mountOffset[1] or 0
+        y = config.mountOffset[2] or 0
+
+        if x ~= 0 or y ~= 0 then
+            paperdoll:setMountOffset(x, y)
+        end
+    end
+
+    if config.mountDirOffset then
+        for dir, offset in pairs(config.mountDirOffset) do
+            local _x = offset[1] or x
+            local _y = offset[2] or y
+            local _onTop = offset[3]
+            if _onTop == nil then _onTop = onTop end
+
+            if type(_x) == 'boolean' then -- onTop Config
+                paperdoll:setMountOnTopByDir(dir, _x)
+            else
+                paperdoll:setMountDirOffset(dir, _x, _y, _onTop)
             end
         end
     end
@@ -134,9 +192,10 @@ PaperdollManager = {
                 return config
             end
         end
+
         return __OBJECTS[id].config
     end,
-    executeThingConfig = function(effect, thingId)
-        executeConfig(effect, PaperdollManager.getConfig(effect:getId(), thingId))
+    executeThingConfig = function(paperdoll, thingId)
+        executeConfig(paperdoll, PaperdollManager.getConfig(paperdoll:getId(), thingId))
     end
 }

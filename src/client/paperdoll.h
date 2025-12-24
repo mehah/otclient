@@ -44,8 +44,8 @@ public:
     float getOpacity() { return m_opacity / 100.f; }
     void setOpacity(float opacity) { m_opacity = opacity * 100u; }
 
-    Size getSize() { return m_size; }
-    void setSize(const Size& s) { m_size = s; }
+    float getSizeFactor() { return m_sizeFactor; }
+    void setSizeFactor(const float s) { m_sizeFactor = s; }
 
     bool getOnlyAddon() { return m_onlyAddon; }
     void setOnlyAddon(bool s) { m_onlyAddon = s; }
@@ -60,11 +60,22 @@ public:
     void setAddon(uint32_t addon) { m_addons |= addon; }
     void removeAddon(uint32_t addon) { m_addons &= ~addon; }
 
-    void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
-    void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
-    void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
+    void setOnTop(bool onTop);
+    void setOffset(int16_t x, int16_t y);
+    void setOnTopByDir(Otc::Direction direction, bool onTop);
 
-    void setDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = false) { m_offsetDirections[direction] = { onTop, {x, y} }; }
+    void setMountOffset(int16_t x, int16_t y);
+    void setMountOnTopByDir(Otc::Direction direction, bool onTop);
+
+    void setUseMountPattern(bool b) { m_useMountPattern = b; }
+    bool isUsingMountPattern() { return m_useMountPattern; }
+
+    void setShowOnMount(bool b) { m_showOnMount = b; }
+    bool isShowingOnMount() { return m_showOnMount; }
+
+    void setDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = true) { m_offsetDirections[0][direction] = { onTop, {x, y} }; }
+    void setMountDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = true) { m_offsetDirections[1][direction] = { onTop, {x, y} }; }
+
     void setShader(const std::string_view name);
     void setCanDrawOnUI(bool canDraw) { m_canDrawOnUI = canDraw; }
     bool canDrawOnUI() { return m_canDrawOnUI; }
@@ -93,6 +104,8 @@ public:
         m_feet = outfit.getFeet();
     }
 
+    void reset();
+
 private:
     int getCurrentAnimationPhase();
 
@@ -115,15 +128,17 @@ private:
 
     bool m_onlyAddon{ false };
     bool m_canDrawOnUI{ true };
+    bool m_useMountPattern{ false };
+    bool m_showOnMount{ true };
 
     ThingType* m_thingType{ nullptr };
 
-    Size m_size;
+    float m_sizeFactor{ 1.0 };
     Timer m_animationTimer;
 
     Otc::Direction m_direction{ Otc::North };
 
-    std::array<DirControl, Otc::Direction::NorthWest + 1> m_offsetDirections;
+    std::array<DirControl, Otc::Direction::West + 1> m_offsetDirections[2];
 
     PainterShaderProgramPtr m_shader;
 

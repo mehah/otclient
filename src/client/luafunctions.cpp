@@ -855,7 +855,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Paperdoll>("setDirOffset", &Paperdoll::setDirOffset);
     g_lua.bindClassMemberFunction<Paperdoll>("setOnTopByDir", &Paperdoll::setOnTopByDir);
     g_lua.bindClassMemberFunction<Paperdoll>("setShader", &Paperdoll::setShader);
-    g_lua.bindClassMemberFunction<Paperdoll>("setSize", &Paperdoll::setSize);
+    g_lua.bindClassMemberFunction<Paperdoll>("setSizeFactor", &Paperdoll::setSizeFactor);
     g_lua.bindClassMemberFunction<Paperdoll>("setPriority", &Paperdoll::setPriority);
     g_lua.bindClassMemberFunction<Paperdoll>("canDrawOnUI", &Paperdoll::canDrawOnUI);
     g_lua.bindClassMemberFunction<Paperdoll>("setCanDrawOnUI", &Paperdoll::setCanDrawOnUI);
@@ -864,6 +864,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Paperdoll>("hasAddon", &Paperdoll::hasAddon);
     g_lua.bindClassMemberFunction<Paperdoll>("setAddon", &Paperdoll::setAddon);
     g_lua.bindClassMemberFunction<Paperdoll>("removeAddon", &Paperdoll::removeAddon);
+    g_lua.bindClassMemberFunction<Paperdoll>("reset", &Paperdoll::reset);
     g_lua.bindClassMemberFunction<Paperdoll>("setColor", &Paperdoll::setColor);
     g_lua.bindClassMemberFunction<Paperdoll>("setHeadColor", &Paperdoll::setHeadColor);
     g_lua.bindClassMemberFunction<Paperdoll>("setBodyColor", &Paperdoll::setBodyColor);
@@ -874,6 +875,12 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Paperdoll>("getLegsColor", &Paperdoll::getLegsColor);
     g_lua.bindClassMemberFunction<Paperdoll>("getFeetColor", &Paperdoll::getFeetColor);
     g_lua.bindClassMemberFunction<Paperdoll>("setColorByOutfit", &Paperdoll::setColorByOutfit);
+
+    g_lua.bindClassMemberFunction<Paperdoll>("setMountOffset", &Paperdoll::setMountOffset);
+    g_lua.bindClassMemberFunction<Paperdoll>("setMountOnTopByDir", &Paperdoll::setMountOnTopByDir);
+    g_lua.bindClassMemberFunction<Paperdoll>("setMountDirOffset", &Paperdoll::setMountDirOffset);
+    g_lua.bindClassMemberFunction<Paperdoll>("setUseMountPattern", &Paperdoll::setUseMountPattern);
+    g_lua.bindClassMemberFunction<Paperdoll>("setShowOnMount", &Paperdoll::setShowOnMount);
 
     g_lua.registerClass<StaticText>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return std::make_shared<StaticText>(); });

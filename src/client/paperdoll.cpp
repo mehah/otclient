@@ -41,9 +41,15 @@ void Paperdoll::draw(const Point& dest, uint16_t animationPhase, bool mount, boo
     if (!m_thingType)
         return;
 
-    const auto& dirControl = m_offsetDirections[m_direction];
+    if (mount && !m_showOnMount)
+        return;
+
+    const auto& dirControl = m_offsetDirections[mount][m_direction];
     if (dirControl.onTop != isOnTop)
         return;
+
+    if (!m_useMountPattern)
+        mount = false;
 
     if (!m_canDrawOnUI && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
         return;
@@ -53,6 +59,10 @@ void Paperdoll::draw(const Point& dest, uint16_t animationPhase, bool mount, boo
 
     const auto& point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
     const int animation = animationPhase == 0 ? getCurrentAnimationPhase() : animationPhase;
+
+    const auto oldScaleFactor = g_drawPool.getScaleFactor();
+
+    g_drawPool.setScaleFactor(m_sizeFactor);
 
     if (!drawThings) {
         m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, false, lightView);
@@ -83,12 +93,14 @@ void Paperdoll::draw(const Point& dest, uint16_t animationPhase, bool mount, boo
             }
         }
     }
+
+    g_drawPool.setScaleFactor(oldScaleFactor);
 }
 
 void Paperdoll::drawLight(const Point& dest, bool mount, LightView* lightView) {
     if (!lightView) return;
 
-    const auto& dirControl = m_offsetDirections[m_direction];
+    const auto& dirControl = m_offsetDirections[mount][m_direction];
     draw(dest, 0, mount, dirControl.onTop, false, lightView);
 }
 
@@ -110,3 +122,37 @@ int Paperdoll::getCurrentAnimationPhase()
 }
 
 void Paperdoll::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
+
+void Paperdoll::reset() {
+    m_onlyAddon = false;
+    m_canDrawOnUI = true;
+
+    m_addons = 0;
+    m_sizeFactor = 1.f;
+    for (auto& pattern : m_offsetDirections)
+        pattern.fill(DirControl());
+}
+
+void Paperdoll::setOnTop(bool onTop) {
+    for (auto& pattern : m_offsetDirections)
+        for (auto& control : pattern)
+            control.onTop = onTop;
+}
+
+void Paperdoll::setOffset(int16_t x, int16_t y) {
+    for (auto& control : m_offsetDirections[0])
+        control.offset = { x, y };
+}
+
+void Paperdoll::setOnTopByDir(Otc::Direction direction, bool onTop) {
+    m_offsetDirections[0][direction].onTop = onTop;
+}
+
+void Paperdoll::setMountOffset(int16_t x, int16_t y) {
+    for (auto& control : m_offsetDirections[1])
+        control.offset = { x, y };
+}
+
+void Paperdoll::setMountOnTopByDir(Otc::Direction direction, bool onTop) {
+    m_offsetDirections[1][direction].onTop = onTop;
+}
