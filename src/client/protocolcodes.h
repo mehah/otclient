@@ -77,6 +77,8 @@ namespace Proto
         GameServerCreatureShader = 54,
         GameServerMapShader = 55,
         GameServerCreatureTyping = 56,
+        GameServerAttachedPaperdoll = 60,
+        GameServerDetachPaperdoll = 61,
         GameServerFeatures = 67,
         GameServerFloorDescription = 75,
 

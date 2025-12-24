@@ -566,6 +566,7 @@ namespace Otc
         GameMapCache = 125,
         GameForgeSkillStats = 126,
         GameCharacterSkillStats = 127,
+        GameCreaturePaperdoll = 128,
         LastGameFeature
     };
 

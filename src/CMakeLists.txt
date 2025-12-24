@@ -288,6 +288,8 @@ set(SOURCE_FILES
         client/protocolgame.cpp
         client/protocolgameparse.cpp
         client/protocolgamesend.cpp
+        client/paperdoll.cpp
+        client/paperdollmanager.cpp
         client/spriteappearances.cpp
         client/spritemanager.cpp
         client/statictext.cpp
