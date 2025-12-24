@@ -2,7 +2,7 @@
     register(id, name, thingId, config)
     config = {
         drawOnUI, priority, onlyAddon, addon,
-        shader, bounce, fixed, sizeFactor,
+        shader, sizeFactor,
         color, headColor, bodyColor, legsColor, feetColor,
         useMountPattern, showOnMount
         offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
@@ -39,8 +39,6 @@ PaperdollManager.register(3, 'Peitoral', 367, {
 PaperdollManager.register(4, 'Akuma Aura', 664, {
     priority = 4,
     addon = 1,
-    bounce = true,
-    fixed = true,
     onlyAddon = true
 })
 
@@ -49,32 +47,4 @@ PaperdollManager.register(5, 'Mochila', 136, {
     addon = 1,
     color = 77,
     onlyAddon = true
-})
-
-PaperdollManager.register(1990, 'wings1990', 136, {
-    priority = 5,
-    onlyAddon = true,
-    addon = 2,
-    onTop = true,
-    bounce = true,
-    fixed = false,
-    useMountPattern = true,
-    dirOffset = {
-        [North] = { 0, 0, true },
-        [East] = { 0, 0, true }, -- x+ esquerda, y+ = cima
-        [South] = { 0, 0, true },
-        [West] = { 0, 0, true }  -- x- = esquerda, y+ = cima
-
-        -- x,y  (x+ = esquerda, y+ = baixo)
-    }
-})
-
-PaperdollManager.register(130, 'wings130', 136, {
-    priority = 4,
-    onlyAddon = true,
-    addon = 1,
-    onTop = true,
-    bounce = false,
-    fixed = false,
-    useMountPattern = true
 })
