@@ -36,6 +36,7 @@
 #include "thingtype.h"
 #include "thingtypemanager.h"
 #include "tile.h"
+#include "paperdoll.h"
 #include "framework/core/clock.h"
 #include "framework/core/eventdispatcher.h"
 #include "framework/core/scheduledevent.h"
@@ -119,6 +120,9 @@ void Creature::drawLight(const Point& dest, LightView* lightView) {
     }
 
     drawAttachedLightEffect(dest + m_walkOffset * g_drawPool.getScaleFactor(), lightView);
+
+    for (const auto& paperdoll : m_paperdolls)
+        paperdoll->drawLight(dest, m_outfit.hasMount(), lightView);
 }
 
 void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
@@ -313,6 +317,11 @@ void Creature::internalDraw(Point dest, const Color& color)
         drawAttachedEffect(dest, nullptr, false); // On Bottom
 
     if (!isHided()) {
+        const int animationPhase = getCurrentAnimationPhase();
+
+        for (const auto& paperdoll : m_paperdolls)
+            paperdoll->draw(dest, animationPhase, m_outfit.hasMount(), false, true);
+
         // outfit is a real creature
         if (m_outfit.isCreature()) {
             if (m_outfit.hasMount()) {
@@ -339,7 +348,6 @@ void Creature::internalDraw(Point dest, const Color& color)
             }
 
             const auto& datType = getThingType();
-            const int animationPhase = getCurrentAnimationPhase();
             const bool useFramebuffer = !replaceColorShader && hasShader() && g_shaders.getShaderById(m_shaderId)->useFramebuffer();
 
             const auto& drawCreature = [&](const Point& dest) {
@@ -378,6 +386,9 @@ void Creature::internalDraw(Point dest, const Color& color)
                 g_drawPool.releaseFrameBuffer(destFB);
                 g_drawPool.resetShaderProgram();
             } else drawCreature(dest);
+
+            for (const auto& paperdoll : m_paperdolls)
+                paperdoll->draw(dest, animationPhase, m_outfit.hasMount(), true, true);
 
             // outfit is a creature imitating an item or the invisible effect
         } else {
@@ -814,6 +825,7 @@ void Creature::setDirection(const Otc::Direction direction)
         m_numPatternX = direction;
 
     setAttachedEffectDirection(static_cast<Otc::Direction>(m_numPatternX));
+    setPaperdollsDirection(static_cast<Otc::Direction>(m_numPatternX));
 }
 
 void Creature::setOutfit(const Outfit& outfit, bool fireEvent)
@@ -1310,4 +1322,87 @@ std::string Creature::getText()
 bool Creature::canShoot(int distance)
 {
     return getTile() ? getTile()->canShoot(distance) : false;
+}
+
+bool Creature::hasPaperdoll(uint16_t id) {
+    for (const auto& pd : m_paperdolls) {
+        if (pd->m_id == id)
+            return true;
+    }
+
+    return false;
+}
+
+void Creature::attachPaperdoll(const PaperdollPtr& obj) {
+    if (!obj) return;
+
+    obj->m_direction = getDirection();
+
+    uint_fast8_t i = 0;
+    for (const auto& pd : m_paperdolls) {
+        if (obj->m_priority < pd->m_priority)
+            break;
+        ++i;
+    }
+
+    m_paperdolls.insert(m_paperdolls.begin() + i, obj);
+
+    g_dispatcher.addEvent([paperdoll = obj, self = static_self_cast<Thing>()] {
+        paperdoll->callLuaField("onAttach", self->asLuaObject());
+    });
+}
+
+bool Creature::detachPaperdollById(uint16_t id) {
+    const auto it = std::find_if(m_paperdolls.begin(), m_paperdolls.end(),
+                                 [id](const PaperdollPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_paperdolls.end())
+        return false;
+
+    onDetachPaperdoll(*it);
+    m_paperdolls.erase(it);
+
+    return true;
+}
+
+bool Creature::detachPaperdollByPriority(uint8_t priority) {
+    bool finded = false;
+    for (auto it = m_paperdolls.begin(); it != m_paperdolls.end();) {
+        const auto& obj = *it;
+        if (obj->getPriority() == priority) {
+            onDetachPaperdoll(obj);
+            it = m_paperdolls.erase(it);
+            finded = true;
+        } else ++it;
+    }
+
+    return finded;
+}
+
+void Creature::onDetachPaperdoll(const PaperdollPtr& paperdoll) {
+    paperdoll->callLuaField("onDetach", asLuaObject());
+}
+
+void Creature::clearPaperdolls() {
+    for (const auto& e : m_paperdolls)
+        onDetachPaperdoll(e);
+    m_paperdolls.clear();
+}
+
+PaperdollPtr Creature::getPaperdollById(uint16_t id) {
+    const auto it = std::find_if(m_paperdolls.begin(), m_paperdolls.end(),
+                                 [id](const PaperdollPtr& obj) { return obj->getId() == id; });
+
+    if (it == m_paperdolls.end())
+        return nullptr;
+
+    return *it;
+}
+
+void Creature::setPaperdollsDirection(Otc::Direction dir) const
+{
+    for (const auto& paperdoll : m_paperdolls) {
+        if (paperdoll->m_thingType)
+            paperdoll->m_direction = dir;
+    }
 }

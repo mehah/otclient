@@ -38,6 +38,8 @@
 #include "thingtypemanager.h"
 #include "framework/core/eventdispatcher.h"
 #include "framework/net/inputmessage.h"
+#include "paperdollmanager.h"
+#include "paperdoll.h"
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {
@@ -146,6 +148,12 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     break;
                 case Proto::GameServerCreatureTyping:
                     parseCreatureTyping(msg);
+                    break;
+                case Proto::GameServerAttachedPaperdoll:
+                    parseAttachedPaperdoll(msg);
+                    break;
+                case Proto::GameServerDetachPaperdoll:
+                    parseDetachPaperdoll(msg);
                     break;
                 case Proto::GameServerFeatures:
                     parseFeatures(msg);
@@ -447,7 +455,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerLootContainers:
                     parseLootContainers(msg);
                     break;
-                case Proto::GameServerVirtue: 
+                case Proto::GameServerVirtue:
                     parseVirtue(msg);
                     break;
                 case Proto::GameServerCyclopediaHouseAuctionMessage:
@@ -3885,6 +3893,15 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             unpass = static_cast<bool>(msg->getU8());
         }
 
+        if (g_game.getFeature(Otc::GameCreaturePaperdoll)) {
+            uint8_t size = msg->getU8();
+            for (uint8_t i = 0; i < size; ++i) {
+                const auto& paperdoll = getPaperdoll(msg);
+                if (creature)
+                    creature->attachPaperdoll(paperdoll);
+            }
+        }
+
         std::string shader;
         if (g_game.getFeature(Otc::GameCreatureShader)) {
             shader = msg->getString();
@@ -5649,7 +5666,6 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         const uint32_t unknown = msg->getU32();
 
         g_lua.callGlobalField("g_game", "onOpenImbuementWindow", itemId, unknown);
-
     } else if (windowType == Otc::IMBUEMENT_WINDOW_SELECT_ITEM) {
         const uint16_t itemId = msg->getU16();
         const auto& item = Item::create(itemId);
@@ -5697,7 +5713,6 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         }
 
         g_lua.callGlobalField("g_game", "onImbuementItem", itemId, slot, activeSlots, imbuements, neededItemsList);
-
     } else if (windowType == Otc::IMBUEMENT_WINDOW_SCROLL) {
         msg->getU8(); // unknown byte
         msg->getU8(); // unknown byte
@@ -6250,7 +6265,77 @@ void ProtocolGame::parseWeaponProficiencyInfo(const InputMessagePtr& msg)
 
     const uint8_t size = msg->getU8();
     for (auto j = 0; j < size; ++j) {
-        msg->getU8(); // proficiencyLevel 
-        msg->getU8(); // perkPosition 
+        msg->getU8(); // proficiencyLevel
+        msg->getU8(); // perkPosition
     }
+}
+
+void ProtocolGame::parseAttachedPaperdoll(const InputMessagePtr& msg) {
+    const uint32_t id = msg->getU32();
+    const auto& paperdoll = getPaperdoll(msg);
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(std::format("could not get creature with id %d", id));
+        return;
+    }
+
+    if (creature->hasPaperdoll(paperdoll->getId()))
+        return;
+
+    creature->attachPaperdoll(paperdoll);
+}
+void ProtocolGame::parseDetachPaperdoll(const InputMessagePtr& msg) {
+    const uint32_t id = msg->getU32();
+    const bool bySlot = msg->getU8();
+    const uint16_t idOrSlot = msg->getU16();
+
+    const auto& creature = g_map.getCreatureById(id);
+    if (!creature) {
+        g_logger.traceError(std::format("could not get creature with id %d", id));
+        return;
+    }
+
+    if (bySlot)
+        creature->detachPaperdollByPriority(idOrSlot);
+    else
+        creature->detachPaperdollById(idOrSlot);
+}
+
+PaperdollPtr ProtocolGame::getPaperdoll(const InputMessagePtr& msg) const {
+    uint16_t id = msg->getU16();
+    uint8_t slot = msg->getU8();
+    uint8_t color = msg->getU8();
+    uint8_t head = msg->getU8();
+    uint8_t body = msg->getU8();
+    uint8_t legs = msg->getU8();
+    uint8_t feet = msg->getU8();
+    const auto& shader = msg->getString();
+
+    auto paperdoll = g_paperdolls.getById(id);
+    if (!paperdoll) return nullptr;
+
+    paperdoll = paperdoll->clone();
+    if (slot != UINT8_MAX)
+        paperdoll->setPriority(slot);
+
+    if (color != 0)
+        paperdoll->setColor(color);
+
+    if (head != 0)
+        paperdoll->setHeadColor(head);
+
+    if (body != 0)
+        paperdoll->setBodyColor(body);
+
+    if (legs != 0)
+        paperdoll->setLegsColor(legs);
+
+    if (feet != 0)
+        paperdoll->setFeetColor(feet);
+
+    if (!shader.empty())
+        paperdoll->setShader(shader);
+
+    return paperdoll;
 }

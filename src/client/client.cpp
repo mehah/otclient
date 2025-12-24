@@ -38,6 +38,7 @@
 #ifdef FRAMEWORK_EDITOR
 #include "creatures.h"
 #endif
+#include "paperdollmanager.h"
 
 Client g_client;
 
@@ -70,6 +71,7 @@ void Client::terminate()
     g_sprites.terminate();
     g_spriteAppearances.terminate();
     g_shaders.terminate();
+    g_paperdolls.clear();
     g_gameConfig.terminate();
 }
 

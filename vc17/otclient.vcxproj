@@ -332,6 +332,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\client\paperdoll.cpp" />
+    <ClCompile Include="..\src\client\paperdollmanager.cpp" />
     <ClCompile Include="..\src\framework\pch.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -511,6 +513,8 @@
     <ClInclude Include="..\src\client\attachedeffectmanager.h" />
     <ClInclude Include="..\src\client\gameconfig.h" />
     <ClInclude Include="..\src\client\luavaluecasts_client.h" />
+    <ClInclude Include="..\src\client\paperdoll.h" />
+    <ClInclude Include="..\src\client\paperdollmanager.h" />
     <ClInclude Include="..\src\client\spriteappearances.h" />
     <ClInclude Include="..\src\client\client.h" />
     <ClInclude Include="..\src\client\const.h" />
