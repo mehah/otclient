@@ -1,6 +1,6 @@
 --[[
     registerThingConfig(thingId, thingType)
-    set(attachedEffectId, config)
+    set(paperdollId, config)
 ]]
 --
 local c = PaperdollManager.registerThingConfig(35)
