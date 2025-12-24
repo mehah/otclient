@@ -31,7 +31,7 @@
 class Paperdoll : public LuaObject
 {
 public:
-    void draw(const Point& /*dest*/, uint16_t animationPhase, bool mount, bool isOnTop, bool drawThings, LightView* = nullptr);
+    void draw(const Point& /*dest*/, uint16_t animationPhase, bool mount, bool isOnTop, bool drawThings, const Color& color, LightView* = nullptr);
     void drawLight(const Point& /*dest*/, bool mount, LightView*);
 
     uint16_t getId() { return m_id; }

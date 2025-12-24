@@ -320,7 +320,7 @@ void Creature::internalDraw(Point dest, const Color& color)
         const int animationPhase = getCurrentAnimationPhase();
 
         for (const auto& paperdoll : m_paperdolls)
-            paperdoll->draw(dest, animationPhase, m_outfit.hasMount(), false, true);
+            paperdoll->draw(dest, animationPhase, m_outfit.hasMount(), false, true, color);
 
         // outfit is a real creature
         if (m_outfit.isCreature()) {
@@ -388,7 +388,7 @@ void Creature::internalDraw(Point dest, const Color& color)
             } else drawCreature(dest);
 
             for (const auto& paperdoll : m_paperdolls)
-                paperdoll->draw(dest, animationPhase, m_outfit.hasMount(), true, true);
+                paperdoll->draw(dest, animationPhase, m_outfit.hasMount(), true, true, color);
 
             // outfit is a creature imitating an item or the invisible effect
         } else {

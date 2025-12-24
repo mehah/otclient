@@ -37,7 +37,7 @@ PaperdollPtr Paperdoll::clone()
     return obj;
 }
 
-void Paperdoll::draw(const Point& dest, uint16_t animationPhase, bool mount, bool isOnTop, bool drawThings, LightView* lightView) {
+void Paperdoll::draw(const Point& dest, uint16_t animationPhase, bool mount, bool isOnTop, bool drawThings, const Color& color, LightView* lightView) {
     if (!m_thingType)
         return;
 
@@ -65,10 +65,10 @@ void Paperdoll::draw(const Point& dest, uint16_t animationPhase, bool mount, boo
     g_drawPool.setScaleFactor(m_sizeFactor);
 
     if (!drawThings) {
-        m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, false, lightView);
+        m_thingType->draw(point, 0, m_direction, 0, 0, animation, color, false, lightView);
     } else {
         if (!m_onlyAddon)
-            m_thingType->draw(point, 0, m_direction, 0, 0, animation, Color::white, drawThings, lightView);
+            m_thingType->draw(point, 0, m_direction, 0, 0, animation, color, drawThings, lightView);
 
         for (int yPattern = 0; yPattern < m_thingType->getNumPatternY(); ++yPattern) {
             if (yPattern == 0 && m_onlyAddon)
@@ -81,7 +81,7 @@ void Paperdoll::draw(const Point& dest, uint16_t animationPhase, bool mount, boo
             if (m_shader)
                 g_drawPool.setShaderProgram(m_shader, true);
 
-            m_thingType->draw(point, 0, m_direction, yPattern, static_cast<uint8_t>(mount), animation, Color::white);
+            m_thingType->draw(point, 0, m_direction, yPattern, static_cast<uint8_t>(mount), animation, color);
 
             if (m_thingType->getLayers() > 1) {
                 g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
@@ -101,7 +101,7 @@ void Paperdoll::drawLight(const Point& dest, bool mount, LightView* lightView) {
     if (!lightView) return;
 
     const auto& dirControl = m_offsetDirections[mount][m_direction];
-    draw(dest, 0, mount, dirControl.onTop, false, lightView);
+    draw(dest, 0, mount, dirControl.onTop, false, Color::white, lightView);
 }
 
 int Paperdoll::getCurrentAnimationPhase()
