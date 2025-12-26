@@ -43,6 +43,38 @@ include(MessageColors)
 include(LoggingHelper)
 include(GNUInstallDirs)
 
+set(_OTCLIENT_EMSCRIPTEN_COMPILER FALSE)
+if(DEFINED CMAKE_CXX_COMPILER)
+    string(FIND "${CMAKE_CXX_COMPILER}" "em++" _OTCLIENT_EMSCRIPTEN_COMPILER_POS)
+    if(NOT _OTCLIENT_EMSCRIPTEN_COMPILER_POS EQUAL -1)
+        set(_OTCLIENT_EMSCRIPTEN_COMPILER TRUE)
+    endif()
+endif()
+
+if(NOT DEFINED WASM)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten"
+            OR CMAKE_CXX_COMPILER_ID MATCHES "Emscripten"
+            OR _OTCLIENT_EMSCRIPTEN_COMPILER)
+        set(WASM ON CACHE BOOL "Build otclient for WebAssembly targets" FORCE)
+    else()
+        set(WASM OFF CACHE BOOL "Build otclient for WebAssembly targets" FORCE)
+    endif()
+endif()
+
+if(WASM)
+    message(STATUS "WASM: ON")
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten"
+        OR CMAKE_CXX_COMPILER_ID MATCHES "Emscripten"
+        OR _OTCLIENT_EMSCRIPTEN_COMPILER
+        OR WASM)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+endif()
+
 # *****************************************************************************
 # Options
 # *****************************************************************************

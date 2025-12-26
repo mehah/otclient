@@ -566,6 +566,7 @@ namespace Otc
         GameMapCache = 125,
         GameForgeSkillStats = 126,
         GameCharacterSkillStats = 127,
+        GameCreaturePaperdoll = 128,
         LastGameFeature
     };
 
@@ -1050,6 +1051,7 @@ enum ThingFlagAttr :uint64_t
     ThingFlagAttrDecoKit = static_cast<uint64_t>(1) << 45,
     ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46,
     ThingFlagAttrAmmo = static_cast<uint64_t>(1) << 47,
+    ThingFlagAttrFloorChange = static_cast<uint64_t>(1) << 48,
 };
 
 enum STACK_PRIORITY : uint8_t

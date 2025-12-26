@@ -4,6 +4,7 @@ controller:registerEvents(g_game, {
         -- g_game.enableFeature(GameKeepUnawareTiles)
         -- g_game.enableFeature(GameNegativeOffset)
         -- g_game.enableFeature(GameWingsAurasEffectsShader)
+        -- g_game.enableFeature(GameCreaturePaperdoll)
         -- g_game.enableFeature(GameAllowCustomBotScripts)
 
         g_game.enableFeature(GameFormatCreatureName)

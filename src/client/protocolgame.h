@@ -366,6 +366,9 @@ private:
     void parseCreatureShader(const InputMessagePtr& msg);
     void parseMapShader(const InputMessagePtr& msg);
 
+    void parseAttachedPaperdoll(const InputMessagePtr& msg);
+    void parseDetachPaperdoll(const InputMessagePtr& msg);
+
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
 
     Imbuement getImbuementInfo(const InputMessagePtr& msg);
@@ -385,6 +388,8 @@ public:
     Position getPosition(const InputMessagePtr& msg);
 
 private:
+    PaperdollPtr getPaperdoll(const InputMessagePtr& msg) const;
+
     bool m_enableSendExtendedOpcode{ false };
     bool m_gameInitialized{ false };
     bool m_mapKnown{ false };

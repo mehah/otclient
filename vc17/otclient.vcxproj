@@ -332,6 +332,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\client\paperdoll.cpp" />
+    <ClCompile Include="..\src\client\paperdollmanager.cpp" />
     <ClCompile Include="..\src\framework\pch.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -501,6 +503,7 @@
     <ClCompile Include="..\src\framework\util\color.cpp" />
     <ClCompile Include="..\src\framework\util\crypt.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\tools\datdump.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\client\animatedtext.h" />
@@ -510,6 +513,8 @@
     <ClInclude Include="..\src\client\attachedeffectmanager.h" />
     <ClInclude Include="..\src\client\gameconfig.h" />
     <ClInclude Include="..\src\client\luavaluecasts_client.h" />
+    <ClInclude Include="..\src\client\paperdoll.h" />
+    <ClInclude Include="..\src\client\paperdollmanager.h" />
     <ClInclude Include="..\src\client\spriteappearances.h" />
     <ClInclude Include="..\src\client\client.h" />
     <ClInclude Include="..\src\client\const.h" />
@@ -694,6 +699,7 @@
     <ClInclude Include="..\src\framework\util\size.h" />
     <ClInclude Include="..\src\framework\util\spinlock.h" />
     <ClInclude Include="..\src\gitinfo.h" />
+    <ClInclude Include="..\src\tools\datdump.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\otcicon.rc" />

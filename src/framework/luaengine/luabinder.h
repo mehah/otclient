@@ -38,16 +38,44 @@
 /// pushes the result to lua.
 namespace luabinder
 {
+    template<typename Ret, typename Enable = void>
+    struct default_return_value;
+
     template<typename Ret>
-    Ret make_default_return_value()
+    struct default_return_value<Ret, std::enable_if_t<std::is_reference_v<Ret>>>
     {
-        if constexpr (std::is_reference_v<Ret>) {
+        static Ret get()
+        {
             using ValueType = std::remove_cv_t<std::remove_reference_t<Ret>>;
             static ValueType value{};
             return value;
-        } else {
-            return std::decay_t<Ret>{};
         }
+    };
+
+    template<typename Ret>
+    struct default_return_value<Ret, std::enable_if_t<!std::is_void_v<Ret> && !std::is_reference_v<Ret>>>
+    {
+        static Ret get()
+        {
+            using ValueType = std::remove_cv_t<Ret>;
+            return ValueType{};
+        }
+    };
+
+    template<>
+    struct default_return_value<void, void>
+    {
+        static void get() {}
+    };
+
+    template<typename Ret>
+    Ret make_default_return_value()
+    {
+        if constexpr (std::is_void_v<Ret>) {
+            default_return_value<Ret>::get();
+            return;
+        }
+        return default_return_value<Ret>::get();
     }
 
     /// Pack arguments from lua stack into a tuple recursively
@@ -184,7 +212,16 @@ namespace luabinder
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
             if (!obj) {
                 g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
-                return make_default_return_value<Ret>();
+                if constexpr (!std::is_void_v<Ret>) {
+                    return make_default_return_value<Ret>();
+                } else {
+                    return;
+                }
+            }
+
+            if constexpr (std::is_void_v<Ret>) {
+                mf(obj.get(), args...);
+                return;
             }
             return mf(obj.get(), args...);
         };
@@ -207,13 +244,19 @@ namespace luabinder
     std::function<Ret(const Args&...)> make_mem_func_singleton(Ret(C::* f)(Args...), C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable -> Ret { return mf(instance, args...); };
+        return [mf, instance](Args... args) -> Ret {
+            if constexpr (std::is_void_v<Ret>) {
+                mf(instance, args...);
+                return;
+            }
+            return mf(instance, args...);
+        };
     }
     template<typename C, typename... Args>
     std::function<void(const Args&...)> make_mem_func_singleton(void (C::* f)(Args...), C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable { mf(instance, args...); };
+        return [mf, instance](Args... args) { mf(instance, args...); };
     }
 
     /// Bind member functions
@@ -259,10 +302,10 @@ namespace luabinder
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
             if (!obj) {
                 g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
-                if constexpr (std::is_void_v<Ret>) {
-                    return;
-                } else {
+                if constexpr (!std::is_void_v<Ret>) {
                     return make_default_return_value<Ret>();
+                } else {
+                    return;
                 }
             }
             if constexpr (std::is_void_v<Ret>) {
@@ -302,7 +345,7 @@ namespace luabinder
     make_mem_func_singleton(Ret (C::*f)(Args...) const, C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable -> Ret {
+        return [mf, instance](Args... args) -> Ret {
             if constexpr (std::is_void_v<Ret>) {
                 mf(instance, args...);
                 return;
@@ -316,7 +359,7 @@ namespace luabinder
     make_mem_func_singleton(void (C::*f)(Args...) const, C* instance)
     {
         auto mf = std::mem_fn(f);
-        return [=](Args... args) mutable { mf(instance, args...); };
+        return [mf, instance](Args... args) { mf(instance, args...); };
     }
 
     template<typename C, typename Ret, class FC, typename... Args>
