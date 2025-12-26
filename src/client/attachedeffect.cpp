@@ -70,7 +70,7 @@ AttachedEffectPtr AttachedEffect::clone()
     return obj;
 }
 
-int getBounce(const AttachedEffect::Bounce bounce, const ticks_t ticks) {
+int getBounce(const Bounce bounce, const ticks_t ticks) {
     const auto minHeight = bounce.minHeight * g_drawPool.getScaleFactor();
     const auto height = bounce.height * g_drawPool.getScaleFactor();
     return minHeight + (height - std::abs(height - static_cast<int>(ticks / (bounce.speed / 100.f)) % static_cast<int>(height * 2)));

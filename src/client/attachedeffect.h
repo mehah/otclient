@@ -115,14 +115,6 @@ onTop,
 
     ThingType* getThingType() const;
 
-    struct Bounce
-    {
-        uint8_t minHeight{ 0 };
-        uint8_t height{ 0 };
-        uint16_t speed{ 0 };
-        Timer timer{};
-    };
-
 private:
     int getCurrentAnimationPhase();
 

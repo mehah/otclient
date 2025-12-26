@@ -24,7 +24,6 @@
 
 #include "declarations.h"
 #include "staticdata.h"
-#include <framework/core/timer.h>
 
 #include "framework/core/declarations.h"
 

@@ -24,6 +24,15 @@
 
 #include "outfit.h"
 #include "position.h"
+#include <framework/core/timer.h>
+
+struct Bounce
+{
+    uint8_t minHeight{ 0 };
+    uint8_t height{ 0 };
+    uint16_t speed{ 0 };
+    Timer timer{};
+};
 
 struct AwareRange
 {

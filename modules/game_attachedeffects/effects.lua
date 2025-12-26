@@ -23,6 +23,8 @@ AttachedEffectManager.register(1, 'Spoke Lighting', 12, ThingCategoryEffect, {
     end
 })
 
+-- For wings, use the paperdoll system, since any paperdoll element is always bound to the owner.
+-- Effects, on the other hand, don’t have to be.
 AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
     speed = 5,
     disableWalkAnimation = true,
@@ -34,8 +36,8 @@ AttachedEffectManager.register(2, 'Bat Wings', 307, ThingCategoryCreature, {
         [West] = { -10, -5, true }
     },
     onAttach = function(effect, owner)
-        owner:setBounce(0, 10, 1000)
-        effect:setBounce(0, 10, 1000)
+        owner:setBounce(0, 10, 5000)
+        effect:setBounce(0, 10, 5000)
     end,
     onDetach = function(effect, oldOwner)
         oldOwner:setBounce(0, 0)

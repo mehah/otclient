@@ -23,7 +23,6 @@
 #pragma once
 
 #include "thing.h"
-#include <framework/core/timer.h>
 
  // @bindclass
 class Effect final : public Thing
