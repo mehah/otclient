@@ -325,7 +325,7 @@ void Creature::internalDraw(Point dest, const Color& color)
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
     else
-        drawAttachedEffect(originalDest, nullptr, false); // On Bottom
+        drawAttachedEffect(originalDest, dest, nullptr, false); // On Bottom
 
     if (!isHided()) {
         const int animationPhase = getCurrentAnimationPhase();
@@ -423,7 +423,7 @@ void Creature::internalDraw(Point dest, const Color& color)
     if (replaceColorShader)
         g_drawPool.resetShaderProgram();
     else {
-        drawAttachedEffect(originalDest, nullptr, true); // On Top
+        drawAttachedEffect(originalDest, dest, nullptr, true); // On Top
         drawAttachedParticlesEffect(originalDest);
     }
 }

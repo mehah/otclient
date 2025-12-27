@@ -84,7 +84,7 @@ void Tile::draw(const Point& dest, const int flags, LightView* lightView)
         drawThing(thing, dest, flags, drawElevation);
     }
 
-    drawAttachedEffect(dest, lightView, false);
+    drawAttachedEffect(dest, dest, lightView, false);
 
     if (hasCommonItem()) {
         for (auto& item : std::ranges::reverse_view(m_things)) {
@@ -103,7 +103,7 @@ void Tile::draw(const Point& dest, const int flags, LightView* lightView)
 
     drawCreature(dest, flags, false, drawElevation);
     drawTop(dest, flags, false, drawElevation);
-    drawAttachedEffect(dest, lightView, true);
+    drawAttachedEffect(dest, dest, lightView, true);
     drawAttachedParticlesEffect(dest);
 }
 

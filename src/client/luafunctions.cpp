@@ -839,6 +839,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setBounce", &AttachedEffect::setBounce);
     g_lua.bindClassMemberFunction<AttachedEffect>("setPulse", &AttachedEffect::setPulse);
     g_lua.bindClassMemberFunction<AttachedEffect>("setFade", &AttachedEffect::setFade);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setFollowOwner", &AttachedEffect::setFollowOwner);
+    g_lua.bindClassMemberFunction<AttachedEffect>("isFollowingOwner", &AttachedEffect::isFollowingOwner);
 
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirection", &AttachedEffect::setDirection);
     g_lua.bindClassMemberFunction<AttachedEffect>("getDirection", &AttachedEffect::getDirection);

@@ -59,6 +59,9 @@ public:
     bool isPermanent() { return m_permanent; }
     void setPermanent(const bool permanent) { m_permanent = permanent; }
 
+    bool isFollowingOwner() { return m_followOwner; }
+    void setFollowOwner(const bool v) { m_followOwner = v; }
+
     uint16_t getDuration() { return m_duration; }
     void setDuration(const uint16_t v) { m_duration = v; }
 
@@ -142,6 +145,7 @@ private:
     bool m_disableWalkAnimation{ false };
     bool m_permanent{ false };
     bool m_smooth = { true };
+    bool m_followOwner{ false };
 
     Outfit m_outfitOwner;
     Light m_light;

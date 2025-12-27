@@ -74,7 +74,7 @@ void Item::internalDraw(const int animationPhase, const Point& dest, const Color
             m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(getId()));
         };*/
 
-        drawAttachedEffect(dest, lightView, false); // On Bottom
+        drawAttachedEffect(dest, dest, lightView, false); // On Bottom
         if (hasShader())
             g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
     }
@@ -83,7 +83,7 @@ void Item::internalDraw(const int animationPhase, const Point& dest, const Color
     g_drawPool.resetShaderProgram();
 
     if (!replaceColorShader) {
-        drawAttachedEffect(dest, lightView, true); // On Top
+        drawAttachedEffect(dest, dest, lightView, true); // On Top
         drawAttachedParticlesEffect(dest);
     }
 }
