@@ -9,6 +9,7 @@ Module
     - game_things
 
   @onLoad: |
+    g_ui.importStyle('authenticatortoken.otui')
     dofile 'entergame'
     dofile 'characterlist'
     dofile 'createAccount'
