@@ -183,7 +183,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, cons
     });
 }
 
-void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear, const bool alwaysDraw)
+void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear)
 {
     select(type);
     const auto pool = getCurrentPool();
@@ -191,9 +191,6 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     pool->resetState();
 
     if (f) f();
-
-    if (alwaysDraw)
-        pool->repaint();
 
     if (beforeRelease)
         beforeRelease();
@@ -220,7 +217,6 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         pool->m_framebuffer->bind();
 
     if (shouldRepaint) {
-        SpinLock::Guard guard(pool->m_threadLock);
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
         pool->m_shouldRepaint.store(false, std::memory_order_release);
     }
