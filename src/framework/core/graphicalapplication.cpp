@@ -191,25 +191,41 @@ void GraphicalApplication::run()
                 continue;
             }
 
+            bool canDrawMap = false;
             if (m_drawEvents->canDraw(DrawPoolType::MAP)) {
-                if (g_drawPool.isDrawing())
-                    continue;
-
-                m_drawEvents->preLoad();
-
-                for (const auto type : { DrawPoolType::LIGHT , DrawPoolType::FOREGROUND, DrawPoolType::FOREGROUND_MAP }) {
-                    if (m_drawEvents->canDraw(type)) {
-                        tasks.emplace_back(g_asyncDispatcher.submit_task([this, type] {
-                            m_drawEvents->draw(type);
-                        }));
+                canDrawMap = true;
+                for (const auto type : { DrawPoolType::MAP, DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP }) {
+                    if (g_drawPool.isDrawing(type)) {
+                        canDrawMap = false;
+                        break;
                     }
                 }
 
-                m_drawEvents->draw(DrawPoolType::MAP);
+                if (canDrawMap) {
+                    if (!g_drawPool.isDrawing(DrawPoolType::FOREGROUND) && m_drawEvents->canDraw(DrawPoolType::FOREGROUND)) {
+                        tasks.emplace_back(g_asyncDispatcher.submit_task([] {
+                            g_ui.render(DrawPoolType::FOREGROUND);
+                        }));
+                    }
 
-                tasks.wait();
-                tasks.clear();
-            } else if (m_drawEvents->canDraw(DrawPoolType::FOREGROUND)) {
+                    m_drawEvents->preLoad();
+
+                    for (const auto type : { DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP }) {
+                        if (m_drawEvents->canDraw(type)) {
+                            tasks.emplace_back(g_asyncDispatcher.submit_task([this, type] {
+                                m_drawEvents->draw(type);
+                            }));
+                        }
+                    }
+
+                    m_drawEvents->draw(DrawPoolType::MAP);
+
+                    tasks.wait();
+                    tasks.clear();
+                }
+            }
+
+            if (!canDrawMap && m_drawEvents->canDraw(DrawPoolType::FOREGROUND)) {
                 g_ui.render(DrawPoolType::FOREGROUND);
             }
 
