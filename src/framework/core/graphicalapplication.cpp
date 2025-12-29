@@ -191,9 +191,10 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            bool canDrawMap = false;
-            if (m_drawEvents->canDraw(DrawPoolType::MAP)) {
-                canDrawMap = true;
+            bool canDrawMap = m_drawEvents->canDraw(DrawPoolType::MAP);
+            bool canDrawForeground = !g_drawPool.isDrawing(DrawPoolType::FOREGROUND) && m_drawEvents->canDraw(DrawPoolType::FOREGROUND);
+
+            if (canDrawMap) {
                 for (const auto type : { DrawPoolType::MAP, DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP }) {
                     if (g_drawPool.isDrawing(type)) {
                         canDrawMap = false;
@@ -202,7 +203,8 @@ void GraphicalApplication::run()
                 }
 
                 if (canDrawMap) {
-                    if (!g_drawPool.isDrawing(DrawPoolType::FOREGROUND) && m_drawEvents->canDraw(DrawPoolType::FOREGROUND)) {
+                    if (canDrawForeground) {
+                        canDrawForeground = false;
                         tasks.emplace_back(g_asyncDispatcher.submit_task([] {
                             g_ui.render(DrawPoolType::FOREGROUND);
                         }));
@@ -225,7 +227,7 @@ void GraphicalApplication::run()
                 }
             }
 
-            if (!canDrawMap && m_drawEvents->canDraw(DrawPoolType::FOREGROUND)) {
+            if (!canDrawMap && canDrawForeground) {
                 g_ui.render(DrawPoolType::FOREGROUND);
             }
 
