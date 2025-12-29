@@ -164,7 +164,7 @@ void TextureAtlas::flush() {
                     g_painter->setTexture(texture->textureID, texture->transformMatrixId);
                     g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
 
-                    texture->enabled.store(true, std::memory_order_release);
+                    texture->enabled.store(true, std::memory_order_relaxed);
                 }
                 glEnable(GL_BLEND);
                 layer.textures.clear();

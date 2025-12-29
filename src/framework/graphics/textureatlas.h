@@ -16,7 +16,7 @@ public:
     std::atomic_bool enabled;
 
     bool isEnabled() const {
-        return enabled.load(std::memory_order_acquire);
+        return enabled.load(std::memory_order_relaxed);
     }
 
     AtlasRegion(uint32_t tid, int16_t x, int16_t y, int8_t layer,
