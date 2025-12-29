@@ -217,7 +217,8 @@ void GraphicalApplication::run()
 
                 m_drawEvents->preLoad();
 
-                for (const auto type : { DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP }) {
+                static constexpr std::array<DrawPoolType, 2> types{ DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP };
+                for (const auto type : types) {
                     if (m_drawEvents->canDraw(type)) {
                         tasks.emplace_back(g_asyncDispatcher.submit_task([this, type] {
                             m_drawEvents->draw(type);
