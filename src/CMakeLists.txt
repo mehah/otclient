@@ -164,7 +164,7 @@ if(TOGGLE_FRAMEWORK_SOUND)
   if(NOT WASM)
     find_package(OpenAL CONFIG REQUIRED)
   endif()
-  if(NOT WIN32)
+  if(NOT WIN32 AND NOT WASM)
     pkg_check_modules(VORBISFILE REQUIRED vorbisfile)
     add_library(Vorbis::vorbisfile INTERFACE IMPORTED)
     set_target_properties(Vorbis::vorbisfile PROPERTIES
