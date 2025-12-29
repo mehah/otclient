@@ -48,7 +48,6 @@ end
 
 function UISpinBox:onTextChange(text, oldText)
     if self.formattedMode then
-        -- Salva posição atual do cursor
         local cursorPos = self:getCursorPos()
         local cleanText = text:gsub(",", "")
 
@@ -78,14 +77,11 @@ function UISpinBox:onTextChange(text, oldText)
             end
         end
 
-        -- Formata o texto e ajusta o cursor
         local formattedText = comma_value(number)
         self:setText(formattedText)
         self.value = number
         self.originalValue = number
 
-        -- Calcula nova posição do cursor
-        -- Conta vírgulas antes da posição original do cursor
         local commasBefore = 0
         local cleanPos = 0
         for i = 1, cursorPos do
@@ -94,7 +90,6 @@ function UISpinBox:onTextChange(text, oldText)
             end
         end
 
-        -- Na posição limpa, calcula quantas vírgulas existem no texto formatado
         local formattedPos = 0
         local cleanCount = 0
         for i = 1, formattedText:len() do
@@ -109,7 +104,6 @@ function UISpinBox:onTextChange(text, oldText)
         self:setCursorPos(formattedPos)
         signalcall(self.onValueChange, self, number)
     else
-        -- Comportamento original (sem mudanças)
         if text:len() == 0 then
             self:setValue(self.minimum)
             return
