@@ -140,6 +140,7 @@ protected:
     void inputEvent(const InputEvent& event);
 
 private:
+    bool canDrawMap() const;
     bool m_onInputEvent{ false };
     bool m_optimize{ true };
     bool m_forceEffectOptimization{ true };

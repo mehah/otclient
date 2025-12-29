@@ -157,6 +157,21 @@ void GraphicalApplication::mainLoop() {
 }
 #endif
 
+bool GraphicalApplication::canDrawMap() const {
+    using enum DrawPoolType;
+
+    if (!m_drawEvents->canDraw(MAP))
+        return false;
+
+    static constexpr std::array<DrawPoolType, 3> types{ MAP, LIGHT, FOREGROUND_MAP };
+
+    for (DrawPoolType type : types) {
+        if (g_drawPool.isDrawing(type))
+            return false;
+    }
+    return true;
+}
+
 void GraphicalApplication::run()
 {
     // run the first poll
@@ -181,19 +196,6 @@ void GraphicalApplication::run()
     // THREAD - POOL & MAP
     const auto& mapThread = g_asyncDispatcher.submit_task([this] {
         BS::multi_future<void> tasks;
-
-        auto canDrawMap = [this] {
-            if (!m_drawEvents->canDraw(DrawPoolType::MAP))
-                return false;
-
-            for (const auto type : { DrawPoolType::MAP, DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP }) {
-                if (g_drawPool.isDrawing(type)) {
-                    return false;
-                }
-            }
-
-            return true;
-        };
 
         g_luaThreadId = g_eventThreadId = stdext::getThreadId();
         while (!m_stopping) {
