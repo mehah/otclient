@@ -551,7 +551,7 @@ end
 function onBlessingsChange(blessings, blessVisualState)
     toggleAdventurerStyle(blessings == 1)
     local blessedButton = getInventoryUi().blessings
-      if not blessedButton then
+    if not blessedButton then
         return
     end
 --[[     local tooltip = 'You are protected by the following blessings:'
