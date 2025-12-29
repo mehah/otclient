@@ -25,7 +25,6 @@
 #include "outfit.h"
 #include "thing.h"
 #include <framework/core/declarations.h>
-#include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 
 #include "staticdata.h"
@@ -202,6 +201,17 @@ minHeight,
     void setVocation(uint8_t vocation) { m_vocation = vocation; }
     uint8_t getVocation() { return m_vocation; }
 
+    void attachPaperdoll(const PaperdollPtr& obj);
+    void clearPaperdolls();
+    bool hasPaperdoll(uint16_t id);
+
+    bool detachPaperdollById(uint16_t id);
+    bool detachPaperdollByPriority(uint8_t priority);
+
+    PaperdollPtr getPaperdollById(uint16_t id);
+
+    const std::vector<PaperdollPtr>& getPaperdolls() { return m_paperdolls; };
+
 protected:
     virtual void terminateWalk();
     virtual void onWalking() {};
@@ -210,6 +220,9 @@ protected:
 
     void setOldPositionSilently(const Position& pos) { m_oldPosition = pos; }
     void setRemovedSilently(const bool removed) { m_removed = removed; }
+
+    void onDetachPaperdoll(const PaperdollPtr& paperdoll);
+    void setPaperdollsDirection(Otc::Direction dir) const;
 
     ThingType* getThingType() const override;
     ThingType* getMountThingType() const;
@@ -261,6 +274,8 @@ private:
         CachedText numberText;
     };
 
+    std::vector<PaperdollPtr> m_paperdolls;
+
     UIWidgetPtr m_widgetInformation;
 
     TilePtr m_walkingTile;
@@ -297,12 +312,7 @@ private:
     Color m_staticSquareColor{ Color::white };
     Color m_informationColor{ Color::white };
 
-    struct
-    {
-        uint8_t minHeight{ 0 };
-        uint8_t height{ 0 };
-        uint16_t speed{ 0 };
-    } m_bounce;
+    Bounce m_bounce;
 
     // jump related
     Timer m_jumpTimer;

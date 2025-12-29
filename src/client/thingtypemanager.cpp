@@ -156,7 +156,15 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
                     appearancesFile = obj["file"];
                 } else if (type == "sprite") {
                     int lastSpriteId = obj["lastspriteid"].get<int>();
-                    g_spriteAppearances.addSpriteSheet(std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>()));
+                    const auto& sheet = std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>());
+                    const int spritesPerSheet = sheet->getSpritesPerSheet();
+                    const int maxSpriteId = sheet->firstId + spritesPerSheet - 1;
+                    if (lastSpriteId > maxSpriteId) {
+                        g_logger.debug("Sprite sheet '{}' lastspriteid {} exceeds capacity {}, clamping to {}", sheet->file, lastSpriteId, maxSpriteId, maxSpriteId);
+                        lastSpriteId = maxSpriteId;
+                        sheet->lastId = maxSpriteId;
+                    }
+                    g_spriteAppearances.addSpriteSheet(sheet);
                     spritesCount = std::max<int>(spritesCount, lastSpriteId);
                 }
             }

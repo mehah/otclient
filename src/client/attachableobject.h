@@ -80,7 +80,7 @@ protected:
         std::vector<UIWidgetPtr> attachedWidgets;
     };
 
-    void drawAttachedEffect(const Point& dest, LightView* lightView, bool isOnTop);
+    void drawAttachedEffect(const Point& originalDest, const Point& dest, LightView* lightView, bool isOnTop);
     void drawAttachedLightEffect(const Point& dest, LightView* lightView);
 
     void onDetachEffect(const AttachedEffectPtr& effect, bool callEvent = true);

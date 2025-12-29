@@ -192,6 +192,9 @@ void GraphicalApplication::run()
             }
 
             if (m_drawEvents->canDraw(DrawPoolType::MAP)) {
+                if (g_drawPool.isDrawing())
+                    continue;
+
                 m_drawEvents->preLoad();
 
                 for (const auto type : { DrawPoolType::LIGHT , DrawPoolType::FOREGROUND, DrawPoolType::FOREGROUND_MAP }) {

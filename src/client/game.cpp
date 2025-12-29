@@ -56,7 +56,6 @@ void Game::terminate()
 void Game::resetGameStates()
 {
     m_online = false;
-    enableBotCall();
     m_dead = false;
     m_serverBeat = 50;
     m_seq = 0;
@@ -173,11 +172,6 @@ void Game::processGameStart()
     // synchronize fight modes with the server
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
 
-    // NOTE: the entire map description and local player information is not known yet (bot call is allowed here)
-    enableBotCall();
-    g_lua.callGlobalField("g_game", "onGameStart");
-    disableBotCall();
-
     if (g_game.getFeature(Otc::GameClientPing) || g_game.getFeature(Otc::GameExtendedClientPing)) {
         m_pingEvent = g_dispatcher.scheduleEvent([] { g_game.ping(); }, m_pingDelay);
     }
@@ -191,6 +185,8 @@ void Game::processGameStart()
             m_connectionFailWarned = false;
         }
     }, 1000);
+
+    g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onGameStart"); });
 }
 
 void Game::processGameEnd()
@@ -251,9 +247,7 @@ void Game::processPlayerModes(const Otc::FightModes fightMode, const Otc::ChaseM
 void Game::processPing()
 {
     g_lua.callGlobalField("g_game", "onPing");
-    enableBotCall();
     m_protocolGame->sendPingBack();
-    disableBotCall();
 }
 
 void Game::processPingBack()
@@ -292,9 +286,7 @@ void Game::processOpenContainer(const uint8_t containerId, const ItemPtr& contai
     container->onAddItems(items);
 
     // we might want to close a container here
-    enableBotCall();
     container->onOpen(previousContainer);
-    disableBotCall();
 
     if (previousContainer)
         previousContainer->onClose();
@@ -641,13 +633,11 @@ void Game::playRecord(const std::string_view& file)
 
 void Game::cancelLogin()
 {
-    enableBotCall();
     // send logout even if the game has not started yet, to make sure that the player doesn't stay logged there
     if (m_protocolGame)
         m_protocolGame->sendLogout();
 
     processDisconnect();
-    disableBotCall();
 }
 
 void Game::forceLogout()
@@ -1640,9 +1630,7 @@ void Game::ping()
     if (m_pingReceived != m_pingSent)
         return;
 
-    enableBotCall();
     m_protocolGame->sendPing();
-    disableBotCall();
     ++m_pingSent;
     m_pingTimer.restart();
 }
@@ -1770,9 +1758,7 @@ Otc::OperatingSystem_t Game::getOs()
 
 void Game::leaveMarket()
 {
-    enableBotCall();
     m_protocolGame->sendMarketLeave();
-    disableBotCall();
 
     g_lua.callGlobalField("g_game", "onMarketLeave");
 }

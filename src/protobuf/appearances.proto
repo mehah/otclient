@@ -190,6 +190,7 @@ message AppearanceFlags {
 	optional bool hook_south = 70;
 	optional bool hook_east = 71;
 	optional AppearanceFlagTransparencyLevel transparencylevel = 72;
+	optional bool floorchange = 73;
 }
 
 message AppearanceFlagUpgradeClassification {

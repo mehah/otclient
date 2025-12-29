@@ -57,6 +57,8 @@
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
+#include "paperdoll.h"
+#include "paperdollmanager.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
@@ -425,6 +427,12 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_attachedEffects", "remove", &AttachedEffectManager::remove, &g_attachedEffects);
     g_lua.bindSingletonFunction("g_attachedEffects", "clear", &AttachedEffectManager::clear, &g_attachedEffects);
 
+    g_lua.registerSingletonClass("g_paperdolls");
+    g_lua.bindSingletonFunction("g_paperdolls", "getById", &PaperdollManager::getById, &g_paperdolls);
+    g_lua.bindSingletonFunction("g_paperdolls", "register", &PaperdollManager::set, &g_paperdolls);
+    g_lua.bindSingletonFunction("g_paperdolls", "remove", &PaperdollManager::remove, &g_paperdolls);
+    g_lua.bindSingletonFunction("g_paperdolls", "clear", &PaperdollManager::clear, &g_paperdolls);
+
     g_lua.bindGlobalFunction("getOutfitColor", Outfit::getColor);
     g_lua.bindGlobalFunction("getAngleFromPos", Position::getAngleFromPositions);
     g_lua.bindGlobalFunction("getDirectionFromPos", Position::getDirectionFromPositions);
@@ -636,6 +644,12 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("isFullHealth", &Creature::isFullHealth);
     g_lua.bindClassMemberFunction<Creature>("isCovered", &Creature::isCovered);
 
+    g_lua.bindClassMemberFunction<Creature>("getPaperdolls", &Creature::getPaperdolls);
+    g_lua.bindClassMemberFunction<Creature>("attachPaperdoll", &Creature::attachPaperdoll);
+    g_lua.bindClassMemberFunction<Creature>("detachPaperdollById", &Creature::detachPaperdollById);
+    g_lua.bindClassMemberFunction<Creature>("getPaperdollById", &Creature::getPaperdollById);
+    g_lua.bindClassMemberFunction<Creature>("clearPaperdolls", &Creature::clearPaperdolls);
+
     g_lua.bindClassMemberFunction<Creature>("setText", &Creature::setText);
     g_lua.bindClassMemberFunction<Creature>("getText", &Creature::getText);
     g_lua.bindClassMemberFunction<Creature>("clearText", &Creature::clearText);
@@ -702,6 +716,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("isTranslucent", &ThingType::isTranslucent);
     g_lua.bindClassMemberFunction<ThingType>("hasDisplacement", &ThingType::hasDisplacement);
     g_lua.bindClassMemberFunction<ThingType>("hasElevation", &ThingType::hasElevation);
+    g_lua.bindClassMemberFunction<ThingType>("hasFloorChange", &ThingType::hasFloorChange);
     g_lua.bindClassMemberFunction<ThingType>("isLyingCorpse", &ThingType::isLyingCorpse);
     g_lua.bindClassMemberFunction<ThingType>("isAnimateAlways", &ThingType::isAnimateAlways);
     g_lua.bindClassMemberFunction<ThingType>("hasMiniMapColor", &ThingType::hasMiniMapColor);
@@ -824,10 +839,50 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setBounce", &AttachedEffect::setBounce);
     g_lua.bindClassMemberFunction<AttachedEffect>("setPulse", &AttachedEffect::setPulse);
     g_lua.bindClassMemberFunction<AttachedEffect>("setFade", &AttachedEffect::setFade);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setFollowOwner", &AttachedEffect::setFollowOwner);
+    g_lua.bindClassMemberFunction<AttachedEffect>("isFollowingOwner", &AttachedEffect::isFollowingOwner);
 
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirection", &AttachedEffect::setDirection);
     g_lua.bindClassMemberFunction<AttachedEffect>("getDirection", &AttachedEffect::getDirection);
     g_lua.bindClassMemberFunction<AttachedEffect>("move", &AttachedEffect::move);
+
+    g_lua.registerClass<Paperdoll>();
+    g_lua.bindClassMemberFunction<Paperdoll>("clone", &Paperdoll::clone);
+    g_lua.bindClassMemberFunction<Paperdoll>("getId", &Paperdoll::getId);
+    g_lua.bindClassMemberFunction<Paperdoll>("getSpeed", &Paperdoll::getSpeed);
+    g_lua.bindClassMemberFunction<Paperdoll>("setOnTop", &Paperdoll::setOnTop);
+    g_lua.bindClassMemberFunction<Paperdoll>("setSpeed", &Paperdoll::setSpeed);
+    g_lua.bindClassMemberFunction<Paperdoll>("setOpacity", &Paperdoll::setOpacity);
+    g_lua.bindClassMemberFunction<Paperdoll>("setOffset", &Paperdoll::setOffset);
+    g_lua.bindClassMemberFunction<Paperdoll>("setDirOffset", &Paperdoll::setDirOffset);
+    g_lua.bindClassMemberFunction<Paperdoll>("setOnTopByDir", &Paperdoll::setOnTopByDir);
+    g_lua.bindClassMemberFunction<Paperdoll>("setShader", &Paperdoll::setShader);
+    g_lua.bindClassMemberFunction<Paperdoll>("setSizeFactor", &Paperdoll::setSizeFactor);
+    g_lua.bindClassMemberFunction<Paperdoll>("setPriority", &Paperdoll::setPriority);
+    g_lua.bindClassMemberFunction<Paperdoll>("canDrawOnUI", &Paperdoll::canDrawOnUI);
+    g_lua.bindClassMemberFunction<Paperdoll>("setCanDrawOnUI", &Paperdoll::setCanDrawOnUI);
+    g_lua.bindClassMemberFunction<Paperdoll>("setOnlyAddon", &Paperdoll::setOnlyAddon);
+    g_lua.bindClassMemberFunction<Paperdoll>("setAddons", &Paperdoll::setAddons);
+    g_lua.bindClassMemberFunction<Paperdoll>("hasAddon", &Paperdoll::hasAddon);
+    g_lua.bindClassMemberFunction<Paperdoll>("setAddon", &Paperdoll::setAddon);
+    g_lua.bindClassMemberFunction<Paperdoll>("removeAddon", &Paperdoll::removeAddon);
+    g_lua.bindClassMemberFunction<Paperdoll>("reset", &Paperdoll::reset);
+    g_lua.bindClassMemberFunction<Paperdoll>("setColor", &Paperdoll::setColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("setHeadColor", &Paperdoll::setHeadColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("setBodyColor", &Paperdoll::setBodyColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("setLegsColor", &Paperdoll::setLegsColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("setFeetColor", &Paperdoll::setFeetColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("getHeadColor", &Paperdoll::getHeadColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("getBodyColor", &Paperdoll::getBodyColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("getLegsColor", &Paperdoll::getLegsColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("getFeetColor", &Paperdoll::getFeetColor);
+    g_lua.bindClassMemberFunction<Paperdoll>("setColorByOutfit", &Paperdoll::setColorByOutfit);
+
+    g_lua.bindClassMemberFunction<Paperdoll>("setMountOffset", &Paperdoll::setMountOffset);
+    g_lua.bindClassMemberFunction<Paperdoll>("setMountOnTopByDir", &Paperdoll::setMountOnTopByDir);
+    g_lua.bindClassMemberFunction<Paperdoll>("setMountDirOffset", &Paperdoll::setMountDirOffset);
+    g_lua.bindClassMemberFunction<Paperdoll>("setUseMountPattern", &Paperdoll::setUseMountPattern);
+    g_lua.bindClassMemberFunction<Paperdoll>("setShowOnMount", &Paperdoll::setShowOnMount);
 
     g_lua.registerClass<StaticText>();
     g_lua.bindClassStaticFunction<StaticText>("create", [] { return std::make_shared<StaticText>(); });
@@ -926,6 +981,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("getGround", &Tile::getGround);
     g_lua.bindClassMemberFunction<Tile>("isWalkable", &Tile::isWalkable);
     g_lua.bindClassMemberFunction<Tile>("hasElevation", &Tile::hasElevation);
+    g_lua.bindClassMemberFunction<Tile>("hasFloorChange", &Tile::hasFloorChange);
 
     g_lua.bindClassMemberFunction<Tile>("isCovered", &Tile::isCovered);
     g_lua.bindClassMemberFunction<Tile>("isCompletelyCovered", &Tile::isCompletelyCovered);

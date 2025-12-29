@@ -24,7 +24,6 @@
 
 #include "declarations.h"
 #include "staticdata.h"
-#include <framework/core/timer.h>
 
 #include "framework/core/declarations.h"
 
@@ -437,10 +436,6 @@ public:
     auto getWalkMaxSteps() { return m_walkMaxSteps; }
     void setWalkMaxSteps(uint8_t v) { m_walkMaxSteps = v; }
 
-protected:
-    void enableBotCall() { m_denyBotCall = false; }
-    void disableBotCall() { m_denyBotCall = true; }
-
 private:
     void setAttackingCreature(const CreaturePtr& creature);
     void setFollowingCreature(const CreaturePtr& creature);
@@ -460,7 +455,6 @@ private:
 
     bool m_tileThingsLuaCallback{ false };
     bool m_online{ false };
-    bool m_denyBotCall{ false };
     bool m_dead{ false };
     bool m_expertPvpMode{ false };
     bool m_connectionFailWarned{ false };

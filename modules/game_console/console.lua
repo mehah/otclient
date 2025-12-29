@@ -349,6 +349,8 @@ function toggleChat()
     else
         consoleToggleChat:setText(tr('Chat On'))
     end
+    
+    updateChatMode()
 end
 
 -- id of object first and then action
@@ -424,8 +426,6 @@ function switchChatOnCall()
             toggleChat()
         end
     end
-
-    updateChatMode()
 end
 
 function disableChatOnCall()
@@ -436,8 +436,6 @@ function disableChatOnCall()
     if isChatEnabled() and not consoleToggleChat.isChecked then
         toggleChat()
     end
-
-    updateChatMode()
 end
 
 function isChatEnabled()
@@ -1072,34 +1070,10 @@ function addTabText(text, speaktype, tab, creatureName)
     local label = g_ui.createWidget('ConsoleLabel', consoleBuffer)
     label:setId('consoleLabel' .. consoleBuffer:getChildCount())
 
-    if speaktype.colored then
-        label:setColoredText(text)
-    else
-        label:setText(text)
-    end
-    
-    label:setColor(speaktype.color)
-    if readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText() then
-        local readOnlyBuffer = readOnlyPanel:getChildById('panel')
-        local readOnlyLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
-        readOnlyLabel:setId('consoleLabel' .. readOnlyBuffer:getChildCount())
-        if speaktype.colored then
-            readOnlyLabel:setColoredText(text)
-        else
-            readOnlyLabel:setText(text)
-        end
-        readOnlyLabel:setColor(speaktype.color)
-    end
-    if consoleTabBar:getCurrentTab() ~= tab then
-        if not (readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText()) then
-            changeNewNessageColor(tab)
-        end
-    end
-
     label.highlightInfo = {}
 
     -- Overlay for consoleBuffer which shows highlighted words only
-
+    local processedText = text
     if speaktype.npcChat and
         (g_game.getCharacterName() ~= creatureName or g_game.getCharacterName() == 'Account Manager') then
         local highlightData = getHighlightedText(text)
@@ -1117,16 +1091,16 @@ function addTabText(text, speaktype, tab, creatureName)
                     _end = highlightData[(i - 1) * 3 + 2],
                     words = highlightData[(i - 1) * 3 + 3]
                 }
-                text = text:gsub('%{(.-)%}', dataBlock.words, 1)
+                processedText = processedText:gsub('%{(.-)%}', dataBlock.words, 1)
 
                 -- Recalculate positions as braces are removed
                 highlightData[(i - 1) * 3 + 1] = dataBlock._start - ((i - 1) * 2)
                 highlightData[(i - 1) * 3 + 2] = dataBlock._end - (1 + (i - 1) * 2)
             end
-            label:setText(text)
+
 
             -- Calculate the positions of the highlighted text and fill with string.char(127) [Width: 1]
-            local drawText = label:getDrawText()
+            local drawText = processedText
             local tmpText = ''
             for i = 1, #highlightData / 3 do
                 local dataBlock = {
@@ -1159,6 +1133,29 @@ function addTabText(text, speaktype, tab, creatureName)
             end
 
             labelHighlight:setText(tmpText)
+        end
+    end
+
+    if speaktype.colored then
+        label:setColoredText(processedText)
+    else
+        label:setText(processedText)
+    end
+    label:setColor(speaktype.color)
+    if readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText() then
+        local readOnlyBuffer = readOnlyPanel:getChildById('panel')
+        local readOnlyLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
+        readOnlyLabel:setId('consoleLabel' .. readOnlyBuffer:getChildCount())
+        if speaktype.colored then
+            readOnlyLabel:setColoredText(processedText)
+        else
+            readOnlyLabel:setText(processedText)
+        end
+        readOnlyLabel:setColor(speaktype.color)
+    end
+    if consoleTabBar:getCurrentTab() ~= tab then
+        if not (readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText()) then
+            changeNewNessageColor(tab)
         end
     end
 

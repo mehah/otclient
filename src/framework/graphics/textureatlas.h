@@ -66,6 +66,7 @@ public:
 
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id, bool smooth);
+    bool canAdd(const TexturePtr& texture) const;
 
     Size getSize() const { return m_size; }
 

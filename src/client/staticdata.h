@@ -24,6 +24,15 @@
 
 #include "outfit.h"
 #include "position.h"
+#include <framework/core/timer.h>
+
+struct Bounce
+{
+    uint8_t minHeight{ 0 };
+    uint8_t height{ 0 };
+    uint16_t speed{ 0 };
+    Timer timer{};
+};
 
 struct AwareRange
 {
@@ -87,6 +96,7 @@ struct Imbuement
     std::string name;
     std::string description;
     std::string group;
+    uint8_t tier;
     uint16_t imageId;
     uint32_t duration;
     bool premiumOnly;
@@ -618,21 +628,31 @@ struct DailyRewardData
 
 struct CyclopediaCharacterOffenceStats
 {
-    double critChance;
-    double critDamage;
-    double critDamageBase;
+    double critChanceTotal;
+    double critChanceFlat;
+    double critChanceEquipament;
+    double critChanceImbuement;
+    double critChanceWheel;
+    double critChanceConcoction;
+
+    double critDamageTotal;
+    double critDamageFlat;
+    double critDamageEquipament;
     double critDamageImbuement;
     double critDamageWheel;
+    double critDamageConcoction;
 
-    double lifeLeech;
-    double lifeLeechBase;
+    double lifeLeechTotal;
+    double lifeLeechEquipament;
     double lifeLeechImbuement;
     double lifeLeechWheel;
+    double lifeLeechEventBonus;
 
-    double manaLeech;
-    double manaLeechBase;
+    double manaLeechTotal;
+    double manaLeechEquipament;
     double manaLeechImbuement;
     double manaLeechWheel;
+    double manaLeechEventBonus;
 
     double onslaught;
     double onslaughtBase;

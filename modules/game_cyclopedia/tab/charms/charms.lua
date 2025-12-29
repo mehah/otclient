@@ -362,7 +362,9 @@ function Cyclopedia.loadCharms(charmsData)
     end
     local CharmList = isModernUI and UI.mainPanelCharmsType.panelCharmList.CharmList or UI.CharmList
     local player = g_game.getLocalPlayer()
-
+    if not CharmList then
+        return
+    end
     if isModernUI then
         local formatResourceBalance = function(resourceType, maxResourceType)
             return string.format("%d/%d", player:getResourceBalance(resourceType),

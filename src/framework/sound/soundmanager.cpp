@@ -30,6 +30,7 @@
 #include "soundfile.h"
 #include "soundsource.h"
 #include "streamsoundsource.h"
+#include "combinedsoundsource.h"
 #include "client/game.h"
 #include "framework/core/asyncdispatcher.h"
 #include "framework/core/clock.h"
@@ -39,11 +40,6 @@
 using namespace otclient::protobuf;
 
 using json = nlohmann::json;
-
-class StreamSoundSource;
-class CombinedSoundSource;
-class SoundFile;
-class SoundBuffer;
 
 SoundManager g_sounds;
 

@@ -3,10 +3,6 @@ project(otclient)
 # *****************************************************************************
 # Options
 # *****************************************************************************
-if(CMAKE_BASE_NAME STREQUAL "em++")
-  set(WASM ON)
-  message(STATUS "WASM: ON")
-endif()
 
 option(TOGGLE_FRAMEWORK_GRAPHICS "Use Graphics " ON)
 option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
@@ -26,7 +22,7 @@ option(SPEED_UP_BUILD_UNITY "Compile using build unity for speed up build" ON)
 # Cmake Features
 # *****************************************************************************
 set(GNUCXX_MINIMUM_VERSION 9)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -135,6 +131,7 @@ find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(utf8cpp REQUIRED)
 
 find_path(CPPCODEC_INCLUDE_DIRS "cppcodec/base32_crockford.hpp")
 
@@ -291,6 +288,8 @@ set(SOURCE_FILES
         client/protocolgame.cpp
         client/protocolgameparse.cpp
         client/protocolgamesend.cpp
+        client/paperdoll.cpp
+        client/paperdollmanager.cpp
         client/spriteappearances.cpp
         client/spritemanager.cpp
         client/statictext.cpp
@@ -309,6 +308,7 @@ set(SOURCE_FILES
         client/uiminimap.cpp
         client/uiprogressrect.cpp
         client/uisprite.cpp
+        tools/datdump.cpp
 )
 
 if (TOGGLE_FRAMEWORK_GRAPHICS)
@@ -551,6 +551,7 @@ if(MSVC)
           winmm.lib
           pugixml::pugixml
           fmt::fmt-header-only
+          utf8cpp::utf8cpp
   )
 elseif(ANDROID)
   target_include_directories(otclient_core
@@ -600,9 +601,21 @@ elseif(ANDROID)
           log
           pugixml::pugixml
           fmt::fmt-header-only
+          utf8cpp::utf8cpp
   )
 
 elseif(WASM)
+  option(WASM_USE_WASM_EXCEPTIONS "Use native WebAssembly exception handling" ON)
+
+  set(_WASM_LONGJMP_MODE "emscripten")
+  set(_WASM_EXPORTED_FUNCTIONS "_main,_paste_return")
+  set(_WASM_CXX_FLAGS "-O3 -ffast-math -frtti -pthread -fexceptions")
+  if(WASM_USE_WASM_EXCEPTIONS)
+    set(_WASM_LONGJMP_MODE "wasm")
+    set(_WASM_EXPORTED_FUNCTIONS "${_WASM_EXPORTED_FUNCTIONS},_emscripten_longjmp")
+    string(APPEND _WASM_CXX_FLAGS " -fwasm-exceptions")
+  endif()
+
   target_include_directories(otclient_core
           PUBLIC
           ${CMAKE_SOURCE_DIR}/src
@@ -652,13 +665,12 @@ elseif(WASM)
           OpenSSL::Crypto
           httplib::httplib
           fmt::fmt
+          utf8cpp::utf8cpp
           Ogg::ogg
           Vorbis::vorbisfile
           Vorbis::vorbis
   )
 
-
-  get_property(linkflags TARGET ${PROJECT_NAME} PROPERTY LINK_FLAGS)
 
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(otclient_core
@@ -666,23 +678,56 @@ elseif(WASM)
             -Wall -Wextra -Wpedantic
     )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-    set(linkflags "${linkflags} -sASSERTIONS=1")
   endif()
 
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -frtti -pthread -fexceptions")
-  set(linkflags "${linkflags}
-			-sINVOKE_RUN=0 -sEXIT_RUNTIME=1 -sTEXTDECODER=0 -sCASE_INSENSITIVE_FS=1
-			-lopenal -lidbfs.js -lwebsocket.js -sEXPORTED_RUNTIME_METHODS=ccall -sEXPORTED_FUNCTIONS=_main,_paste_return
-			-sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
-			-sFORCE_FILESYSTEM -sMALLOC=mimalloc -sWEBSOCKET_SUBPROTOCOL=binary -sOFFSCREENCANVAS_SUPPORT=1
-			-sOFFSCREEN_FRAMEBUFFER -sENVIRONMENT=web,worker -sPROXY_TO_PTHREAD -sFULL_ES2=1
-			-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sUSE_PTHREADS=1 -sFETCH=1
-			-sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sALLOW_MEMORY_GROWTH=1
-			--preload-file=../otclientrc.lua@otclientrc.lua --preload-file=../init.lua@init.lua
-			--preload-file=../data@data --preload-file=../mods@mods --preload-file=../modules@modules
-			--shell-file=../browser/shell.html --use-preload-cache")
-  set_target_properties(${PROJECT_NAME} PROPERTIES
-          LINK_FLAGS ${linkflags})
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_WASM_CXX_FLAGS}")
+
+  set(WASM_LINK_OPTIONS
+          -sINVOKE_RUN=0
+          -sEXIT_RUNTIME=1
+          -sTEXTDECODER=2
+          -sCASE_INSENSITIVE_FS=1
+          -lopenal
+          -lidbfs.js
+          -lwebsocket.js
+          -sEXPORTED_RUNTIME_METHODS=ccall
+          "-sEXPORTED_FUNCTIONS=${_WASM_EXPORTED_FUNCTIONS}"
+          -sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
+          -sFORCE_FILESYSTEM
+          -sMALLOC=dlmalloc
+          "-sSUPPORT_LONGJMP=${_WASM_LONGJMP_MODE}"
+          -sWEBSOCKET_SUBPROTOCOL=binary
+          -sOFFSCREENCANVAS_SUPPORT=1
+          -sOFFSCREEN_FRAMEBUFFER
+          -sENVIRONMENT=web,worker
+          -sPROXY_TO_PTHREAD
+          -sFULL_ES2=1
+          -sMIN_WEBGL_VERSION=2
+          -sMAX_WEBGL_VERSION=2
+          -sUSE_PTHREADS=1
+          -sFETCH=1
+          -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency
+          -sALLOW_MEMORY_GROWTH=1
+          --preload-file=../otclientrc.lua@otclientrc.lua
+          --preload-file=../init.lua@init.lua
+          --preload-file=../data@data
+          --preload-file=../mods@mods
+          --preload-file=../modules@modules
+          --shell-file=../browser/shell.html
+          --use-preload-cache
+  )
+
+  if(WASM_USE_WASM_EXCEPTIONS)
+    list(APPEND WASM_LINK_OPTIONS "-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=['emscripten_longjmp']")
+  endif()
+
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    list(APPEND WASM_LINK_OPTIONS -sASSERTIONS=1)
+  endif()
+
+  target_link_options(${PROJECT_NAME} PRIVATE ${WASM_LINK_OPTIONS})
+  string(REPLACE ";" " " _WASM_LINK_LOG "${WASM_LINK_OPTIONS}")
+  message(STATUS "WASM link options: ${_WASM_LINK_LOG}")
   set(CMAKE_EXECUTABLE_SUFFIX ".html")
   set(VCPKG_TARGET_TRIPLET "wasm32-emscripten" CACHE STRING "")
 
@@ -736,6 +781,7 @@ else() # Linux
           OpenSSL::Crypto
           httplib::httplib
           fmt::fmt-header-only
+          utf8cpp::utf8cpp
           Ogg::ogg
           Vorbis::vorbisfile
           Vorbis::vorbis

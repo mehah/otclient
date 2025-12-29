@@ -86,6 +86,18 @@ public:
 
     bool eof() { return (m_readPos - m_headerPos) >= m_messageSize; }
 
+    std::vector<uint8_t> peekBytes(int bytes) const
+    {
+        const int available = m_messageSize - (m_readPos - m_headerPos);
+        if (available <= 0)
+            return {};
+
+        bytes = std::min<uint8_t>(bytes, available);
+        std::vector<uint8_t> data(bytes);
+        std::memcpy(data.data(), m_buffer + m_readPos, bytes);
+        return data;
+    }
+
 protected:
     void reset();
     void fillBuffer(const uint8_t* buffer, uint16_t size);

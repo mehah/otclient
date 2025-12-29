@@ -310,6 +310,7 @@ private:
     void parseTaskHuntingData(const InputMessagePtr& msg);
     void parseExperienceTracker(const InputMessagePtr& msg);
     void parseLootContainers(const InputMessagePtr& msg);
+    void parseVirtue(const InputMessagePtr& msg);
     void parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg);
     void parseCyclopediaHousesInfo(const InputMessagePtr& msg);
     void parseCyclopediaHouseList(const InputMessagePtr& msg);
@@ -355,11 +356,18 @@ private:
     void parseBestiaryMonsterData(const InputMessagePtr& msg);
     void parseBestiaryCharmsData(const InputMessagePtr& msg);
 
+    // 15x
+    void parseWeaponProficiencyExperience(const InputMessagePtr& msg);
+    void parseWeaponProficiencyInfo(const InputMessagePtr& msg);
+
     void parseHighscores(const InputMessagePtr& msg);
     void parseAttachedEffect(const InputMessagePtr& msg);
     void parseDetachEffect(const InputMessagePtr& msg);
     void parseCreatureShader(const InputMessagePtr& msg);
     void parseMapShader(const InputMessagePtr& msg);
+
+    void parseAttachedPaperdoll(const InputMessagePtr& msg);
+    void parseDetachPaperdoll(const InputMessagePtr& msg);
 
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
 
@@ -380,6 +388,8 @@ public:
     Position getPosition(const InputMessagePtr& msg);
 
 private:
+    PaperdollPtr getPaperdoll(const InputMessagePtr& msg) const;
+
     bool m_enableSendExtendedOpcode{ false };
     bool m_gameInitialized{ false };
     bool m_mapKnown{ false };

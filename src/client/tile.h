@@ -126,6 +126,7 @@ public:
     }
 
     bool hasElevation(const int elevation = 1) { return m_elevation >= elevation; }
+    bool hasFloorChange() const;
 
 #ifdef FRAMEWORK_EDITOR
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
