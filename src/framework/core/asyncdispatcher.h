@@ -24,4 +24,4 @@
 
 #include <BS_thread_pool.hpp>
 
-extern BS::thread_pool g_asyncDispatcher;
+extern BS::thread_pool<0> g_asyncDispatcher;
