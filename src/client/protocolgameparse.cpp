@@ -4431,7 +4431,7 @@ void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)
 
 void ProtocolGame::parseSpecialContainer(const InputMessagePtr& msg)
 {
-    msg->getU8(); // (bool) IsSupplyStashAvailable
+    g_game.getLocalPlayer()->setSupplyStashAvailable(msg->getU8());
     if (g_game.getProtocolVersion() >= 1220) {
         msg->getU8(); // (bool) IsMarketAvailable
     }

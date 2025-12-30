@@ -1458,6 +1458,22 @@ void ProtocolGame::sendStashWithdraw(const uint16_t itemId, const uint32_t count
     send(msg);
 }
 
+void ProtocolGame::sendStashStow(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientUseStash);
+    msg->addU8(action);
+    addPosition(msg, position);
+    msg->addU16(itemId);
+    msg->addU8(stackpos);
+
+    if (action == Otc::Supply_Stash_Actions_t::SUPPLY_STASH_ACTION_STOW_ITEM) {
+        msg->addU32(count);
+    }
+
+    send(msg);
+}
+
 void ProtocolGame::sendHighscoreInfo(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
 {
     const auto& msg = std::make_shared<OutputMessage>();

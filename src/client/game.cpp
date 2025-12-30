@@ -1851,6 +1851,14 @@ void Game::stashWithdraw(const uint16_t itemId, const uint32_t count, const uint
     m_protocolGame->sendStashWithdraw(itemId, count, stackpos);
 }
 
+void Game::stashStowItem(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendStashStow(position, itemId, count, stackpos, action);
+}
+
 void Game::requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
 {
     if (!canPerformGameAction())
