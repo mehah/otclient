@@ -23,8 +23,8 @@
     "bshoshany-thread-pool",
     "fmt",
     "utfcpp",
-    "gtest",
-    { "name": "inih", "features": ["cpp"] },
+    "gtest",	
+    "inih",
     {
       "name": "luajit",
       "platform": "!android & !wasm32"
@@ -42,5 +42,5 @@
       "platform": "windows"
     }
   ],
-  "builtin-baseline": "b322364f06308bdd24823f9d8f03fe0cc86fd46f"
+  "builtin-baseline":"b322364f06308bdd24823f9d8f03fe0cc86fd46f"
 }
