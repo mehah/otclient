@@ -782,7 +782,8 @@ function addPrivateText(text, speaktype, name, isPrivateCommand, creatureName)
         if (modules.client_options.getOption('showPrivateMessagesInConsole') and not focus) or
             (isPrivateCommand and not privateTab) then
             privateTab = defaultTab
-        else
+        end
+        if not privateTab then
             privateTab = addTab(name, focus)
             channels[name] = name
         end
