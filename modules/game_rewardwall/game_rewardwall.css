@@ -131,6 +131,7 @@
 .reward-arrow-loop {
   --image-offset: -466 90;
   --image-size: 435 13;
+  --phantom: true;
 }
 
 .premium-panel {
