@@ -23,7 +23,8 @@
     "bshoshany-thread-pool",
     "fmt",
     "utfcpp",
-    "gtest",
+    "gtest",	
+    { "name": "inih", "features": ["cpp"] },
     {
       "name": "luajit",
       "platform": "!android & !wasm32"

@@ -2,6 +2,7 @@
 #include "textureatlas.h"
 
 #include "painter.h"
+#include <framework/core/configmanager.h>
 
 // Extra padding around smooth textures to avoid sampling artifacts (in pixels)
 static constexpr uint8_t SMOOTH_PADDING = 2;
@@ -15,7 +16,7 @@ static constexpr int MIN_PADDED_ATLAS_TEXTURE_SIZE = 4 + SMOOTH_PADDING * 2;
 
 TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :
     m_type(type),
-    m_size({ std::min<int>(size, 8192) }) {
+    m_size({ std::min<int>(size, g_configs.getPublicConfig().graphics.maxAtlasSize) }) {
     createNewLayer(false);
     if (smoothSupport)
         createNewLayer(true);

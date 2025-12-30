@@ -25,6 +25,7 @@
 #include "graphics.h"
 #include "painter.h"
 #include "textureatlas.h"
+#include <framework/core/configmanager.h>
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 
@@ -39,8 +40,17 @@ void DrawPoolManager::init(const uint16_t spriteSize)
     if (spriteSize != 0)
         m_spriteSize = spriteSize;
 
-    auto atlasMap = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::MAP, g_graphics.getMaxTextureSize());
-    auto atlasForeground = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::FOREGROUND, 2048, true);
+    auto mapAtlasSize = g_configs.getPublicConfig().graphics.mapAtlasSize;
+    auto foregroundAtlasSize = g_configs.getPublicConfig().graphics.foregroundAtlasSize;
+
+    if (mapAtlasSize == 0)
+        mapAtlasSize = g_graphics.getMaxTextureSize();
+
+    if (foregroundAtlasSize == 0)
+        foregroundAtlasSize = g_graphics.getMaxTextureSize();
+
+    auto atlasMap = mapAtlasSize > 0 ? std::make_shared<TextureAtlas>(Fw::TextureAtlasType::MAP, mapAtlasSize) : nullptr;
+    auto atlasForeground = foregroundAtlasSize > 0 ? std::make_shared<TextureAtlas>(Fw::TextureAtlasType::FOREGROUND, foregroundAtlasSize, true) : nullptr;
 
     // Create Pools
     for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {

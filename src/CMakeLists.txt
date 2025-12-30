@@ -132,6 +132,7 @@ find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(utf8cpp REQUIRED)
+find_package(unofficial-inih CONFIG REQUIRED)
 
 find_path(CPPCODEC_INCLUDE_DIRS "cppcodec/base32_crockford.hpp")
 
@@ -388,6 +389,9 @@ if (WASM)
 endif()
 
 add_library(otclient_core STATIC ${SOURCE_FILES})
+
+target_link_libraries(otclient_core PRIVATE unofficial::inih::inireader)
+
 if(NOT MSVC)
   target_link_options(otclient_core PUBLIC -flto=auto)
 endif()
