@@ -139,6 +139,6 @@ void ConfigManager::loadPublicConfig(const std::string& fileName) {
         m_publicConfig.graphics.mapAtlasSize = reader.GetInteger("graphics", "mapAtlasSize", 0);
         m_publicConfig.graphics.foregroundAtlasSize = reader.GetInteger("graphics", "foregroundAtlasSize", 2048);
     } catch (const std::exception& e) {
-        g_logger.error("Failed to load public config '{}': {}", fileName, e.what());
+        g_logger.error("Failed to parse public config '{}'", fileName);
     }
 }

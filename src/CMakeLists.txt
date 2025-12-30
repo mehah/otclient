@@ -388,6 +388,9 @@ if (WASM)
 endif()
 
 add_library(otclient_core STATIC ${SOURCE_FILES})
+
+target_link_libraries(otclient_core PRIVATE unofficial::inih::inireader)
+
 if(NOT MSVC)
   target_link_options(otclient_core PUBLIC -flto=auto)
 endif()

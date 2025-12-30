@@ -24,7 +24,7 @@
     "fmt",
     "utfcpp",
     "gtest",	
-    "inih",
+    { "name": "inih", "features": ["cpp"] },
     {
       "name": "luajit",
       "platform": "!android & !wasm32"
