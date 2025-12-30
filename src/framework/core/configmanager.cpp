@@ -138,6 +138,7 @@ void ConfigManager::loadPublicConfig(const std::string& fileName) {
         m_publicConfig.graphics.maxAtlasSize = std::max<int>(2048, reader.GetInteger("graphics", "maxAtlasSize", 8192));
         m_publicConfig.graphics.mapAtlasSize = reader.GetInteger("graphics", "mapAtlasSize", 0);
         m_publicConfig.graphics.foregroundAtlasSize = reader.GetInteger("graphics", "foregroundAtlasSize", 2048);
-    } catch (std::exception e) {
+    } catch (const std::exception& e) {
+        g_logger.error("Failed to load public config '{}': {}", fileName, e.what());
     }
 }
