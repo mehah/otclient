@@ -196,10 +196,21 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 
     if (flags.has_hook()) {
         const auto& hookDirection = flags.hook();
-        if (hookDirection.east()) {
-            m_flags |= ThingFlagAttrHookEast;
-        } else if (hookDirection.south()) {
-            m_flags |= ThingFlagAttrHookSouth;
+        if (hookDirection.has_south()) {
+            const auto hookType = hookDirection.south();
+            if (hookType == appearances::HOOK_TYPE_SOUTH) {
+                m_flags |= ThingFlagAttrHookSouth;
+            } else if (hookType == appearances::HOOK_TYPE_EAST) {
+                m_flags |= ThingFlagAttrHookEast;
+            }
+        }
+        if (hookDirection.has_east()) {
+            const auto hookType = hookDirection.east();
+            if (hookType == appearances::HOOK_TYPE_SOUTH) {
+                m_flags |= ThingFlagAttrHookSouth;
+            } else if (hookType == appearances::HOOK_TYPE_EAST) {
+                m_flags |= ThingFlagAttrHookEast;
+            }
         }
     }
 
