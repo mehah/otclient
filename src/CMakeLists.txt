@@ -132,6 +132,7 @@ find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(utf8cpp REQUIRED)
+find_package(unofficial-inih CONFIG REQUIRED)
 
 find_path(CPPCODEC_INCLUDE_DIRS "cppcodec/base32_crockford.hpp")
 
