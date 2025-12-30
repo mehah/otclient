@@ -157,6 +157,21 @@ void GraphicalApplication::mainLoop() {
 }
 #endif
 
+bool GraphicalApplication::canDrawMap() const {
+    using enum DrawPoolType;
+
+    if (!m_drawEvents->canDraw(MAP))
+        return false;
+
+    static constexpr std::array<DrawPoolType, 3> types{ MAP, LIGHT, FOREGROUND_MAP };
+
+    for (DrawPoolType type : types) {
+        if (g_drawPool.isDrawing(type))
+            return false;
+    }
+    return true;
+}
+
 void GraphicalApplication::run()
 {
     // run the first poll
@@ -191,13 +206,19 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (m_drawEvents->canDraw(DrawPoolType::MAP)) {
-                if (g_drawPool.isDrawing())
-                    continue;
+            const bool canDrawForeground = !g_drawPool.isDrawing(DrawPoolType::FOREGROUND) && m_drawEvents->canDraw(DrawPoolType::FOREGROUND);
+
+            if (canDrawMap()) {
+                if (canDrawForeground) {
+                    tasks.emplace_back(g_asyncDispatcher.submit_task([] {
+                        g_ui.render(DrawPoolType::FOREGROUND);
+                    }));
+                }
 
                 m_drawEvents->preLoad();
 
-                for (const auto type : { DrawPoolType::LIGHT , DrawPoolType::FOREGROUND, DrawPoolType::FOREGROUND_MAP }) {
+                static constexpr std::array<DrawPoolType, 2> types{ DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP };
+                for (const auto type : types) {
                     if (m_drawEvents->canDraw(type)) {
                         tasks.emplace_back(g_asyncDispatcher.submit_task([this, type] {
                             m_drawEvents->draw(type);
@@ -209,7 +230,7 @@ void GraphicalApplication::run()
 
                 tasks.wait();
                 tasks.clear();
-            } else if (m_drawEvents->canDraw(DrawPoolType::FOREGROUND)) {
+            } else if (canDrawForeground) {
                 g_ui.render(DrawPoolType::FOREGROUND);
             }
 

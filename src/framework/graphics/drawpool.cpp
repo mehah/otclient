@@ -259,7 +259,7 @@ bool DrawPool::canRepaint()
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;
 
-    return refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay;
+    return refreshDelay == 0 || m_refreshTimer.ticksElapsed() >= refreshDelay;
 }
 
 void DrawPool::release() {
