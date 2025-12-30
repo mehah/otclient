@@ -165,32 +165,9 @@ if(TOGGLE_FRAMEWORK_SOUND)
   if(NOT WASM)
     find_package(OpenAL CONFIG REQUIRED)
   endif()
-  if(NOT WIN32 AND NOT WASM)
-    pkg_check_modules(VORBISFILE REQUIRED vorbisfile)
-    add_library(Vorbis::vorbisfile INTERFACE IMPORTED)
-    set_target_properties(Vorbis::vorbisfile PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${VORBISFILE_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${VORBISFILE_LIBRARIES}"
-    )
-
-    pkg_check_modules(VORBIS REQUIRED vorbis)
-    add_library(Vorbis::vorbis INTERFACE IMPORTED)
-    set_target_properties(Vorbis::vorbis PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${VORBIS_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${VORBIS_LIBRARIES}"
-    )
-
-    pkg_check_modules(OGG REQUIRED ogg)
-    add_library(Ogg::ogg INTERFACE IMPORTED)
-    set_target_properties(Ogg::ogg PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${OGG_INCLUDE_DIRS}"
-      INTERFACE_LINK_LIBRARIES "${OGG_LIBRARIES}"
-    )
-  else()
-    find_package(VorbisFile REQUIRED)
-    find_package(Vorbis CONFIG REQUIRED)
-    find_package(Ogg CONFIG REQUIRED)
-  endif()
+  find_package(VorbisFile REQUIRED)
+  find_package(Vorbis CONFIG REQUIRED)
+  find_package(Ogg CONFIG REQUIRED)
 endif()
 if(ANDROID)
   set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
