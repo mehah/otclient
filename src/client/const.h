@@ -536,6 +536,7 @@ namespace Otc
         GameAnthem = 95,
         GameVipGroups = 96,
         GameBosstiary = 97,
+        GameDoublePlayerGoodsMoney = 98,
 
         //  others
         GameLoadSprInsteadProtobuf = 100,

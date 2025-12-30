@@ -1691,7 +1691,11 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
     if (g_game.getClientVersion() >= 1281) {
         money = m_localPlayer->getTotalMoney();
     } else {
-        money = g_game.getClientVersion() >= 973 ? msg->getU64() : msg->getU32();
+        uint64_t money;
+        if (g_game.getFeature(Otc::GameDoublePlayerGoodsMoney))
+            money = msg->getU64();
+        else
+            money = msg->getU32();
     }
 
     const uint8_t itemsListSize = g_game.getClientVersion() >= 1334 ? msg->getU16() : msg->getU8();
