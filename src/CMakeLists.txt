@@ -406,7 +406,7 @@ if(SPEED_UP_BUILD_UNITY)
 endif(SPEED_UP_BUILD_UNITY)
 
 if(ANDROID)
-  target_sources(${PROJECT_NAME} PRIVATE androidmain.cpp)
+  target_sources(${PROJECT_NAME} PRIVATE androidmain.cpp main.cpp)
 else()
   target_sources(${PROJECT_NAME} PRIVATE main.cpp)
 endif()
