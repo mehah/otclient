@@ -53,7 +53,6 @@ if(inih_FOUND)
       IMPORTED_LOCATION "${INIH_CPP_LIBRARY}"
       INTERFACE_INCLUDE_DIRECTORIES "${INIH_CPP_INCLUDE_DIR}"
     )
-    # inireader depends on core inih in many layouts
     target_link_libraries(inih::inireader INTERFACE inih::inih)
   endif()
 endif()
