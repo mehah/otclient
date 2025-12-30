@@ -53,7 +53,7 @@ public:
     bool unload(const std::string& file);
     void remove(const ConfigPtr& config);
 
-    const PublicConfig& getPublicConfig() { return m_publicConfig; }
+    const PublicConfig& getPublicConfig() const { return m_publicConfig; }
     void loadPublicConfig(const std::string& file);
 
 protected:
