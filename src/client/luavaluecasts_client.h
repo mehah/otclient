@@ -51,6 +51,8 @@ bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints);
 // imbuement
 int push_luavalue(const Imbuement& i);
 int push_luavalue(const ImbuementTrackerItem& i);
+int push_luavalue(const std::vector<std::tuple<Imbuement, uint32_t, uint32_t>>& activeSlots);
+int push_luavalue(const std::unordered_map<int, std::tuple<Imbuement, uint32_t, uint32_t>>& activeSlots);
 
 // bless
 int push_luavalue(const BlessData& bless);
@@ -105,8 +107,25 @@ int push_luavalue(const DailyRewardData& data);
 int push_luavalue(const ForgeOpenData& data);
 int push_luavalue(const ForgeTransferData& data);
 int push_luavalue(const ForgeItemInfo& data);
+int push_luavalue(const ForgeResult& data);
+int push_luavalue(const ForgeHistory& data);
+int push_luavalue(const ForgeData& data);
+int push_luavalue(const std::vector<ForgeHistory>& data);
 
 // Game Analysers Structs
 int push_luavalue(const BossCooldownData& data);
 int push_luavalue(const PartyMemberData& data);
 int push_luavalue(const PartyMemberName& data);
+
+// proficiency
+int push_luavalue(const WeaponProficiencyPerk& perk);
+int push_luavalue(const std::vector<WeaponProficiencyPerk>& perks);
+
+// wheel
+bool luavalue_cast(int index, std::vector<uint16_t>& data);
+int push_luavalue(const std::vector<uint32_t>& data);
+int push_luavalue(const std::vector<std::map<std::string, uint32_t>>& data);
+int push_luavalue(const std::map<uint16_t, uint8_t>& data);
+int push_luavalue(const std::map<uint8_t, uint8_t>& data);
+int push_luavalue(const std::map<uint32_t, Imbuement>& data);
+int push_luavalue(const std::map<uint16_t, uint16_t>& data);

@@ -541,6 +541,14 @@ function toggleAdventurerStyle(hasBlessing)
     end
 end
 
+function getLeftSlotItem()
+    local player = g_game.getLocalPlayer()
+    if not player then
+        return nil
+    end
+    return player:getInventoryItem(InventorySlotLeft)
+end
+
 function onBlessingsChange(blessings, blessVisualState)
     toggleAdventurerStyle(blessings == 1)
     local blessedButton = getInventoryUi().blessings

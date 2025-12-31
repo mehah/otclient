@@ -51,6 +51,7 @@ local skillsTuples = {
 }
 
 StatsBar = {}
+local lastProficiencyCache = {}
 
 function getConfigurations()
     -- This method will return all the stats bar configurations.
@@ -760,6 +761,85 @@ function StatsBar.onHungryChange(regenerationTime, alert)
                 icon:destroy()
                 icon = nil
             end
+        end
+    end
+end
+
+-- Proficiency integration
+function StatsBar.switchCurrentLayout()
+    if table.empty(lastProficiencyCache) then
+        return
+    end
+
+    StatsBar.onUpdateProficiencyData(lastProficiencyCache.itemCache, lastProficiencyCache.hasUnnusedPerk, lastProficiencyCache.thingType)
+end
+
+function StatsBar.onUpdateProficiencyData(itemCache, hasUnnusedPerk, thingType)
+    local statsBar = StatsBar.getCurrentStatsBar and StatsBar.getCurrentStatsBar()
+    if not statsBar or not itemCache or not thingType then return end
+
+    local highlightButton = statsBar:recursiveGetChildById('highlightProficiencyButton')
+    local percentBar = statsBar:recursiveGetChildById('starProgress')
+    local percentLabel = statsBar:recursiveGetChildById('proficiencyLabel')
+    local proficiencyIcon = statsBar:recursiveGetChildById('proficiencyIcon')
+
+    if not modules.game_proficiency or not modules.game_proficiency.ProficiencyData then return end
+    
+    local proficiencyId = thingType:getProficiencyId()
+    if not proficiencyId or proficiencyId == 0 then return end
+    
+    local perkCount = modules.game_proficiency.ProficiencyData:getPerkLaneCount(proficiencyId) or 0
+    if perkCount == 0 then return end
+    
+    local item = Item.create(thingType:getId())
+    if not item then return end
+    
+    local maxAvailableLevel = perkCount + 2
+    local weaponLevel = modules.game_proficiency.ProficiencyData:getCurrentLevelByExp(item, itemCache.exp or 0, true)
+    local nextLevel = math.min(maxAvailableLevel, weaponLevel + 1)
+    local percent = modules.game_proficiency.ProficiencyData:getLevelPercent(itemCache.exp or 0, nextLevel, item)
+    local maxLevelExperience = modules.game_proficiency.ProficiencyData:getMaxExperienceByLevel(nextLevel, item)
+
+    if percentBar then
+        percentBar:setPercent(percent)
+        percentBar:setTooltip(string.format("Proficiency Progress: %s / %s", comma_value(itemCache.exp or 0), comma_value(maxLevelExperience)))
+    end
+
+    if percentLabel then
+        percentLabel:setText(percent .. "%")
+    end
+
+    if highlightButton then
+        highlightButton:setVisible(hasUnnusedPerk)
+    end
+
+    if proficiencyIcon then
+        proficiencyIcon:setOn(hasUnnusedPerk)
+    end
+
+    lastProficiencyCache = { itemCache = itemCache, hasUnnusedPerk = hasUnnusedPerk, thingType = thingType }
+end
+
+function StatsBar.clearProficiencyCache()
+    lastProficiencyCache = {}
+    local statsBar = StatsBar.getCurrentStatsBar and StatsBar.getCurrentStatsBar()
+    if statsBar then
+        local percentBar = statsBar:recursiveGetChildById('starProgress')
+        local percentLabel = statsBar:recursiveGetChildById('proficiencyLabel')
+        local highlightButton = statsBar:recursiveGetChildById('highlightProficiencyButton')
+        local proficiencyIcon = statsBar:recursiveGetChildById('proficiencyIcon')
+        if percentBar then
+            percentBar:setPercent(0)
+            percentBar:setTooltip("")
+        end
+        if percentLabel then
+            percentLabel:setText("0%")
+        end
+        if highlightButton then
+            highlightButton:setVisible(false)
+        end
+        if proficiencyIcon then
+            proficiencyIcon:setOn(false)
         end
     end
 end

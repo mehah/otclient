@@ -544,3 +544,10 @@ function Spells.getImageClipCooldown(indexClip, profile)
     end
     return indexClip * SpelllistSettings[profile].iconSizeCooldown.width .. " 0 " .. SpelllistSettings[profile].iconSizeCooldown.width .. " " .. SpelllistSettings[profile].iconSizeCooldown.height
 end
+
+SpellAreas = {
+    AREA_CIRCLE2X2 = 1,
+    AREA_CIRCLE3X3 = 2,
+    AREA_SQUAREWAVE4 = 3,
+    AREA_SQUAREWAVE6 = 4
+}

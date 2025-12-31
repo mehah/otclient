@@ -1,0 +1,13 @@
+Module
+  name: game_imbui
+  description: Manage imbuements
+  author: otclient team
+  website: https://github.com/edubart/otclient
+  sandboxed: true
+  scripts: 
+    - classes/imbuementselection
+    - classes/imbuementitem
+    - classes/imbuementscroll
+    - imbuing
+  @onLoad: init()
+  @onUnload: terminate()

@@ -71,6 +71,7 @@ public:
     ThingType* getRawThingType(uint16_t id, ThingCategory category);
 
     const ThingTypeList& getThingTypes(ThingCategory category);
+    ThingTypeList getProficiencyThings();
 
     uint32_t getDatSignature() { return m_datSignature; }
     uint16_t getContentRevision() { return m_contentRevision; }

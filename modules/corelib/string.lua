@@ -74,3 +74,22 @@ function string:wrap(width)
     end
     return wrapped
 end
+
+function string.empty(str)
+    if not str then
+        return true
+    end
+    return #str == 0
+end
+
+function formatMoney(amount, separator)
+  local patternSeparator = string.format("%%1%s%%2", separator)
+  local formatted = tostring(amount)
+  while true do
+    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", patternSeparator)
+    if (k==0) then
+      break
+    end
+  end
+  return formatted
+end

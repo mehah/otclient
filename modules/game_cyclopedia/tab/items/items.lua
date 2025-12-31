@@ -1109,6 +1109,10 @@ function Cyclopedia.FillItemList()
 end
 
 function Cyclopedia.loadItemDetail(itemId, descriptions)
+    if not UI or not UI.InfoBase or not UI.InfoBase.DetailsBase or not UI.InfoBase.DetailsBase.List then
+        return
+    end
+
     UI.InfoBase.DetailsBase.List:destroyChildren()
 
     local internalData = g_things.getThingType(itemId, ThingCategoryItem)

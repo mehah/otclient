@@ -1,0 +1,248 @@
+ForgeContainerItem < Panel
+  size: 36 36
+  Panel
+    id: forgeItem
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-top: 1
+    margin-left: 1
+    marign-left: 1
+    margin-bottom: 1
+
+
+ForgePanel < Panel
+  width: 153
+  color: #dfdfdf
+  text-align: top
+  !text: tr('Convert Dust')
+  padding-top: 21
+  image-source: /images/ui/window_new
+  image-border: 4
+  color: #BFBFBF
+  font: verdana-11px-monochrome
+  draggable: false
+
+ForgeTextWithIcon < Panel
+  Label
+    id: value
+    text: Generate 66666
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-align: center
+    text-auto-resize: true
+  UIWidget
+    id: icon
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/game/forge/icon-currency-sliver
+
+ForgeTextWithIcon2 < Panel
+  id: forgeTextWithIcon2
+  Label
+    id: value
+    text: 100
+    anchors.left: parent.left
+    text-align: left
+    text-auto-resize: true
+  UIWidget
+    id: icon
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/game/forge/icon-currency-sliver
+  Label
+    id: value2
+    text: to 101
+    anchors.left: prev.right
+    margin-left: 5
+    text-align: left
+    text-auto-resize: true
+  UIWidget
+    id: icon2
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/game/forge/icon-currency-sliver
+
+ForgeItem < Panel
+  id: forgeItem
+  size: 60 80
+  Item
+    id: item
+    size: 64 64
+    margin-left: 3
+    anchors.top: parent.top
+  UIWidget
+    id: image
+    anchors.top: prev.top
+    anchors.left: prev.left
+    image-source: /images/game/forge/dust
+    size: 64 64
+  Panel
+    id: countPanel
+    image-source: /images/ui/item
+    image-border: 10
+    anchors.top: item.bottom
+    margin-top: 2
+    anchors.left: prev.left
+    anchors.right: prev.right
+    size: 86 22
+    Label
+      id: value
+      text: 100
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-right: 5
+      text-align: center
+      text-auto-resize: true
+    UIWidget
+      id: icon
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      margin-left: 5
+      image-source: /images/game/forge/icon-currency-sliver
+
+ForgeButton < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  size: 118 35
+  UIButton
+    id: button
+    size: 118 35
+    image-source: /images/ui/button-grey-up
+    image-border: 5
+    opacity: 1.0
+    text: Transfer
+    text-offset: 0 1
+    $pressed:
+      image-source: /images/ui/button-grey-down
+    $disabled:
+      image-source: /images/ui/button-grey-down
+    $checked:
+      image-source: /images/ui/button-grey-down
+  UIWidget
+    id: icon
+    anchors.top: parent.top
+    margin-top: 6
+    anchors.left: parent.left
+    margin-left: 6
+    phantom: true
+
+MainWindow
+  @onEscape: modules.game_exaltationforge.Forge:close()
+  size: 500 435
+  !text: tr('Exaltation Forge')
+  Button
+    id: close
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    text: Close
+    size: 43 20
+  Panel
+    id: goldBalancePanel
+    anchors.bottom: close.bottom
+    anchors.top: close.top
+    anchors.left: parent.left
+    image-source: /images/ui/item
+    image-border: 10
+    width: 120
+    UIWidget
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/game/forge/icon-goldcoin
+      margin-right: 3
+    Label
+      id: value
+      text: 555,5555
+      anchors.right: prev.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 10
+      text-auto-resize: true
+  Panel
+    id: dustBalancePanel
+    anchors.bottom: prev.bottom
+    anchors.top: prev.top
+    anchors.left: prev.right
+    image-source: /images/ui/item
+    image-border: 10
+    width: 80
+    margin-left: 5
+    UIWidget
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/game/forge/icon-currency-dust
+      margin-right: 3
+    Label
+      id: value
+      text: 2000
+      anchors.right: prev.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 10
+      text-auto-resize: true
+  Panel
+    id: sliverBalancePanel
+    anchors.bottom: prev.bottom
+    anchors.top: prev.top
+    anchors.left: prev.right
+    image-source: /images/ui/item
+    image-border: 10
+    width: 50
+    margin-left: 5
+    UIWidget
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/game/forge/icon-currency-sliver
+      margin-right: 3
+    Label
+      id: value
+      text: 0
+      anchors.right: prev.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 10
+      text-auto-resize: true
+  Panel
+    id: coreBalancePanel
+    anchors.bottom: prev.bottom
+    anchors.top: prev.top
+    anchors.left: prev.right
+    image-source: /images/ui/item
+    image-border: 10
+    width: 50
+    margin-left: 5
+    UIWidget
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/game/forge/icon-currency-exaltedcore
+      margin-right: 3
+    Label
+      id: value
+      text: 0
+      anchors.right: prev.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 10
+      text-auto-resize: true  
+  HorizontalSeparator
+    id: separator
+    anchors.bottom: prev.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 10
+  QtPanel
+    id: firstTooltip
+    anchors.bottom: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 5
+    height: 63
+    visible: false
+  QtPanel
+    id: secondTooltip
+    anchors.bottom: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 51
+    visible: false
+	

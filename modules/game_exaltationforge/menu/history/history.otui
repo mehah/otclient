@@ -1,0 +1,117 @@
+ForgeHistoryWidget < Panel
+  height: 40
+  margin-left: 1
+  Label
+    id: date
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-auto-resize: true
+    margin-top: 4
+    margin-left: 4
+  Label
+    id: action
+    anchors.top: date.top
+    anchors.left: parent.left
+    text-auto-resize: true
+    margin-left: 182
+  VerticalSeparator
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    margin-left: 178
+  Label
+    id: details
+    anchors.top: date.top
+    anchors.left: prev.left
+    anchors.right: parent.right
+    margin-right: 10
+    text-auto-resize: true
+    text-wrap: true
+    margin-left: 114
+  VerticalSeparator
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    margin-left: 287
+	
+HistoryButton < Button
+  font: verdana-11px-antialised
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 5 0
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0 
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+	
+	
+HistoryWindow < Panel
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-bottom: 120
+  border-width-top: 1
+  border-color-top: black
+  border-width-left: 1
+  border-color-left: black
+  border-width-bottom: 1
+  border-color-bottom: #747474
+  border-width-right: 1
+  visible: false
+  Panel
+    id: mainPanel
+    anchors.fill: parent
+    margin-top: 5
+    margin-left: 3
+    margin-bottom: 5
+    vertical-scrollbar: scrollBar
+    border-color-right: #747474
+    background-color: #2C2C2C
+    HistoryButton
+      id: dateButton
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: -1
+      text: Date
+      text-align: left
+      width: 180
+      height: 20
+    HistoryButton
+      id: actionButton
+      anchors.top: parent.top
+      anchors.left: prev.right
+      text: Action
+      text-align: left
+      width: 110
+      height: 20
+    HistoryButton
+      id: detailsButton
+      anchors.top: parent.top
+      anchors.left: prev.right
+      anchors.right: parent.right
+      text: Details
+      text-align: left
+      height: 20
+    ScrollablePanel
+      id: contentPanel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      vertical-scrollbar: scrollBar
+      layout:
+        type: verticalBox
+    VerticalQtScrollBar
+      id: scrollBar
+      anchors.top: parent.top
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-bottom: -3
+      step: 30
+      pixel-scroll: true

@@ -345,6 +345,10 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
         m_upgradeClassification = flags.upgradeclassification().upgrade_classification();
     }
 
+    if (flags.has_proficiency() && flags.proficiency().has_proficiency_id()) {
+        m_proficiencyId = flags.proficiency().proficiency_id();
+    }
+
     // reverse_addons_east
     // reverse_addons_west
     // reverse_addons_south
@@ -1156,3 +1160,9 @@ void ThingType::exportImage(const std::string& fileName)
     image->savePNG(fileName);
 }
 #endif
+
+uint16_t ThingType::getProficiencyId()
+{
+    // Return the proficiency ID from protobuf (will be 0 if not set)
+    return m_proficiencyId;
+}

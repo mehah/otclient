@@ -27,6 +27,12 @@
 
 #include "framework/core/declarations.h"
 
+struct WeaponProficiencyPerk
+{
+    uint8_t level;
+    uint8_t perk;
+};
+
  //@bindsingleton g_game
 class Game
 {
@@ -153,6 +159,11 @@ protected:
     static void processUpdateBestiaryCharmsData(const BestiaryCharmsData& charmData);
     static void processBosstiaryInfo(const std::vector<BosstiaryData>& boss);
     static void processBosstiarySlots(const BosstiarySlotsData& data);
+
+    // exaltation forge
+    static void processOpenExaltationForge(const ForgeOpenData& data);
+    static void onForgeResult(const ForgeResult& data);
+    static void onForgeHistory(uint32_t currentPage, uint32_t lastPage, const std::vector<ForgeHistory>& data);
 
     friend class ProtocolGame;
     friend class Map;
@@ -303,6 +314,10 @@ public:
     void sendRequestStoreHome();
     void sendRequestStorePremiumBoost();
     void sendRequestUsefulThings(const uint8_t serviceType);
+    void sendOpenDestinyWheel(uint32_t playerId);
+    void sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uint32_t greenGemId, uint32_t redGemId, uint32_t blueGemId, uint32_t purpleGemId);
+    void sendWeaponProficiencyAction(const uint8_t proficiencyType, const uint16_t itemId = 0);
+    void sendWeaponProficiencyApply(uint16_t itemId, const std::map<uint8_t, uint8_t>& perks);
     void sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType);
     void sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType);
     void openStore(uint8_t serviceType = 0, std::string_view category = "");
@@ -382,6 +397,8 @@ public:
     void clearImbuement(uint8_t slot);
     void closeImbuingWindow();
     void imbuementDurations(bool isOpen = false);
+    void selectImbuementItem(uint16_t itemId, const Position& pos, uint8_t stackpos);
+    void selectImbuementScroll();
 
     void enableTileThingLuaCallback(const bool value) { m_tileThingsLuaCallback = value; }
     bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
@@ -427,6 +444,12 @@ public:
     void processCyclopediaCharacterOffenceStats(const CyclopediaCharacterOffenceStats& data);
     void processCyclopediaCharacterDefenceStats(const CyclopediaCharacterDefenceStats& data);
     void processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStats& data);
+
+    // exaltation forge related
+    void sendForgeAction(Otc::ForgeActions_t forgeAction, bool convergence, uint16_t itemid1, uint8_t tier, uint16_t itemid2, bool usedCore = false, bool reduceTierLoss = false);
+    void sendResourceBalance();
+    void sendForgeHistory(uint32_t pageId);
+    void parseItemClasses(const ForgeData& forgeData);
 
     void updateMapLatency() {
         if (!m_mapUpdateTimer.first) {

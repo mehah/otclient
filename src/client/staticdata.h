@@ -762,3 +762,55 @@ struct ForgeOpenData
     std::vector<ForgeTransferData> convergenceTransfers;
     uint16_t dustLevel{ 0 };
 };
+
+struct ForgeResult {
+    uint8_t actionType;   // 0 = fusion, 1 = transfer
+    uint8_t convergence;
+    uint8_t success;
+
+    uint16_t leftItemId;
+    uint8_t leftTier;
+
+    uint16_t rightItemId;
+    uint8_t rightTier;
+
+    uint8_t bonus;
+
+    uint8_t coreCount;
+    uint16_t extraItemId;
+    uint8_t extraTier;
+};
+
+struct ForgeHistory
+{
+    std::string date;
+    std::string action;
+    std::string details;
+    bool bonus;
+};
+
+struct ForgeConfig
+{
+    uint8_t dustPercent = 0;
+    uint8_t dustToSliver = 0;
+    uint8_t sliverToCore = 0;
+    uint8_t dustPercentUpgrade = 0;
+    uint16_t maxDust = 0;
+    uint16_t maxDustCap = 0;
+    uint8_t dustNormalFusion = 0;
+    uint8_t dustConvergenceFusion = 0;
+    uint8_t dustNormalTransfer = 0;
+    uint8_t dustConvergenceTransfer = 0;
+    uint8_t baseChance = 0;
+    uint8_t improvedChance = 0;
+    uint8_t tierLossReduction = 0;
+};
+
+struct ForgeData
+{
+    std::map<uint8_t, std::map<uint8_t, uint64_t>> classificationTable;
+    std::map<uint8_t, uint8_t> exaltedCores;
+    std::map<uint8_t, uint64_t> convergenceFusion;
+    std::map<uint8_t, uint64_t> convergenceTransfer;
+    ForgeConfig config;
+};

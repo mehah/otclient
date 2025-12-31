@@ -692,6 +692,8 @@ namespace Otc
         RESOURCE_LESSER_GEMS = 81,
         RESOURCE_REGULAR_GEMS = 82,
         RESOURCE_GREATER_GEMS = 83,
+        RESOURCE_LESSER_FRAGMENT = 84,
+        RESOURCE_GREATER_FRAGMENT = 85,
         RESOURCE_WHEEL_OF_DESTINY = 86,
         RESOURE_COIN_NORMAL = 90,
         RESOURE_COIN_TRANSFERRABLE = 91,
@@ -855,6 +857,15 @@ namespace Otc
         OPEN_USEFUL_THINGS = 3,
         OPEN_OFFER = 4,
         OPEN_SEARCH = 5,
+    };
+
+    enum ForgeActions_t : uint8_t
+    {
+        FUSION = 0,
+        TRANSFER = 1,
+        DUSTTOSLIVERS = 2,
+        SLIVERSTOCORES = 3,
+        INCREASELIMIT = 4
     };
 
     enum WeaponProficiency_t : uint8_t

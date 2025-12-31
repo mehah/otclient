@@ -1,0 +1,172 @@
+NewHeadlessWindow
+  id: helperWindow
+  anchors.horizontalCenter: parent.horizontalCenter
+  size: 295 365
+  @onEscape: hide()
+  UIWidget
+    size: 145 56
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: -33
+    image-source: /images/game/tutorial/backdrop_crest
+    phantom: true
+
+  Panel
+    id: contentPanel
+    anchors.fill: parent
+    margin: 15 13 17 13
+    Panel
+      id: optionsTabBar
+      height: 36
+      image-source: /images/game/destiny_wheel/menuBg
+      image-border: 1
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 12
+      Button
+        id: healingMenu
+        anchors.top: parent.top
+        anchors.left: parent.left
+        size: 34 34
+        margin-left: 1
+        margin-top: 1
+        image-source: /images/ui/helper
+        image-clip: 0 102 34 34
+        $hover !checked:
+          size: 34 34
+          image-clip: 0 102 34 34
+        $pressed:
+          size: 34 34
+          image-clip: 0 136 34 34
+        $checked:
+          size: 134 34
+          image-clip: 0 0 134 34
+        @onClick: loadMenu('healingMenu')
+      Button
+        id: toolsMenu
+        anchors.top: parent.top
+        anchors.left: prev.right
+        size: 34 34
+        margin-left: 1
+        margin-top: 1
+        image-source: /images/ui/helper
+        image-clip: 34 102 34 34
+        $hover !checked:
+          size: 34 34
+          image-clip: 34 102 34 34
+        $pressed:
+          size: 34 34
+          image-clip: 34 136 34 34
+        $checked:
+          size: 134 34
+          image-clip: 0 34 134 34
+        @onClick: loadMenu('toolsMenu')
+      Button
+        id: shooterMenu
+        anchors.top: parent.top
+        anchors.left: prev.right
+        size: 34 34
+        margin-left: 1
+        margin-top: 1
+        image-source: /images/ui/helper
+        image-clip: 68 102 34 34
+        visible: true
+        enabled: true
+        $hover !checked:
+          size: 34 34
+          image-clip: 68 102 34 34
+        $pressed:
+          size: 34 34
+          image-clip: 68 136 34 34
+        $checked:
+          size: 134 34
+          image-clip: 0 68 134 34
+        @onClick: loadMenu('shooterMenu')
+
+    HealingPanel
+      id: healingPanel
+      anchors.top: optionsTabBar.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 5
+      visible: false
+
+    ToolsPanel
+      id: toolsPanel
+      anchors.top: optionsTabBar.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 5
+      visible: false
+
+    ShooterPanel
+      id: shooterPanel
+      anchors.top: optionsTabBar.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 5
+      visible: false
+
+    HorizontalSeparator
+      id: separator
+      anchors.bottom: next.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 7
+
+    Button
+      id: close
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      !text: tr('Close')
+      size: 43 20
+      @onClick: hide()
+
+    Button
+      id: tracker
+      anchors.bottom: parent.bottom
+      anchors.right: prev.left
+      margin-right: 5
+      !text: tr('Helper Stats')
+      size: 73 20
+      @onClick: toggleHelperTracker()
+
+    Label
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      margin-bottom: 8
+      !text: tr('Helper Status:')
+      font: verdana-11px-antialised
+      color: #dfdfdf
+      text-auto-resize: true
+
+    Label
+      id: helperStatusLabel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      !text: tr('Status')
+      font: verdana-11px-antialised
+      color: #dfdfdf
+      text-auto-resize: true
+
+    UIButton
+      id: helperStatus
+      size: 12 9
+      anchors.bottom: prev.bottom
+      anchors.left: prev.right
+      margin-left: 5
+      margin-bottom: 2
+      image-source: /images/store/icon-yes
+      @onClick: botStatus()
+      !tooltip: tr(' - Helper Status: [ENABLED]')
+
+    Button
+      id: setKeyHelperButton
+      size: 41 15
+      anchors.bottom: prev.bottom
+      anchors.left: prev.right
+      margin-left: 5
+      margin-bottom: -3
+      !text: tr('Set Key')
+      @onClick: manageHotkeys("Enable/Disable Helper")

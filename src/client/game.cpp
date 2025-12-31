@@ -1582,6 +1582,43 @@ void Game::sendRequestUsefulThings(const uint8_t serviceType)
     m_protocolGame->sendRequestUsefulThings(serviceType);
 }
 
+void Game::sendOpenDestinyWheel(const uint32_t playerId)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendOpenDestinyWheel(playerId);
+}
+
+void Game::sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uint32_t greenGemId, uint32_t redGemId, uint32_t blueGemId, uint32_t purpleGemId)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendApplyWheelPoints(pointsInvested, greenGemId, redGemId, blueGemId, purpleGemId);
+}
+
+void Game::sendWeaponProficiencyAction(const uint8_t proficiencyType, const uint16_t itemId)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendWeaponProficiencyAction(proficiencyType, itemId);
+}
+
+void Game::sendWeaponProficiencyApply(uint16_t itemId, const std::map<uint8_t, uint8_t>& perks)
+{
+    if (!canPerformGameAction())
+        return;
+
+    std::vector<std::pair<uint8_t, uint8_t>> perkVector;
+    for (const auto& perk : perks) {
+        perkVector.emplace_back(perk.first, perk.second);
+    }
+
+    m_protocolGame->sendWeaponProficiencyApply(itemId, perkVector);
+}
+
 void Game::sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType)
 {
     if (!canPerformGameAction())
@@ -1835,6 +1872,22 @@ void Game::closeImbuingWindow()
     m_protocolGame->sendCloseImbuingWindow();
 }
 
+void Game::selectImbuementItem(const uint16_t itemId, const Position& pos, const uint8_t stackpos)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendImbuementWindowAction(1, itemId, pos, stackpos);
+}
+
+void Game::selectImbuementScroll()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendImbuementWindowAction(2);
+}
+
 void Game::imbuementDurations(const bool isOpen)
 {
     if (!canPerformGameAction())
@@ -2059,4 +2112,39 @@ void Game::processCyclopediaCharacterDefenceStats(const CyclopediaCharacterDefen
 void Game::processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStats& data)
 {
     g_lua.callGlobalField("g_game", "onCyclopediaCharacterMiscStats", data);
+}
+
+void Game::processOpenExaltationForge(const ForgeOpenData& data)
+{
+    g_lua.callGlobalField("g_game", "onOpenExaltationForge", data);
+}
+
+void Game::sendForgeAction(Otc::ForgeActions_t forgeAction, bool convergence, uint16_t itemid1, uint8_t tier, uint16_t itemid2, bool usedCore, bool reduceTierLoss) 
+{
+    m_protocolGame->sendForgeAction(forgeAction, convergence, itemid1, tier, itemid2, usedCore, reduceTierLoss);
+}
+
+void Game::onForgeResult(const ForgeResult& data) 
+{
+	g_lua.callGlobalField("g_game", "onResultExaltationForge", data);
+}
+
+void Game::parseItemClasses(const ForgeData& data)
+{
+    g_lua.callGlobalField("g_game", "onItemClasses", data);
+}
+
+void Game::sendForgeHistory(uint32_t pageId) 
+{
+    m_protocolGame->sendForgeHistory(pageId);
+}
+
+void Game::onForgeHistory(uint32_t currentPage, uint32_t lastPage, const std::vector<ForgeHistory>& data)
+{
+	g_lua.callGlobalField("g_game", "onForgeHistory", currentPage, lastPage, data);
+}
+
+void Game::sendResourceBalance() 
+{
+    m_protocolGame->sendResourceBalance();
 }

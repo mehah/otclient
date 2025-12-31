@@ -1,0 +1,388 @@
+FusionButton < UIButton
+  font: verdana-11px-antialised
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 0 0
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0 
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+
+FusionWindow < Panel
+  visible: false
+  margin-top: 5
+  margin-bottom: 5
+  UIWindow
+    id: mainPanel1
+    text: Select item for Fusion
+    color: #dfdfdf
+    text-offset: 0 6
+    text-align: top
+    image-source: /images/ui/window
+    image-border: 6
+    image-border-top: 27
+    draggable: false
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 120
+    ScrollablePanel
+      id: contentPanel
+      vertical-scrollbar: fusionScrollBar
+      image-source: /images/ui/panel_flat
+      image-border: 10
+      padding-top: 5
+      padding-bottom: 5
+      padding-left: 5
+      background-color: #363636
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      margin-top: 27
+      margin-bottom: 10
+      margin-left: 10
+      width: 165
+      layout:
+        type: grid
+        cell-size: 36 36
+        cell-spacing: 1
+        flow: true
+    VerticalQtScrollBar
+      id: fusionScrollBar
+      anchors.top: contentPanel.top
+      anchors.right: contentPanel.right
+      anchors.bottom: contentPanel.bottom
+      step: 30
+      pixel-scroll: true
+    Panel
+      id: previewPanel
+      anchors.top: prev.top
+      anchors.left: prev.right
+      anchors.right: parent.right
+      anchors.bottom: prev.bottom
+      margin-right: 5
+      UIWidget
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 30
+        image-source: /images/game/forge/icon-arrow-rightlarge
+        margin-bottom: 5
+      UIWidget
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        margin-left: 5
+        image-source: /images/game/forge/icon-arrow-rightlarge
+      UIWidget
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        margin-left: 5
+        image-source: /images/game/forge/icon-arrow-rightlarge
+      CheckBox
+        id: convergence
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        margin-left: 12
+        text-auto-resize: true
+        text: Convergence
+      Item
+        id: previewItem
+        image-source:
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 55
+        size: 64 64
+      UIWidget
+        id: previewQuestionMark
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 75
+        image-source: /images/game/forge/icon-questionmark
+  UIWindow
+    text: Further Items Needed For Fusion
+    id: previewPanel2
+    color: #dfdfdf
+    text-offset: 0 6
+    text-align: top
+    image-source: /images/ui/window
+    image-border: 6
+    image-border-top: 27
+    draggable: false
+    anchors.top: mainPanel1.bottom
+    anchors.left: prev.left
+    anchors.right: prev.right
+    height: 122
+    margin-top: 5
+    ScrollablePanel
+      id: fusionContent2
+      visible: false
+      vertical-scrollbar: fusionScrollBar2
+      image-source: /images/ui/panel_flat
+      image-border: 10
+      padding-top: 5
+      padding-bottom: 5
+      padding-left: 5
+      background-color: #363636
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      margin-top: 29
+      margin-bottom: 10
+      margin-left: 10
+      width: 165
+      layout:
+        type: grid
+        cell-size: 36 36
+        cell-spacing: 1
+        flow: true
+    VerticalQtScrollBar
+      id: fusionScrollBar2
+      anchors.top: fusionContent2.top
+      anchors.right: fusionContent2.right
+      anchors.bottom: fusionContent2.bottom
+      step: 30
+      pixel-scroll: true
+      visible: false
+    Item
+      id: convergenceDustItem
+      size: 64 64
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 5
+      visible: false
+    UIWidget
+      id: convergenceDustImage
+      anchors.top: prev.top
+      anchors.left: prev.left
+      image-source: /images/game/forge/dust
+      size: 64 64
+      visible: false
+    Panel
+      id: convergenceDustCountPanel
+      visible: false
+      image-source: /images/ui/item
+      image-border: 10
+      anchors.top: previewCount.top
+      anchors.left: prev.left
+      anchors.right: prev.right
+      anchors.bottom: fusionContent2.bottom
+      size: 86 22
+      Label
+        id: value
+        text: 60000
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        text-auto-resize: true
+      UIWidget
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        margin-left: 2
+        image-source: /images/game/forge/icon-currency-dust
+    Item
+      id: previewItem
+      size: 64 64
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: 27
+      margin-left: 7
+    UIWidget
+      id: previewQuestionMark
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: prev.left
+      margin-left: 30
+      image-source: /images/game/forge/icon-questionmark
+    Panel
+      id: previewCount
+      image-source: /images/ui/item
+      image-border: 10
+      anchors.top: previewItem.bottom
+      margin-top: 3
+      anchors.left: previewItem.left
+      anchors.right: previewItem.right
+      size: 86 22
+      Label
+        id: value
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text-align: center
+        text: 100
+        text-auto-resize: true
+    Item
+      id: requiredItem
+      size: 64 64
+      anchors.top: previewItem.top
+      anchors.left: previewItem.right
+      margin-left: 3
+    UIWidget
+      id: requiredImage
+      anchors.top: prev.top
+      anchors.left: prev.left
+      image-source: /images/game/forge/dust
+      size: 64 64
+    Panel
+      id: requiredCount
+      image-source: /images/ui/item
+      image-border: 10
+      anchors.top: previewCount.top
+      anchors.left: prev.left
+      anchors.right: prev.right
+      size: 86 22
+      Label
+        id: value
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text-align: center
+        text: 100
+        text-auto-resize: true
+      UIWidget
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        margin-left: 2
+        image-source: /images/game/forge/icon-currency-dust
+    Label
+      id: successRate
+      anchors.top: requiredItem.top
+      anchors.left: requiredItem.right
+      margin-left: 6
+      text: Success Rate:
+    FusionButton
+      id: improveButton     
+      anchors.top: prev.bottom
+      margin-top: 2
+      anchors.left: successRate.left
+      text-auto-resize: true
+      font: cipsoftFont
+      text: Improve to 65%   		
+    Panel
+      id: exaltedCorePanel
+      anchors.top: prev.top
+      anchors.left: prev.right
+      anchors.bottom: prev.bottom
+      margin-left: 2
+      image-source: /images/ui/item
+      image-border: 10
+      width: 28
+      Label
+        id: value
+        text: 1
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        margin-right: 4
+        text-auto-resize: true
+      UIWidget
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        margin-left: 2
+        image-source: /images/game/forge/icon-currency-exaltedcore
+    Label
+      id: successRateValue
+      anchors.top: successRate.top
+      anchors.left: successRate.left
+      anchors.right: prev.right
+      text-align: right
+      color: #F75F5F
+    FusionButton
+      id: tierLossButton
+      anchors.bottom: requiredCount.bottom
+      anchors.left: successRate.left
+      anchors.right: improveButton.right
+      text-auto-resize: true
+      font: cipsoftFont
+      text: Improve to 65%
+    Panel
+      id: exaltedCorePanel2
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 2
+      anchors.bottom: prev.bottom
+      image-source: /images/ui/item
+      image-border: 10
+      width: 28
+      Label
+        id: value
+        text: 1
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        margin-right: 4
+        text-auto-resize: true
+      UIWidget
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        margin-left: 2
+        image-source: /images/game/forge/icon-currency-exaltedcore
+    Label
+      id: tierLoss
+      anchors.bottom: tierLossButton.top
+      anchors.left: successRate.left
+      margin-bottom: 2
+      text: Tier Loss:
+    Label
+      id: tierLossValue
+      anchors.top: prev.top
+      anchors.left: prev.left
+      anchors.right: exaltedCorePanel2.right
+      text-align: right
+      color: #F75F5F
+    UIWidget
+      anchors.verticalCenter: parent.verticalCenter
+      margin-top: 11
+      anchors.left: prev.right
+      margin-left: 20
+      image-source: /images/game/forge/icon-arrow-rightlarge
+    QtButton
+      id: fusionButtonProcced
+      anchors.right: parent.right
+      margin-right: 7
+      anchors.top: previewItem.top
+      anchors.bottom: tierLossValue.bottom
+      anchors.left: prev.right
+      margin-left: 20
+      opacity: 0.9
+      Item
+        id: item1
+        image-source:
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 5
+        size: 32 32
+      UIWidget
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        margin-left: 3
+        image-source: /images/game/forge/icon_3arrows
+      Item
+        id: item2
+        image-source:
+        anchors.top: item1.top 
+        anchors.left: prev.right
+        margin-left: 20
+        size: 32 32
+    Panel
+      id: exaltedCorePanel3
+      anchors.top: exaltedCorePanel2.top
+      anchors.left: prev.left
+      anchors.right: prev.right
+      margin-left: 2
+      anchors.bottom: exaltedCorePanel2.bottom
+      image-source: /images/ui/item
+      image-border: 10
+      width: 28
+      Label
+        id: value
+        text: 1
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        margin-right: 4
+        text-auto-resize: true
+      UIWidget
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        margin-left: 2
+        image-source: /images/game/forge/icon-goldcoin
+

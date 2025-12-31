@@ -26,3 +26,7 @@ ProgressRect < UIProgressRect
   color: white
   background-color: #00000088
   font: verdana-11px-rounded
+
+ProgressBarSD < UIProgressBarSD
+  height: 22
+  tooltip-delayed: true

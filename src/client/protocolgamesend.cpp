@@ -1242,6 +1242,64 @@ void ProtocolGame::sendRequestUsefulThings(const uint8_t offerId)
     send(msg);
 }
 
+void ProtocolGame::sendWeaponProficiencyAction(const uint8_t proficiencyType, const uint16_t itemId)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientWeaponProficiencyAction);
+    msg->addU8(proficiencyType);
+    if (proficiencyType != 1) {
+        msg->addU16(itemId);
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendWeaponProficiencyApply(uint16_t itemId, const std::vector<std::pair<uint8_t, uint8_t>>& perks)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientWeaponProficiencyAction);
+    msg->addU8(Proto::WEAPON_PROFICIENCY_APPLY_PERKS);
+    msg->addU16(itemId);
+    msg->addU8(perks.size());
+    for (const auto& perk : perks) {
+        msg->addU8(perk.first);   // level
+        msg->addU8(perk.second);  // position
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendForgeAction(Otc::ForgeActions_t forgeAction, bool convergence, uint16_t itemid1, uint8_t tier, uint16_t itemid2, bool usedCore, bool reduceTierLoss)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeEnter);
+    msg->addU8(static_cast<uint8_t>(forgeAction));    
+    msg->addU8(convergence ? 1 : 0);
+    msg->addU16(itemid1);
+    msg->addU8(tier);
+    msg->addU16(itemid2);
+
+    if (!convergence) {
+        msg->addU8(usedCore ? 1 : 0);
+        msg->addU8(reduceTierLoss ? 1 : 0);
+    }
+
+    send(msg);
+}
+
+void ProtocolGame::sendForgeHistory(uint32_t pageId)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeBrowseHistory);   
+    msg->addU8(pageId);
+    send(msg);
+}
+
+void ProtocolGame::sendResourceBalance()
+{
+    const auto msg = std::make_shared<OutputMessage>();
+	msg->addU8(237); 
+	send(msg);
+}
+
 void ProtocolGame::sendRequestStoreOfferById(uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType)
 {
     const auto& msg = std::make_shared<OutputMessage>();
@@ -1420,6 +1478,21 @@ void ProtocolGame::sendCloseImbuingWindow()
     send(msg);
 }
 
+void ProtocolGame::sendImbuementWindowAction(const uint8_t type, const uint16_t itemId, const Position& pos, const uint8_t stackpos)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(0xB2);  // same opcode as parseImbuementWindow on server
+    msg->addU8(type);  // 1 = SELECT_ITEM, 2 = SCROLL
+
+    if (type == 1) {  // SELECT_ITEM
+        addPosition(msg, pos);
+        msg->addU16(itemId);
+        msg->addU8(stackpos);
+    }
+
+    send(msg);
+}
+
 void ProtocolGame::sendOpenRewardWall()
 {
     const auto& msg = std::make_shared<OutputMessage>();
@@ -1541,5 +1614,63 @@ void ProtocolGame::openContainerQuickLoot(const uint8_t action, const uint8_t ca
     } else if (action == 1 || action == 2 || action == 5 || action == 6) {
         msg->addU8(category);
     }
+    send(msg);
+}
+
+void ProtocolGame::sendOpenDestinyWheel(const uint32_t playerId)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientOpenDestinyWheel);
+    msg->addU32(playerId);
+    send(msg);
+}
+
+void ProtocolGame::sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uint32_t greenGemId, uint32_t redGemId, uint32_t blueGemId, uint32_t purpleGemId)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientApplyWheelPoints);
+
+    // Send points for all 36 slots
+    for (size_t i = 0; i < 36; ++i) {
+        if (i < pointsInvested.size()) {
+            msg->addU16(pointsInvested[i]);
+        } else {
+            msg->addU16(0);
+        }
+    }
+
+    // Send gem vessel data (hasGem + gemIndex for each domain)
+    // Green gem (domain 0)
+    if (greenGemId != static_cast<uint32_t>(-1)) {
+        msg->addU8(1); // hasGem = true
+        msg->addU16(static_cast<uint16_t>(greenGemId)); // gemIndex
+    } else {
+        msg->addU8(0); // hasGem = false
+    }
+
+    // Red gem (domain 1)
+    if (redGemId != static_cast<uint32_t>(-1)) {
+        msg->addU8(1); // hasGem = true
+        msg->addU16(static_cast<uint16_t>(redGemId)); // gemIndex
+    } else {
+        msg->addU8(0); // hasGem = false
+    }
+
+    // Blue gem (domain 2)
+    if (blueGemId != static_cast<uint32_t>(-1)) {
+        msg->addU8(1); // hasGem = true
+        msg->addU16(static_cast<uint16_t>(blueGemId)); // gemIndex
+    } else {
+        msg->addU8(0); // hasGem = false
+    }
+
+    // Purple gem (domain 3)
+    if (purpleGemId != static_cast<uint32_t>(-1)) {
+        msg->addU8(1); // hasGem = true
+        msg->addU16(static_cast<uint16_t>(purpleGemId)); // gemIndex
+    } else {
+        msg->addU8(0); // hasGem = false
+    }
+
     send(msg);
 }

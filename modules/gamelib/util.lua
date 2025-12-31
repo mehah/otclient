@@ -29,3 +29,35 @@ function formatTimeByMinutes(totalMinutes)
     local minutes = math.floor(remainingSeconds / 60)
     return string.format("%02d:%02d", hours, minutes)
 end
+
+function matchText(input, target)
+    input = input:lower()
+    target = target:lower()
+
+    if input == target then
+        return true
+    end
+
+    if #input >= 1 and target:find(input, 1, true) then
+        return true
+    end
+    return false
+end
+
+function roundToTwoDecimalPlaces(num)
+  return math.floor(num * 100 + 0.5) / 100
+end
+
+function convertLongGold(amount, short)
+  if short then
+    if amount >= 1000000 then
+      return string.format("%.1fM", amount / 1000000)
+    elseif amount >= 1000 then
+      return string.format("%.1fK", amount / 1000)
+    else
+      return tostring(amount)
+    end
+  else
+    return comma_value(amount)
+  end
+end

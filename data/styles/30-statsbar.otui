@@ -508,6 +508,74 @@ TopStatsBarDefaultOnTop < UIWidget
     layout:
       type: horizontalBox
 
+  UIButton
+    id: proficiencyButton
+    size: 13 13
+    anchors.top: proficiencyPanel.top
+    anchors.right: proficiencyPanel.left
+    margin-right: 3
+    image-source: /images/game/topbar/proficiency-button
+    image-clip: 0 0 13 13
+    !tooltip: tr('Open Weapon Proficiency Dialog')
+    tooltip-delayed: true
+    @onClick: modules.game_proficiency.requestOpenWindow()
+    $hover !pressed:
+      image-clip: 0 0 13 13
+    $pressed:
+      image-clip: 0 13 13 13
+  UIWidget
+    id: highlightProficiencyButton
+    size: 15 15
+    anchors.top: prev.top
+    anchors.left: prev.left
+    margin-top: -1
+    margin-left: -1
+    visible: false
+    phantom: true
+    image-source: /images/game/topbar/highlight-proficiency-button
+
+  Panel
+    id: proficiencyPanel
+    size: 103 13
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 8
+    UIWidget
+      id: proficiencyBg
+      size: 100 13
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-bg
+      !tooltip: tr('Proficiency Progress: 0 / 1750')
+      tooltip-delayed: true
+      ProgressBarSD
+        id: starProgress
+        anchors.fill: parent
+        image-source: /images/game/proficiency/proficiency-progress
+        margin: 1 1 1 1
+        percent: 0
+      Label
+        id: proficiencyLabel
+        anchors.fill: parent
+        text-align: center
+        text-auto-resize: true
+        font: Verdana Bold-11px
+        color: #f4f4f4
+        text: 0%
+        phantom: true
+    UIWidget
+      id: proficiencyIcon
+      anchors.top: parent.top
+      anchors.right: prev.right
+      size: 9 11
+      margin-top: 1
+      margin-right: -4
+      phantom: true
+      on: false
+      image-source: /images/game/topbar/icon-proficiencytree-off
+      $on:
+        image-source: /images/game/topbar/icon-proficiencytree-on
+
 TopStatsBarCompactOnTop < UIWidget
   StatsBarTopWithShrink
     anchors.fill: parent

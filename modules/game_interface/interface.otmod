@@ -15,6 +15,7 @@ Module
     - game_mainpanel
     - game_prey
     - game_imbuing
+    - game_imbui
     - game_imbuementtracker
     - game_hotkeys
     - game_questlog
@@ -52,5 +53,9 @@ Module
     - game_cyclopedia
     - game_creatureinformation
     - game_rewardwall
+    - game_proficiency
+    - game_wheel
+    - game_exaltationforge
+    - game_helper
   @onLoad: init()
   @onUnload: terminate()

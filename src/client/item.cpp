@@ -287,6 +287,21 @@ ThingType* Item::getThingType() const {
     return g_things.getRawThingType(m_clientId, ThingCategoryItem);
 }
 
+uint8_t Item::getWeaponType() {
+    auto* thingType = getThingType();
+    if (!thingType) {
+        return 0;
+    }
+
+    const auto& marketData = thingType->getMarketData();
+    return static_cast<uint8_t>(marketData.category);
+}
+
+uint16_t Item::getProficiencyId()
+{
+    return getThingType()->getProficiencyId();
+}
+
 #ifdef FRAMEWORK_EDITOR
 
 std::string Item::getName()
