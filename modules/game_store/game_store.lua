@@ -831,7 +831,9 @@ function show()
     end, 1000, function() return 'serverNoSendPackets0xF20xFA' end)
 end
 
-
+function getUI()
+    return controllerShop.ui
+end
 
 function getCoinsWebsite()
     if GameStore.website.WEBSITE_GETCOINS ~= "" then

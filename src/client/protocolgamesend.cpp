@@ -27,6 +27,7 @@
 #include "protocolcodes.h"
 #include "thingtypemanager.h"
 #include "framework/util/crypt.h"
+#include "thingtype.h"
 
 void ProtocolGame::onSend() {}
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
@@ -1379,7 +1380,7 @@ void ProtocolGame::sendMarketLeave()
     send(msg);
 }
 
-void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType)
+void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketBrowse);
@@ -1387,6 +1388,13 @@ void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t brows
         msg->addU8(browseId);
         if (browseType > 0) {
             msg->addU16(browseType);
+		// If browseId is 3 (browse item), send tier if item has classification
+            if (browseId == 3) {
+                const auto& thing = g_things.getThingType(browseType, ThingCategoryItem);
+                if (thing && thing->getClassification() > 0) {
+                    msg->addU8(tier);
+                }
+            }
         }
     } else {
         msg->addU16(browseType);
@@ -1400,8 +1408,8 @@ void ProtocolGame::sendMarketCreateOffer(const uint8_t type, const uint16_t item
     msg->addU8(Proto::ClientMarketCreate);
     msg->addU8(type);
     msg->addU16(itemId);
-    if (const auto& item = Item::create(itemId)) {
-        if (item->getClassification() > 0) {
+    if (const auto& thing = g_things.getThingType(itemId, ThingCategoryItem)) {
+        if (thing->getClassification() > 0) {
             msg->addU8(itemTier);
         }
     }

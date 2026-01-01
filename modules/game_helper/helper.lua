@@ -576,17 +576,52 @@ function init()
   end
 
   success, err = pcall(function()
-    if g_game and g_game.isOnline then
-      local isOnline = g_game.isOnline()
-      safeLog("debug", string.format("Helper: init() - Game online status: %s", tostring(isOnline)))
-      if isOnline then
-        safeLog("info", "Helper: init() - Game is online, calling online()")
-        online()
+    local attempts = 0
+    local maxAttempts = 10
+    
+    local function tryInitialize()
+      attempts = attempts + 1
+      -- Verificar diretamente se o player existe (mais confiável que isOnline())
+      if g_game and g_game.getLocalPlayer then
+        local player = g_game.getLocalPlayer()
+        if player then
+          safeLog("info", "Helper: init() - Player found, calling online()")
+          online()
+          return true
+        else
+          safeLog("debug", string.format("Helper: init() - Player not available yet (attempt %d/%d)", attempts, maxAttempts))
+          return false
+        end
       else
-        safeLog("info", "Helper: init() - Game is not online yet (will be called on onGameStart)")
+        safeLog("debug", string.format("Helper: init() - g_game.getLocalPlayer not available yet (attempt %d/%d)", attempts, maxAttempts))
+        return false
       end
-    else
-      safeLog("error", "Helper: init() - g_game.isOnline not available")
+    end
+    
+    -- Tentar inicializar imediatamente
+    if not tryInitialize() then
+      -- Se falhou, tentar novamente com intervalos progressivos
+      if _G.scheduleEvent then
+        safeLog("debug", "Helper: init() - Scheduling initialization retry attempts")
+        local function retryAttempt()
+          if helperEvents and helperEvents.helperCycleEvent then
+            safeLog("info", "Helper: init() - CycleEvent already registered, stopping retries")
+            return
+          end
+          if attempts >= maxAttempts then
+            safeLog("warn", string.format("Helper: init() - Max initialization attempts reached (%d), giving up", maxAttempts))
+            return
+          end
+          if tryInitialize() then
+            safeLog("info", "Helper: init() - Initialization successful after retry")
+          else
+            -- Agendar próxima tentativa com intervalo maior
+            local delay = math.min(500 + (attempts * 200), 2000)
+            _G.scheduleEvent(retryAttempt, delay)
+          end
+        end
+        _G.scheduleEvent(retryAttempt, 300)
+      end
     end
   end)
   
@@ -595,6 +630,92 @@ function init()
   end
   
   safeLog("info", "Helper: init() - Initialization complete")
+
+  -- Garantir que as funções de teste sejam globais
+  _G.testHealingSystem = testHealingSystem
+  _G.forceRegisterCycleEvent = forceRegisterCycleEvent
+  _G.forceInitializeHelper = forceInitializeHelper
+
+  -- Função de emergência que pode ser executada diretamente
+  _G.emergencyTest = function()
+    print("EMERGENCY TEST:")
+    print("hotkeyHelperStatus = " .. tostring(hotkeyHelperStatus))
+    print("player = " .. tostring(player ~= nil))
+    print("cycleEvent = " .. tostring(cycleEvent ~= nil))
+    if g_game then
+      local p = g_game.getLocalPlayer()
+      if p then
+        local h = p:getHealth()
+        local mh = p:getMaxHealth()
+        local pct = (h/mh)*100
+        print("Health: " .. h .. "/" .. mh .. " (" .. string.format("%.1f", pct) .. "%)")
+      end
+    end
+  end
+
+  -- Função para testar execução manual de magia
+  _G.testSpellCast = function(spellId, percent)
+    print("=== TESTE MANUAL DE MAGIA ===")
+    spellId = spellId or 1  -- ID padrão se não informado
+    percent = percent or 50  -- 50% padrão
+
+    local currentPlayer = getPlayer()
+    if not currentPlayer then
+      print("ERRO: Player não encontrado!")
+      return
+    end
+
+    local health = currentPlayer:getHealth()
+    local maxHealth = currentPlayer:getMaxHealth()
+    local healthPercent = (health / maxHealth) * 100
+
+    print(string.format("Vida atual: %d/%d (%.1f%%)", health, maxHealth, healthPercent))
+    print(string.format("Testando magia ID %d com percent %d%%", spellId, percent))
+
+    if healthPercent <= percent then
+      print("Condição atendida - executando magia...")
+      local result = castHealingSpell(spellId)
+      print("Resultado: " .. tostring(result))
+    else
+      print(string.format("Condição NÃO atendida (%.1f%% > %d%%)", healthPercent, percent))
+    end
+
+    print("=== FIM TESTE MAGIA ===")
+  end
+
+  -- Função para configurar magia rapidamente
+  _G.setupTestSpell = function(slot, spellId, percent)
+    slot = slot or 1
+    spellId = spellId or 1
+    percent = percent or 70
+
+    if helperConfig and helperConfig.spells and helperConfig.spells[slot] then
+      helperConfig.spells[slot].id = spellId
+      helperConfig.spells[slot].percent = percent
+      print(string.format("Magia configurada - Slot %d: ID %d, Percent %d%%", slot, spellId, percent))
+    else
+      print("ERRO: helperConfig.spells não encontrado!")
+    end
+  end
+
+  -- Função para configurar poção rapidamente
+  _G.setupTestPotion = function(slot, potionId, percent, priority)
+    slot = slot or 1
+    potionId = potionId or 266  -- Small Health Potion
+    percent = percent or 80
+    priority = priority or 0
+
+    if helperConfig and helperConfig.potions and helperConfig.potions[slot] then
+      helperConfig.potions[slot].id = potionId
+      helperConfig.potions[slot].percent = percent
+      helperConfig.potions[slot].priority = priority
+      print(string.format("Poção configurada - Slot %d: ID %d, Percent %d%%, Priority %d", slot, potionId, percent, priority))
+    else
+      print("ERRO: helperConfig.potions não encontrado!")
+    end
+  end
+
+  -- Função para testar as verificações de zona de proteção nos sistemas
 end
 
 function terminate()
@@ -673,14 +794,13 @@ function show()
   end
 end
 
+local helperCycleEventCount = 0
+
 function helperCycleEvent()
   -- Debug: Check if cycle is running (log every 50 cycles to reduce spam)
-  if not helperCycleEvent._cycleCount then
-    helperCycleEvent._cycleCount = 0
-  end
-  helperCycleEvent._cycleCount = helperCycleEvent._cycleCount + 1
-  if helperCycleEvent._cycleCount % 50 == 0 then
-    safeLog("debug", string.format("Helper: helperCycleEvent - Cycle running (count: %d)", helperCycleEvent._cycleCount))
+  helperCycleEventCount = helperCycleEventCount + 1
+  if helperCycleEventCount % 10 == 0 then  -- Reduzi para cada 10 chamadas
+    safeLog("debug", string.format("Helper: helperCycleEvent - CYCLE EXECUTANDO! Count: %d, helperStatus: %s", helperCycleEventCount, tostring(hotkeyHelperStatus)))
   end
   for eventName, eventData in pairs(eventTable) do
     if not timers[eventName] then
@@ -691,20 +811,32 @@ function helperCycleEvent()
       timers[eventName] = 0
       local func = eventData.action
       if func and type(func) == "function" then
-        safeLog("debug", string.format("Helper: helperCycleEvent - Executing event: %s", eventName))
+        safeLog("debug", string.format("Helper: helperCycleEvent - EXECUTANDO EVENTO: %s", eventName))
         func()
+        safeLog("debug", string.format("Helper: helperCycleEvent - EVENTO %s EXECUTADO", eventName))
       else
-        safeLog("debug", string.format("Helper: helperCycleEvent - Event %s has no valid action function (type: %s, value: %s)", eventName, type(func), tostring(func)))
+        safeLog("debug", string.format("Helper: helperCycleEvent - ERRO: Event %s has no valid action function (type: %s, value: %s)", eventName, type(func), tostring(func)))
       end
     end
   end
 end
 
 function online()
-  safeLog("info", "Helper: online() - Function called")
+  safeLog("info", "Helper: online() - Function called - INICIANDO SISTEMA DE CURA!")
   local benchmark = g_clock.millis()
+
+  -- Verificar se cycleEvent está disponível ANTES de tentar usar
+  safeLog("debug", string.format("Helper: online() - cycleEvent function available: %s", tostring(cycleEvent ~= nil)))
+  safeLog("debug", string.format("Helper: online() - type of cycleEvent: %s", type(cycleEvent)))
+
 	player = g_game.getLocalPlayer()
-  safeLog("info", "Helper: online() - Player retrieved")
+  safeLog("info", string.format("Helper: online() - Player retrieved: %s (type: %s)", tostring(player ~= nil), type(player)))
+
+  -- Verificar se player tem os métodos necessários
+  if player then
+    safeLog("debug", string.format("Helper: online() - Player has getHealth: %s", tostring(player.getHealth ~= nil)))
+    safeLog("debug", string.format("Helper: online() - Player has getMaxHealth: %s", tostring(player.getMaxHealth ~= nil)))
+  end
 
   reset()
   loadSettings()
@@ -713,17 +845,49 @@ function online()
 
   helperConfig.currentLockedTargetId = 0
   
+  -- Verificar se já foi inicializado
+  if helperEvents.helperCycleEvent then
+    safeLog("info", "Helper: online() - CycleEvent already registered, skipping initialization")
+    return
+  end
+
   local success, err = pcall(function()
-    if cycleEvent then
-      safeLog("debug", string.format("Helper: online() - Registering cycleEvent with timer: %d", helperEvents.helperCycleTimer))
-      helperEvents.helperCycleEvent = cycleEvent(helperCycleEvent, helperEvents.helperCycleTimer)
+    safeLog("debug", "Helper: online() - Attempting to register cycleEvent...")
+
+    -- Tentar _G.cycleEvent primeiro (mais confiável)
+    local cycleEventFunc = _G.cycleEvent
+    if not cycleEventFunc then
+      cycleEventFunc = cycleEvent
+    end
+
+    if cycleEventFunc then
+      safeLog("debug", string.format("Helper: online() - cycleEvent found, registering with timer: %d", helperEvents.helperCycleTimer))
+
+      -- Tentar registrar o cycleEvent
+      local result = cycleEventFunc(helperCycleEvent, helperEvents.helperCycleTimer)
+      helperEvents.helperCycleEvent = result
+
+      safeLog("debug", string.format("Helper: online() - cycleEvent() returned: %s", tostring(result)))
+
       if helperEvents.helperCycleEvent then
-        safeLog("info", "Helper: online() - CycleEvent registered successfully")
+        safeLog("info", "Helper: online() - CycleEvent registered successfully - HELPER DEVE FUNCIONAR AGORA!")
+        safeLog("info", "Helper: online() - checkHealthHealing assigned to eventTable: " .. tostring(eventTable.checkHealthHealing and eventTable.checkHealthHealing.action ~= nil))
+
+        -- Verificar se o cycle event foi realmente criado
+        safeLog("debug", string.format("Helper: online() - helperEvents.helperCycleEvent type: %s", type(helperEvents.helperCycleEvent)))
       else
         safeLog("error", "Helper: online() - Failed to register cycleEvent (returned nil)")
       end
     else
-      safeLog("error", "Helper: online() - cycleEvent function not available")
+      safeLog("error", "Helper: online() - cycleEvent function not available - FUNCAO CYCLEEVENT NAO ENCONTRADA!")
+
+      -- Listar funções disponíveis no escopo global
+      safeLog("debug", "Helper: online() - Checking global functions...")
+      for k, v in pairs(_G) do
+        if type(v) == "function" and string.find(k, "cycle") then
+          safeLog("debug", string.format("Helper: online() - Found cycle function: %s", k))
+        end
+      end
     end
   end)
   
@@ -985,7 +1149,7 @@ function assignTrainingSpell(button, isHaste)
   if g_client and g_client.setInputLockWidget then
     g_client.setInputLockWidget(window)
   end
-  helper:hide()
+  hide()
 
   local windowHeader = isHaste and "Assign Haste Spell" or "Assign Training Spell"
   window:setText(windowHeader)
@@ -1167,7 +1331,7 @@ function sendRenameOrAddWindow(isRename)
   if g_client and g_client.setInputLockWidget then
     g_client.setInputLockWidget(window)
   end
-  helper:hide()
+  hide()
 
   local onWrite = function()
     local warning = window.contentPanel.warning
@@ -1275,7 +1439,7 @@ function assignSpell(button, groupName, groups, tableToAssign)
     g_client.setInputLockWidget(window)
   end
   end
-  helper:hide()
+  hide()
 
 	window:setText("Assign " .. groupName .. " Spell")
 
@@ -1397,7 +1561,7 @@ function assignSpell(button, groupName, groups, tableToAssign)
       local creaturesMin = shooterPanel:recursiveGetChildById("countMinCreature" .. slotID)
       local forceCast = shooterPanel:recursiveGetChildById("conditionSetting" .. slotID)
       local selfCast = shooterPanel:recursiveGetChildById("selfCast" .. slotID)
-      local spell = getSpellByClientId(tonumber(spellId))
+      local spell = getSpellDataById(tonumber(spellId))
       if spell then
           if table.contains(bothCastTypeSpells, spell.id) then -- divine grenade self cast
             if not selfCast then
@@ -1421,8 +1585,10 @@ function assignSpell(button, groupName, groups, tableToAssign)
             selfCast:destroy()
           end
           if (spell.range > 0 or not spell.area) and not table.contains(bothCastTypeSpells, spell.id) then
-            profile.spells[slotID + 1].creatures = 1
-            creaturesMin:setCurrentOption("1+")
+            if not profile.spells[slotID + 1].creatures or profile.spells[slotID + 1].creatures < 1 then
+              profile.spells[slotID + 1].creatures = 1
+            end
+            creaturesMin:setCurrentOption(tostring(profile.spells[slotID + 1].creatures) .. "+")
             creaturesMin:disable()
             if forceCast then
               forceCast:setChecked(profile.spells[slotID + 1].forceCast)
@@ -1466,9 +1632,11 @@ function assignSpell(button, groupName, groups, tableToAssign)
 end
 
 function assignRune(button, groupName, groups, tableToAssign)
-  g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  if g_mouse and g_mouse.updateGrabber then
+    g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  end
   mouseGrabberWidget:grabMouse()
-  helper:hide()
+  hide()
   g_mouse.pushCursor('target')
   mouseGrabberWidget.onMouseRelease = function(self, mousePosition, mouseButton)
       onAssignRune(self, mousePosition, mouseButton, button)
@@ -1476,7 +1644,9 @@ function assignRune(button, groupName, groups, tableToAssign)
 end
 
 function onAssignRune(self, mousePosition, mouseButton, button)
-  g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  if g_mouse and g_mouse.updateGrabber then
+    g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  end
   mouseGrabberWidget:ungrabMouse()
   helper:show()
   g_mouse.popCursor('target')
@@ -1618,10 +1788,12 @@ end
 
 function assignPotionEvent(button)
   if g_mouse and g_mouse.updateGrabber then
+    if g_mouse and g_mouse.updateGrabber then
     g_mouse.updateGrabber(mouseGrabberWidget, 'target')
   end
+  end
   mouseGrabberWidget:grabMouse()
-  helper:hide()
+  hide()
   g_mouse.pushCursor('target')
   mouseGrabberWidget.onMouseRelease = function(self, mousePosition, mouseButton)
       onAssignPotion(self, mousePosition, mouseButton, button)
@@ -1629,7 +1801,11 @@ function assignPotionEvent(button)
 end
 
 function onAssignPotion(self, mousePosition, mouseButton, button)
-  g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  if g_mouse and g_mouse.updateGrabber then
+    if g_mouse and g_mouse.updateGrabber then
+    g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  end
+  end
   mouseGrabberWidget:ungrabMouse()
   helper:show()
   g_mouse.popCursor('target')
@@ -2075,18 +2251,22 @@ end
 
 function castHealingSpell(spellId)
   safeLog("debug", string.format("Helper: castHealingSpell - Attempting to cast spell ID %d", spellId))
-  
+
   -- Try to get spell by ID first (spell.id), then by clientId
   local spell = getSpellDataById(spellId)
-  
+
   -- If not found by ID, try by clientId
   if not spell then
     safeLog("debug", string.format("Helper: castHealingSpell - Spell not found by ID %d, trying clientId", spellId))
     spell = getSpellByClientId(tonumber(spellId))
   end
-  
+
   if not spell then
-    safeLog("debug", string.format("Helper: castHealingSpell - Spell ID %d not found", spellId))
+    safeLog("debug", string.format("Helper: castHealingSpell - ERRO: Spell ID %d not found in spell database!", spellId))
+    safeLog("debug", string.format("Helper: castHealingSpell - Checking SpellInfo.Default availability: %s", tostring(SpellInfo and SpellInfo.Default)))
+    if SpellInfo and SpellInfo.Default then
+      safeLog("debug", string.format("Helper: castHealingSpell - SpellInfo.Default has %d spells", table.size(SpellInfo.Default)))
+    end
     return false
   end
   
@@ -2122,46 +2302,153 @@ function castHealingSpell(spellId)
   end
 
   -- Execute the spell
-  safeLog("debug", string.format("Helper: castHealingSpell - Casting spell ID %d with words: %s", spellId, spell.words))
+  safeLog("debug", string.format("Helper: castHealingSpell - EXECUTANDO magia ID %d with words: '%s'", spellId, spell.words))
   g_game.doThing(false)
   g_game.talk(spell.words, true)
   g_game.doThing(true)
-  safeLog("debug", string.format("Helper: castHealingSpell - Successfully executed spell ID %d", spellId))
+  safeLog("debug", string.format("Helper: castHealingSpell - MAGIA EXECUTADA com sucesso: ID %d, words: '%s'", spellId, spell.words))
   return true
 end
 
+local checkHealthHealingCallCount = 0
+
 function checkHealthHealing()
-  -- Log apenas a cada 10 chamadas para reduzir spam
-  if not checkHealthHealing._callCount then
-    checkHealthHealing._callCount = 0
+  -- Log apenas a cada 5 chamadas para reduzir spam
+  checkHealthHealingCallCount = checkHealthHealingCallCount + 1
+
+  -- Log sempre nas primeiras chamadas para debug
+  if checkHealthHealingCallCount <= 3 then
+    safeLog("info", string.format("Helper: checkHealthHealing - PRIMEIRA CHAMADA #%d - FUNÇÃO ESTÁ SENDO EXECUTADA!", checkHealthHealingCallCount))
   end
-  checkHealthHealing._callCount = checkHealthHealing._callCount + 1
-  if checkHealthHealing._callCount % 10 == 0 then
-    safeLog("debug", string.format("Helper: checkHealthHealing - Function called (count: %d, status: %s)", checkHealthHealing._callCount, tostring(hotkeyHelperStatus)))
+  if checkHealthHealingCallCount % 5 == 0 then  -- Mais frequente
+    safeLog("debug", string.format("Helper: checkHealthHealing - Function called (count: %d, status: %s)", checkHealthHealingCallCount, tostring(hotkeyHelperStatus)))
+    -- Mostrar configurações dos spells
+    safeLog("debug", "Helper: checkHealthHealing - Current spell configs:")
+    for i, spell in ipairs(helperConfig.spells) do
+      safeLog("debug", string.format("  Slot %d: id=%s, percent=%s", i, tostring(spell.id), tostring(spell.percent)))
+    end
   end
-  
+
   if not hotkeyHelperStatus then
-    if checkHealthHealing._callCount % 10 == 0 then
-      safeLog("debug", "Helper: checkHealthHealing - hotkeyHelperStatus is false")
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", "Helper: checkHealthHealing - hotkeyHelperStatus is false - HABILITE O HELPER COM A TECLA PAUSE BREAK!")
+    end
+    return false
+  end
+
+  -- Verificar se helperConfig.spells existe
+  if not helperConfig or not helperConfig.spells then
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", "Helper: checkHealthHealing - ERRO: helperConfig.spells não existe!")
     end
     return false
   end
 
   local currentPlayer = getPlayer()
   if not currentPlayer then
-    if checkHealthHealing._callCount % 10 == 0 then
-      safeLog("debug", "Helper: checkHealthHealing - no player found")
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", "Helper: checkHealthHealing - ERRO: getPlayer() retornou nil!")
+      safeLog("debug", string.format("Helper: checkHealthHealing - g_game.getLocalPlayer(): %s", tostring(g_game and g_game.getLocalPlayer())))
+      safeLog("debug", string.format("Helper: checkHealthHealing - g_game existe: %s", tostring(g_game ~= nil)))
     end
     return false
   end
 
-  local health, maxHealth = currentPlayer:getHealth(), currentPlayer:getMaxHealth()
-  if maxHealth == 0 then
-    safeLog("debug", "Helper: checkHealthHealing - maxHealth is 0")
+  -- Verificar se o player tem os métodos necessários
+  if not currentPlayer.getHealth or not currentPlayer.getMaxHealth then
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", "Helper: checkHealthHealing - ERRO: Player não tem métodos getHealth/getMaxHealth!")
+      safeLog("debug", string.format("Helper: checkHealthHealing - Player type: %s", type(currentPlayer)))
+      safeLog("debug", string.format("Helper: checkHealthHealing - Player methods: %s", table.concat(table.keys(currentPlayer), ", ")))
+    end
     return false
   end
+
+  -- Tentar obter vida com tratamento de erro
+  local health, maxHealth
+  local success, err = pcall(function()
+    health = currentPlayer:getHealth()
+    maxHealth = currentPlayer:getMaxHealth()
+  end)
+
+  if not success then
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", string.format("Helper: checkHealthHealing - ERRO ao obter vida: %s", err))
+      safeLog("debug", string.format("Helper: checkHealthHealing - Player válido: %s", tostring(currentPlayer ~= nil)))
+    end
+    return false
+  end
+
+  -- Verificar valores obtidos
+  if not health or not maxHealth then
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", string.format("Helper: checkHealthHealing - Vida ou maxHealth nil: health=%s, maxHealth=%s", tostring(health), tostring(maxHealth)))
+    end
+    return false
+  end
+
+  if maxHealth == 0 then
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", "Helper: checkHealthHealing - maxHealth é 0 - personagem pode estar morto ou não carregado")
+    end
+    return false
+  end
+  -- Calcular porcentagem com verificações
+  if type(health) ~= "number" or type(maxHealth) ~= "number" then
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", string.format("Helper: checkHealthHealing - ERRO: Valores não são números - health type: %s (%s), maxHealth type: %s (%s)",
+        type(health), tostring(health), type(maxHealth), tostring(maxHealth)))
+    end
+    return false
+  end
+
+  if health < 0 or maxHealth < 0 then
+    if checkHealthHealingCallCount % 10 == 0 then
+      safeLog("debug", string.format("Helper: checkHealthHealing - ERRO: Valores negativos - health: %s, maxHealth: %s", tostring(health), tostring(maxHealth)))
+    end
+    return false
+  end
+
   local healthPercent = (health / maxHealth) * 100
   safeLog("debug", string.format("Helper: checkHealthHealing - Health: %d/%d (%.2f%%)", health, maxHealth, healthPercent))
+
+  -- Verificar se há algum spell ou poção válido configurado
+  local hasValidSpell = false
+  for _, spell in ipairs(helperConfig.spells) do
+    if spell.id and spell.id > 0 and spell.percent and spell.percent > 0 then
+      hasValidSpell = true
+      break
+    end
+  end
+
+  local hasValidPotion = false
+  for _, potion in ipairs(helperConfig.potions) do
+    if potion.id and potion.id > 0 and potion.percent and potion.percent > 0 then
+      hasValidPotion = true
+      break
+    end
+  end
+
+  if not hasValidSpell and not hasValidPotion then
+    if checkHealthHealingCallCount % 20 == 0 then
+      safeLog("debug", "Helper: checkHealthHealing - NENHUMA MAGIA OU POCAO VALIDA CONFIGURADA! Configure pelo menos uma magia ou poção de cura.")
+      for i, spell in ipairs(helperConfig.spells) do
+        safeLog("debug", string.format("  Spell %d: id=%s, percent=%s", i, tostring(spell.id), tostring(spell.percent)))
+      end
+      for i, potion in ipairs(helperConfig.potions) do
+        safeLog("debug", string.format("  Potion %d: id=%s, percent=%s, priority=%s", i, tostring(potion.id), tostring(potion.percent), tostring(potion.priority)))
+      end
+    end
+    return false
+  end
+
+  -- Debug: mostrar configuração dos spells
+  if checkHealthHealingCallCount % 50 == 0 then
+    safeLog("debug", "Helper: checkHealthHealing - Spell configurations:")
+    for i, spell in ipairs(helperConfig.spells) do
+      safeLog("debug", string.format("  Spell %d: id=%s, percent=%s", i, tostring(spell.id), tostring(spell.percent)))
+    end
+  end
 
   local prioritizedPotions = {}
   for _, potion in pairs(helperConfig.potions) do
@@ -2181,9 +2468,19 @@ function checkHealthHealing()
   
   for _, potion in ipairs(prioritizedPotions) do
     if hasItemInBackpack(potion.id) and isHealthPotion(potion.id) and healthPercent <= potion.percent then
-      safeLog("debug", string.format("Helper: checkHealthHealing - Using potion ID %d (health %.2f%% <= %.2f%%)", potion.id, healthPercent, potion.percent))
-      usePotion(potion.id)
+      safeLog("debug", string.format("Helper: checkHealthHealing - POCAO ENCONTRADA! Tentando usar poção ID %d (vida %.2f%% <= %.2f%%)", potion.id, healthPercent, potion.percent))
+      local result = usePotion(potion.id)
+      safeLog("debug", string.format("Helper: checkHealthHealing - Resultado uso da poção ID %d: %s", potion.id, tostring(result)))
       break -- Use only one potion at a time
+    else
+      -- Debug por que não usou a poção
+      if not hasItemInBackpack(potion.id) then
+        safeLog("debug", string.format("Helper: checkHealthHealing - Poção ID %d não encontrada no inventário", potion.id))
+      elseif not isHealthPotion(potion.id) then
+        safeLog("debug", string.format("Helper: checkHealthHealing - Poção ID %d não é poção de vida", potion.id))
+      elseif healthPercent > potion.percent then
+        safeLog("debug", string.format("Helper: checkHealthHealing - Vida %.2f%% está acima da configuração %.2f%%", healthPercent, potion.percent))
+      end
     end
   end
 
@@ -2214,13 +2511,15 @@ function checkHealthHealing()
     end
 
     safeLog("debug", string.format("Helper: checkHealthHealing - Checking spell ID %d, percent: %.2f%%, healthPercent: %.2f%%", spell.id, spell.percent or 0, healthPercent))
-    
+
     -- Only cast if health is at or below the configured percentage
     -- The spells are sorted by percent (lowest first), so we cast the first one that matches
-    if spell.id and spell.id > 0 and spell.percent and healthPercent <= spell.percent then
-      safeLog("debug", string.format("Helper: checkHealthHealing - Attempting to cast spell ID %d (health %.2f%% <= %.2f%%)", spell.id, healthPercent, spell.percent))
+    local spellPercentNum = tonumber(spell.percent)
+    if spell.id and spell.id > 0 and spellPercentNum and spellPercentNum > 0 and healthPercent <= spellPercentNum then
+          safeLog("debug", string.format("Helper: checkHealthHealing - CONDITION MET: spell.id=%s > 0, spell.percent=%s (type: %s), healthPercent=%.2f <= spellPercentNum=%.2f", tostring(spell.id), tostring(spell.percent), type(spell.percent), healthPercent, spellPercentNum))
+      safeLog("debug", string.format("Helper: checkHealthHealing - MAGIA ENCONTRADA! Tentando executar spell ID %d (vida %.2f%% <= %.2f%%)", spell.id, healthPercent, spellPercentNum))
       if castHealingSpell(spell.id) then
-        safeLog("debug", string.format("Helper: checkHealthHealing - Successfully cast spell ID %d", spell.id))
+        safeLog("debug", string.format("Helper: checkHealthHealing - MAGIA EXECUTADA COM SUCESSO: ID %d", spell.id))
         -- Spell was cast successfully, break to avoid casting multiple spells
         break
       else
@@ -2232,7 +2531,9 @@ function checkHealthHealing()
       elseif not spell.percent or spell.percent == 0 then
         safeLog("debug", string.format("Helper: checkHealthHealing - Spell ID %d has invalid percent: %s", spell.id, tostring(spell.percent)))
       elseif healthPercent > spell.percent then
-        safeLog("debug", string.format("Helper: checkHealthHealing - Health %.2f%% is above spell percent %.2f%%", healthPercent, spell.percent))
+        safeLog("debug", string.format("Helper: checkHealthHealing - Health %.2f%% is above spell percent %.2f%% - WAITING FOR HEALTH TO DROP", healthPercent, spell.percent))
+      else
+        safeLog("debug", string.format("Helper: checkHealthHealing - Unknown condition failure for spell ID %d", spell.id))
       end
     end
 
@@ -2458,9 +2759,33 @@ function autoChangeGold()
     return
   end
 
-  g_game.doThing(false)
-  Helper.changeGold()
-  g_game.doThing(true)
+  local goldCoinId = 3031  -- Gold Coin
+  local platinumCoinId = 3035  -- Platinum Coin
+  local crystalCoinId = 3043  -- Crystal Coin
+  
+  local goldCount = currentPlayer:getInventoryCount(goldCoinId)
+  local platinumCount = currentPlayer:getInventoryCount(platinumCoinId)
+  
+  -- Tentar encontrar os itens nos containers abertos
+  local goldItem = g_game.findItemInContainers(goldCoinId)
+  local platinumItem = g_game.findItemInContainers(platinumCoinId)
+  local crystalItem = g_game.findItemInContainers(crystalCoinId)
+  
+  -- Se tiver 100+ platinum coins e crystal coin, converte platinum -> crystal
+  if platinumCount >= 100 then
+    g_game.doThing(false)
+    g_game.useWith(platinumItem, platinumItem)
+    g_game.doThing(true)
+    return
+  end
+  
+  -- Se tiver 100+ gold coins e platinum coin, converte gold -> platinum
+  if goldCount >= 100  then
+    g_game.doThing(false)
+    g_game.useWith(goldItem, goldItem)
+    g_game.doThing(true)
+    return
+  end
 end
 
 function checkMana()
@@ -2652,8 +2977,11 @@ local function printArea(area)
 end
 
 local function rotateArea(area, direction)
-  local rotatedArea = {}
+  if not area or type(area) ~= "table" or #area == 0 or not area[1] or type(area[1]) ~= "table" then
+    return area
+  end
 
+  local rotatedArea = {}
   local rows = #area
   local cols = #area[1]
 
@@ -2725,6 +3053,7 @@ local function countAttackableCreatures(casterPos, direction, area, creatureList
   if not playerX or not playerY then
       return 0
   end
+  local countedCreatures = {}
   for yOffset, row in ipairs(area) do
       for xOffset, value in ipairs(row) do
           if value == 1 or (ranged and (value == 3 or value == 2)) then
@@ -2733,10 +3062,16 @@ local function countAttackableCreatures(casterPos, direction, area, creatureList
                   y = casterPos.y + (yOffset - playerY),
                   z = casterPos.z
               }
-              for _, creature in ipairs(creatureList) do
-                  if positionCompare(creature.position, position) and (g_map.isSightClear(casterPos, creature.position)) then
-                      creatures = creatures + 1
-                      break
+              for _, creatureData in ipairs(creatureList) do
+                  local creaturePos = creatureData.position
+                  if creaturePos and positionCompare(creaturePos, position) and (g_map.isSightClear(casterPos, creaturePos)) then
+                      local creature = creatureData.creature
+                      local creatureId = creature and creature.getId and creature:getId() or tostring(creaturePos.x) .. "," .. tostring(creaturePos.y) .. "," .. tostring(creaturePos.z)
+                      if not countedCreatures[creatureId] then
+                          countedCreatures[creatureId] = true
+                          creatures = creatures + 1
+                          break
+                      end
                   end
               end
           end
@@ -2757,19 +3092,25 @@ local function sortMagicShooterByPriority(list)
   local player = g_game.getLocalPlayer()
   if not player then return list end
 
-  local harmonyCount = player:getHarmony()
-  if harmonyCount >= 5 then
-    local spenderIndex = nil
-    for i, item in ipairs(list) do
-      if item.spell and item.spell.spender then
-        spenderIndex = i
-        break
-      end
-    end
+  local vocation = player:getVocation()
+  -- Apenas vocações Monk (5 = Monk, 15 = Exalted Monk - client ID) têm harmony
+  if vocation == 5 or vocation == 15 then
+    if player.getHarmony and type(player.getHarmony) == "function" then
+      local harmonyCount = player:getHarmony()
+      if harmonyCount and harmonyCount >= 5 then
+        local spenderIndex = nil
+        for i, item in ipairs(list) do
+          if item.spell and item.spell.spender then
+            spenderIndex = i
+            break
+          end
+        end
 
-    if spenderIndex then
-      local spenderSpell = table.remove(list, spenderIndex)
-      table.insert(list, 1, spenderSpell)
+        if spenderIndex then
+          local spenderSpell = table.remove(list, spenderIndex)
+          table.insert(list, 1, spenderSpell)
+        end
+      end
     end
   end
   return list
@@ -2823,6 +3164,7 @@ function checkMagicShooter()
   local myCharacter = g_game.getLocalPlayer()
   if not myCharacter then return end
 
+  -- Verificar se estamos em zona de proteção
   if myCharacter:isInProtectionZone() then
     local caster = enableButtons:recursiveGetChildById("enableMagicShooter")
     if caster then
@@ -2832,16 +3174,7 @@ function checkMagicShooter()
     end
   end
 
-  local timer = g_ui.getActionTimer()
-  if timer > afkTime then
-    local widget = enableButtons:recursiveGetChildById("enableMagicShooter")
-    if widget then
-      widget:setChecked(false)
-      toggleMagicShooter(widget, "RTCaster disabled! \nDue to no changes in your actions so far.")
-      return
-    end
-    return
-  end
+  -- Verificação de AFK removida pois getActionTimer não existe
 
   local following = g_game.getFollowingCreature()
   if following then
@@ -2866,7 +3199,7 @@ function checkMagicShooter()
   local unifiedList = {}
 
   for i, shooter in ipairs(profile.spells) do
-    local spell = shooter.id ~= 0 and getSpellByClientId(shooter.id) or nil
+    local spell = shooter.id ~= 0 and getSpellDataById(shooter.id) or nil
     if spell then
       table.insert(unifiedList, {type = "spell", spell = spell, config = shooter})
     end
@@ -2886,7 +3219,12 @@ function checkMagicShooter()
     return
   end
   local percentageMana = (currentPlayer:getMana() / currentPlayer:getMaxMana()) * 100
-  local harmonyCount = currentPlayer:getHarmony()
+  local harmonyCount = 0
+  local vocation = currentPlayer:getVocation()
+  -- Apenas vocações Monk (5 = Monk, 15 = Exalted Monk - client ID) têm harmony
+  if (vocation == 5 or vocation == 15) and currentPlayer.getHarmony and type(currentPlayer.getHarmony) == "function" then
+    harmonyCount = currentPlayer:getHarmony() or 0
+  end
 
   for _, entry in ipairs(unifiedList) do
     if autoTargetOnHold then
@@ -2894,6 +3232,7 @@ function checkMagicShooter()
     end
 
     local target = g_game.getAttackingCreature()
+  local target = g_game.getAttackingCreature()
     local positionTarget = target and target:getPosition() or {x = 0xFFFF, y = 0xFFFF, z = 0xFF}
 
     if entry.type == "spell" then
@@ -2903,8 +3242,7 @@ function checkMagicShooter()
       local reachableCreatures = 0
       local targetable = (spell.range and spell.range > 0) or table.contains(bothCastTypeSpells, spell.id)
 
-      local currentPlayerMana = currentPlayer:getMana()
-      if currentPlayerMana < spell.mana or (targetable and not target) then
+      if player:getMana() < spell.mana or (targetable and not target) then
         goto continue
       elseif not table.contains(spell.vocations, translateVocation(myCharacter:getVocation())) then
         goto continue
@@ -3008,6 +3346,7 @@ function checkAutoTarget()
   local myCharacter = g_game.getLocalPlayer()
   if not myCharacter then return end
 
+  -- Verificar se estamos em zona de proteção
   if myCharacter:isInProtectionZone() then
     local autoTarget = enableButtons:recursiveGetChildById("enableAutoTarget")
     if autoTarget then
@@ -3017,16 +3356,7 @@ function checkAutoTarget()
     end
   end
 
-  local timer = g_ui.getActionTimer()
-  if timer > afkTime then
-    local widget = enableButtons:recursiveGetChildById("enableAutoTarget")
-    if widget then
-      widget:setChecked(false)
-      toggleAutoTarget(widget)
-      return
-    end
-    return
-  end
+  -- Verificação de AFK removida pois getActionTimer não existe
 
   local position = myCharacter:getPosition()
 
@@ -3045,9 +3375,19 @@ function checkAutoTarget()
   local farthestLowestHealthTarget = {id = nil, distance = -1, health = 100}
   local farthestHighestHealthTarget = {id = nil, distance = -1, health = -1}
 
-  local area = SpellAreas.AREA_CIRCLE3X3
+  local area = {
+    {0, 0, 1, 0, 0},
+    {0, 1, 1, 1, 0},
+    {1, 1, 2, 1, 1},
+    {0, 1, 1, 1, 0},
+    {0, 0, 1, 0, 0}
+  }
   if translateVocation(myCharacter:getVocation()) == 7 then
-    area = SpellAreas.AREA_CIRCLE2X2
+    area = {
+      {0, 1, 0},
+      {1, 2, 1},
+      {0, 1, 0}
+    }
   end
 
   local creatureList = {}
@@ -3162,14 +3502,22 @@ function checkAutoHaste()
     return true
   end
 
-  if not helperConfig.haste[1].safecast and player:isInPz() then
+  if not helperConfig.haste[1].safecast and localPlayer:isInProtectionZone() then
     return true
   end
 
   local spellId = helperConfig.haste[1].id
-  local spell = getSpellByClientId(spellId)
-  if not spell or spell.id == 0 then
-    return false
+  local spell = getSpellDataById(spellId)
+  if not spell or not spell.words then
+    return
+  end
+
+  -- Verificar se já está com haste ativa
+  if localPlayer and localPlayer.getStates then
+    local states = localPlayer:getStates()
+    if states and bit.band(states, PlayerStates.Haste) ~= 0 then
+      return
+    end
   end
 
   if not checkHealthPriority() then
@@ -3177,9 +3525,9 @@ function checkAutoHaste()
   end
 
   local currentMillis = g_clock.millis()
-  local nextTime = lastHaste + spell.duration
-
-  if currentMillis < nextTime then
+  local cooldown = getSpellCooldown(spellId)
+  
+  if currentMillis < cooldown then
     return
   end
 
@@ -3683,10 +4031,22 @@ function onLoadHelperData()
       local button = toolsPanel:recursiveGetChildById("hasteButton" .. k - 1)
       local spell = getSpellDataById(v.id)
       if spell then
-        local spellId = getSpellIdFromIcon(spell.icon)
-        local source = SpelllistSettings['Default'].iconFile
+        -- Try to get icon ID from spell.icon or use clientId as fallback
+        local spellId = 0
+        if spell.icon and spell.icon ~= "" then
+          spellId = getSpellIdFromIcon(spell.icon)
+        end
+        -- If icon ID is 0, try using clientId
+        if spellId == 0 and spell.clientId then
+          spellId = spell.clientId
+        end
+        -- If still 0, try using spell.id
+        if spellId == 0 and spell.id then
+          spellId = spell.id
+        end
+        
+        local source = (SpelllistSettings and SpelllistSettings['Default'] and SpelllistSettings['Default'].iconFile) or "/images/game/spells/spell-icons-32x32"
         local clip = getSpellImageClip(spellId, 'Default')
-
         button:setImageSource(source)
         button:setImageClip(clip)
         button:setBorderColorTop("#1b1b1b")
@@ -3972,9 +4332,11 @@ end
 eventTable.checkExerciseEvent.action = checkExerciseEvent
 
 function assignExerciseEvent(button)
-  g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  if g_mouse and g_mouse.updateGrabber then
+    g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  end
   mouseGrabberWidget:grabMouse()
-  helper:hide()
+  hide()
   g_mouse.pushCursor('target')
   mouseGrabberWidget.onMouseRelease = function(self, mousePosition, mouseButton)
       onAssignExercise(self, mousePosition, mouseButton, button)
@@ -3982,7 +4344,9 @@ function assignExerciseEvent(button)
 end
 
 function onAssignExercise(self, mousePosition, mouseButton, button)
-  g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  if g_mouse and g_mouse.updateGrabber then
+    g_mouse.updateGrabber(mouseGrabberWidget, 'target')
+  end
   mouseGrabberWidget:ungrabMouse()
   g_mouse.popCursor('target')
   mouseGrabberWidget.onMouseRelease = nil
@@ -4040,6 +4404,109 @@ function onCheckPotionPriority(button)
     button:setTooltip("This potion is healing health...")
     helperConfig.potions[index + 1].priority = 1
   end
+end
+
+_G.forceInitializeHelper = function()
+  print("=== FORÇANDO INICIALIZAÇÃO DO HELPER ===")
+
+  -- 1. Definir player se não estiver definido
+  if not player then
+    print("Definindo variável player...")
+    player = g_game.getLocalPlayer()
+    print("Player definido: " .. tostring(player ~= nil))
+  end
+
+  -- 2. Chamar online() se cycleEvent não estiver registrado
+  if not helperEvents or not helperEvents.helperCycleEvent then
+    print("Chamando função online()...")
+    online()
+  else
+    print("CycleEvent já registrado")
+  end
+
+  -- 3. Verificar status final
+  print("Status final:")
+  print("  Player definido: " .. tostring(player ~= nil))
+  print("  CycleEvent ativo: " .. tostring(helperEvents and helperEvents.helperCycleEvent ~= nil))
+  print("  Helper status: " .. tostring(hotkeyHelperStatus))
+
+  print("=== INICIALIZAÇÃO CONCLUÍDA ===")
+end
+
+_G.forceRegisterCycleEvent = function()
+  print("Forçando registro do cycleEvent...")
+
+  if cycleEvent then
+    print("cycleEvent encontrado, registrando...")
+    helperEvents.helperCycleEvent = cycleEvent(helperCycleEvent, helperEvents.helperCycleTimer)
+    print("CycleEvent registrado: " .. tostring(helperEvents.helperCycleEvent ~= nil))
+  elseif _G.cycleEvent then
+    print("Encontrado _G.cycleEvent")
+    helperEvents.helperCycleEvent = _G.cycleEvent(helperCycleEvent, helperEvents.helperCycleTimer)
+    print("CycleEvent registrado via _G: " .. tostring(helperEvents.helperCycleEvent ~= nil))
+  else
+    print("ERRO: cycleEvent não encontrado!")
+
+    -- Listar funções relacionadas a cycle/timing
+    print("Funções relacionadas encontradas:")
+    for k, v in pairs(_G) do
+      if type(v) == "function" and (string.find(k, "cycle") or string.find(k, "timer") or string.find(k, "event")) then
+        print("  " .. k)
+      end
+    end
+  end
+end
+
+_G.testHealingSystem = function()
+  print("=== TESTE DO SISTEMA DE CURA ===")
+
+  -- Status básico
+  print("Helper status: " .. tostring(hotkeyHelperStatus or false))
+  print("Player definido: " .. tostring(player ~= nil))
+  print("CycleEvent registrado: " .. tostring(helperEvents and helperEvents.helperCycleEvent ~= nil))
+
+  -- Testar player
+  local currentPlayer = getPlayer()
+  if currentPlayer and currentPlayer.getHealth and currentPlayer.getMaxHealth then
+    local success, err = pcall(function()
+      local health = currentPlayer:getHealth()
+      local maxHealth = currentPlayer:getMaxHealth()
+      local healthPercent = (health / maxHealth) * 100
+      print(string.format("Player health: %d/%d (%.2f%%)", health, maxHealth, healthPercent))
+    end)
+    if not success then
+      print("ERRO ao obter vida: " .. err)
+    end
+  else
+    print("Player não encontrado ou sem métodos!")
+  end
+
+  -- Mostrar configurações
+  print("Spell configurations:")
+  if helperConfig and helperConfig.spells then
+    for i, spell in ipairs(helperConfig.spells) do
+      print(string.format("  Slot %d: id=%s, percent=%s", i, tostring(spell.id), tostring(spell.percent)))
+    end
+  else
+    print("ERRO: helperConfig.spells não existe!")
+  end
+
+  print("Potion configurations:")
+  if helperConfig and helperConfig.potions then
+    for i, potion in ipairs(helperConfig.potions) do
+      print(string.format("  Slot %d: id=%s, percent=%s, priority=%s", i, tostring(potion.id), tostring(potion.percent), tostring(potion.priority)))
+    end
+  else
+    print("ERRO: helperConfig.potions não existe!")
+  end
+
+  -- Inicialização forçada se necessário
+  if (not player or not helperEvents or not helperEvents.helperCycleEvent) then
+    print("Executando inicialização forçada...")
+    forceInitializeHelper()
+  end
+
+  print("=== FIM DO TESTE ===")
 end
 
 function botStatus()
@@ -4153,7 +4620,7 @@ function toggleNextWindow()
 end
 
 function manageHotkeys(typo)
-  helper:hide()
+  hide()
   local rootWidget = g_ui.getRootWidget()
   if not rootWidget then
     safeLog("error", "Helper: manageHotkeys - No root widget available")
@@ -4368,8 +4835,10 @@ function onSetupDropSpell(button, spellData, groups, tableToAssign)
       end
 
       if (spell.range > 0 or not spell.area) and not table.contains(bothCastTypeSpells, spell.id) then
-        profile.spells[slotID + 1].creatures = 1
-        creaturesMin:setCurrentOption("1+")
+        if not profile.spells[slotID + 1].creatures or profile.spells[slotID + 1].creatures < 1 then
+          profile.spells[slotID + 1].creatures = 1
+        end
+        creaturesMin:setCurrentOption(tostring(profile.spells[slotID + 1].creatures) .. "+")
         creaturesMin:disable()
         if forceCast then
           forceCast:setChecked(profile.spells[slotID + 1].forceCast)

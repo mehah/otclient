@@ -1,0 +1,10 @@
+Module
+  name: game_market
+  description: Market system module
+  author: BeniS, libergod
+  website: https://github.com/edubart/otclient
+  sandboxed: true
+  dependencies: [ gamelib ]
+  scripts: [ market_constants, market_helpers, classes/t_history, classes/t_ownOffers, t_market ]
+  @onLoad: init()
+  @onUnload: terminate()

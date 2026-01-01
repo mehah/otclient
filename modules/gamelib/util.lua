@@ -61,3 +61,9 @@ function convertLongGold(amount, short)
     return comma_value(amount)
   end
 end
+
+
+function math.cround(value, rd)
+    local _round = math.floor(value / rd)
+    return _round * rd
+end

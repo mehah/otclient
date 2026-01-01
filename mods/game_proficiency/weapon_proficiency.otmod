@@ -1,0 +1,6 @@
+Module
+  name: game_proficiency
+  sandboxed: true
+  scripts: [ proficiency, proficiency_data, const ]
+  @onLoad: init()
+  @onUnload: terminate()
