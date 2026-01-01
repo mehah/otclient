@@ -10,6 +10,34 @@ function dirtostring(dir)
     end
 end
 
+function short_text(text, chars_limit)
+  if #text > chars_limit then
+    local newstring = ''
+    for char in (text):gmatch(".") do
+      newstring = string.format("%s%s", newstring, char)
+      if #newstring >= chars_limit then
+        break
+      end
+    end
+    return newstring .. '...'
+  else
+    return text
+  end
+end
+
+function newline_text_long(text, chars_limit)
+  if #text > chars_limit then
+    local breakPoint = chars_limit
+    while breakPoint <= #text and text:sub(breakPoint, breakPoint) ~= " " do
+        breakPoint = breakPoint + 1
+    end
+    return text:sub(1, breakPoint) .. "\n" .. text:sub(breakPoint + 1)
+  else
+    return text
+  end
+end
+
+
 function comma_value(n)
     local left, num, right = string.match(n, '^([^%d]*%d)(%d*)(.-)$')
     return left .. (num:reverse():gsub('(%d%d%d)', '%1,'):reverse()) .. right
@@ -62,8 +90,48 @@ function convertLongGold(amount, short)
   end
 end
 
+function translateVocation(id)
+	if id == 1 or id == 11 then
+		return 8 -- ek
+	elseif id == 2 or id == 12 then
+		return 7 -- rp
+	elseif id == 3 or id == 13 then
+		return 5 -- ms
+	elseif id == 4 or id == 14 then
+		return 6 -- ed
+  elseif id == 5 or id == 15 then
+    return 9 -- em
+	end
+  return 0
+end
 
-function math.cround(value, rd)
-    local _round = math.floor(value / rd)
-    return _round * rd
+function translateWheelVocation(id)
+	if id == 1 or id == 11 then
+		return 1 -- ek
+	elseif id == 2 or id == 12 then
+		return 2 -- rp
+	elseif id == 3 or id == 13 then
+		return 3 -- ms
+	elseif id == 4 or id == 14 then
+		return 4 -- ed
+  elseif id == 5 or id == 15 then
+    return 5 -- em
+	end
+  return 0
+end
+
+function translateVocationName(id)
+	if id == 1 or id == 11 then
+		return "Knight"
+	elseif id == 2 or id == 12 then
+		return "Paladin"
+	elseif id == 3 or id == 13 then
+		return "Sorcerer"
+	elseif id == 4 or id == 14 then
+		return "Druid"
+  elseif id == 5 or id == 15 then
+    return "Monk"
+	end
+
+  return "Rookie"
 end

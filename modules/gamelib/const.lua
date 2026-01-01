@@ -10,6 +10,17 @@ SkullRed = 4
 SkullBlack = 5
 SkullOrange = 6
 
+
+WEAPON_NONE = 0
+WEAPON_SWORD = 1
+WEAPON_AXE = 2
+WEAPON_CLUB = 3
+WEAPON_FIST = 4
+WEAPON_BOW = 5
+WEAPON_CROSSBOW = 6
+WEAPON_WANDROD = 7
+WEAPON_THROW = 8
+
 ShieldNone = 0
 ShieldWhiteYellow = 1
 ShieldWhiteBlue = 2

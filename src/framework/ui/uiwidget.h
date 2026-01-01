@@ -1032,7 +1032,7 @@ public:
     bool isTextWrap() { return hasProp(PropTextWrap); }
     std::string getFont();
     Size getTextSize() { return m_textSize; }
-
+	int getWrappedLinesCount(int maxWidth);
     // custom style
 protected:
     virtual void parseCustomStyle(const OTMLNodePtr& /*styleNode*/) {};

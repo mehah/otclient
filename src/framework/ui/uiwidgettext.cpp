@@ -371,3 +371,23 @@ void UIWidget::applyWhiteSpace() {
     }
     computeHtmlTextIntrinsicSize();
 }
+
+
+int UIWidget::getWrappedLinesCount(int maxWidth)
+{
+    if (!m_font || m_text.empty() || maxWidth <= 0)
+        return 0;
+    
+    if (m_drawText.empty())
+        return 1;
+    
+    // Count newline characters in the wrapped text
+    int lineCount = 1;
+    for (char c : m_drawText) {
+        if (c == '\n')
+            lineCount++;
+    }
+    
+    return lineCount;
+}
+
