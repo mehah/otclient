@@ -24,10 +24,20 @@
 
 #include "framework/core/resourcemanager.h"
 #include "framework/otml/otmldocument.h"
+#include "ttfloader.h"
 
 FontManager g_fonts;
 
-void FontManager::terminate() { clearFonts(); }
+void FontManager::init()
+{
+    TTFLoader::init(); // Inicializar FreeType
+}
+
+void FontManager::terminate()
+{
+    clearFonts();
+    TTFLoader::terminate(); // Finalizar FreeType
+}
 
 void FontManager::clearFonts() {
     m_fonts.clear();
@@ -37,6 +47,12 @@ void FontManager::clearFonts() {
 
 bool FontManager::importFont(const std::string& file)
 {
+
+    if ((file.find(".ttf") != std::string::npos || file.find(".otf") != std::string::npos) 
+        && file.find(".otfont") == std::string::npos) {
+        return importTTF(file, 12);
+    }
+
     const auto& path = g_resources.guessFilePath(file, "otfont");
     try {
         const auto& doc = OTMLDocument::parse(path);
@@ -55,15 +71,52 @@ bool FontManager::importFont(const std::string& file)
         font->load(fontNode);
         m_fonts.emplace_back(font);
 
+        if (!m_defaultFont || fontNode->valueAt("default", false))
+
         // set as default if needed
         if (!m_defaultFont || fontNode->valueAt<bool>("default", false))
+
             m_defaultFont = font;
-        else if (!m_defaultWidgetFont || fontNode->valueAt<bool>("widget-default", false))
+         else if (!m_defaultWidgetFont || fontNode->valueAt("widget-default", false))
             m_defaultWidgetFont = font;
 
         return true;
     } catch (const stdext::exception& e) {
         g_logger.error("Unable to load font from file '{}': {}", path, e.what());
+        return false;
+    }
+}
+
+bool FontManager::importTTF(const std::string& file, int fontSize)
+{
+    try {
+        const auto& font = TTFLoader::load(file, fontSize);
+        
+        if (!font) {
+            g_logger.error("Failed to load TTF font: {}", file);
+            return false;
+        }
+
+        const auto& name = font->getName();
+        
+        // Remover fonte com o mesmo nome se existir
+        for (auto it = m_fonts.begin(); it != m_fonts.end(); ++it) {
+            if ((*it)->getName() == name) {
+                m_fonts.erase(it);
+                break;
+            }
+        }
+        
+        m_fonts.emplace_back(font);
+        
+        if (!m_defaultFont)
+            m_defaultFont = font;
+        
+        g_logger.info("TTF font '{}' imported successfully (size: {}px)", name, fontSize);
+        return true;
+        
+    } catch (const stdext::exception& e) {
+        g_logger.error("Unable to load TTF font from file '{}': {}", file, e.what());
         return false;
     }
 }

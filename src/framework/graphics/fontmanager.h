@@ -28,10 +28,12 @@
 class FontManager
 {
 public:
+    void init(); 
     void terminate();
     void clearFonts();
 
     bool importFont(const std::string& file);
+    bool importTTF(const std::string& file, int fontSize = 12); 
 
     bool fontExists(std::string_view fontName);
     BitmapFontPtr getFont(std::string_view fontName);

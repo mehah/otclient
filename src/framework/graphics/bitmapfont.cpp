@@ -153,7 +153,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         const int glyph = static_cast<uint8_t>(text[i]);
         if (glyph < 32) continue;
 
-        Rect glyphScreenCoords(glyphsPositions[i] + Point(dx, dy), m_glyphsSize[glyph]);
+        Rect glyphScreenCoords(glyphsPositions[i] + Point(dx, dy) + m_glyphsOffset[glyph], m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
 
         if (!clipAndTranslateGlyph(glyphScreenCoords, glyphTextureCoords, screenCoords))
@@ -196,7 +196,7 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
         const int glyph = static_cast<uint8_t>(text[i]);
         if (glyph < 32) continue;
 
-        Rect glyphScreenCoords(glyphsPositions[i] + Point(dx, dy), m_glyphsSize[glyph]);
+        Rect glyphScreenCoords(glyphsPositions[i] + Point(dx, dy) + m_glyphsOffset[glyph], m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
 
         if (!clipAndTranslateGlyph(glyphScreenCoords, glyphTextureCoords, screenCoords))
@@ -251,7 +251,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
         const int glyph = static_cast<uint8_t>(text[i]);
         if (glyph < 32) continue;
 
-        Rect glyphScreenCoords(glyphsPositions[i], m_glyphsSize[glyph]);
+        Rect glyphScreenCoords(glyphsPositions[i] + m_glyphsOffset[glyph], m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
 
         int dx = 0, dy = 0;
@@ -322,7 +322,8 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
                 continue;
             }
             if (g >= 32) {
-                s_lineWidths[lines] += widths[g].width();
+                // Usar advance ao invés de largura para calcular espaçamento correto
+                s_lineWidths[lines] += m_glyphsAdvance[g];
                 if (i + 1 != textLength && p[i + 1] != static_cast<unsigned char>('\n'))
                     s_lineWidths[lines] += m_glyphSpacing.width();
                 if (s_lineWidths[lines] > maxLineWidth)
@@ -353,7 +354,8 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
 
         if (g >= 32 && g != static_cast<unsigned char>('\n')) {
             glyphsPositions[i] = vpos;
-            vpos.x += widths[g].width() + m_glyphSpacing.width();
+            // Usar advance ao invés de largura para avançar a posição
+            vpos.x += m_glyphsAdvance[g] + m_glyphSpacing.width();
         }
     }
 

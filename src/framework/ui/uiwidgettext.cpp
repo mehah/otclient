@@ -157,6 +157,23 @@ void UIWidget::resizeToText()
 
 void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
 {
+
+    int ttfFontSize = 12; // tamanho padrão
+    std::string ttfFontName;
+    
+    for (const auto& node : styleNode->children()) {
+        if (node->tag() == "ttf-font-size")
+            ttfFontSize = node->value<int>();
+        else if (node->tag() == "ttf-font")
+            ttfFontName = node->value();
+    }
+    
+    // Se tiver ttf-font, carregar a fonte TTF primeiro
+    if (!ttfFontName.empty()) {
+        setTTFFont(ttfFontName, ttfFontSize);
+    }
+
+
     for (const auto& node : styleNode->children()) {
         const std::string tag = node->tag();
 
@@ -317,6 +334,44 @@ std::string UIWidget::getFont() { return m_font->getName(); }
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
+    computeHtmlTextIntrinsicSize();
+    updateText();
+    onFontChange(fontName);
+    scheduleHtmlTask(PropUpdateSize);
+    refreshHtml(true);
+}
+
+void UIWidget::setTTFFont(const std::string_view fontName, int fontSize)
+{
+    // Criar o nome base da fonte (remover extensão e path)
+    std::string baseName = std::string(fontName);
+    
+    // Remover extensão
+    size_t lastDot = baseName.find_last_of('.');
+    if (lastDot != std::string::npos) {
+        baseName = baseName.substr(0, lastDot);
+    }
+    
+    // Remover path
+    size_t lastSlash = baseName.find_last_of("/\\");
+    if (lastSlash != std::string::npos) {
+        baseName = baseName.substr(lastSlash + 1);
+    }
+    
+    // Nome único para a fonte com o tamanho (como TTFLoader::load gera)
+    std::string uniqueFontName = baseName + "_" + std::to_string(fontSize);
+    
+    // Verificar se a fonte já foi carregada com esse tamanho
+    if (!g_fonts.fontExists(uniqueFontName)) {
+        // Importar a fonte TTF com o tamanho especificado
+        if (!g_fonts.importTTF(std::string(fontName), fontSize)) {
+            g_logger.error("Failed to load TTF font: {} with size {}", fontName, fontSize);
+            return;
+        }
+    }
+    
+    // Definir a fonte no widget
+    m_font = g_fonts.getFont(uniqueFontName);
     computeHtmlTextIntrinsicSize();
     updateText();
     onFontChange(fontName);

@@ -37,13 +37,12 @@ Panel
     anchors.horizontalCenter: parent.horizontalCenter
     text-align: center
     text-auto-resize: true
-    color: #e98d02
+    color: #000000ff
     margin-bottom: 110
     text: OTClient Redemption
-    font: verdana-11px-rounded
-    font-scale: 4
-    shader: Map - Party
-
+    ttf-font: pixel dead
+    ttf-font-size: 100
+    
   MiniQtScrollableWindow
     id: showOffWindow
     anchors.bottom: parent.bottom

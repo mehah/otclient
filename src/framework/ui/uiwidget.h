@@ -1021,6 +1021,7 @@ public:
     }
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(std::string_view fontName);
+    void setTTFFont(std::string_view fontName, int fontSize = 12);
     void setFontScale(const float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }
     void setLineHeight(std::string height);
     const auto& getLineHeight() { return m_lineHeight; }
