@@ -27,15 +27,15 @@ function UIItem:onDragLeave(droppedWidget, mousePos)
     return true
 end
 
-function UIItem:onDrop(widget, mousePos)
+function UIItem:onDrop(widget, mousePos, forced)
     self:setBorderWidth(0)
 
-    if not self:canAcceptDrop(widget, mousePos) then
+    if not self:canAcceptDrop(widget, mousePos) and not forced then
         return false
     end
 
     local item = widget.currentDragThing
-    if not item:isItem() then
+    if not item or not item:isItem() then
         return false
     end
 
@@ -161,7 +161,7 @@ function UIItem:onMouseRelease(mousePosition, mouseButton)
         return false
     end
 
-    if modules.client_options.getOption('classicControl') and
+    if modules.client_options.getOption('classicControl') and not g_platform.isMobile() and
         ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton) or
             (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
         g_game.look(item)
@@ -194,4 +194,22 @@ function UIItem:canAcceptDrop(widget, mousePos)
 
     error('Widget ' .. self:getId() .. ' not in drop list.')
     return false
+end
+
+function UIItem:onClick(mousePos)
+    if not self.selectable or not self.editable then
+        return
+    end
+
+    if modules.game_itemselector then
+        modules.game_itemselector.show(self)
+    end
+end
+
+function UIItem:onItemChange()
+    local tooltip = ""
+    if self:getItem() and self:getItem():getTooltip():len() > 0 then
+        tooltip = self:getItem():getTooltip()
+    end
+    self:setTooltip(tooltip)
 end
