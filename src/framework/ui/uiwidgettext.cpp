@@ -170,6 +170,7 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
     
     // Se tiver ttf-font, carregar a fonte TTF primeiro
     if (!ttfFontName.empty()) {
+        g_logger.debug("parseTextStyle: setting TTF font '{}' size {}", ttfFontName, ttfFontSize);
         setTTFFont(ttfFontName, ttfFontSize);
     }
 
@@ -193,8 +194,10 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
             setTextVerticalAutoResize(node->value<bool>());
         else if (tag == "text-only-upper-case")
             setTextOnlyUpperCase(node->value<bool>());
-        else if (tag == "font")
-            setFont(node->value());
+        else if (node->tag() == "font") {
+            if (ttfFontName.empty())
+                setFont(node->value());
+        }
         else if (tag == "font-scale")
             setFontScale(node->value<float>());
         else if (tag == "font-size")
