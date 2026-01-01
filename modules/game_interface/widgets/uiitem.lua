@@ -207,7 +207,7 @@ function UIItem:onClick(mousePos)
 end
 
 function UIItem:onItemChange()
-    local tooltip = nil
+    local tooltip = ""
     if self:getItem() and self:getItem():getTooltip():len() > 0 then
         tooltip = self:getItem():getTooltip()
     end
