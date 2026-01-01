@@ -277,7 +277,7 @@ int push_luavalue(const UnjustifiedPoints& unjustifiedPoints)
 
 int push_luavalue(const Imbuement& i)
 {
-    g_lua.createTable(0, 12);
+    g_lua.createTable(0, 11);
     g_lua.pushInteger(i.id);
     g_lua.setField("id");
     g_lua.pushString(i.name);
@@ -286,8 +286,6 @@ int push_luavalue(const Imbuement& i)
     g_lua.setField("description");
     g_lua.pushString(i.group);
     g_lua.setField("group");
-    g_lua.pushInteger(i.tier);
-    g_lua.setField("type");
     g_lua.pushInteger(i.imageId);
     g_lua.setField("imageId");
     g_lua.pushInteger(i.duration);
@@ -310,6 +308,8 @@ int push_luavalue(const Imbuement& i)
     g_lua.setField("successRate");
     g_lua.pushInteger(i.protectionCost);
     g_lua.setField("protectionCost");
+    g_lua.pushInteger(i.tier);
+    g_lua.setField("tier");
     return 1;
 }
 
@@ -338,60 +338,6 @@ int push_luavalue(const ImbuementTrackerItem& i)
         g_lua.rawSeti(id + 1);
     }
     g_lua.setField("slots");
-    return 1;
-}
-
-int push_luavalue(const std::vector<std::tuple<Imbuement, uint32_t, uint32_t>>& activeSlots)
-{
-    g_lua.createTable(activeSlots.size(), 0);
-    for (size_t i = 0; i < activeSlots.size(); ++i) {
-        const auto& slot = activeSlots[i];
-        if (std::get<0>(slot).id != 0) {
-            g_lua.createTable(0, 3);
-            push_luavalue(std::get<0>(slot));
-            g_lua.rawSeti(1);
-            g_lua.pushInteger(std::get<1>(slot));
-            g_lua.rawSeti(2);
-            g_lua.pushInteger(std::get<2>(slot));
-            g_lua.rawSeti(3);
-        } else {
-            g_lua.createTable(0, 0);
-        }
-        g_lua.rawSeti(i + 1);
-    }
-    return 1;
-}
-
-int push_luavalue(const std::unordered_map<int, std::tuple<Imbuement, uint32_t, uint32_t>>& activeSlots)
-{
-    if (activeSlots.empty()) {
-        g_lua.createTable(0, 0);
-        return 1;
-    }
-    
-    int maxIndex = 0;
-    for (const auto& pair : activeSlots) {
-        if (pair.first > maxIndex) {
-            maxIndex = pair.first;
-        }
-    }
-    
-    g_lua.createTable(maxIndex + 1, 0);
-    for (int i = 0; i <= maxIndex; ++i) {
-        auto it = activeSlots.find(i);
-        if (it != activeSlots.end() && std::get<0>(it->second).id != 0) {
-            g_lua.createTable(0, 3);
-            push_luavalue(std::get<0>(it->second));
-            g_lua.rawSeti(1);
-            g_lua.pushInteger(std::get<1>(it->second));
-            g_lua.rawSeti(2);
-            g_lua.pushInteger(std::get<2>(it->second));
-            g_lua.rawSeti(3);
-        } else {
-            g_lua.createTable(0, 0);
-        }
-        g_lua.rawSeti(i + 1);
-    }
     return 1;
 }
 

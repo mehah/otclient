@@ -51,8 +51,7 @@ bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints);
 // imbuement
 int push_luavalue(const Imbuement& i);
 int push_luavalue(const ImbuementTrackerItem& i);
-int push_luavalue(const std::vector<std::tuple<Imbuement, uint32_t, uint32_t>>& activeSlots);
-int push_luavalue(const std::unordered_map<int, std::tuple<Imbuement, uint32_t, uint32_t>>& activeSlots);
+ 
 
 // bless
 int push_luavalue(const BlessData& bless);
