@@ -285,9 +285,9 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
             
             // Offset Y para alinhar na baseline
             // Apenas para caracteres com bitmap visual
-            if (glyphsSize[i].height() > 0 && glyphsBearingY[i] != 0) {
+            if (glyphsSize[i].height() > 0) {
                 int offsetY = ascender - glyphsBearingY[i] + yShift;
-                font->m_glyphsOffset[i] = Point(0, offsetY);
+                font->m_glyphsOffset[i] = Point(glyphsBearingX[i], offsetY);
             } else {
                 // Caracteres sem bitmap (espaço, etc) - offset Y = 0
                 font->m_glyphsOffset[i] = Point(0, 0);
