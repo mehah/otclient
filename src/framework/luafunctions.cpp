@@ -791,6 +791,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("setTextHorizontalAutoResize", &UIWidget::setTextHorizontalAutoResize);
     g_lua.bindClassMemberFunction<UIWidget>("setFont", &UIWidget::setFont);
     g_lua.bindClassMemberFunction<UIWidget>("setFontScale", &UIWidget::setFontScale);
+    g_lua.bindClassMemberFunction<UIWidget>("setTTFFont", &UIWidget::setTTFFont);
     g_lua.bindClassMemberFunction<UIWidget>("setShader", &UIWidget::setShader);
     g_lua.bindClassMemberFunction<UIWidget>("getText", &UIWidget::getText);
     g_lua.bindClassMemberFunction<UIWidget>("getDrawText", &UIWidget::getDrawText);
