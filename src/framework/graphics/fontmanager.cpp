@@ -87,10 +87,10 @@ bool FontManager::importFont(const std::string& file)
     }
 }
 
-bool FontManager::importTTF(const std::string& file, int fontSize)
+bool FontManager::importTTF(const std::string& file, int fontSize, int strokeWidth, const Color& strokeColor)
 {
     try {
-        const auto& font = TTFLoader::load(file, fontSize);
+        const auto& font = TTFLoader::load(file, fontSize, strokeWidth, strokeColor);
         
         if (!font) {
             g_logger.error("Failed to load TTF font: {}", file);
@@ -112,7 +112,7 @@ bool FontManager::importTTF(const std::string& file, int fontSize)
         if (!m_defaultFont)
             m_defaultFont = font;
         
-        g_logger.info("TTF font '{}' imported successfully (size: {}px)", name, fontSize);
+        g_logger.info("TTF font '{}' imported successfully (size: {}px, stroke: {}px)", name, fontSize, strokeWidth);
         return true;
         
     } catch (const stdext::exception& e) {

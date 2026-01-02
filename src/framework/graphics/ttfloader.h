@@ -18,13 +18,14 @@
 #include "bitmapfont.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include FT_STROKER_H
 
 class TTFLoader
 {
 public:
     static void init();
     static void terminate();
-    static BitmapFontPtr load(const std::string& file, int fontSize);
+    static BitmapFontPtr load(const std::string& file, int fontSize, int strokeWidth = 0, const Color& strokeColor = Color::black);
 
 private:
     static FT_Library s_library;
@@ -35,5 +36,7 @@ private:
                                     int& atlasWidth, int& atlasHeight,
                                     Size glyphsSize[256],
                                     Rect glyphsCoords[256],
-                                    int& glyphHeight);
+                                    int& glyphHeight,
+                                    int strokeWidth,
+                                    const Color& strokeColor);
 };

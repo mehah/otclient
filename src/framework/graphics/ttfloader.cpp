@@ -28,6 +28,8 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/core/logger.h>
 #include <cmath>
+#include <sstream>
+#include <iomanip>
 
 
 #ifdef max
@@ -64,14 +66,14 @@ void TTFLoader::terminate()
     s_initialized = false;
 }
 
-BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
+BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize, int strokeWidth, const Color& strokeColor)
 {
     if (!s_initialized) {
         g_logger.error("FreeType library not initialized. Call TTFLoader::init() first");
         return nullptr;
     }
 
-    g_logger.info("TTFLoader::load called with file='{}', fontSize={}", file, fontSize);
+    g_logger.info("TTFLoader::load called with file='{}', fontSize={}, strokeWidth={}", file, fontSize, strokeWidth);
 
     try {
 
@@ -147,6 +149,17 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
         }
 
         fontName = fontName + "_" + std::to_string(fontSize);
+        
+        // Adicionar stroke ao nome se houver
+        if (strokeWidth > 0) {
+            std::ostringstream colorStream;
+            colorStream << std::hex << std::setfill('0') 
+                        << std::setw(2) << (int)strokeColor.r()
+                        << std::setw(2) << (int)strokeColor.g()
+                        << std::setw(2) << (int)strokeColor.b()
+                        << std::setw(2) << (int)strokeColor.a();
+            fontName += "_s" + std::to_string(strokeWidth) + "_" + colorStream.str();
+        }
 
         auto font = std::make_shared<BitmapFont>(fontName);
 
@@ -170,18 +183,60 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
             glyphsBearingY[i] = 0;
         }
 
+        // Criar stroker se necessário
+        FT_Stroker stroker = nullptr;
+        if (strokeWidth > 0) {
+            if (FT_Stroker_New(s_library, &stroker)) {
+                g_logger.error("Failed to create FreeType stroker");
+                strokeWidth = 0; // Desabilitar stroke em caso de erro
+            } else {
+                // Configurar stroker (strokeWidth em pixels * 64 para unidades FreeType)
+                FT_Stroker_Set(stroker, strokeWidth * 64, FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
+            }
+        }
+
         for (int i = firstGlyph; i <= lastGlyph; ++i) {
-            if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
+            if (FT_Load_Char(face, i, FT_LOAD_DEFAULT)) {
                 continue;
             }
 
             FT_GlyphSlot slot = face->glyph;
+            
+            int width = 0;
+            int height = 0;
+            int advance = (int)(slot->advance.x >> 6);
+            int bearingX = 0;
+            int bearingY = 0;
 
-            const int width = (int)slot->bitmap.width;
-            const int height = (int)slot->bitmap.rows;
-            const int advance = (int)(slot->advance.x >> 6); // advance está em 1/64 pixels
-            const int bearingX = (int)slot->bitmap_left;
-            const int bearingY = (int)slot->bitmap_top;
+            if (strokeWidth > 0 && stroker) {
+                // Obter o glyph como outline
+                FT_Glyph glyph;
+                if (FT_Get_Glyph(slot, &glyph) == 0) {
+                    // Aplicar stroke
+                    FT_Glyph_StrokeBorder(&glyph, stroker, 0, 1);
+                    
+                    // Renderizar o glyph com stroke
+                    if (glyph->format == FT_GLYPH_FORMAT_OUTLINE) {
+                        FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
+                    }
+                    
+                    FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
+                    width = (int)bitmapGlyph->bitmap.width;
+                    height = (int)bitmapGlyph->bitmap.rows;
+                    bearingX = bitmapGlyph->left;
+                    bearingY = bitmapGlyph->top;
+                    
+                    FT_Done_Glyph(glyph);
+                }
+            } else {
+                // Renderizar normalmente sem stroke
+                if (FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL) == 0) {
+                    width = (int)slot->bitmap.width;
+                    height = (int)slot->bitmap.rows;
+                    bearingX = (int)slot->bitmap_left;
+                    bearingY = (int)slot->bitmap_top;
+                }
+            }
 
             glyphsSize[i] = Size(width, height);
             glyphsAdvance[i] = advance;
@@ -209,13 +264,12 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
                 continue;
             }
 
-            if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
+            if (FT_Load_Char(face, i, FT_LOAD_DEFAULT)) {
                 continue;
             }
 
             FT_GlyphSlot slot = face->glyph;
-            const FT_Bitmap& bitmap = slot->bitmap;
-
+            
             const int col = i % glyphsPerRow;
             const int row = i / glyphsPerRow;
             const int atlasX = col * (maxGlyphWidth + padding);
@@ -223,24 +277,103 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
 
             glyphsCoords[i] = Rect(atlasX, atlasY, glyphsSize[i].width(), glyphsSize[i].height());
 
-            const int copyWidth = std::min((int)bitmap.width, glyphsSize[i].width());
-            const int copyHeight = std::min((int)bitmap.rows, glyphsSize[i].height());
-            
-            for (int y = 0; y < copyHeight; ++y) {
-                for (int x = 0; x < copyWidth; ++x) {
-                    const int srcIdx = y * bitmap.pitch + x;
-                    const int dstX = atlasX + x;
-                    const int dstY = atlasY + y;
-                    const int dstIdx = (dstY * atlasWidth + dstX) * 4;
+            if (strokeWidth > 0 && stroker) {
+                // Renderizar stroke primeiro (fundo)
+                FT_Glyph strokeGlyph;
+                if (FT_Get_Glyph(slot, &strokeGlyph) == 0) {
+                    FT_Glyph_StrokeBorder(&strokeGlyph, stroker, 0, 1);
+                    
+                    if (strokeGlyph->format == FT_GLYPH_FORMAT_OUTLINE) {
+                        FT_Glyph_To_Bitmap(&strokeGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
+                    }
+                    
+                    FT_BitmapGlyph strokeBitmapGlyph = (FT_BitmapGlyph)strokeGlyph;
+                    const FT_Bitmap& strokeBitmap = strokeBitmapGlyph->bitmap;
+                    
+                    const int copyWidth = std::min((int)strokeBitmap.width, glyphsSize[i].width());
+                    const int copyHeight = std::min((int)strokeBitmap.rows, glyphsSize[i].height());
+                    
+                    // Desenhar stroke
+                    for (int y = 0; y < copyHeight; ++y) {
+                        for (int x = 0; x < copyWidth; ++x) {
+                            const int srcIdx = y * strokeBitmap.pitch + x;
+                            const int dstX = atlasX + x;
+                            const int dstY = atlasY + y;
+                            const int dstIdx = (dstY * atlasWidth + dstX) * 4;
 
-                    const uint8_t alpha = bitmap.buffer[srcIdx];
+                            const uint8_t alpha = strokeBitmap.buffer[srcIdx];
+                            
+                            if (alpha > 0) {
+                                atlasPixels[dstIdx + 0] = strokeColor.r(); // R
+                                atlasPixels[dstIdx + 1] = strokeColor.g(); // G
+                                atlasPixels[dstIdx + 2] = strokeColor.b(); // B
+                                atlasPixels[dstIdx + 3] = alpha; // A
+                            }
+                        }
+                    }
+                    
+                    FT_Done_Glyph(strokeGlyph);
+                }
+                
+                // Renderizar glyph original por cima
+                if (FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL) == 0) {
+                    const FT_Bitmap& bitmap = slot->bitmap;
+                    
+                    // Calcular offset para centralizar o glyph original sobre o stroke
+                    int offsetX = (glyphsSize[i].width() - (int)bitmap.width) / 2;
+                    int offsetY = (glyphsSize[i].height() - (int)bitmap.rows) / 2;
+                    
+                    const int copyWidth = std::min((int)bitmap.width, glyphsSize[i].width() - offsetX);
+                    const int copyHeight = std::min((int)bitmap.rows, glyphsSize[i].height() - offsetY);
+                    
+                    for (int y = 0; y < copyHeight; ++y) {
+                        for (int x = 0; x < copyWidth; ++x) {
+                            const int srcIdx = y * bitmap.pitch + x;
+                            const int dstX = atlasX + x + offsetX;
+                            const int dstY = atlasY + y + offsetY;
+                            const int dstIdx = (dstY * atlasWidth + dstX) * 4;
 
-                    atlasPixels[dstIdx + 0] = 255; // R
-                    atlasPixels[dstIdx + 1] = 255; // G
-                    atlasPixels[dstIdx + 2] = 255; // B
-                    atlasPixels[dstIdx + 3] = alpha; // A
+                            const uint8_t alpha = bitmap.buffer[srcIdx];
+                            
+                            if (alpha > 0) {
+                                atlasPixels[dstIdx + 0] = 255; // R
+                                atlasPixels[dstIdx + 1] = 255; // G
+                                atlasPixels[dstIdx + 2] = 255; // B
+                                atlasPixels[dstIdx + 3] = alpha; // A
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Renderizar normalmente sem stroke
+                if (FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL) == 0) {
+                    const FT_Bitmap& bitmap = slot->bitmap;
+
+                    const int copyWidth = std::min((int)bitmap.width, glyphsSize[i].width());
+                    const int copyHeight = std::min((int)bitmap.rows, glyphsSize[i].height());
+                    
+                    for (int y = 0; y < copyHeight; ++y) {
+                        for (int x = 0; x < copyWidth; ++x) {
+                            const int srcIdx = y * bitmap.pitch + x;
+                            const int dstX = atlasX + x;
+                            const int dstY = atlasY + y;
+                            const int dstIdx = (dstY * atlasWidth + dstX) * 4;
+
+                            const uint8_t alpha = bitmap.buffer[srcIdx];
+
+                            atlasPixels[dstIdx + 0] = 255; // R
+                            atlasPixels[dstIdx + 1] = 255; // G
+                            atlasPixels[dstIdx + 2] = 255; // B
+                            atlasPixels[dstIdx + 3] = alpha; // A
+                        }
+                    }
                 }
             }
+        }
+
+        // Limpar stroker se foi criado
+        if (stroker) {
+            FT_Stroker_Done(stroker);
         }
 
 

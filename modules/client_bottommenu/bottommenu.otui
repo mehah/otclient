@@ -13,14 +13,13 @@ ShowOffWidget < UIWidget
 
   Label
     id: description
-    size: 476 0
+    size: 480 0
     ttf-font: arial
-    ttf-font-size: 24	
+    ttf-font-size: 16
     anchors.left: image.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
-    margin-top: 2
-    margin-left: 10
+    margin-left: 2
     color: #c0c0c0ff
     text-wrap: true
     text-auto-resize: true
@@ -39,11 +38,13 @@ Panel
     anchors.horizontalCenter: parent.horizontalCenter
     text-align: center
     text-auto-resize: true
-    color: #000000ff
+    color: #c0c0c0ff
     margin-bottom: 110
     text: OTClient Redemption
-    ttf-font: pixel dead
-    ttf-font-size: 100
+    ttf-font: 28 Days Later
+    ttf-font-size: 120
+    stroke: 2 black
+    shader: Map - Party
     
   MiniQtScrollableWindow
     id: showOffWindow
