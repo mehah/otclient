@@ -161,7 +161,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerFeatures:
                     parseFeatures(msg);
                     break;
-               case Proto::GameServerProficiency:
+                case Proto::GameServerProficiency:
                     parseProficiency(msg);
                     break;
                 case Proto::GameServerProficiencyExperience:
@@ -169,7 +169,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     break;
                 case Proto::GameServerFloorDescription:
                     parseFloorDescription(msg);
-                    break;         
+                    break;
                 case Proto::GameServerImbuementDurations:
                     parseImbuementDurations(msg);
                     break;
@@ -473,7 +473,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerCyclopediaHouseAuctionMessage:
                     parseCyclopediaHouseAuctionMessage(msg);
                     break;
-                 case Proto::GameServerCyclopediaHousesInfo:
+                case Proto::GameServerCyclopediaHousesInfo:
                     parseCyclopediaHousesInfo(msg);
                     break;
                 case Proto::GameServerCyclopediaHouseList:
@@ -1766,12 +1766,12 @@ void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
 {
-    msg->getU8(); // 0x00
-    msg->getU8(); // bool is cyclopedia
-    msg->getU32(); // creature ID (version 13.00)
-    msg->getU8(); // 0x01
+    msg->getU8();                       // 0x00
+    uint8_t inspectType = msg->getU8(); // 0x01 is cyclopedia - 0x02 is proficiency
+    uint32_t playerId = msg->getU32();  // creature ID (version 13.00)
+    msg->getU8();                       // 0x01
 
-    msg->getString(); // item name
+    const std::string& itemName = msg->getString(); // item name
     const auto& item = getItem(msg);
 
     msg->getU8(); // 0x00
@@ -1786,7 +1786,10 @@ void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
         descriptions.emplace_back(firstDescription, secondDescription);
     }
 
-    g_game.processItemDetail(item->getId(), descriptions);
+    g_lua.callGlobalField("g_game", "onInspection", inspectType, itemName, item, descriptions);
+    if (inspectType == 1) {
+        g_game.processItemDetail(item->getId(), descriptions);
+    }
 }
 
 void ProtocolGame::parseAddInventoryItem(const InputMessagePtr& msg)
@@ -2046,7 +2049,7 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
 
 void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 {
-     ForgeData forgeData;
+    ForgeData forgeData;
 
     const uint8_t classSize = msg->getU8();
     for (auto i = 0; i < classSize; ++i) {
@@ -2237,7 +2240,7 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
         data.convergenceTransfers.emplace_back(transfer);
     }
     data.dustLevel = msg->getU16();
-    
+
     g_game.processOpenExaltationForge(data);
 }
 
@@ -2279,33 +2282,33 @@ void ProtocolGame::parseCloseForgeWindow(const InputMessagePtr& /*msg*/)
 void ProtocolGame::parseForgeResult(const InputMessagePtr& msg)
 {
     ForgeResult result;
-    result.actionType  = msg->getU8();   // 0 = fusion | 1 = transfer
+    result.actionType = msg->getU8();   // 0 = fusion | 1 = transfer
     result.convergence = msg->getU8();   // bool (0/1)
-    result.success     = msg->getU8();   // bool (0/1)
+    result.success = msg->getU8();   // bool (0/1)
 
-    result.leftItemId  = msg->getU16();
-    result.leftTier    = msg->getU8();
+    result.leftItemId = msg->getU16();
+    result.leftTier = msg->getU8();
 
     result.rightItemId = msg->getU16();
-    result.rightTier   = msg->getU8();
+    result.rightTier = msg->getU8();
 
-    result.bonus       = msg->getU8();
+    result.bonus = msg->getU8();
 
     // defaulty
-    result.coreCount   = 0;
+    result.coreCount = 0;
     result.extraItemId = 0;
-    result.extraTier   = 0;
+    result.extraTier = 0;
 
-    if(result.actionType == 1) {
+    if (result.actionType == 1) {
         // transfer – bonus zawsze 0, brak dodatkowych danych
     } else {
-        if(result.bonus == 2) {
+        if (result.bonus == 2) {
             // core kept
             result.coreCount = msg->getU8();
-        } else if(result.bonus >= 4 && result.bonus <= 8) {
+        } else if (result.bonus >= 4 && result.bonus <= 8) {
             // serwer wysyła ponownie leftItemId + leftTier
             result.leftItemId = msg->getU16();
-            result.leftTier   = msg->getU8();
+            result.leftTier = msg->getU8();
         }
     }
 
@@ -2332,7 +2335,7 @@ void ProtocolGame::parseForgeHistory(const InputMessagePtr& msg)
         char buffer[20];
         strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M", localtime(&rawtime));
         entry.date = buffer;
-        entry.action = std::to_string(actionType); 
+        entry.action = std::to_string(actionType);
         entry.details = description;
         entries.emplace_back(entry);
     }
@@ -6523,19 +6526,19 @@ void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
 
     g_game.processHighscore(serverName, world, worldType, battlEye, vocations, categories, page, totalPages, highscores, entriesTs);
 }
- 
+
 void ProtocolGame::parseProficiency(const InputMessagePtr& msg)
 {
-    const uint16_t itemId     = msg->getU16();
+    const uint16_t itemId = msg->getU16();
     const uint32_t experience = msg->getU32();
-    const uint8_t  count      = msg->getU8();
+    const uint8_t  count = msg->getU8();
 
     std::vector<WeaponProficiencyPerk> perks;
     perks.reserve(count);
     for (uint8_t i = 0; i < count; ++i) {
         const uint8_t levelIdx = msg->getU8();
-        const uint8_t perkIdx  = msg->getU8();
-        perks.emplace_back(WeaponProficiencyPerk{levelIdx, perkIdx});
+        const uint8_t perkIdx = msg->getU8();
+        perks.emplace_back(WeaponProficiencyPerk{ levelIdx, perkIdx });
     }
 
     uint16_t marketCategory = 0;

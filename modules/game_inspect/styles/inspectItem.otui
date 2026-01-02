@@ -1,0 +1,118 @@
+NewMainWindow
+  id: inspectItem
+  !text: tr('Inspect Object')
+  size: 482 308
+  @onEscape: modules.game_inspect.hide()
+
+  Panel
+    id: contentPanel
+    anchors.fill: parent
+    margin: 12 12 12 12
+
+    UIItem
+      id: item
+      size: 64 64
+      anchors.top: parent.top
+      anchors.left: parent.left
+      priceable: false
+      virtual: true
+      draggable: false
+
+    Label
+      id: name
+      width: 380
+      anchors.bottom: prev.bottom
+      anchors.left: prev.right
+      margin-left: 3
+      !text: tr('You are inspecting:')
+      text-wrap: true
+      font: Verdana Bold-11px
+      color: #c0c0c0
+      text-auto-resize: true
+      text-align: leftBottom
+
+    TextList
+      id: itemInfo
+      size: 450 150
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-top: 5
+      vertical-scrollbar: itemInfoScroll
+      text-wrap: true
+
+    VerticalScrollBar
+      id: itemInfoScroll
+      anchors.top: prev.top
+      anchors.bottom: prev.bottom
+      anchors.right: prev.right
+      margin-right: 1
+      margin-top: 1
+      margin-bottom: 1
+      step: 16
+      pixels-scroll: true
+
+    HorizontalSeparator
+      id: separator
+      anchors.bottom: next.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 10
+
+    Button
+      id: prevButton
+      size: 43 20
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      !text: tr('Close')
+      @onClick: modules.game_inspect.hide()
+
+    
+    UIButton
+      id: copyInfo
+      size: 20 20
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      !tooltip: tr('Copy information')
+      image-source: /images/game/destiny_wheel/change_preset_icon
+      image-clip: 0 0 20 20
+      $pressed:
+        image-clip: 0 20 20 20
+      $!pressed:
+        image-clip: 0 0 20 20
+      @onClick: modules.game_inspect.clipboard()
+
+
+InspectLabel < Panel
+  id: label
+  size: 270 21
+
+  Label
+    id: label
+    size: 151 21
+    font: Verdana Bold-11px
+    color: #cdcdcd
+    text-align: right
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: next.left
+    text-offset: 0 5
+
+  UIWidget
+    id: separator
+    size: 9 21
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 150
+
+  Label
+    id: content
+    size: 270 21
+    font: Verdana Bold-11px
+    color: #cdcdcd
+    text-wrap: true
+    text-align: left
+    text-auto-resize: true
+    text-offset: -2 6
+    margin-left: 2
+    anchors.top: parent.top
+    anchors.left: prev.right

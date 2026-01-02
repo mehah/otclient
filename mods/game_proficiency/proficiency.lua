@@ -189,7 +189,7 @@ function requestOpenWindow(redirectItem)
 end
 
 function onInspection(inspectType, itemName, item, descriptions)
-	if inspectType ~= 1 then
+	if inspectType ~= 2 then
 		return
 	end
 
