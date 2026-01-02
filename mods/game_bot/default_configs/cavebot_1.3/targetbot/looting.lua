@@ -138,9 +138,9 @@ TargetBot.Looting.process = function(targets, dangerLevel)
   end
 
   local tile = g_map.getTile(loot.pos)
-  if dist >= 3 or not tile then
+  if dist > 1 or not tile then
     loot.tries = loot.tries + 1
-    TargetBot.walkTo(loot.pos, 20, { ignoreNonPathable = true, precision = 2 })
+    TargetBot.walkTo(loot.pos, 20, { ignoreNonPathable = true, precision = 1 })
     return true
   end
 
