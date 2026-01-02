@@ -4,7 +4,7 @@ Module
   author: Gesior.pl
   reloadable: true
   sandboxed: true
- 
+  //autoload: true
   scripts: [ client_ui_debug ]
   @onLoad: init()
   @onUnload: terminate()

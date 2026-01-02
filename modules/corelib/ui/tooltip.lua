@@ -179,7 +179,16 @@ function g_tooltip.terminate()
 end
 
 function g_tooltip.display(text)
-    if text == nil or text:len() == 0 then
+	if text == nil then
+ 	        return
+ 	    end
+ 	    
+ 	    -- Handle table input (convert to string)
+ 	    if type(text) == "table" then
+ 	        text = tostring(text)
+ 	    end
+ 	    
+ 	    if text:len() == 0 then
         return
     end
     if not toolTipLabel then
@@ -344,3 +353,9 @@ g_tooltip.init()
 connect(g_app, {
     onTerminate = g_tooltip.terminate
 })
+
+function g_tooltip.onWidgetHoverChange(widget, hovered)
+ 	    onWidgetHoverChange(widget, hovered)
+ 	end
+
+

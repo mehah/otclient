@@ -17,41 +17,28 @@ MinimapFloorUpButton < Button
   anchors.right: parent.right
   anchors.bottom: parent.bottom
   icon-source: /images/game/minimap/floor_up
-  icon-clip: 0 32 16 16
-  $pressed:
-    icon-clip: 0 0 16 16
-  $hover !pressed:
-    icon-clip: 0 16 16 16
+  icon-size: 16 16
+  icon-clip: 0 0 16 16
+ 
 
-MinimapFloorDownButton < Button
-  size: 20 20
-  margin-right: 28
-  margin-bottom: 4
-  anchors.right: parent.right
-  anchors.bottom: parent.bottom
-  icon-source: /images/game/minimap/floor_down
-  icon-clip: 0 32 16 16
-  $pressed:
-    icon-clip: 0 0 16 16
-  $hover !pressed:
-    icon-clip: 0 16 16 16
 
 MinimapZoomInButton < Button
   text: +
   size: 20 20
-  margin-right: 4
-  margin-bottom: 28
-  anchors.right: parent.right
-  anchors.bottom: parent.bottom
   //icon-source: /images/game/minimap/zoom_in
+
+MinimapFloorDownButton < Button
+  size: 20 20
+  margin-right: 28
+  icon-source: /images/game/minimap/floor_down
+  icon-size: 16 16
+  icon-clip: 0 0 16 16
+ 
+
 
 MinimapZoomOutButton < Button
   text: -
   size: 20 20
-  margin-right: 4
-  margin-bottom: 4
-  anchors.right: parent.right
-  anchors.bottom: parent.bottom
   //icon-source: /images/game/minimap/zoom_out
 
 MinimapResetButton < Button
@@ -71,16 +58,25 @@ Minimap < UIMinimap
     id: floorUpButton
     @onClick: self:getParent():floorUp(1)
 
-  MinimapFloorDownButton
-    id: floorDownButton
-    @onClick: self:getParent():floorDown(1)
-
   MinimapZoomInButton
     id: zoomInButton
+    anchors.right: floorUpButton.left
+    anchors.bottom: floorUpButton.bottom
+    margin-right: 4
     @onClick: self:getParent():zoomIn()
+
+  MinimapFloorDownButton
+    id: floorDownButton
+    anchors.right: parent.right
+    anchors.bottom: floorUpButton.top
+    margin-bottom: 4
+    @onClick: self:getParent():floorDown(1)
 
   MinimapZoomOutButton
     id: zoomOutButton
+    anchors.right: floorDownButton.left
+    anchors.bottom: floorDownButton.bottom
+    margin-right: 4
     @onClick: self:getParent():zoomOut()
 
   MinimapResetButton
