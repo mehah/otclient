@@ -759,7 +759,7 @@ return {
             modules.game_actionbar.updateVisibleOptions('hotkey', value)
         end,
     },
-    actionBarBottomLocked = false,
-    actionBarLeftLocked = false,
-    actionBarRightLocked = false    
+    stowContainer                     = {
+        value = true,
+    },
 }

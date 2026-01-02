@@ -1,0 +1,54 @@
+StowContainer < NewMainWindow
+  id: StowContainer
+  !text: tr("Confirmation of Stowing Container's Content")
+  size: 400 128
+  Panel
+    id: contentPanel
+    anchors.fill: parent
+    margin: 12 12 12 12
+    UIWidget
+      size: 335 37
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: 2
+      image-source: /images/ui/labels/stow-container
+    HorizontalSeparator
+      anchors.bottom: next.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 11
+    FlatLabel
+      size: 221 22
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      CheckBox
+        id: AskBeforeStowContainer
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 5
+        @onCheckChange: modules.client_options.setOption('stowContainer', not self:isChecked())
+      Label
+        !text: tr('Do not show this dialog again!')
+        text-auto-resize: true
+        font: Verdana Bold-11px
+        color: #c0c0c0
+        anchors.left: prev.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 4
+    Button
+      id: buttonNo
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      size: 43 20
+      margin-bottom: 1
+      font: cipsoftFont
+      !text: tr('No')
+    Button
+      id: buttonYes
+      anchors.right: prev.left
+      anchors.bottom: parent.bottom
+      margin-right: 6
+      margin-bottom: 1
+      size: 43 20
+      font: cipsoftFont
+      !text: tr('Yes')

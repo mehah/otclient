@@ -29,3 +29,16 @@ function formatTimeByMinutes(totalMinutes)
     local minutes = math.floor(remainingSeconds / 60)
     return string.format("%02d:%02d", hours, minutes)
 end
+
+local gold = {
+    [3031] = "gold coin",
+    [3035] = "platinum coin",
+    [3043] = "crystal coin"
+}
+
+function isGoldCoin(itemId)
+    if gold[itemId] then
+        return true
+    end
+    return false
+end

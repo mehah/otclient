@@ -1,3 +1,47 @@
+MiscWindow < Panel
+  id: misc
+  anchors.fill: parent
+  text-wrap: true
+  image-source: /images/ui/2pixel-up-frame-borderimage
+  image-border: 3
+  padding: 3
+
+  FlatPanel
+    size: 505 22
+    anchors.top: prev.bottom
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-top: 5
+    margin-left: 4
+    margin-right: 4
+
+    CheckBox
+      id: stowContainer
+      size: 12 12
+      !text: tr('Ask Before Stowing Container Content')
+      font: Verdana Bold-11px
+      text-auto-resize: true
+      color: #c0c0c0
+      text-offset: 14 -2
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-top: 5
+      margin-left: 4
+      image-source: /images/ui/checkbox
+      image-clip: 0 0 12 12
+      @onSetup: |
+        local value = modules.client_options.getOption('stowContainer')
+        self:setChecked(value)
+
+    UIWidget
+      size: 12 12
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-right: 5
+      margin-top: 5
+      image-source: /images/skin/show-gui-help-grey
+      !tooltip: tr('If you have checked this box, a confirmation dialog will open up \nwhenever you try to stow container content.')
+
 UIWidget
   anchors.fill: parent
   visible: false

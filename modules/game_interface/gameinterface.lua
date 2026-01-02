@@ -878,27 +878,31 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
     end
 
     if g_game.getClientVersion() >= 1410 then
-        if lookThing and not lookThing:isCreature() and not lookThing:isNotMoveable() and lookThing:isPickupable() then
-            local player = g_game.getLocalPlayer()
-            if player and player:isSupplyStashAvailable() then
-                local itemTier = lookThing:getTier() or 0
-                if itemTier <= 0 then
+        local player = g_game.getLocalPlayer()
+        if player and player:isSupplyStashAvailable() then
+            local itemTier = lookThing:getTier() or 0
+            if itemTier <= 0 then
+                if not isGoldCoin(useThing:getId()) and useThing:isMarketable() then
                     menu:addSeparator()
                     menu:addOption(tr("Stow"), function()
                         stashItem(lookThing)
                     end)
                     menu:addOption(tr("Stow all items of this type"), function()
                         g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
-                            lookThing:getStackPos(), 2)
+                            lookThing:getStackPos(), SUPPLY_STASH_ACTION_STOW_STACK)
                     end)
-
-                    local isContainer = lookThing:isContainer()
-                    if isContainer then
-                        menu:addOption(tr('Stow container\'s content'), function()
+                end
+                local isContainer = lookThing:isContainer()
+                if isContainer then
+                    menu:addOption(tr('Stow container\'s content'), function()
+                        if modules.client_options.getOption('stowContainer') then
+                            modules.game_stash.stowContainerContent(useThing, nil,
+                                false)
+                        else
                             g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
-                                lookThing:getStackPos(), 1)
-                        end)
-                    end
+                                lookThing:getStackPos(), SUPPLY_STASH_ACTION_STOW_CONTAINER)
+                        end
+                    end)
                 end
             end
         end
@@ -1444,15 +1448,39 @@ local function handleItemInteraction(item, widget, callback)
         spinbox.onValueChange = spinBoxValueChange
     end
 
+    local function cleanupAndDestroy()
+        -- Unbind keyboard events
+        g_keyboard.unbindKeyPress('Up', spinbox)
+        g_keyboard.unbindKeyPress('Down', spinbox)
+        g_keyboard.unbindKeyPress('Right', spinbox)
+        g_keyboard.unbindKeyPress('Left', spinbox)
+        g_keyboard.unbindKeyPress('PageUp', spinbox)
+        g_keyboard.unbindKeyPress('PageDown', spinbox)
+
+        -- Clear callbacks to release references
+        spinbox.onValueChange = nil
+        scrollbar.onValueChange = nil
+
+        -- Re-enable hotkeys
+        if widget.hotkeyBlock then
+            modules.game_hotkeys.enableHotkeys(widget.hotkeyBlock)
+            widget.hotkeyBlock = nil
+        end
+
+        -- Destroy the widget
+        widget:destroy()
+    end
+
     local okButton = widget:getChildById('buttonOk')
     local moveFunc = function()
-        callback(itembox:getItemCount())
-        okButton:getParent():destroy()
+        local itemCount = itembox:getItemCount()
+        cleanupAndDestroy()
+        callback(itemCount)
         widget = nil
     end
     local cancelButton = widget:getChildById('buttonCancel')
     local cancelFunc = function()
-        cancelButton:getParent():destroy()
+        cleanupAndDestroy()
         widget = nil
     end
 

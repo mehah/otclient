@@ -1,0 +1,70 @@
+CountWithdraw < NewMainWindow
+  id: countWithdraw
+  !text: tr('Retrieve Items')
+  size: 245 143
+
+  Panel
+    id: contentPanel
+    anchors.fill: parent
+    margin: 12 12 12 12
+
+    SpinBox
+      id: spinBox
+      anchors.left: parent.left
+      anchors.top: parent.top
+      width: 1
+      height: 1
+      phantom: true
+      margin-top: 2
+      focusable: true
+      cursor-visible: false
+
+    Item
+      id: item
+      anchors.left: parent.left
+      anchors.top: parent.top
+      focusable: false
+      virtual: true
+      virtual-count: true
+      show-count: false
+
+    UIWidget
+      size: 167 35
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 12
+      margin-top: 2
+      image-source: /images/ui/labels/retrieve-stash
+
+    HorizontalScrollBar
+      id: countScrollBar
+      anchors.left: item.right
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-left: 11
+      margin-top: 8
+      focusable: false
+      default-scroll: true
+
+    HorizontalSeparator
+      anchors.bottom: next.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 11
+
+    Button
+      id: buttonCancel
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      size: 43 20
+      font: cipsoftFont
+      !text: tr('Cancel')
+
+    Button
+      id: buttonOk
+      anchors.right: prev.left
+      anchors.bottom: parent.bottom
+      margin-right: 6
+      size: 43 20
+      font: cipsoftFont
+      !text: tr('Ok')
