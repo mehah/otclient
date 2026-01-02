@@ -1864,12 +1864,19 @@ function testExtendedView(mode)
         gameMainRightPanel:setImageColor('alpha')
         gameBottomPanel:addAnchor(AnchorTop, 'gameBottomActionPanel', AnchorBottom)
         gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        gameLeftActionPanel:setImageSource('alpha')
+        gameRightActionPanel:setImageSource('alpha')
+        gameLeftActionPanel:setBorderWidthRight(0)
+        gameRightActionPanel:setBorderWidthLeft(0)
     else
         -- Reset to normal view
         gameMainRightPanel:setHeight(200)
         gameMainRightPanel:setMarginTop(0)
         gameMainRightPanel:setImageColor('white')
-
+        gameLeftActionPanel:setImageSource('/images/ui/actionbar/actionbar_background-light')
+        gameRightActionPanel:setImageSource('/images/ui/actionbar/actionbar_background-light')
+        gameLeftActionPanel:setBorderWidthRight(1)
+        gameRightActionPanel:setBorderWidthLeft(1)
         local buttons = { leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
             leftDecreaseSidePanels }
 
