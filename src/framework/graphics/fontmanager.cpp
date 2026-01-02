@@ -30,13 +30,13 @@ FontManager g_fonts;
 
 void FontManager::init()
 {
-    TTFLoader::init(); // Inicializar FreeType
+    TTFLoader::init();
 }
 
 void FontManager::terminate()
 {
     clearFonts();
-    TTFLoader::terminate(); // Finalizar FreeType
+    TTFLoader::terminate();
 }
 
 void FontManager::clearFonts() {
@@ -59,7 +59,6 @@ bool FontManager::importFont(const std::string& file)
         const auto& fontNode = doc->at("Font");
         const auto& name = fontNode->valueAt("name");
 
-        // remove any font with the same name
         for (auto it = m_fonts.begin(); it != m_fonts.end(); ++it) {
             if ((*it)->getName() == name) {
                 m_fonts.erase(it);
@@ -73,7 +72,6 @@ bool FontManager::importFont(const std::string& file)
 
         if (!m_defaultFont || fontNode->valueAt("default", false))
 
-        // set as default if needed
         if (!m_defaultFont || fontNode->valueAt<bool>("default", false))
 
             m_defaultFont = font;
@@ -99,7 +97,6 @@ bool FontManager::importTTF(const std::string& file, int fontSize, int strokeWid
 
         const auto& name = font->getName();
         
-        // Remover fonte com o mesmo nome se existir
         for (auto it = m_fonts.begin(); it != m_fonts.end(); ++it) {
             if ((*it)->getName() == name) {
                 m_fonts.erase(it);
@@ -112,7 +109,6 @@ bool FontManager::importTTF(const std::string& file, int fontSize, int strokeWid
         if (!m_defaultFont)
             m_defaultFont = font;
         
-        g_logger.info("TTF font '{}' imported successfully (size: {}px, stroke: {}px)", name, fontSize, strokeWidth);
         return true;
         
     } catch (const stdext::exception& e) {
