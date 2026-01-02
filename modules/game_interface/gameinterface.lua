@@ -609,6 +609,10 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end, shortcut)
     end
 
+    if lookThing and not lookThing:isCreature() and not lookThing:isNotMoveable() and lookThing:isPickupable() then
+        menu:addOption(tr('Inspect'), function() g_game.inspectionNormalObject(lookThing:getPosition()) end)
+    end
+
     if not classic and not mobile then
         shortcut = '(Ctrl)'
     else

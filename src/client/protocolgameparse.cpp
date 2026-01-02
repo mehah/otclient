@@ -1615,12 +1615,12 @@ void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
 {
-    msg->getU8(); // 0x00
-    msg->getU8(); // bool is cyclopedia
-    msg->getU32(); // creature ID (version 13.00)
-    msg->getU8(); // 0x01
+    msg->getU8();                       // 0x00
+    uint8_t inspectType = msg->getU8(); // 0x01 is cyclopedia - 0x02 is proficiency
+    uint32_t playerId = msg->getU32();  // creature ID (version 13.00)
+    msg->getU8();                       // 0x01
 
-    msg->getString(); // item name
+    const std::string& itemName = msg->getString(); // item name
     const auto& item = getItem(msg);
 
     msg->getU8(); // 0x00
@@ -1635,7 +1635,10 @@ void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
         descriptions.emplace_back(firstDescription, secondDescription);
     }
 
-    g_game.processItemDetail(item->getId(), descriptions);
+    g_lua.callGlobalField("g_game", "onInspection", inspectType, itemName, item, descriptions);
+    if (inspectType == 1) {
+        g_game.processItemDetail(item->getId(), descriptions);
+    }
 }
 
 void ProtocolGame::parseAddInventoryItem(const InputMessagePtr& msg)

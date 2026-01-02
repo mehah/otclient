@@ -52,5 +52,6 @@ Module
     - game_cyclopedia
     - game_creatureinformation
     - game_rewardwall
+    - game_inspect
   @onLoad: init()
   @onUnload: terminate()
