@@ -672,7 +672,6 @@ function openPlayerReportRuleViolationWindow()
 end
 
 function addTab(name, focus)
-    print('addTab', name)
     local tab = getTab(name)
     if tab then -- is channel already open
         if not focus then
