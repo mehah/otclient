@@ -165,11 +165,13 @@ public:
     void sendQuickLoot(const uint8_t variant, const Position& pos, const uint16_t itemId, const uint8_t stackpos);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
+    // wheel of destiny related
     void sendOpenDestinyWheel(uint32_t playerId);
     void sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uint32_t greenGemId, uint32_t redGemId, uint32_t blueGemId, uint32_t purpleGemId);
-    void sendInspectionNormalObject(const Position& position);
+    void sendGemAtelierAction(uint8_t action, uint8_t param1, uint16_t param2, bool param3 = false);
     void sendInspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
-
+	void sendInspectionNormalObject(const Position& position);
+	
     // otclient only
     void sendChangeMapAwareRange(uint8_t xrange, uint8_t yrange);
 
@@ -371,8 +373,7 @@ private:
     // 15x
     void parseProficiency(const InputMessagePtr& msg);
     void parseProficiencyExperience(const InputMessagePtr& msg);
-    void parseWeaponProficiencyExperience(const InputMessagePtr& msg);
-    void parseWeaponProficiencyInfo(const InputMessagePtr& msg);
+  
 
     void parseHighscores(const InputMessagePtr& msg);
     void parseAttachedEffect(const InputMessagePtr& msg);

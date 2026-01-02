@@ -783,7 +783,17 @@ function StatsBar.onUpdateProficiencyData(itemCache, hasUnnusedPerk, thingType)
     local percentLabel = statsBar:recursiveGetChildById('proficiencyLabel')
     local proficiencyIcon = statsBar:recursiveGetChildById('proficiencyIcon')
 
-    if not modules.game_proficiency or not modules.game_proficiency.ProficiencyData then return end
+    -- Check if module is properly loaded and initialized
+    if not modules.game_proficiency or
+       not modules.game_proficiency.ProficiencyData or
+       type(modules.game_proficiency.ProficiencyData) ~= 'table' then
+        -- Module not loaded or not properly initialized - hide all proficiency UI elements
+        if highlightButton then highlightButton:setVisible(false) end
+        if percentBar then percentBar:setVisible(false) end
+        if percentLabel then percentLabel:setVisible(false) end
+        if proficiencyIcon then proficiencyIcon:setVisible(false) end
+        return
+    end
     
     local proficiencyId = thingType:getProficiencyId()
     if not proficiencyId or proficiencyId == 0 then return end

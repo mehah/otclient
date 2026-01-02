@@ -1598,6 +1598,14 @@ void Game::sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uin
     m_protocolGame->sendApplyWheelPoints(pointsInvested, greenGemId, redGemId, blueGemId, purpleGemId);
 }
 
+void Game::sendGemAtelierAction(uint8_t action, uint8_t param1, uint16_t param2, bool param3)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendGemAtelierAction(action, param1, param2, param3);
+}
+
 void Game::sendWeaponProficiencyAction(const uint8_t proficiencyType, const uint16_t itemId)
 {
     if (!canPerformGameAction())

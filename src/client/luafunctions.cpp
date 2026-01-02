@@ -360,6 +360,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "sendRequestUsefulThings", &Game::sendRequestUsefulThings, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendOpenDestinyWheel", &Game::sendOpenDestinyWheel, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendApplyWheelPoints", &Game::sendApplyWheelPoints, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendGemAtelierAction", &Game::sendGemAtelierAction, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendWeaponProficiencyAction", &Game::sendWeaponProficiencyAction, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendWeaponProficiencyApply", &Game::sendWeaponProficiencyApply, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendRequestStoreHome", &Game::sendRequestStoreHome, &g_game);

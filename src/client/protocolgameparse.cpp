@@ -161,12 +161,15 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerFeatures:
                     parseFeatures(msg);
                     break;
+               case Proto::GameServerProficiency:
+                    parseProficiency(msg);
+                    break;
+                case Proto::GameServerProficiencyExperience:
+                    parseProficiencyExperience(msg);
+                    break;
                 case Proto::GameServerFloorDescription:
                     parseFloorDescription(msg);
-                    break;
-                case Proto::GameServerWeaponProficiencyExperience:
-                    parseWeaponProficiencyExperience(msg);
-                    break;
+                    break;         
                 case Proto::GameServerImbuementDurations:
                     parseImbuementDurations(msg);
                     break;
@@ -470,10 +473,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerCyclopediaHouseAuctionMessage:
                     parseCyclopediaHouseAuctionMessage(msg);
                     break;
-                case Proto::GameServerWeaponProficiencyInfo:
-                    parseWeaponProficiencyInfo(msg);
-                    break;
-                case Proto::GameServerCyclopediaHousesInfo:
+                 case Proto::GameServerCyclopediaHousesInfo:
                     parseCyclopediaHousesInfo(msg);
                     break;
                 case Proto::GameServerCyclopediaHouseList:
@@ -6523,39 +6523,7 @@ void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
 
     g_game.processHighscore(serverName, world, worldType, battlEye, vocations, categories, page, totalPages, highscores, entriesTs);
 }
-
-void ProtocolGame::parseWeaponProficiencyExperience(const InputMessagePtr& msg)
-{
-    uint16_t itemId = msg->getU16();
-    uint32_t experience = msg->getU32();
-    uint8_t hasUnnusedPerk = msg->getU8();
-    const auto& thingType = g_things.getThingType(itemId, ThingCategoryItem);
-    g_lua.callGlobalField("g_game", "onProficiencyNotification", itemId, experience, hasUnnusedPerk, thingType);
-}
-
-void ProtocolGame::parseWeaponProficiencyInfo(const InputMessagePtr& msg)
-{
-    const uint16_t itemId     = msg->getU16();
-    const uint32_t experience = msg->getU32();
-    const uint8_t  count      = msg->getU8();
-
-    std::vector<WeaponProficiencyPerk> perks;
-    perks.reserve(count);
-    for (uint8_t i = 0; i < count; ++i) {
-        const uint8_t levelIdx = msg->getU8();
-        const uint8_t perkIdx  = msg->getU8();
-        perks.emplace_back(WeaponProficiencyPerk{levelIdx, perkIdx});
-    }
-
-    uint16_t marketCategory = 0;
-    const auto& tt = g_things.getThingType(itemId, ThingCategoryItem);
-    if (tt) {
-        marketCategory = static_cast<uint16_t>(tt->getMarketData().category);
-    }
-
-    g_lua.callGlobalField("g_game", "onWeaponProficiency", itemId, experience, perks, marketCategory);
-}
-
+ 
 void ProtocolGame::parseProficiency(const InputMessagePtr& msg)
 {
     const uint16_t itemId     = msg->getU16();
@@ -6584,8 +6552,8 @@ void ProtocolGame::parseProficiencyExperience(const InputMessagePtr& msg)
     uint16_t itemId = msg->getU16();
     uint32_t experience = msg->getU32();
     uint8_t hasUnnusedPerk = msg->getU8();
-    const auto& thingType = g_things.getThingType(itemId, ThingCategoryItem);
-    g_lua.callGlobalField("g_game", "onProficiencyNotification", itemId, experience, hasUnnusedPerk, thingType);
+    const auto& item = Item::create(itemId);
+    g_lua.callGlobalField("g_game", "onProficiencyNotification", itemId, experience, hasUnnusedPerk, item);
 }
 
 void ProtocolGame::parseAttachedPaperdoll(const InputMessagePtr& msg) {

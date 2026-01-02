@@ -1682,3 +1682,30 @@ void ProtocolGame::sendApplyWheelPoints(const std::vector<uint16_t>& pointsInves
 
     send(msg);
 }
+
+void ProtocolGame::sendGemAtelierAction(uint8_t action, uint8_t param1, uint16_t param2, bool param3)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+ 
+    msg->addU8(0xE7);
+    msg->addU8(action);
+ 
+    uint8_t encodedParam = param1;
+    if (action == 0 || action == 2 || action == 3) {
+        if (encodedParam == 0 && param2 != 0) {
+            encodedParam = static_cast<uint8_t>(param2 & 0xFF);
+        }
+        msg->addU8(encodedParam);
+    } else if (action == 1) {
+        // Reveal
+        msg->addU8(encodedParam);
+    } else if (action == 4) {
+        // ImproveGrade: param1 (fragmentType), następnie pos (u8) z param2
+        msg->addU8(encodedParam);
+        msg->addU8(static_cast<uint8_t>(param2 & 0xFF));
+    } else {
+        // Fallback: wyślij tylko jeden bajt parametru
+        msg->addU8(encodedParam);
+    }
+    send(msg);
+}

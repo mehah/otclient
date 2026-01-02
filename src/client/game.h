@@ -314,8 +314,12 @@ public:
     void sendRequestStoreHome();
     void sendRequestStorePremiumBoost();
     void sendRequestUsefulThings(const uint8_t serviceType);
+    
+    // wheel of destiny related
     void sendOpenDestinyWheel(uint32_t playerId);
     void sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uint32_t greenGemId, uint32_t redGemId, uint32_t blueGemId, uint32_t purpleGemId);
+    void sendGemAtelierAction(uint8_t action, uint8_t param1, uint16_t param2, bool param3 = false);
+
     void sendWeaponProficiencyAction(const uint8_t proficiencyType, const uint16_t itemId = 0);
     void sendWeaponProficiencyApply(uint16_t itemId, const std::map<uint8_t, uint8_t>& perks);
     void sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType);

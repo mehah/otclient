@@ -259,6 +259,7 @@ namespace Proto
 
         ClientOpenDestinyWheel = 97,
         ClientApplyWheelPoints = 98,
+        ClientGemAtelierAction = 99,  // 0x63
         // original tibia ONLY
         ClientImbuementDurations = 96,
         ClientAutoWalk = 100,

@@ -79,12 +79,16 @@ function terminate()
 end
 
 function onGameStart()
+
 	WeaponProficiency.allProficiencyRequested = false
 	WeaponProficiency.saveWeaponMissing = false
 	WeaponProficiency.firstItemRequested = nil
 	loadProficiencyJson()
+
+
 	WeaponProficiency.button = modules.game_mainpanel.addToggleButton('ProciencyButton', tr('Open Proficiency'),
             '/images/options/weaponProficiency', function() requestOpenWindow() end, false, 10)
+
 end
 
 function onGameEnd()
@@ -135,6 +139,7 @@ function sortWeaponProficiency(marketCategory)
 end
 
 function requestOpenWindow(redirectItem)
+
 	local category = "Weapons: All"
 	local targetItemId = nil
 	local leftSlotItem = modules.game_inventory.getLeftSlotItem()
@@ -160,22 +165,26 @@ function requestOpenWindow(redirectItem)
 		WeaponProficiency.firstItemRequested = redirectItem
 	end
 
-	local focusFirstChild = false
-	local focusVocation = (category ~= "Weapons: All")
-	if not focusVocation then
-		focusFirstChild = true
-		sortWeaponProficiency(MarketCategory.WeaponsAll)
-	end
+	-- Only show window if it's not already visible
+	if not WeaponProficiency.window:isVisible() then
+		local focusFirstChild = false
+		local focusVocation = (category ~= "Weapons: All")
+		if not focusVocation then
+			focusFirstChild = true
+			sortWeaponProficiency(MarketCategory.WeaponsAll)
+		end
 
-	WeaponProficiency.filters["vocButton"] = focusVocation 
-	WeaponProficiency.window:recursiveGetChildById("vocButton"):setChecked(focusVocation, true)
+		WeaponProficiency.filters["vocButton"] = focusVocation
+		WeaponProficiency.window:recursiveGetChildById("vocButton"):setChecked(focusVocation, true)
 
-	WeaponProficiency:onClearSearch(true)
-	WeaponProficiency:onWeaponCategoryChange(category, nil, targetItemId, focusFirstChild)
+		WeaponProficiency:onClearSearch(true)
+		WeaponProficiency:onWeaponCategoryChange(category, nil, targetItemId, focusFirstChild)
 
-	if WeaponProficiency.allProficiencyRequested then
-		--g_client.setInputLockWidget(WeaponProficiency.window)
 		show()
+	else
+		-- Window is already visible, just focus it without changing category
+		WeaponProficiency.window:raise()
+		WeaponProficiency.window:focus()
 	end
 end
 
@@ -220,11 +229,22 @@ end
 
 ---------------------------
 ---------------------------
-local function canChangeWeaponPerks()
+local function canChangeWeaponPerks(weaponItem)
 	local player = g_game.getLocalPlayer()
 	if not player or not g_game.isOnline() then
 		return false
 	end
+	
+	-- Verifica se a arma está equipada
+	if weaponItem then
+		local weaponId = weaponItem:getId()
+		local leftHand = player:getInventoryItem(InventorySlotLeft)
+		local rightHand = player:getInventoryItem(InventorySlotRight)
+		
+		local isEquipped = (leftHand and leftHand:getId() == weaponId) or (rightHand and rightHand:getId() == weaponId)
+		return isEquipped
+	end
+	
 	return true
 end
 
@@ -242,12 +262,6 @@ local function isMasteryAchieved(targetItem)
 end
 
 local function enableBonusIcon(bonusIcon, iconGrey, hightLightWidget, borderWidget, bonusDescWidget, bonusTooltip, augmentIconDarker, perkData)
-	if bonusIcon.blocked or bonusIcon.active or bonusIcon.locked then
-		return true
-	end
-
-	local visible = not iconGrey:isVisible()
-
 	iconGrey:setVisible(false)
 	hightLightWidget:setVisible(true)
 	borderWidget:setImageSource("/images/game/proficiency/border-weaponmasterytreeicons-active")
@@ -282,7 +296,7 @@ local function disableBonusIcon(iconGrey, hightLightWidget, borderWidget, bonusD
 	end
 end
 
-local function disableOtherBonusIcons(currentPerkPanel, currentBonusIcon)
+local function disableOtherBonusIcons(currentPerkPanel, currentBonusIcon, levelIndex)
 	for i = 0, 2 do
 		local bonusIcon = currentPerkPanel:getChildById("bonusIcon" .. i)
 		if bonusIcon and bonusIcon ~= currentBonusIcon and bonusIcon.active then
@@ -301,6 +315,19 @@ local function disableOtherBonusIcons(currentPerkPanel, currentBonusIcon)
 			if augmentIcon:isVisible() then
 				augmentIconDarker:setVisible(true)
 				augmentIconDarker:setOpacity(1)
+			end
+			
+			-- Atualiza o bonusDetail para este nível
+			if levelIndex and WeaponProficiency.bonusDetailPanel then
+				local bonusDetail = WeaponProficiency.bonusDetailPanel:getChildById("bonusDetail_" .. levelIndex)
+				if bonusDetail then
+					local bonusDescWidget = bonusDetail:recursiveGetChildById("bonusName")
+					if bonusDescWidget and bonusIcon.perkData then
+						bonusDescWidget:setImageSource("/images/game/proficiency/icon-lock-grey")
+						bonusDescWidget:setText("")
+						bonusDescWidget:removeTooltip()
+					end
+				end
 			end
 		end
 	end
@@ -325,8 +352,18 @@ local function updatePercentWidgets(child, currentExperience, _index, itemType)
 	if percent >= 100 then
 		local iconTypo = isMasteryAchieved(itemType) and "gold" or "silver"
 		starWidget:getChildById("star"):setImageSource(string.format("/images/store/icon-star-%s", iconTypo))
+		-- Desbloqueia os perks deste nível, mas não força todos como ativos
 		for _, widget in pairs(child.currentPerkPanel:getChildren()) do
-			widget.blocked = false
+			if not widget.locked then
+				widget.blocked = false
+			end
+		end
+	else
+		-- Se o nível não foi alcançado, bloqueia todos os perks
+		for _, widget in pairs(child.currentPerkPanel:getChildren()) do
+			if not widget.locked then
+				widget.blocked = true
+			end
 		end
 	end
 end
@@ -399,11 +436,25 @@ local function createHoverHandler(bonusIcon, iconGrey, augmentIconDarker)
 	end
 end
 
-local function createClickHandler(bonusIcon, currentPerkPanel, bonusDetail, hightLightWidget, borderWidget, iconGrey, augmentIconDarker, bonusTooltip, perkData, itemId)
+local function createClickHandler(bonusIcon, currentPerkPanel, bonusDetail, hightLightWidget, borderWidget, iconGrey, augmentIconDarker, bonusTooltip, perkData, itemId, levelIndex)
 	return function()
-		if bonusIcon.blocked or bonusIcon.active or bonusIcon.locked then return end
-		disableOtherBonusIcons(currentPerkPanel, bonusIcon)
+		if bonusIcon.blocked or bonusIcon.locked then return end
+		
+		-- Se já está ativo, desabilita
+		if bonusIcon.active then
+			bonusIcon.active = false
+			disableBonusIcon(iconGrey, hightLightWidget, borderWidget, bonusDetail:recursiveGetChildById("bonusName"), augmentIconDarker, perkData)
+			WeaponProficiency:checkPerksMatch(itemId)
+			return
+		end
+		
+		-- Desabilita todos os outros perks do mesmo nível antes de ativar este
+		disableOtherBonusIcons(currentPerkPanel, bonusIcon, levelIndex)
+		
+		-- Habilita este perk
 		enableBonusIcon(bonusIcon, iconGrey, hightLightWidget, borderWidget, bonusDetail:recursiveGetChildById("bonusName"), bonusTooltip, augmentIconDarker, perkData)
+		
+		-- Atualiza os botões
 		WeaponProficiency:checkPerksMatch(itemId)
 	end
 end
@@ -415,8 +466,8 @@ function WeaponProficiency:reset()
 	self.allProficiencyRequested = false
 end
 
-function WeaponProficiency:updateMainButtons(currentData)
-	local enableReset = canChangeWeaponPerks() and table.size(currentData.perks) > 0
+function WeaponProficiency:updateMainButtons(currentData, currentItem)
+	local enableReset = currentItem and canChangeWeaponPerks(currentItem) and table.size(currentData.perks) > 0
 	local resetButton = self.window:getChildById("reset")
 	local applyButton = self.window:getChildById("apply")
 	local okButton = self.window:getChildById("ok")
@@ -427,8 +478,10 @@ function WeaponProficiency:updateMainButtons(currentData)
 	okButton:setOn(false)
 
 	local resetTooltip = "Reset your perks"
-	if not canChangeWeaponPerks() then
-		resetTooltip = "You can only reset your perks in a protection zone."
+	if not currentItem then
+		resetTooltip = "No weapon selected."
+	elseif not canChangeWeaponPerks(currentItem) then
+		resetTooltip = "This weapon is not equipped."
 	elseif table.empty(currentData.perks) then
 		resetTooltip = "You don't have any perks to reset."
 	end
@@ -755,7 +808,13 @@ function WeaponProficiency:onItemListFocusChange(selectedCache)
 			widget.currentPerkPanel = currentPerkPanel
 		end
 
-		local widgetIsBlocked = not canChangeWeaponPerks() and currentData.perks[i - 1]
+		local isWeaponEquipped = canChangeWeaponPerks(displayItem)
+		local widgetIsBlocked = not isWeaponEquipped
+		local activePerkIndex = currentData.perks[i - 1] -- Guarda qual perk deve estar ativo para este nível
+		
+		-- Primeiro atualiza o progresso/bloqueio baseado no XP
+		updatePercentWidgets(widget, currentData.exp, i, displayItem)
+		
 		for index, perkData in ipairs(levelData.Perks) do
 			local bonusIcon = currentPerkPanel:getChildById(string.format("bonusIcon%s", index - 1))
 			local icon = bonusIcon:getChildById("icon")
@@ -777,21 +836,23 @@ function WeaponProficiency:onItemListFocusChange(selectedCache)
 
 			setupPerkIconGrey(perkData, iconSource, iconClip, iconGrey, augmentIconNormal, augmentIconDarker)
 
-			if currentData.perks[i - 1] == index - 1 then
-				bonusIcon.blocked = false
-				enableBonusIcon(bonusIcon, iconGrey, hightLightWidget, borderWidget, bonusDetail:recursiveGetChildById("bonusName"), bonusTooltip, augmentIconDarker, perkData)
-			end
-
 			if widgetIsBlocked then
 				bonusIcon:getChildById("locked-perk"):setVisible(true)
 				bonusIcon.locked = true
+				bonusIcon.blocked = true  -- For\u00e7a bloqueio se arma n\u00e3o equipada
+			end
+			
+			-- Ativa APENAS o perk que está salvo para este nível (se houver) E se o nível foi desbloqueado
+			if activePerkIndex ~= nil and activePerkIndex == index - 1 then
+				-- bonusIcon.blocked já foi configurado por updatePercentWidgets
+				if not bonusIcon.blocked and not bonusIcon.locked then
+					enableBonusIcon(bonusIcon, iconGrey, hightLightWidget, borderWidget, bonusDetail:recursiveGetChildById("bonusName"), bonusTooltip, augmentIconDarker, perkData)
+				end
 			end
 
 			bonusIcon.onHoverChange = createHoverHandler(bonusIcon, iconGrey, augmentIconDarker)
-			bonusIcon.onClick = createClickHandler(bonusIcon, currentPerkPanel, bonusDetail, hightLightWidget, borderWidget, iconGrey, augmentIconDarker, bonusTooltip, perkData, displayItemId)
+			bonusIcon.onClick = createClickHandler(bonusIcon, currentPerkPanel, bonusDetail, hightLightWidget, borderWidget, iconGrey, augmentIconDarker, bonusTooltip, perkData, displayItemId, i)
 		end
-
-		updatePercentWidgets(widget, currentData.exp, i, displayItem)
 	end
 end
 
@@ -804,16 +865,26 @@ function WeaponProficiency:onUpdateSelectedProficiency(itemId)
 	local currentData = self.cacheList[itemId] or {exp = 0, perks = {}}
 	local experience = currentData.exp
 	self:updateExperienceProgress(experience, #self.perkPanel:getChildren(), currentItem)
-	self:updateMainButtons(currentData)
+	self:updateMainButtons(currentData, currentItem)
 
 	for i, child in ipairs(self.perkPanel:getChildren()) do
+		local isWeaponEquipped = canChangeWeaponPerks(currentItem)
+		local widgetIsBlocked = not isWeaponEquipped
+		local savedPerkIndex = currentData.perks[i - 1] -- Qual perk está salvo para este nível
+		
+		-- Atualiza o progresso/bloqueio baseado no XP primeiro
 		updatePercentWidgets(child, experience, i, currentItem)
-
-		local widgetIsBlocked = not canChangeWeaponPerks() and currentData.perks[i - 1]
+		
+		-- Primeiro, reseta todos os perks deste nível
 		for index, widget in pairs(child.currentPerkPanel:getChildren()) do
 			widget.active = false
-			widget.blocked = false
-			widget.locked = false
+			-- Não altera widget.blocked aqui, foi configurado por updatePercentWidgets
+			if not widgetIsBlocked then
+				widget.locked = false
+			else
+				widget.locked = true
+				widget.blocked = true  -- Força bloqueio se arma não equipada
+			end
 			
 			local iconGrey = widget:getChildById("icon-grey")
 			local borderWidget = widget:getChildById("border")
@@ -824,27 +895,27 @@ function WeaponProficiency:onUpdateSelectedProficiency(itemId)
 			disableBonusIcon(iconGrey, hightLightWidget, borderWidget, bonusDetail:recursiveGetChildById("bonusName"), augmentIconDarker, widget.perkData)
 		end
 		
+		-- Depois, ativa apenas o perk salvo (se houver E se o nível foi desbloqueado)
 		for index, widget in pairs(child.currentPerkPanel:getChildren()) do
 			if widgetIsBlocked then
 				widget:getChildById("locked-perk"):setVisible(true)
 				widget.locked = true
 			end
 
-			if currentData.perks[i - 1] == index - 1 then
-				widget.blocked = false
-				widget.locked = false
+			if savedPerkIndex ~= nil and savedPerkIndex == index - 1 then
+				-- Só ativa se não estiver bloqueado e não estiver locked
+				if not widget.blocked and not widget.locked then
+					local iconGrey = widget:getChildById("icon-grey")
+					local borderWidget = widget:getChildById("border")
+					local hightLightWidget = widget:getChildById("highlight")
+					local augmentIconDarker = widget:getChildById("iconPerks-grey")
+					local bonusDetail = self.bonusDetailPanel:getChildById("bonusDetail_" .. i)
+					local _, bonusTooltip = ProficiencyData:getBonusNameAndTooltip(widget.perkData)
 
-				local iconGrey = widget:getChildById("icon-grey")
-				local borderWidget = widget:getChildById("border")
-				local hightLightWidget = widget:getChildById("highlight")
-				local augmentIconDarker = widget:getChildById("iconPerks-grey")
-				local bonusDetail = self.bonusDetailPanel:getChildById("bonusDetail_" .. i)
-				local _, bonusTooltip = ProficiencyData:getBonusNameAndTooltip(widget.perkData)
-
-				enableBonusIcon(widget, iconGrey, hightLightWidget, borderWidget, bonusDetail:recursiveGetChildById("bonusName"), bonusTooltip, augmentIconDarker, widget.perkData)
+					enableBonusIcon(widget, iconGrey, hightLightWidget, borderWidget, bonusDetail:recursiveGetChildById("bonusName"), bonusTooltip, augmentIconDarker, widget.perkData)
+				end
 			end
 		end
-		::continue::
 	end
 
 	self:checkPerksMatch(itemId)
@@ -961,7 +1032,7 @@ function WeaponProficiency:onApplyChanges(button, targetItem)
 end
 
 function WeaponProficiency:onResetWeapon(button)
-	if not canChangeWeaponPerks() or not button:isOn() then
+	if not button:isOn() then
 		return
 	end
 
@@ -969,51 +1040,58 @@ function WeaponProficiency:onResetWeapon(button)
 	if not currentItem then
 		return
 	end
+	
+	if not canChangeWeaponPerks(currentItem) then
+		return
+	end
 
+	local currentItemId = currentItem:getId()
+	local weaponEntry = self.cacheList[currentItemId] or {}
+	local perksSize = table.size(weaponEntry.perks)
+
+	if perksSize == 0 then
+		button:setOn(false)
+		return
+	end
+	
+	-- Envia reset para o servidor
+	g_game.sendWeaponProficiencyAction(2, currentItemId)
+	
+	-- Limpa o cache local
+	weaponEntry.perks = {}
+	
 	local applyButton = self.window:getChildById("apply")
 	local okButton = self.window:getChildById("ok")
 	local closeButton = self.window:getChildById("close")
-	local weaponEntry = self.cacheList[currentItem:getId()] or {}
-	local perksSize = table.size(weaponEntry.perks)
-
+	
 	button:setOn(false)
-	applyButton:setOn(perksSize > 0)
-	okButton:setOn(perksSize > 0)
-
+	applyButton:setOn(false)
+	okButton:setOn(false)
+	closeButton:setText("Close")
+	self.saveWeaponMissing = false
+	
 	button:setTooltip("You don't have any perks to reset.")
+	local text = "No changes have been made to your perks."
+	applyButton:setTooltip(text)
+	okButton:setTooltip(text)
 
-	if perksSize > 0 then
-		local text = "Apply changes to your perks"
-		applyButton:setTooltip(text)
-		okButton:setTooltip(text)
-		closeButton:setText("Cancel")
-		self.saveWeaponMissing = true
-	else
-		local text = "No changes have been made to your perks."
-		applyButton:setTooltip(text)
-		okButton:setTooltip(text)
-		closeButton:setText("Close")
-	end
-
+	-- Desabilita todos os perks visualmente
 	for i, child in ipairs(self.perkPanel:getChildren()) do
 		local bonusDetail = self.bonusDetailPanel:getChildById("bonusDetail_" .. i)
 
 		for index, widget in pairs(child.currentPerkPanel:getChildren()) do
 			widget:getChildById("locked-perk"):setVisible(false)
+			widget.active = false
+			widget.locked = false
+			-- widget.blocked mantém o estado baseado no XP
 
-			if widget.active then
-				widget.blocked = false
-				widget.locked = false
-				widget.active = false
-
-				local iconGrey = widget:getChildById("icon-grey")
-				local borderWidget = widget:getChildById("border")
-				local hightLightWidget = widget:getChildById("highlight")
-				local augmentIconDarker = widget:getChildById("iconPerks-grey")
-				local detailChild = bonusDetail:recursiveGetChildById("bonusName")
-				if detailChild then
-					disableBonusIcon(iconGrey, hightLightWidget, borderWidget, detailChild, augmentIconDarker, widget.perkData)
-				end
+			local iconGrey = widget:getChildById("icon-grey")
+			local borderWidget = widget:getChildById("border")
+			local hightLightWidget = widget:getChildById("highlight")
+			local augmentIconDarker = widget:getChildById("iconPerks-grey")
+			local detailChild = bonusDetail:recursiveGetChildById("bonusName")
+			if detailChild then
+				disableBonusIcon(iconGrey, hightLightWidget, borderWidget, detailChild, augmentIconDarker, widget.perkData)
 			end
 		end
 	end
