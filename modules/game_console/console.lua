@@ -672,6 +672,7 @@ function openPlayerReportRuleViolationWindow()
 end
 
 function addTab(name, focus)
+    print('addTab', name)
     local tab = getTab(name)
     if tab then -- is channel already open
         if not focus then
@@ -2324,6 +2325,11 @@ end
 function activateReadOnlyMode(channelName)
     activeactiveReadOnlyTabName = channelName
     readOnlyButton:setText(activeactiveReadOnlyTabName)
+    if activeactiveReadOnlyTabName:len() > 13 then
+        readOnlyButton:setWidth(readOnlyButton:getTextSize().width + 10)
+    else
+        readOnlyButton:setWidth(readOnlyButton.tabWidth)
+    end
     copyMessagesToReadOnlyPanel(channelName)
     local tab = consoleTabBar:getTab(channelName)
     if tab then
@@ -2417,6 +2423,7 @@ function toggleReadOnlyMode()
         readOnlyButton:setIcon("/images/game/console/readOnly")
         readOnlyButton:setImageSource("")
         activeactiveReadOnlyTabName = ""
+        readOnlyButton:setWidth(readOnlyButton.tabWidth)
     else
         consoleContentPanel:removeAnchor(AnchorRight)
         consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)

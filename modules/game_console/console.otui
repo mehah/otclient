@@ -63,11 +63,13 @@ ConsoleTabBarButton < UIButton
   image-clip: 0 18 96 18
   color: #7f7f7fff
   font: verdana-11px-rounded
-  &ignoreTextResize: true
   anchors.top: parent.top
   anchors.left: parent.left
   padding: 5
   tab-spacing: 0
+  padding-left: 20
+  padding-right: 20
+  &tabWidth: 95
 
   $checked:
     image-clip: 0 0 96 18
@@ -303,8 +305,9 @@ Panel
     font: verdana-11px-rounded
     padding: 5
     tab-spacing: 0
-    &ignoreTextResize: true
-    text-auto-resize: false
+    &tabWidth: 95
+    padding-left: 20
+    padding-right: 20
     $checked:
       image-clip: 0 0 96 18
       color: #dfdfdfff
@@ -317,7 +320,8 @@ Panel
     id: sayModeButton
     anchors.left: parent.left
     anchors.bottom: parent.bottom
-    margin-bottom: 3
+    margin-bottom: 4
+    margin-left: 5
     size: 18 18
     image-source: /images/ui/console_say
     image-clip: 0 0 18 18
@@ -349,6 +353,7 @@ Panel
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     margin-bottom: 3
+    margin-right: 3
     size: 64 18
     color: #c0c0c0ff
     font: cipsoftFont
