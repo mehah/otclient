@@ -1,9 +1,9 @@
 Module
   name: game_stash
   description: Manages enter game and character list windows
-  author: ZLukSrT#8740
+  author: Aluisio Penna, ZLukSrT#8740
   sandboxed: true
-  website: https://hadesot.com.br/
+  website: https://github.com/mehah/otclient
   scripts: [ stash ]
   @onLoad: init()
   @onUnload: terminate()
