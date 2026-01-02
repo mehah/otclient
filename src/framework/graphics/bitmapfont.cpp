@@ -161,6 +161,9 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
     for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
         if (glyph < 32) continue;
+		
+        if (m_glyphsSize[glyph].width() == 0 || m_glyphsSize[glyph].height() == 0)
+            continue;		
 
         Rect glyphScreenCoords(glyphsPositions[i] + Point(dx, dy) + m_glyphsOffset[glyph], m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
@@ -204,6 +207,9 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
     for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
         if (glyph < 32) continue;
+		
+        if (m_glyphsSize[glyph].width() == 0 || m_glyphsSize[glyph].height() == 0)
+            continue;		
 
         Rect glyphScreenCoords(glyphsPositions[i] + Point(dx, dy) + m_glyphsOffset[glyph], m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
@@ -259,6 +265,9 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
 
         const int glyph = static_cast<uint8_t>(text[i]);
         if (glyph < 32) continue;
+		
+        if (m_glyphsSize[glyph].width() == 0 || m_glyphsSize[glyph].height() == 0)
+            continue;		
 
         Rect glyphScreenCoords(glyphsPositions[i] + m_glyphsOffset[glyph], m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
@@ -302,7 +311,7 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
     int lines = 0;
 
     if (textBoxSize && textLength == 0) {
-        textBoxSize->resize(0, m_glyphHeight);
+        textBoxSize->resize(0, m_glyphHeight + m_yOffset);
         return;
     }
 
@@ -341,7 +350,7 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
         }
     }
 
-    Point vpos(0, m_yOffset);
+    Point vpos(0, 0);
     lines = 0;
 
     for (int i = 0; i < textLength; ++i) {
@@ -370,7 +379,7 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
 
     if (textBoxSize) {
         textBoxSize->setWidth(maxLineWidth);
-        textBoxSize->setHeight(vpos.y + m_glyphHeight);
+        textBoxSize->setHeight(vpos.y + m_glyphHeight + m_yOffset);
     }
 }
 

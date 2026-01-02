@@ -71,12 +71,13 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
         return nullptr;
     }
 
+    g_logger.info("TTFLoader::load called with file='{}', fontSize={}", file, fontSize);
+
     try {
-        // Carregar arquivo TTF
+
         std::string resolvedPath;
         std::string fileName = file;
         
-        // Se não tem extensão, adicionar .ttf
         if (fileName.find(".ttf") == std::string::npos && fileName.find(".otf") == std::string::npos) {
             fileName += ".ttf";
         }
@@ -93,7 +94,6 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
             searchPaths = { fileName };
         }
         
-        // Procurar em cada diretório
         for (const auto& path : searchPaths) {
             if (g_resources.fileExists(path)) {
                 resolvedPath = path;
@@ -106,7 +106,8 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
             return nullptr;
         }
 
-        // Ler arquivo como buffer de bytes
+        g_logger.info("TTF font file found: {}", resolvedPath);
+
         std::string fontBuffer = g_resources.readFileContents(resolvedPath);
         
         if (fontBuffer.empty()) {
@@ -114,7 +115,7 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
             return nullptr;
         }
 
-        // Criar face do FreeType
+
         FT_Face face;
         if (FT_New_Memory_Face(s_library, 
                                reinterpret_cast<const FT_Byte*>(fontBuffer.data()), 
@@ -125,26 +126,26 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
             return nullptr;
         }
 
-        // Configurar tamanho da fonte (em pixels)
+
         if (FT_Set_Pixel_Sizes(face, 0, fontSize)) {
             g_logger.error("Failed to set font size: " + file);
             FT_Done_Face(face);
             return nullptr;
         }
 
-        // Criar BitmapFont
+
         std::string fontName = file;
-        // Remover extensão
+
         size_t lastDot = fontName.find_last_of('.');
         if (lastDot != std::string::npos) {
             fontName = fontName.substr(0, lastDot);
         }
-        // Remover path
+		
         size_t lastSlash = fontName.find_last_of("/\\");
         if (lastSlash != std::string::npos) {
             fontName = fontName.substr(lastSlash + 1);
         }
-        // Adicionar tamanho ao nome para identificar variantes de tamanho
+
         fontName = fontName + "_" + std::to_string(fontSize);
 
         auto font = std::make_shared<BitmapFont>(fontName);
@@ -154,7 +155,6 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
         const int lastGlyph = 255;
         const int padding = 2;
 
-        // Primeira passagem: calcular dimensões e advances
         int maxGlyphWidth = 0;
         int maxGlyphHeight = 0;
         Size glyphsSize[256];       // Tamanho visual do glyph (bitmap)
@@ -201,7 +201,6 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
         // Criar atlas RGBA
         std::vector<uint8_t> atlasPixels(atlasWidth * atlasHeight * 4, 0);
 
-        // Segunda passagem: copiar glyphs para o atlas
         Rect glyphsCoords[256];
         
         for (int i = firstGlyph; i <= lastGlyph; ++i) {
@@ -210,7 +209,6 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
                 continue;
             }
 
-            // Recarregar glyph
             if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
                 continue;
             }
@@ -218,17 +216,18 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
             FT_GlyphSlot slot = face->glyph;
             const FT_Bitmap& bitmap = slot->bitmap;
 
-            // Calcular posição no atlas
             const int col = i % glyphsPerRow;
             const int row = i / glyphsPerRow;
             const int atlasX = col * (maxGlyphWidth + padding);
             const int atlasY = row * (maxGlyphHeight + padding);
 
-            glyphsCoords[i] = Rect(atlasX, atlasY, (int)bitmap.width, (int)bitmap.rows);
+            glyphsCoords[i] = Rect(atlasX, atlasY, glyphsSize[i].width(), glyphsSize[i].height());
 
-            // Copiar pixels
-            for (unsigned int y = 0; y < bitmap.rows; ++y) {
-                for (unsigned int x = 0; x < bitmap.width; ++x) {
+            const int copyWidth = std::min((int)bitmap.width, glyphsSize[i].width());
+            const int copyHeight = std::min((int)bitmap.rows, glyphsSize[i].height());
+            
+            for (int y = 0; y < copyHeight; ++y) {
+                for (int x = 0; x < copyWidth; ++x) {
                     const int srcIdx = y * bitmap.pitch + x;
                     const int dstX = atlasX + x;
                     const int dstY = atlasY + y;
@@ -245,7 +244,6 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
         }
 
 
-        // Criar imagem e textura
         ImagePtr image = std::make_shared<Image>(Size(atlasWidth, atlasHeight), 4, atlasPixels.data());
         TexturePtr texture = TexturePtr(new Texture(image));
         texture->setSmooth(true);
@@ -261,17 +259,15 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
         
         for (int i = firstGlyph; i <= lastGlyph; ++i) {
             if (glyphsSize[i].height() > 0) {
-                // O offset Y é: ascender - bearingY (distância do topo da linha até o topo do glyph)
+
                 int yOffset = ascender - glyphsBearingY[i];
                 minYOffset = std::min(minYOffset, yOffset);
                 maxYOffset = std::max(maxYOffset, yOffset + glyphsSize[i].height());
             }
         }
         
-        // Shift para garantir que nenhum offset seja negativo
         int yShift = (minYOffset < 0) ? -minYOffset : 0;
         
-        // Configurar fonte (usando friend class)
         font->m_texture = texture;
         font->m_glyphHeight = std::max(lineHeight, maxYOffset - minYOffset + yShift);
         font->m_firstGlyph = 32;
@@ -279,33 +275,29 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
         font->m_glyphSpacing = Size(0, 0);
         
         for (int i = 0; i < 256; ++i) {
-            // Tamanho visual do glyph (do bitmap)
+
             font->m_glyphsSize[i] = glyphsSize[i];
             font->m_glyphsTextureCoords[i] = glyphsCoords[i];
-            
-            // Offset Y para alinhar na baseline
-            // Apenas para caracteres com bitmap visual
+
             if (glyphsSize[i].height() > 0) {
                 int offsetY = ascender - glyphsBearingY[i] + yShift;
                 font->m_glyphsOffset[i] = Point(glyphsBearingX[i], offsetY);
             } else {
-                // Caracteres sem bitmap (espaço, etc) - offset Y = 0
+
                 font->m_glyphsOffset[i] = Point(0, 0);
             }
-            
-            // Advance horizontal - se for 0 e o glyph tem tamanho, usar o tamanho como fallback
+
             if (glyphsAdvance[i] > 0) {
                 font->m_glyphsAdvance[i] = glyphsAdvance[i];
             } else if (glyphsSize[i].width() > 0) {
-                // Fallback: usar largura do glyph + bearing como advance
+
                 font->m_glyphsAdvance[i] = glyphsSize[i].width() + std::max(0, glyphsBearingX[i]);
             } else {
-                // Caractere não carregado - usar 0
+
                 font->m_glyphsAdvance[i] = 0;
             }
         }
         
-        // Espaço (32) - garantir que tenha valores corretos
         if (font->m_glyphsAdvance[32] <= 0) {
             font->m_glyphsAdvance[32] = fontSize / 3;
         }
@@ -317,6 +309,25 @@ BitmapFontPtr TTFLoader::load(const std::string& file, int fontSize)
         font->m_glyphsAdvance[127] = 1;
         font->m_glyphsSize[static_cast<int>('\n')] = Size(1, font->m_glyphHeight);
         font->m_glyphsAdvance[static_cast<int>('\n')] = 0;
+
+
+        g_logger.info("=== TTF Font Metrics Debug ===");
+        g_logger.info("Font: {}, Size: {}px", fontName, fontSize);
+        g_logger.info("Ascender: {}, Descender: {}, LineHeight: {}", ascender, descender, lineHeight);
+        g_logger.info("Calculated glyphHeight: {}, yOffset: {}, yShift: {}", font->m_glyphHeight, font->m_yOffset, yShift);
+        g_logger.info("minYOffset: {}, maxYOffset: {}", minYOffset, maxYOffset);
+        g_logger.info("Space (32) advance: {}, size: {}x{}", font->m_glyphsAdvance[32], font->m_glyphsSize[32].width(), font->m_glyphsSize[32].height());
+        
+        for (char c : {'A', 'a', 'M', 'm', 'g', 'y'}) {
+            int idx = static_cast<int>(c);
+            g_logger.info("Char '{}' ({}): advance={}, size={}x{}, offset=({},{}), bearing=({},{})", 
+                c, idx, 
+                font->m_glyphsAdvance[idx], 
+                font->m_glyphsSize[idx].width(), font->m_glyphsSize[idx].height(),
+                font->m_glyphsOffset[idx].x, font->m_glyphsOffset[idx].y,
+                glyphsBearingX[idx], glyphsBearingY[idx]);
+        }
+        g_logger.info("=== End TTF Debug ===");
 
         FT_Done_Face(face);
         g_logger.info("TTF font loaded successfully: " + fontName + " (size: " + std::to_string(fontSize) + "px, height: " + std::to_string(font->m_glyphHeight) + ")");

@@ -11,9 +11,11 @@ ShowOffWidget < UIWidget
     margin-left: 10
     image-auto-resize: true
 
-  UITextEdit
+  Label
     id: description
     size: 476 0
+    ttf-font: arial
+    ttf-font-size: 24	
     anchors.left: image.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
@@ -31,7 +33,7 @@ Panel
   anchors.horizontalCenter: parent.horizontalCenter
   image-source: /images/ui/panel_top
   
-  UIWidget
+  Label
     phantom: true
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter
