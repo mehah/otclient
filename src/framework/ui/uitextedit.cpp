@@ -54,6 +54,8 @@ UITextEdit::UITextEdit()
     m_placeholderColor = Color::gray;
     m_placeholderFont = g_fonts.getDefaultFont();
     m_placeholderAlign = Fw::AlignLeftCenter;
+    // Always use 1.0 to prevent distortion with TTF fonts
+    m_fontScale = 1.0f;	
     blinkCursor();
 }
 
@@ -84,17 +86,35 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     if (textLength == 0) {
         if (m_placeholderColor != Color::alpha && !m_placeholder.empty())
             m_placeholderFont->drawText(m_placeholder, m_drawArea, m_placeholderColor, m_placeholderAlign);
+        return;  // No text to render
     }
-
+	
+    // This ensures TTF font offsets are always correctly applied
     if (m_color != Color::alpha) {
-        g_drawPool.setDrawOrder(m_textDrawOrder);
-        if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
-            g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_color);
-        } else {
-            for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer)
-                g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color);
+        for (int i = 0; i < textLength; ++i) {
+            const auto& [dest, src] = m_glyphsCoords[i];
+            if (dest.isValid() && src.isValid()) {
+                // Apply text colors if available
+                Color glyphColor = m_color;
+                if (!m_drawTextColors.empty()) {
+                    // Find the color for this glyph
+                    for (size_t colorIdx = 0; colorIdx < m_drawTextColors.size(); ++colorIdx) {
+                        if (i >= m_drawTextColors[colorIdx].first) {
+                            if (colorIdx + 1 < m_drawTextColors.size()) {
+                                if (i < m_drawTextColors[colorIdx + 1].first) {
+                                    glyphColor = m_drawTextColors[colorIdx].second;
+                                    break;
+                                }
+                            } else {
+                                glyphColor = m_drawTextColors[colorIdx].second;
+                                break;
+                            }
+                        }
+                    }
+                }
+                g_drawPool.addTexturedRect(dest, texture, src, glyphColor);
+            }
         }
-        g_drawPool.resetDrawOrder();
     }
 
     if (hasSelection()) {
@@ -255,6 +275,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     Size textBoxSize;
     m_font->calculateGlyphsPositions(m_drawText, m_textAlign, m_glyphsPositionsCache, &textBoxSize);
     const Rect* glyphsTextureCoords = m_font->getGlyphsTextureCoords();
+    const Point* glyphsOffset = m_font->getGlyphsOffset();  // Get glyph offsets for TTF fonts	
     const Size* glyphsSize = m_font->getGlyphsSize();
 
     if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
@@ -544,10 +565,12 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 
         const uint8_t glyph = static_cast<uint8_t>(m_drawText[i]);
         m_glyphsCoords[i].first.clear();
-        if (glyph < 32)
+        
+		if (glyph < 32)
             continue;
 
-        Rect glyphScreenCoords(m_glyphsPositionsCache[i], glyphsSize[glyph]);
+        // Add glyph offset for proper TTF font rendering (same as BitmapFont::fillTextCoords)
+        Rect glyphScreenCoords(m_glyphsPositionsCache[i] + glyphsOffset[glyph], glyphsSize[glyph]);
         Rect glyphTextureCoords = glyphsTextureCoords[glyph];
 
         if (m_textAlign & Fw::AlignBottom) {
@@ -1173,8 +1196,17 @@ void UITextEdit::onHoverChange(const bool hovered)
 void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
     UIWidget::onStyleApply(styleName, styleNode);
+		
+    // Force scale to 1.0 to prevent distortion with TTF fonts
+    m_fontScale = 1.0f;	
 
-    for (const auto& node : styleNode->children()) {
+    for (const auto& node : styleNode->children()) {    // Force scale to 1.0 to prevent distortion with TTF fonts
+    m_fontScale = 1.0f;	
+        if (node->tag() == "ttf-font" || node->tag() == "ttf-font-size" || 
+            node->tag() == "ttf-stroke-width" || node->tag() == "ttf-stroke-color" ||
+            node->tag() == "stroke" || node->tag() == "font" || node->tag() == "font-scale") {
+            continue;
+        }		
         if (node->tag() == "text") {
             setText(node->value());
             setCursorPos(m_text.length());

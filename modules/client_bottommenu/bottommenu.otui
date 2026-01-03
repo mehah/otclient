@@ -11,7 +11,7 @@ ShowOffWidget < UIWidget
     margin-left: 10
     image-auto-resize: true
 
-  Label
+  UITextEdit
     id: description
     size: 480 0
     ttf-font: arial
@@ -42,7 +42,7 @@ Panel
     margin-bottom: 110
     text: OTClient Redemption
     ttf-font: 28 Days Later
-    ttf-font-size: 120
+    ttf-font-size: 100
     stroke: 2 black
     shader: Map - Party
     
