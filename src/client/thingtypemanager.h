@@ -33,9 +33,9 @@ public:
     void init();
     void terminate();
 
-    bool loadDat(std::string file);
+    bool loadDat(std::string file, const uint16_t resourceId);
     bool loadOtml(std::string file);
-    bool loadAppearances(const std::string& file);
+    bool loadAppearances(const std::string& file, const uint16_t resourceId);
     bool loadStaticData(const std::string& file);
 
 #ifdef FRAMEWORK_EDITOR

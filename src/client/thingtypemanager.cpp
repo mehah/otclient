@@ -68,7 +68,7 @@ void ThingTypeManager::terminate()
 #endif
 }
 
-bool ThingTypeManager::loadDat(std::string file)
+bool ThingTypeManager::loadDat(std::string file, const uint16_t resourceId)
 {
     m_datLoaded = false;
     m_datSignature = 0;
@@ -142,7 +142,7 @@ bool ThingTypeManager::loadOtml(std::string file)
     }
 }
 
-bool ThingTypeManager::loadAppearances(const std::string& file)
+bool ThingTypeManager::loadAppearances(const std::string& file, const uint16_t resourceId)
 {
     try {
         if (!g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {

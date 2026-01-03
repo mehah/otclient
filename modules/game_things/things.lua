@@ -1,11 +1,6 @@
 ThingsLoaderController = Controller:new()
 
-local filename = nil
 local loaded = false
-
-function setFileName(name)
-    filename = name
-end
 
 function isLoaded()
     return loaded
@@ -41,47 +36,208 @@ local function tryLoadDatWithFallbacks(datPath)
     return false
 end
 
-local function load(version)
-    local errorList = {}
+local function findFileByExtension(path, ext)
+	-- find Tibia.ext
+	local fileName = "Tibia" .. ext
+	local resolvedPath = resolvepath(path .. fileName)
+	if g_resources.fileExists(resolvedPath) then
+		return resolvedPath
+	end
 
-    if version >= 1281 and not g_game.getFeature(GameLoadSprInsteadProtobuf) then
-        local filePath = resolvepath(string.format('/things/%d/', version))
-        if not g_things.loadAppearances(filePath) then
-            errorList[#errorList + 1] = "Couldn't load assets"
-        end
-        if not g_things.loadStaticData(filePath) then
-            errorList[#errorList + 1] = "Couldn't load staticdata"
-        end
-    else
-        local datPath, sprPath
-        if filename then
-            datPath = resolvepath('/data/things/' .. filename)
-            sprPath = resolvepath('/data/things/' .. filename)
-        else
-            datPath = resolvepath('/data/things/' .. version .. '/Tibia')
-            sprPath = resolvepath('/data/things/' .. version .. '/Tibia')
-        end
-
-        g_logger.setLevel(5)
-        if not tryLoadDatWithFallbacks(datPath) then
-            errorList[#errorList + 1] = tr('Unable to load dat file, please place a valid dat in \'%s.dat\'', datPath)
-        end
-        g_logger.setLevel(1)
-
-        if not g_sprites.loadSpr(sprPath) then
-            errorList[#errorList + 1] = tr('Unable to load spr file, please place a valid spr in \'%s.spr\'', sprPath)
-        end
-        if g_game.getFeature(GameLoadSprInsteadProtobuf) and version >= 1281 then
-            local staticPath = resolvepath(string.format('/things/%d/appearances', version))
-            if not g_things.loadAppearances(staticPath) then
-                g_logger.warning(string.format(
-                    "[game_things.load()] Couldn't load /things/%d/appearances.dat, possible packets error.", version))
-            end
+	-- find any filename.ext
+	resolvedPath = resolvepath(path)
+    local files = g_resources.listDirectoryFiles(resolvedPath)
+    for _, file in ipairs(files) do
+		-- match .otfi extension
+		if file:lower():sub(ext:len()) == ext then
+			resolvedPath = resolvepath(path .. "/" .. file)
+            return resolvedPath
         end
     end
 
+	-- no file found
+end
+
+-- helper to get boolean from parsed otfi
+local function toboolean(v)
+    if v == nil then
+        return false
+    end
+
+    if type(v) == "boolean" then
+        return v
+    end
+
+    if type(v) ~= "string" then
+        return false
+    end
+
+    v = string.lower(v)
+    return v == "true" or v == "1" or v == "yes" or v == "on" or v == "enabled"
+end
+
+local function setFeature(feature, value)
+	if value == nil then
+		-- use version default if not defined in otfi
+		return
+	elseif toboolean(value) then
+		-- evaluated to true
+		g_game.enableFeature(feature)
+	else
+		-- evaluated to false
+		g_game.disableFeature(feature)
+	end
+end
+
+local function addError(errorList, message, resourceId)
+	if resourceId > 0 then
+		errorList[#errorList + 1] = string.format("Resource %d: %s", resourceId, message)
+	else
+		errorList[#errorList + 1] = message
+	end
+end
+
+local function loadResource(path, version, resourceId, errorList)
+	-- file loading fallback order:
+	-- 1. catalog-content.json - if found: load assets
+	-- 2. Tibia.otfi - if found: load dat specified in it
+	-- 3. any otfi - if found: load dat specified in it
+	-- 4. Tibia.dat
+	-- 5. any dat
+
+	-- assets
+	if g_resources.fileExists(resolvepath(path .. 'catalog-content.json')) then
+		if not g_things.loadAppearances(resolvepath(path .. 'appearances'), resourceId) then
+            addError(errorList, "Couldn't load assets", resourceId)
+        end
+        if not g_things.loadStaticData(path) then
+            addError(errorList, "Couldn't load staticdata", resourceId)
+        end
+
+		return
+	end
+
+	-- otfi-defined spr/dat
+	local otfiPath = findFileByExtension(path, ".otfi")
+	if otfiPath then
+		-- read config from otfi
+		local otfiSettings = g_configs.create(otfiPath)
+		if not otfiSettings then
+			addError(errorList, "Failed to load OTFI", resourceId)
+			return
+		end
+
+		local datSpr = otfiSettings:getNode("DatSpr")
+		if not datSpr then
+			addError(errorList, "Invalid OTFI structure", resourceId)
+			return
+		end
+
+		-- nodes priority:
+		-- 1. otfi assets-name
+		-- 2. otfi "-file" nodes
+		-- 3. (if not defined by otfi) Tibia .spr/.dat
+		local sprName = "Tibia.spr"
+		local datName = "Tibia.dat"
+
+		local assetsName = datSpr["assets-name"]
+		if assetsName then
+			sprName = assetsName .. ".spr"
+			datName = assetsName .. ".dat"
+		else
+			sprName = datSpr["sprites-file"] or sprName
+			datName = datSpr["metadata-file"] or datName
+		end
+
+		-- set features according to otfi
+		setFeature(GameSpritesU32, datSpr["extended"])
+		setFeature(GameSpritesAlphaChannel, datSpr["transparency"])
+		setFeature(GameIdleAnimations, datSpr["frame-groups"])
+		setFeature(GameEnhancedAnimations,datSpr["frame-durations"])
+
+		-- check if otfi-specified dat file exists
+		local datPath = resolvepath(path .. datName)
+		if not g_resources.fileExists(datPath) then
+			addError(errorList, string.format("Unable to load %s: file not found", datName), resourceId)
+			return
+		end
+
+		-- try to load dat file
+		if not g_things.loadDat(datPath, resourceId) then
+			addError(errorList, string.format("Failed to read %s: file structure does not match the defined version or OTFI specification", datName), resourceId)
+			return
+		end
+	else
+		-- normal spr/dat
+		local datPath = findFileByExtension(path, ".dat")
+		if not datPath then
+			addError(errorList, "DAT file not found", resourceId)
+			return
+		end
+
+		local datResult = tryLoadDatWithFallbacks(datPath, resourceId)
+		if not datResult then
+			addError(errorList, "Failed to read dat file: file structure does not match the defined version", resourceId)
+		end
+	end
+end
+
+local function resourcesFromXML(filePath)
+    local file = io.open(filePath, "r")
+    if not file then
+        return nil
+    end
+
+    local content = file:read("*a")
+    file:close()
+
+    if not content then
+        return nil
+    end
+
+	local resources = {}
+    for id, version, dir in content:gmatch('<resource id="(%d+)" version="(%d+)" dir="(%s+)"') do
+        id = tonumber(id)
+        version = tonumber(version)
+
+		if id and version then
+			resources[id] = {version = version, dir = dir}
+        end
+    end
+
+    return resources
+end
+
+local function load(version)
+	-- prevent calling again after a failed attempt
+	if version == 0 then
+		return
+	end
+
+    local errorList = {}
+	local path = string.format('/data/things/%s/', version)
+
+	local packPath = resolvepath(path .. 'packinfo.xml')
+	if g_resources.fileExists(packPath) then
+		local packInfo = resourcesFromXML(packPath)
+		if not packInfo then
+			addError(errorList, "Failed to decode packinfo.xml", 0)
+			return
+		end
+
+		for resourceId, resInfo in pairs(packInfo) do
+			loadResource(path .. resInfo.dir, resInfo.version, resourceId, errorList)
+
+			if #errorList > 0 then
+				break
+			end
+		end
+	else
+		loadResource(path, version, 0, errorList)
+	end
+
     loaded = #errorList == 0
-    if loaded then
+    if loaded and version > 1300 then
         -- loading client files was successful, try to load sounds now
         -- sound files are optional, this means that failing to load them
         -- will not block logging into game

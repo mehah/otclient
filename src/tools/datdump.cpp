@@ -174,7 +174,7 @@ bool run(const Request& request)
     if (request.clientVersion > 0)
         g_game.setClientVersion(static_cast<uint16_t>(request.clientVersion));
 
-    if (!g_things.loadDat(request.datPath)) {
+    if (!g_things.loadDat(request.datPath, 0)) { // TO DO: multispr?
         throw std::runtime_error("unable to load DAT file: " + request.datPath);
     }
 
