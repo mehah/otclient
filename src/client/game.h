@@ -411,7 +411,7 @@ public:
     void inspectionNormalObject(const Position& position);
     void inspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
     void requestBestiary();
-    void requestBestiaryOverview(std::string_view catName);
+    void requestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
     void requestBestiarySearch(uint16_t raceId);
     void requestSendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void requestSendCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage = 0, uint16_t page = 0);

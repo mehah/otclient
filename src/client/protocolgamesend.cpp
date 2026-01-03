@@ -1057,12 +1057,19 @@ void ProtocolGame::sendRequestBestiary()
     send(msg);
 }
 
-void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName)
+void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName, bool search, std::vector<uint16_t> raceIds)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBestiaryRequestOverview);
-    msg->addU8(0x00);
-    msg->addString(catName);
+    msg->addU8(search ? 0x01 : 0x00);
+    if (search) {
+        msg->addU16(static_cast<uint16_t>(raceIds.size()));
+        for (const uint16_t raceId : raceIds) {
+            msg->addU16(raceId);
+        }
+    } else {
+        msg->addString(catName);
+    }
     send(msg);
 }
 
