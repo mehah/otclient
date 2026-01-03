@@ -1,7 +1,7 @@
 Module
   name: game_market
   description: Market system module
-  author: BeniS, libergod
+  author: R!ck && Christianlb, BeniS, libergod
   website: https://github.com/edubart/otclient
   sandboxed: true
   dependencies: [ gamelib ]
