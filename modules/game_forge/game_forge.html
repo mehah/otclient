@@ -144,11 +144,8 @@
             <span class="transfer-header">{{self.fusion.title}}</span>
             <div class="transfer-requirements-wrapper">
               <div
-                *if="self.fusion.isConvergence"
-                background-color="lightblue"
-                height="85"
-                image-size="155 90"
-                class="transfer-select-donnor-container"
+                *if="self.fusion.isConvergence and self.fusion.convergenceItems"
+                class="transfer-select-donnor-container fusion-convergence-container"
                 layout="type: grid; cell-size: 34 34;cell-spacing:2;num-columns:4"
               >
                 <div

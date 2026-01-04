@@ -43,6 +43,7 @@
   align-items: center;
 }
 .item-rarity {
+  position: absolute;
   width: 34px;
   height: 34px;
 }
@@ -147,6 +148,16 @@
   padding-left: 8px;
   margin-top: 15px;
   width: 100px;
+}
+
+.fusion-convergence-container {
+  --image-border: 1;
+  --image-source: "/modules/game_forge/images/scrollarea";
+  --image-size: 155 85;
+  width: 155px;
+  height: 85px;
+  overflow: scroll;
+  padding: 2px;
 }
 .transfer-requirements-wrapper {
   display: flex;

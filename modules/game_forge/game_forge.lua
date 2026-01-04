@@ -554,6 +554,7 @@ ForgeController.fusion = {
 
     clip = { x = 0, y = 0, width = 116, height = 34 },
     items = {},
+    convergenceItems = {},
     selected = cloneValue(ForgeController.baseSelected),
     selectedTarget = cloneValue(ForgeController.baseSelected),
     canFusion = false,
