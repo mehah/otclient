@@ -77,7 +77,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
     auto& list = m_objects[m_currentDrawOrder];
     auto& state = getCurrentState();
 
-    if (!list.empty() && list.back().state == state) {
+    if (!list.empty() && list.back().coords && list.back().state == state) {
         auto& last = list.back();
         coordsBuffer ? last.coords->append(coordsBuffer.get()) : addCoords(*last.coords, method);
     } else if (m_alwaysGroupDrawings) {
