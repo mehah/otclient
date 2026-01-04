@@ -461,7 +461,6 @@
     <ClCompile Include="..\src\framework\otml\otmlexception.cpp" />
     <ClCompile Include="..\src\framework\otml\otmlnode.cpp" />
     <ClCompile Include="..\src\framework\otml\otmlparser.cpp" />
-    <ClCompile Include="..\src\framework\ini\inidocument.cpp" />    
     <ClCompile Include="..\src\framework\platform\platform.cpp" />
     <ClCompile Include="..\src\framework\platform\platformwindow.cpp" />
     <ClCompile Include="..\src\framework\platform\win32crashhandler.cpp" />
@@ -645,9 +644,6 @@
     <ClInclude Include="..\src\framework\otml\otmlexception.h" />
     <ClInclude Include="..\src\framework\otml\otmlnode.h" />
     <ClInclude Include="..\src\framework\otml\otmlparser.h" />
-    <ClInclude Include="..\src\framework\ini\declarations.h" />
-    <ClInclude Include="..\src\framework\ini\inidocument.h" />
-    <ClInclude Include="..\src\framework\ini\ini.h" />
     <ClInclude Include="..\src\framework\pch.h" />
     <ClInclude Include="..\src\framework\platform\crashhandler.h" />
     <ClInclude Include="..\src\framework\platform\platform.h" />
