@@ -25,7 +25,7 @@
 #include "declarations.h"
 
 #include <framework/graphics/bitmapfont.h>
-#include <framework/ini/declarations.h>
+#include <framework/otml/declarations.h>
 
  // @bindclass
 class GameConfig
@@ -56,7 +56,6 @@ public:
     uint16_t getShieldBlinkTicks() { return m_shieldBlinkTicks; }
     uint16_t getVolatileSquareDuration() const { return m_volatileSquareDuration; }
 
-    bool isDrawingCoveredThings() const { return m_drawCoveredThings; }
     uint16_t getInvisibleTicksPerFrame() const { return m_invisibleTicksPerFrame; }
     uint16_t getItemTicksPerFrame() const { return m_itemTicksPerFrame; }
     uint16_t getEffectTicksPerFrame() const { return m_effectTicksPerFrame; }
@@ -81,17 +80,17 @@ public:
     void loadFonts();
 
 private:
-    void loadGameSection(const INISectionPtr& section);
-    void loadFontSection(const INISectionPtr& section);
-    void loadMapSection(const INISectionPtr& section);
-    void loadTileSection(const INISectionPtr& section);
-    void loadCreatureSection(const INISectionPtr& section);
-    void loadPlayerSection(const INISectionPtr& section);
-    void loadRenderSection(const INISectionPtr& section);
+    void loadGameNode(const OTMLNodePtr& node);
+    void loadFontNode(const OTMLNodePtr& node);
+    void loadMapNode(const OTMLNodePtr& node);
+    void loadTileNode(const OTMLNodePtr& node);
+    void loadCreatureNode(const OTMLNodePtr& node);
+    void loadPlayerNode(const OTMLNodePtr& node);
+    void loadRenderNode(const OTMLNodePtr& node);
 
     // Game
     uint8_t m_spriteSize{ 32 };
-    uint16_t m_lastSupportedVersion{ 1332 };
+    uint16_t m_lastSupportedVersion{ 1511 };
     bool m_drawTyping{ false };
     std::string m_typingIcon{ "/images/game/console/typing" };
 
@@ -120,7 +119,6 @@ private:
     double m_playerDiagonalWalkSpeed{ 3 };
 
     // Render
-    bool m_drawCoveredThings{ false };
     uint16_t m_invisibleTicksPerFrame{ 500 };
     uint16_t m_itemTicksPerFrame{ 500 };
     uint16_t m_effectTicksPerFrame{ 75 };
