@@ -188,7 +188,6 @@ local function inventoryEvent(player, slot, item, oldItem)
         return
     end
 
-    -- Tratamento especial para slot Right: se há item real, restaura estado normal
     if slot == InventorySlotRight and item then
         local slotPanel, toggler = getSlotInfo(ui)
         slotPanel.item:setOpacity(1.0)
