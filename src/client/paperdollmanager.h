@@ -27,7 +27,7 @@
 class PaperdollManager
 {
 public:
-    PaperdollPtr set(uint16_t id, uint16_t thingId);
+    PaperdollPtr set(uint16_t id, uint16_t thingId, uint16_t thingResourceId);
     PaperdollPtr getById(uint16_t id);
 
     void remove(uint16_t id) { m_paperdolls.erase(id); }

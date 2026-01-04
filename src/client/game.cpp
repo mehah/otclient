@@ -841,9 +841,9 @@ void Game::use(const ThingPtr& thing)
     g_lua.callGlobalField("g_game", "onUse", pos, thing->getId(), thing->getStackPos(), 0);
 }
 
-void Game::useInventoryItem(const uint16_t itemId)
+void Game::useInventoryItem(const uint16_t itemId, const uint16_t resourceId)
 {
-    if (!canPerformGameAction() || !g_things.isValidDatId(itemId, ThingCategoryItem))
+    if (!canPerformGameAction() || !g_things.isValidDatId(itemId, ThingCategoryItem, resourceId))
         return;
 
     const auto& pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
@@ -1479,13 +1479,13 @@ void Game::equipItem(const ItemPtr& item)
     }
 }
 
-void Game::equipItemId(const uint16_t itemId, const uint8_t tier)
+void Game::equipItemId(const uint16_t itemId, const uint8_t tier, const uint16_t resourceId)
 {
     if (!canPerformGameAction())
         return;
 
     if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
-        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
         if (thing && thing->getClassification() > 0) {
             m_protocolGame->sendEquipItemWithTier(itemId, tier);
             return;

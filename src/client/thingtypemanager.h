@@ -88,7 +88,7 @@ public:
         // no resources allocated
         return false;
     }
-    bool isValidDatId(const uint16_t id, const ThingCategory category) const { return category < ThingLastCategory && id >= 1 && id < m_thingTypes[category].size(); }
+    bool isValidDatId(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const;
 
 private:
 

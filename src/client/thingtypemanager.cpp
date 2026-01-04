@@ -242,6 +242,12 @@ uint16_t ThingTypeManager::getContentRevision(const uint16_t resourceId) const
     return res ? res->getContentRevision() : 0;
 }
 
+bool ThingTypeManager::isValidDatId(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const
+{
+    auto res = getResourceById(resourceId);
+    return res ? res->isValidDatId(id, category) : false;
+}
+
 const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const
 {
     auto res = getResourceById(resourceId);

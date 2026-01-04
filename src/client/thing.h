@@ -223,6 +223,7 @@ protected:
     Position m_position;
 
     uint16_t m_clientId{ 0 };
+    uint16_t m_resourceId{ 0 };
 
     int8_t m_stackPos{ -1 };
     uint8_t m_numPatternX{ 0 };

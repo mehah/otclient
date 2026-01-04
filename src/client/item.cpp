@@ -264,9 +264,9 @@ int Item::calculateAnimationPhase()
     return m_phase;
 }
 
-void Item::setId(uint32_t id)
+void Item::setId(uint32_t id, uint16_t resourceId)
 {
-    if (!g_things.isValidDatId(id, ThingCategoryItem))
+    if (!g_things.isValidDatId(id, ThingCategoryItem, resourceId))
         id = 0;
 
 #ifdef FRAMEWORK_EDITOR
@@ -274,6 +274,7 @@ void Item::setId(uint32_t id)
 #endif
 
     m_clientId = id;
+    m_resourceId = resourceId;
 
     // Shader example on only items that can be marketed.
     /*
@@ -284,7 +285,7 @@ void Item::setId(uint32_t id)
 }
 
 ThingType* Item::getThingType() const {
-    return g_things.getRawThingType(m_clientId, ThingCategoryItem);
+    return g_things.getRawThingType(m_clientId, ThingCategoryItem, m_resourceId);
 }
 
 #ifdef FRAMEWORK_EDITOR

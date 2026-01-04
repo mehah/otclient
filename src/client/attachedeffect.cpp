@@ -34,8 +34,8 @@
 #include "framework/graphics/texture.h"
 #include "framework/graphics/texturemanager.h"
 
-AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
-    if (!g_things.isValidDatId(thingId, category)) {
+AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category, const uint16_t resourceId) {
+    if (!g_things.isValidDatId(thingId, category, resourceId)) {
         g_logger.error("AttachedEffectManager::getInstance({}, {}): invalid thing with id or category.", thingId, static_cast<uint8_t>(category));
         return nullptr;
     }
@@ -43,6 +43,7 @@ AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCate
     const auto& obj = std::make_shared<AttachedEffect>();
     obj->m_thingId = thingId;
     obj->m_thingCategory = category;
+    obj->m_resourceId = resourceId;
     return obj;
 }
 
@@ -204,5 +205,5 @@ void AttachedEffect::move(const Position& fromPosition, const Position& toPositi
 }
 
 ThingType* AttachedEffect::getThingType() const {
-    return m_thingId > 0 ? g_things.getRawThingType(m_thingId, m_thingCategory) : nullptr;
+    return m_thingId > 0 ? g_things.getRawThingType(m_thingId, m_thingCategory, m_resourceId) : nullptr;
 }
