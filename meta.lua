@@ -151,7 +151,7 @@ g_things = {}
 
 ---@param file string
 ---@return boolean
-function g_things.loadAppearances(file) end
+function g_things.loadAppearances(file, resourceId) end
 
 ---@param file string
 ---@return boolean
@@ -159,11 +159,11 @@ function g_things.loadStaticData(file) end
 
 ---@param file string
 ---@return boolean
-function g_things.loadDat(file) end
+function g_things.loadDat(file, resourceId) end
 
 ---@param file string
 ---@return boolean
-function g_things.loadOtml(file) end
+function g_things.loadOtml(file, resourceId) end
 
 ---@return boolean
 function g_things.isDatLoaded() end
@@ -181,7 +181,7 @@ function g_things.getThingType(id, category) end
 
 ---@param category integer
 ---@return ThingType[]
-function g_things.getThingTypes(category) end
+function g_things.getThingTypes(category, resourceId) end
 
 ---@param attr integer
 ---@param category integer

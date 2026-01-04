@@ -23,6 +23,7 @@
 #pragma once
 
 #include "staticdata.h"
+#include "spritemanager.h"
 
 using RaceList = std::vector<RaceType>;
 static const RaceType emptyRaceType{};
@@ -33,8 +34,8 @@ public:
     void init();
     void terminate();
 
-    bool loadDat(std::string file, const uint16_t resourceId);
-    bool loadOtml(std::string file);
+    bool loadDat(const std::string& file, const uint16_t resourceId);
+    bool loadOtml(std::string file, uint16_t resourceId);
     bool loadAppearances(const std::string& file, const uint16_t resourceId);
     bool loadStaticData(const std::string& file);
 
@@ -67,27 +68,38 @@ public:
 
     const ThingTypePtr& getNullThingType() { return m_nullThingType; }
 
-    const ThingTypePtr& getThingType(uint16_t id, ThingCategory category);
-    ThingType* getRawThingType(uint16_t id, ThingCategory category);
+    const ThingTypePtr& getThingType(uint16_t id, ThingCategory category, const uint16_t resourceId) const;
+    ThingType* getRawThingType(uint16_t id, ThingCategory category, uint16_t resourceId) const;
 
-    const ThingTypeList& getThingTypes(ThingCategory category);
+    const ThingTypeList& getThingTypes(ThingCategory category, uint16_t resourceId = 0);
 
-    uint32_t getDatSignature() { return m_datSignature; }
-    uint16_t getContentRevision() { return m_contentRevision; }
+    AssetResourcePtr getResourceById(const uint16_t resourceId) const;
+    uint32_t getDatSignature(const uint16_t resourceId = 0) const;
+    uint16_t getContentRevision(const uint16_t resourceId = 0) const;
 
-    bool isDatLoaded() { return m_datLoaded; }
+    bool isDatLoaded() {
+        // return the state of the first resource encountered
+        for (const auto& resource : m_assetResources) {
+            if (resource) {
+                return m_assetResources.front()->isDatLoaded();
+            }
+        }
+
+        // no resources allocated
+        return false;
+    }
     bool isValidDatId(const uint16_t id, const ThingCategory category) const { return category < ThingLastCategory && id >= 1 && id < m_thingTypes[category].size(); }
 
 private:
-    ThingTypeList m_thingTypes[ThingLastCategory];
-    RaceList m_monsterRaces;
+
+    // loaded spr/dat/assets storage
+    // resources 0 .. n
+    AssetResourceList m_assetResources;
 
     ThingTypePtr m_nullThingType;
 
-    bool m_datLoaded{ false };
-
-    uint32_t m_datSignature{ 0 };
-    uint16_t m_contentRevision{ 0 };
+    // to do: resourceId support
+    RaceList m_monsterRaces;
 
 #ifdef FRAMEWORK_EDITOR
     ItemTypePtr m_nullItemType;
@@ -103,3 +115,42 @@ private:
 };
 
 extern ThingTypeManager g_things;
+
+class AssetResource
+{
+public:
+    uint32_t getDatSignature() const { return m_datSignature; }
+    uint16_t getContentRevision() const { return m_contentRevision; }
+
+    const ThingTypeList& getThingTypes(const ThingCategory category);
+
+    const ThingTypePtr& getThingType(uint16_t id, ThingCategory category);
+    ThingType* getRawThingType(uint16_t id, ThingCategory category);
+
+    void findThingTypesByAttr(ThingAttr attr, ThingCategory category, ThingTypeList& out) const;
+
+    // spr/dat
+    bool loadDat(const std::string& file);
+    bool isDatLoaded() const { return m_datLoaded; }
+    bool isValidDatId(const uint16_t id, const ThingCategory category) const { return category < ThingLastCategory && id >= 1 && id < m_thingTypes[category].size(); }
+
+    // protobuf assets
+    bool loadAppearances(const std::string& file);
+
+private:
+    ThingTypeList m_thingTypes[ThingLastCategory];
+
+    // sprite manager for current resource
+    // if assets: points to ProtobufSpriteManager object
+    // if spr/dat: points to LegacySpriteManager object
+    std::unique_ptr<ISpriteManager> spriteManager;
+
+    uint32_t m_datSignature{ 0 };
+    uint16_t m_contentRevision{ 0 };
+    uint16_t m_clientVersion{ 0 };
+    uint16_t resourceId{ 0 };
+
+    bool m_datLoaded{ false };
+
+    friend class GarbageCollection;
+};

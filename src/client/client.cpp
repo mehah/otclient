@@ -27,7 +27,6 @@
 #include "map.h"
 #include "mapview.h"
 #include "minimap.h"
-#include "spriteappearances.h"
 #include "spritemanager.h"
 #include "thingtypemanager.h"
 #include "uimap.h"

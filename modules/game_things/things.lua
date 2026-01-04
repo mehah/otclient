@@ -195,6 +195,9 @@ local function resourcesFromXML(filePath)
         return nil
     end
 
+	-- note: dat file may have different client version than protocol version
+	-- this is why it has to be defined in packinfo.xml
+	-- this ensures that dat flags will be read properly
 	local resources = {}
     for id, version, dir in content:gmatch('<resource id="(%d+)" version="(%d+)" dir="(%s+)"') do
         id = tonumber(id)

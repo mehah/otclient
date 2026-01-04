@@ -71,24 +71,54 @@ void GarbageCollection::thingType() {
         AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
 
     static uint8_t category{ ThingLastCategory };
-    static size_t index = 0;
 
-    if (category == ThingLastCategory)
-        category = ThingCategoryItem;
+    static size_t thingId = 0;
+    static size_t resourceId = 0;
+    size_t scanned = 0;
 
-    const auto& thingTypes = g_things.m_thingTypes[category];
-    const size_t limit = std::min<size_t>(index + AMOUNT_PER_CHECK, thingTypes.size());
-
-    while (index < limit) {
-        auto& thing = thingTypes[index];
-        if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME) {
-            thing->unload();
+    while (scanned < AMOUNT_PER_CHECK) {
+        if (resourceId >= g_things.m_assetResources.size()) {
+            resourceId = 0;
+            category = ThingCategoryItem;
+            thingId = 0;
         }
-        ++index;
-    }
 
-    if (limit == thingTypes.size()) {
-        index = 0;
-        ++category;
+        auto& res = g_things.m_assetResources[resourceId];
+        if (!res) {
+            ++resourceId;
+            category = ThingCategoryItem;
+            thingId = 0;
+            continue;
+        }
+
+        auto& things = res->m_thingTypes[category];
+        if (things.empty()) {
+            ++category;
+            thingId = 0;
+            if (category == ThingLastCategory) {
+                category = ThingCategoryItem;
+                ++resourceId;
+            }
+            continue;
+        }
+
+        const size_t limit = std::min(thingId + (AMOUNT_PER_CHECK - scanned), things.size());
+
+        for (; thingId < limit; ++thingId, ++scanned) {
+            auto& thing = things[thingId];
+            if (!thing) continue;
+
+            if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME)
+                thing->unload();
+        }
+
+        if (thingId == things.size()) {
+            thingId = 0;
+            ++category;
+            if (category == ThingLastCategory) {
+                category = ThingCategoryItem;
+                ++resourceId;
+            }
+        }
     }
 }

@@ -26,7 +26,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "game.h"
-#include "spriteappearances.h"
+#include "spritemanager.h"
 #include "thingtype.h"
 #include "framework/core/filestream.h"
 #include "framework/core/resourcemanager.h"
@@ -68,46 +68,29 @@ void ThingTypeManager::terminate()
 #endif
 }
 
-bool ThingTypeManager::loadDat(std::string file, const uint16_t resourceId)
+bool ThingTypeManager::loadDat(const std::string& file, const uint16_t resourceId)
 {
-    m_datLoaded = false;
-    m_datSignature = 0;
-    m_contentRevision = 0;
-    try {
-        file = g_resources.guessFilePath(file, "dat");
+    auto resource = std::make_shared<AssetResource>(resourceId);
 
-        const auto& fin = g_resources.openFile(file);
-        fin->cache(true);
-
-        m_datSignature = fin->getU32();
-        m_contentRevision = static_cast<uint16_t>(m_datSignature);
-
-        for (auto& thingType : m_thingTypes) {
-            const int count = fin->getU16() + 1;
-            thingType.clear();
-            thingType.resize(count, m_nullThingType);
-        }
-
-        for (int category = -1; ++category < ThingLastCategory;) {
-            const uint16_t firstId = category == ThingCategoryItem ? 100 : 1;
-
-            for (uint16_t id = firstId - 1, s = m_thingTypes[category].size(); ++id < s;) {
-                const auto& type = std::make_shared<ThingType>();
-                type->unserialize(id, static_cast<ThingCategory>(category), fin);
-                m_thingTypes[category][id] = type;
-            }
-        }
-
-        m_datLoaded = true;
-        g_lua.callGlobalField("g_things", "onLoadDat", file);
-        return true;
-    } catch (const stdext::exception& e) {
-        g_logger.error("Failed to read dat '{}': {}'", file, e.what());
+    if (!resource->loadDat(file))
         return false;
-    }
+
+    // resize vector before inserting if necessary
+    if (resourceId >= m_assetResources.size())
+        m_assetResources.resize(static_cast<uint16_t>(resourceId) + 1);
+
+    // insert into resource list
+    m_assetResources[resourceId] = std::move(resource);
+
+    // notify Lua
+    // IMPORTANT: this may require moving so it's called only once
+    // or introducing a new method
+    g_lua.callGlobalField("g_things", "onLoadDat", file);
+
+    return true;
 }
 
-bool ThingTypeManager::loadOtml(std::string file)
+bool ThingTypeManager::loadOtml(std::string file, uint16_t resourceId)
 {
     try {
         file = g_resources.guessFilePath(file, "otml");
@@ -129,7 +112,7 @@ bool ThingTypeManager::loadOtml(std::string file)
 
             for (const auto& node2 : node->children()) {
                 const auto id = stdext::safe_cast<uint16_t>(node2->tag());
-                const auto& type = getThingType(id, category);
+                const auto& type = getThingType(id, category, resourceId);
                 if (!type)
                     throw OTMLException(node2, "thing not found");
                 type->unserializeOtml(node2);
@@ -142,86 +125,15 @@ bool ThingTypeManager::loadOtml(std::string file)
     }
 }
 
-bool ThingTypeManager::loadAppearances(const std::string& file, const uint16_t resourceId)
+bool ThingTypeManager::loadAppearances(const std::string& file, uint16_t resourceId)
 {
-    try {
-        if (!g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
-            g_spriteAppearances.unload();
-            int spritesCount = 0;
-            std::string appearancesFile;
-            json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file + "catalog-content", "json"))));
-            for (const auto& obj : document) {
-                const auto& type = obj["type"];
-                if (type == "appearances") {
-                    appearancesFile = obj["file"];
-                } else if (type == "sprite") {
-                    int lastSpriteId = obj["lastspriteid"].get<int>();
-                    const auto& sheet = std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>());
-                    const int spritesPerSheet = sheet->getSpritesPerSheet();
-                    const int maxSpriteId = sheet->firstId + spritesPerSheet - 1;
-                    if (lastSpriteId > maxSpriteId) {
-                        g_logger.debug("Sprite sheet '{}' lastspriteid {} exceeds capacity {}, clamping to {}", sheet->file, lastSpriteId, maxSpriteId, maxSpriteId);
-                        lastSpriteId = maxSpriteId;
-                        sheet->lastId = maxSpriteId;
-                    }
-                    g_spriteAppearances.addSpriteSheet(sheet);
-                    spritesCount = std::max<int>(spritesCount, lastSpriteId);
-                }
-            }
-            g_spriteAppearances.setSpritesCount(spritesCount + 1);
-            g_spriteAppearances.setPath(file);
-            // load appearances.dat
-            std::stringstream fin;
-            g_resources.readFileStream(g_resources.resolvePath(fmt::format("{}{}", file, appearancesFile)), fin);
-            auto appearancesLib = appearances::Appearances();
-            if (!appearancesLib.ParseFromIstream(&fin)) {
-                throw stdext::exception("Couldn't parse appearances lib.");
-            }
-            for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
-                const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
-                switch (category) {
-                    case ThingCategoryItem: appearances = &appearancesLib.object(); break;
-                    case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
-                    case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
-                    case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
-                    default: return false;
-                }
-                // fix for custom asserts, where ids are not sorted.
-                uint32_t lastAppearanceId = 0;
-                for (const auto& appearance : *appearances) {
-                    if (appearance.id() > lastAppearanceId)
-                        lastAppearanceId = appearance.id();
-                }
-                auto& things = m_thingTypes[category];
-                things.clear();
-                things.resize(lastAppearanceId + 1, m_nullThingType);
-                for (const auto& appearance : *appearances) {
-                    const auto& type = std::make_shared<ThingType>();
-                    const uint16_t id = appearance.id();
-                    type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
-                    m_thingTypes[category][id] = type;
-                }
-            }
-            m_datLoaded = true;
-        } else {
-            std::stringstream datFileStream;
-            auto appearancesLib = appearances::Appearances();
-            g_resources.readFileStream(g_resources.resolvePath(g_resources.guessFilePath(file, "dat")), datFileStream);
-            if (!appearancesLib.ParseFromIstream(&datFileStream)) {
-                throw stdext::exception("Couldn't parse appearances.dat.");
-            }
-            for (const auto& appearance : appearancesLib.object()) {
-                const uint16_t id = appearance.id();
-                if (auto* type = getRawThingType(id, ThingCategoryItem)) {
-                    type->applyAppearanceFlags(appearance.flags());
-                }
-            }
-        }
-        return true;
-    } catch (const std::exception& e) {
-        g_logger.error("Failed to load '{}' (Appearances): {}", file, e.what());
+    auto resource = getResourceById(resourceId);
+    if (!resource) {
+        g_logger.error("Invalid resourceId {} in loadAppearances", resourceId);
         return false;
     }
+
+    return resource->loadAppearances(file);
 }
 
 namespace {
@@ -300,37 +212,71 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
     return false;
 }
 
-const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category)
+const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category, uint16_t resourceId)
 {
-    if (category < ThingLastCategory)
-        return m_thingTypes[category];
-
-    throw Exception("invalid thing type category {}", category);
-}
-
-const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category)
-{
-    if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
-        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
-        return m_nullThingType;
+    auto res = getResourceById(resourceId);
+    if (!res) {
+        throw Exception("invalid resource id {}", resourceId);
     }
-    return m_thingTypes[category][id];
+
+    return res->getThingTypes(category);
 }
 
-ThingType* ThingTypeManager::getRawThingType(uint16_t id, ThingCategory category) {
-    if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
-        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
+AssetResourcePtr ThingTypeManager::getResourceById(const uint16_t resourceId) const
+{
+    if (resourceId >= m_assetResources.size())
+        return nullptr;
+
+    return m_assetResources[resourceId];
+}
+
+uint32_t ThingTypeManager::getDatSignature(const uint16_t resourceId) const
+{
+    auto res = getResourceById(resourceId);
+    return res ? res->getDatSignature() : 0;
+}
+
+uint16_t ThingTypeManager::getContentRevision(const uint16_t resourceId) const
+{
+    auto res = getResourceById(resourceId);
+    return res ? res->getContentRevision() : 0;
+}
+
+const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const
+{
+    auto res = getResourceById(resourceId);
+    if (!res) {
+        g_logger.error("failed to get raw thing type {} in category {}: resource {} not loaded", id, static_cast<uint8_t>(category), resourceId);
         return nullptr;
     }
-    return m_thingTypes[category][id].get();
+
+    return res->getThingType(id, category);
+}
+
+ThingType* ThingTypeManager::getRawThingType(uint16_t id, ThingCategory category, uint16_t resourceId) const
+{
+    auto res = getResourceById(resourceId);
+    if (!res) {
+        g_logger.error("failed to get raw thing type {} in category {}: resource {} not loaded", id, static_cast<uint8_t>(category), resourceId);
+        return nullptr;
+    }
+
+    return res->getRawThingType(id, category);
 }
 
 ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const ThingCategory category)
 {
     ThingTypeList ret;
-    for (const auto& type : m_thingTypes[category])
-        if (type->hasAttr(attr))
-            ret.emplace_back(type);
+
+    // read items from all resources
+    // (this is for displaying them in market or cyclopedia)
+    for (const auto& resource : m_assetResources) {
+        if (!resource)
+            continue;
+
+        resource->findThingTypesByAttr(attr, category, ret);
+    }
+
     return ret;
 }
 
@@ -608,5 +554,187 @@ void ThingTypeManager::loadXml(const std::string& file)
 }
 
 #endif
+
+bool AssetResource::loadDat(const std::string& file)
+{
+    if (m_datLoaded) {
+        g_logger.error("Failed to read dat '{}': Resource already loaded!", file);
+        return false;
+    }
+
+    try {
+        auto fin = g_resources.openFile(file);
+        fin->cache(true);
+
+        m_datSignature = fin->getU32();
+        m_contentRevision = static_cast<uint16_t>(m_datSignature);
+
+        for (auto& thingTypeList : m_thingTypes) {
+            const uint16_t count = fin->getU16() + 1;
+            thingTypeList.clear();
+            thingTypeList.resize(count);
+        }
+
+        for (int category = -1; category < ThingLastCategory; ++category) {
+            const uint16_t firstId = (category == ThingCategoryItem ? 100 : 1);
+            auto& thingList = m_thingTypes[category];
+
+            for (uint16_t id = firstId; id < thingList.size(); ++id) {
+                auto type = std::make_shared<ThingType>();
+                type->unserialize(id, static_cast<ThingCategory>(category), fin);
+                thingList[id] = std::move(type);
+            }
+        }
+
+        // allocate sprite manager for managing spr/dat assets
+        spriteManager = std::make_unique<LegacySpriteManager>();
+
+        m_datLoaded = true;
+        return true;
+
+    } catch (const stdext::exception& e) {
+        g_logger.error("Failed to read dat '{}': {}", file, e.what());
+        return false;
+    }
+}
+
+bool AssetResource::loadAppearances(const std::string& file)
+{
+    if (m_datLoaded) {
+        g_logger.error("Failed to read '{}': Resource already loaded!", file);
+        return false;
+    }
+
+    try {
+        int spritesCount = 0;
+        std::string appearancesFile;
+
+        json document = json::parse(
+            g_resources.readFileContents(
+                g_resources.resolvePath(
+                    g_resources.guessFilePath(file + "catalog-content", "json")
+                )
+            )
+        );
+
+        auto protoSprites = std::make_unique<ProtobufSpriteManager>();
+
+        for (const auto& obj : document) {
+            const auto& type = obj["type"];
+
+            if (type == "appearances") {
+                appearancesFile = obj["file"];
+            } else if (type == "sprite") {
+                int lastSpriteId = obj["lastspriteid"].get<int>();
+                auto sheet = std::make_shared<SpriteSheet>(
+                    obj["firstspriteid"].get<int>(),
+                    lastSpriteId,
+                    static_cast<SpriteLayout>(obj["spritetype"].get<int>()),
+                    obj["file"].get<std::string>()
+                );
+
+                const int maxSpriteId = sheet->firstId + sheet->getSpritesPerSheet() - 1;
+                if (lastSpriteId > maxSpriteId) {
+                    lastSpriteId = maxSpriteId;
+                    sheet->lastId = maxSpriteId;
+                }
+
+                protoSprites->addSpriteSheet(sheet);
+                spritesCount = std::max(spritesCount, lastSpriteId);
+            }
+        }
+
+        protoSprites->setSpritesCount(spritesCount + 1);
+        protoSprites->setPath(file);
+
+        spriteManager = std::move(protoSprites);
+
+        // load appearances.dat
+        std::stringstream fin;
+        g_resources.readFileStream(
+            g_resources.resolvePath(fmt::format("{}{}", file, appearancesFile)),
+            fin
+        );
+
+        appearances::Appearances appearancesLib;
+        if (!appearancesLib.ParseFromIstream(&fin))
+            throw stdext::exception("Couldn't parse appearances lib.");
+
+        auto& nullThing = g_things.getNullThingType();
+        for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
+            const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
+            switch (category) {
+                case ThingCategoryItem: appearances = &appearancesLib.object(); break;
+                case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
+                case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
+                case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
+                default: return false;
+            }
+            // fix for custom assets, in which the ids are not sorted.
+            uint32_t lastAppearanceId = 0;
+            for (const auto& appearance : *appearances) {
+                if (appearance.id() > lastAppearanceId)
+                    lastAppearanceId = appearance.id();
+            }
+            auto& things = m_thingTypes[category];
+            things.clear();
+            things.resize(lastAppearanceId + 1, nullThing);
+            for (const auto& appearance : *appearances) {
+                const auto& type = std::make_shared<ThingType>();
+                const uint16_t id = appearance.id();
+                type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
+                m_thingTypes[category][id] = type;
+            }
+        }
+
+        m_datLoaded = true;
+        return true;
+    } catch (const std::exception& e) {
+        g_logger.error("Failed to load appearances '{}': {}", file, e.what());
+        return false;
+    }
+}
+
+const ThingTypeList& AssetResource::getThingTypes(const ThingCategory category)
+{
+    if (category < ThingLastCategory)
+        return m_thingTypes[category];
+
+    throw Exception("invalid thing type category {}", category);
+}
+
+const ThingTypePtr& AssetResource::getThingType(const uint16_t id, const ThingCategory category)
+{
+    if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
+        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
+        return g_things.getNullThingType();
+    }
+    return m_thingTypes[category][id];
+}
+
+ThingType* AssetResource::getRawThingType(uint16_t id, ThingCategory category)
+{
+    if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
+        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
+        return nullptr;
+    }
+    return m_thingTypes[category][id].get();
+}
+
+void AssetResource::findThingTypesByAttr(ThingAttr attr, ThingCategory category, ThingTypeList& out) const
+{
+    if (!m_datLoaded || category >= ThingLastCategory)
+        return;
+
+    const auto& nullThing = g_things.getNullThingType();
+
+    for (const auto& type : m_thingTypes[category]) {
+        if (!type || type == nullThing)
+            continue;
+
+        if (type->hasAttr(attr))
+            out.emplace_back(type);
+    }
+}
 
 /* vim: set ts=4 sw=4 et: */
