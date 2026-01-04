@@ -1942,12 +1942,12 @@ void Game::requestBestiary()
     m_protocolGame->sendRequestBestiary();
 }
 
-void Game::requestBestiaryOverview(const std::string_view catName)
+void Game::requestBestiaryOverview(const std::string_view catName, bool search, std::vector<uint16_t> raceIds)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendRequestBestiaryOverview(catName);
+    m_protocolGame->sendRequestBestiaryOverview(catName, search, raceIds);
 }
 
 void Game::requestBestiarySearch(const uint16_t raceId)
