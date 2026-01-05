@@ -149,8 +149,6 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         dx = (screenCoords.width() - textBoxSize.width()) / 2;
     }
 
-    const AtlasRegion* region = m_texture->getAtlasRegion();
-
     for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
         if (glyph < 32) continue;
@@ -160,9 +158,6 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
 
         if (!clipAndTranslateGlyph(glyphScreenCoords, glyphTextureCoords, screenCoords))
             continue;
-
-        if (region)
-            glyphTextureCoords.translate(region->x, region->y);
 
         list.emplace_back(glyphScreenCoords, glyphTextureCoords);
     }

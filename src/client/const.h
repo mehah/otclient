@@ -544,6 +544,7 @@ namespace Otc
         GameAnthem = 95,
         GameVipGroups = 96,
         GameBosstiary = 97,
+        GameDoublePlayerGoodsMoney = 98,
 
         //  others
         GameLoadSprInsteadProtobuf = 100,
@@ -574,6 +575,7 @@ namespace Otc
         GameMapCache = 125,
         GameForgeSkillStats = 126,
         GameCharacterSkillStats = 127,
+        GameCreaturePaperdoll = 128,
         LastGameFeature
     };
 
@@ -739,9 +741,12 @@ namespace Otc
         ITEM_DESC_PERFECT = 21,
         ITEM_DESC_UPGRADECLASS = 22,
         ITEM_DESC_CURRENTTIER = 23,
+        ITEM_DESC_ELEMENTALBOND = 24,
+        ITEM_DESC_MANTRA = 25,
+        ITEM_DESC_IMBUEMENTEFFECT = 26,
 
         ITEM_DESC_FIRST = ITEM_DESC_ARMOR,
-        ITEM_DESC_LAST = ITEM_DESC_CURRENTTIER,
+        ITEM_DESC_LAST = ITEM_DESC_IMBUEMENTEFFECT,
     };
 
     enum MarketAction : uint8_t
@@ -860,6 +865,21 @@ namespace Otc
         OPEN_SEARCH = 5,
     };
 
+    enum WeaponProficiency_t : uint8_t
+    {
+        WEAPON_PROFICIENCY_ITEM_INFO = 0,
+        WEAPON_PROFICIENCY_LIST_INFO = 1,
+        WEAPON_PROFICIENCY_RESET_PERKS = 2,
+        WEAPON_PROFICIENCY_APPLY_PERKS = 3
+    };
+
+    enum Imbuement_Window_t : uint8_t
+    {
+        IMBUEMENT_WINDOW_CHOICE = 0,
+        IMBUEMENT_WINDOW_SELECT_ITEM = 1,
+        IMBUEMENT_WINDOW_SCROLL = 2
+    };
+
     enum Vocations_t : uint8_t
     {
         NONE = 0,
@@ -867,12 +887,14 @@ namespace Otc
         PALADIN = 2,
         SORCERER = 3,
         DRUID = 4,
+        MONK = 5,
         ELITE_KNIGHT = 11,
         ROYAL_PALADIN = 12,
         MASTER_SORCERER = 13,
         ELDER_DRUID = 14,
+        EXALTED_MONK = 15,
         FIRST = KNIGHT,
-        LAST = DRUID,
+        LAST = MONK,
     };
 
     enum PartyAnalyzerAction_t : uint8_t
@@ -1038,6 +1060,7 @@ enum ThingFlagAttr :uint64_t
     ThingFlagAttrDecoKit = static_cast<uint64_t>(1) << 45,
     ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46,
     ThingFlagAttrAmmo = static_cast<uint64_t>(1) << 47,
+    ThingFlagAttrFloorChange = static_cast<uint64_t>(1) << 48,
 };
 
 enum STACK_PRIORITY : uint8_t

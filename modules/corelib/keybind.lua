@@ -52,7 +52,7 @@ function Keybind.init()
   Keybind.presets = g_settings.getList("controls-presets")
 
   if #Keybind.presets == 0 then
-    Keybind.presets = { "Druid", "Knight", "Paladin", "Sorcerer" }
+    Keybind.presets = { "Druid", "Knight", "Paladin", "Sorcerer", "Monk" }
     Keybind.currentPreset = "Druid"
   else
     Keybind.currentPreset = g_settings.getValue("controls-preset-current")

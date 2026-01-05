@@ -225,11 +225,11 @@ local function addOffer(offer, offerType)
             row = buyMyOfferTable:addRow({{
                 text = itemName .. " (Tier " .. tier .. ")"
             }, {
-                text = price * amount
+                text = comma_value(price * amount)
             }, {
-                text = price
+                text = comma_value(price)
             }, {
-                text = amount
+                text = comma_value(amount)
             }, {
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
                 sortvalue = timestamp
@@ -238,11 +238,11 @@ local function addOffer(offer, offerType)
             row = buyMyHistoryTable:addRow({{
                 text = itemName .. " (Tier " .. tier .. ")"
             }, {
-                text = price * amount
+                text = comma_value(price * amount)
             }, {
-                text = price
+                text = comma_value(price)
             }, {
-                text = amount
+                text = comma_value(amount)
             }, {
                 text = MarketOfferStateString[action],
                 sortvalue = timestamp
@@ -251,11 +251,11 @@ local function addOffer(offer, offerType)
             row = buyOfferTable:addRow({{
                 text = player
             }, {
-                text = amount
+                text = comma_value(amount)
             }, {
-                text = price * amount
+                text = comma_value(price * amount)
             }, {
-                text = price
+                text = comma_value(price)
             }, {
                 text = string.gsub(os.date('%c', timestamp), ' ', '  ')
             }})
@@ -276,11 +276,11 @@ local function addOffer(offer, offerType)
             row = sellMyOfferTable:addRow({{
                 text = itemName .. " (Tier " .. tier .. ")"
             }, {
-                text = price * amount
+                text = comma_value(price * amount)
             }, {
-                text = price
+                text = comma_value(price)
             }, {
-                text = amount
+                text = comma_value(amount)
             }, {
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
                 sortvalue = timestamp
@@ -289,11 +289,11 @@ local function addOffer(offer, offerType)
             row = sellMyHistoryTable:addRow({{
                 text = itemName .. " (Tier " .. tier .. ")"
             }, {
-                text = price * amount
+                text = comma_value(price * amount)
             }, {
-                text = price
+                text = comma_value(price)
             }, {
-                text = amount
+                text = comma_value(amount)
             }, {
                 text = MarketOfferStateString[action],
                 sortvalue = timestamp
@@ -302,11 +302,11 @@ local function addOffer(offer, offerType)
             row = sellOfferTable:addRow({{
                 text = player
             }, {
-                text = amount
+                text = comma_value(amount)
             }, {
-                text = price * amount
+                text = comma_value(price * amount)
             }, {
-                text = price
+                text = comma_value(price)
             }, {
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
                 sortvalue = timestamp
@@ -596,7 +596,7 @@ local function updateBalance(balance)
     end
     information.balance = balance
 
-    balanceLabel:setText('Balance: ' .. balance .. ' gold')
+    balanceLabel:setText('Balance: ' .. comma_value(balance) .. ' gold')
     balanceLabel:resizeToText()
 end
 
@@ -607,7 +607,7 @@ local function updateFee(price, amount)
     elseif fee > 1000 then
         fee = 1000
     end
-    feeLabel:setText('Fee: ' .. fee)
+    feeLabel:setText('Fee: ' .. comma_value(fee))
     feeLabel:resizeToText()
 end
 
@@ -658,7 +658,7 @@ local function openAmountWindow(callback, actionType, actionText)
     scrollbar:setText(offer:getPrice() .. 'gp')
 
     scrollbar.onValueChange = function(widget, value)
-        widget:setText((value * offer:getPrice()) .. 'gp')
+        widget:setText(comma_value(value * offer:getPrice()) .. 'gp')
         itembox:setText(value)
     end
 
@@ -807,10 +807,10 @@ end
 
 local function onTotalPriceChange()
     local amount = amountEdit:getValue()
-    local totalPrice = totalPriceEdit:getValue()
+    local totalPrice = totalPriceEdit:getFormattedValue()
     local piecePrice = math.floor(totalPrice / amount)
 
-    piecePriceEdit:setValue(piecePrice, true)
+    piecePriceEdit:setFormattedValue(piecePrice)
     if Market.isItemSelected() then
         updateFee(piecePrice, amount)
     end
@@ -818,10 +818,10 @@ end
 
 local function onPiecePriceChange()
     local amount = amountEdit:getValue()
-    local totalPrice = totalPriceEdit:getValue()
-    local piecePrice = piecePriceEdit:getValue()
+    local totalPrice = totalPriceEdit:getFormattedValue()
+    local piecePrice = piecePriceEdit:getFormattedValue()
 
-    totalPriceEdit:setValue(piecePrice * amount, true)
+    totalPriceEdit:setFormattedValue(piecePrice * amount)
     if Market.isItemSelected() then
         updateFee(piecePrice, amount)
     end
@@ -829,10 +829,10 @@ end
 
 local function onAmountChange()
     local amount = amountEdit:getValue()
-    local piecePrice = piecePriceEdit:getValue()
+    local piecePrice = piecePriceEdit:getFormattedValue()
     local totalPrice = piecePrice * amount
 
-    totalPriceEdit:setValue(piecePrice * amount, true)
+    totalPriceEdit:setFormattedValue(piecePrice * amount)
     if Market.isItemSelected() then
         updateFee(piecePrice, amount)
     end
@@ -1013,6 +1013,9 @@ local function initInterface()
     totalPriceEdit.onValueChange = onTotalPriceChange
     piecePriceEdit.onValueChange = onPiecePriceChange
     amountEdit.onValueChange = onAmountChange
+    totalPriceEdit:setFormattedMode(true)  
+    piecePriceEdit:setFormattedMode(true)
+
 
     offerTypeList = marketOffersPanel:getChildById('offerTypeComboBox')
     offerTypeList.onOptionChange = onChangeOfferType
@@ -1273,8 +1276,8 @@ function Market.updateCurrentItems()
 end
 
 function Market.resetCreateOffer(resetFee)
-    piecePriceEdit:setValue(1)
-    totalPriceEdit:setValue(1)
+    piecePriceEdit:setFormattedValue(1)
+    totalPriceEdit:setFormattedValue(1)
     amountEdit:setValue(1)
     refreshTypeList()
 
@@ -1419,7 +1422,7 @@ function Market.createNewOffer()
 
     local spriteId = selectedItem.item.marketData.tradeAs
 
-    local piecePrice = piecePriceEdit:getValue()
+    local piecePrice = piecePriceEdit:getFormattedValue()
     local amount = amountEdit:getValue()
     local anonymous = anonymous:isChecked() and 1 or 0
 

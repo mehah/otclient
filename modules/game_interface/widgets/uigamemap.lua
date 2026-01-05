@@ -22,6 +22,10 @@ function UIGameMap:onDragEnter(mousePos)
         return false
     end
 
+    if thing:isItem() and not thing:isNotMoveable() then
+        UIDragIcon:display(thing)
+    end
+
     self.currentDragThing = thing
 
     g_mouse.pushCursor('target')
@@ -33,6 +37,7 @@ function UIGameMap:onDragLeave(droppedWidget, mousePos)
     self.currentDragThing = nil
     self.hoveredWho = nil
     g_mouse.popCursor('target')
+    UIDragIcon:hide()
     return true
 end
 
@@ -68,6 +73,7 @@ function UIGameMap:onDrop(widget, mousePos)
         g_game.move(thing, toPos, 1)
     end
 
+    UIDragIcon:hide()
     return true
 end
 

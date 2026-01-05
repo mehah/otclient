@@ -1057,12 +1057,19 @@ void ProtocolGame::sendRequestBestiary()
     send(msg);
 }
 
-void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName)
+void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName, bool search, std::vector<uint16_t> raceIds)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBestiaryRequestOverview);
-    msg->addU8(0x00);
-    msg->addString(catName);
+    msg->addU8(search ? 0x01 : 0x00);
+    if (search) {
+        msg->addU16(static_cast<uint16_t>(raceIds.size()));
+        for (const uint16_t raceId : raceIds) {
+            msg->addU16(raceId);
+        }
+    } else {
+        msg->addString(catName);
+    }
     send(msg);
 }
 
@@ -1429,7 +1436,9 @@ void ProtocolGame::sendApplyImbuement(const uint8_t slot, const uint32_t imbueme
     msg->addU8(Proto::ClientApplyImbuement);
     msg->addU8(slot);
     msg->addU32(imbuementId);
-    msg->addU8(protectionCharm);
+    if (g_game.getClientVersion() < 1510) {
+        msg->addU8(protectionCharm);
+    }
     send(msg);
 }
 
@@ -1483,6 +1492,22 @@ void ProtocolGame::sendStashWithdraw(const uint16_t itemId, const uint32_t count
     msg->addU16(itemId);
     msg->addU32(count);
     msg->addU8(stackpos);
+    send(msg);
+}
+
+void ProtocolGame::sendStashStow(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientUseStash);
+    msg->addU8(action);
+    addPosition(msg, position);
+    msg->addU16(itemId);
+    msg->addU8(stackpos);
+
+    if (action == Otc::Supply_Stash_Actions_t::SUPPLY_STASH_ACTION_STOW_ITEM) {
+        msg->addU32(count);
+    }
+
     send(msg);
 }
 

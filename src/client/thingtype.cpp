@@ -38,16 +38,16 @@
 const static TexturePtr m_textureNull;
 
 namespace {
-std::string_view categoryName(const ThingCategory category)
-{
-    switch (category) {
-        case ThingCategoryItem: return "item";
-        case ThingCategoryCreature: return "creature";
-        case ThingCategoryEffect: return "effect";
-        case ThingCategoryMissile: return "missile";
-        default: return "unknown";
+    std::string_view categoryName(const ThingCategory category)
+    {
+        switch (category) {
+            case ThingCategoryItem: return "item";
+            case ThingCategoryCreature: return "creature";
+            case ThingCategoryEffect: return "effect";
+            case ThingCategoryMissile: return "missile";
+            default: return "unknown";
+        }
     }
-}
 }
 
 void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCategory category, const appearances::Appearance& appearance)
@@ -113,6 +113,10 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
 
 void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 {
+    if (flags.floorchange()) {
+        m_flags |= ThingFlagAttrFloorChange;
+    }
+
     if (flags.has_bank()) {
         m_groundSpeed = flags.bank().waypoints();
         m_flags |= ThingFlagAttrGround;
@@ -192,10 +196,21 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 
     if (flags.has_hook()) {
         const auto& hookDirection = flags.hook();
-        if (hookDirection.east()) {
-            m_flags |= ThingFlagAttrHookEast;
-        } else if (hookDirection.south()) {
-            m_flags |= ThingFlagAttrHookSouth;
+        if (hookDirection.has_south()) {
+            const auto hookType = hookDirection.south();
+            if (hookType == appearances::HOOK_TYPE_SOUTH) {
+                m_flags |= ThingFlagAttrHookSouth;
+            } else if (hookType == appearances::HOOK_TYPE_EAST) {
+                m_flags |= ThingFlagAttrHookEast;
+            }
+        }
+        if (hookDirection.has_east()) {
+            const auto hookType = hookDirection.east();
+            if (hookType == appearances::HOOK_TYPE_SOUTH) {
+                m_flags |= ThingFlagAttrHookSouth;
+            } else if (hookType == appearances::HOOK_TYPE_EAST) {
+                m_flags |= ThingFlagAttrHookEast;
+            }
         }
     }
 
@@ -645,11 +660,9 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
     // this line fixes a bug that makes them disappear while moving
     int animationFrameId = animationPhase % m_animationPhases;
 
-    TexturePtr texture;
-    if (g_drawPool.getCurrentType() != DrawPoolType::LIGHT) {
-        texture = getTexture(animationFrameId); // texture might not exists, neither its rects.
-        if (!texture)
-            return;
+    const auto& texture = getTexture(animationFrameId);
+    if (!texture) {
+        return; // texture might not exists, neither its rects.
     }
 
     const auto& textureData = m_textureData[animationFrameId];
@@ -685,26 +698,25 @@ const TexturePtr& ThingType::getTexture(const int animationPhase)
 
     auto& textureData = m_textureData[animationPhase];
 
-    auto& animationPhaseTexture = textureData.source;
-
-    if (animationPhaseTexture) return animationPhaseTexture;
-
-    bool async = g_app.isLoadingAsyncTexture();
-    if (g_game.isUsingProtobuf() && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
-        async = false;
-
-    if (!async) {
-        loadTexture(animationPhase);
+    if (textureData.source)
         return textureData.source;
-    }
 
-    if (!m_loading) {
-        m_loading = true;
+    bool expected = false;
+    if (m_loading.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
+        bool async = g_app.isLoadingAsyncTexture();
+        if (g_game.isUsingProtobuf() && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
+            async = false;
+
+        if (!async) {
+            loadTexture(animationPhase);
+            m_loading.store(false, std::memory_order_release);
+            return textureData.source;
+        }
 
         auto action = [this] {
             for (int_fast8_t i = -1; ++i < m_animationPhases;)
                 loadTexture(i);
-            m_loading = false;
+            m_loading.store(false, std::memory_order_release);
         };
 
         g_asyncDispatcher.detach_task(std::move(action));
@@ -758,23 +770,25 @@ void ThingType::loadTexture(const int animationPhase)
                                 return;
 
                             if (!spriteImage) {
-                                g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, animationPhase);
-                                return;
+                                if (spriteId != 0) {
+                                    g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, animationPhase);
+                                    return;
+                                }
+                            } else {
+                                // verifies that the first block in the lower right corner is transparent.
+                                if (spriteImage->hasTransparentPixel()) {
+                                    fullImage->setTransparentPixel(true);
+                                }
+
+                                if (spriteMask) {
+                                    spriteImage->overwriteMask(maskColors[(l - 1)]);
+                                }
+
+                                auto spriteSize = spriteImage->getSize() / g_gameConfig.getSpriteSize();
+
+                                const Point& spritePos = Point(m_size.width() - spriteSize.width(), m_size.height() - spriteSize.height()) * g_gameConfig.getSpriteSize();
+                                fullImage->blit(framePos + spritePos, spriteImage);
                             }
-
-                            // verifies that the first block in the lower right corner is transparent.
-                            if (!spriteImage || spriteImage->hasTransparentPixel()) {
-                                fullImage->setTransparentPixel(true);
-                            }
-
-                            if (spriteMask) {
-                                spriteImage->overwriteMask(maskColors[(l - 1)]);
-                            }
-
-                            auto spriteSize = spriteImage->getSize() / g_gameConfig.getSpriteSize();
-
-                            const Point& spritePos = Point(m_size.width() - spriteSize.width(), m_size.height() - spriteSize.height()) * g_gameConfig.getSpriteSize();
-                            fullImage->blit(framePos + spritePos, spriteImage);
                         } else {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
@@ -787,21 +801,23 @@ void ThingType::loadTexture(const int animationPhase)
                                         return;
 
                                     if (!spriteImage) {
-                                        g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
-                                        return;
-                                    }
+                                        if (spriteId != 0) {
+                                            g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
+                                            return;
+                                        }
+                                    } else {
+                                        // verifies that the first block in the lower right corner is transparent.
+                                        if (h == 0 && w == 0 && spriteImage->hasTransparentPixel()) {
+                                            fullImage->setTransparentPixel(true);
+                                        }
 
-                                    // verifies that the first block in the lower right corner is transparent.
-                                    if (h == 0 && w == 0 && (!spriteImage || spriteImage->hasTransparentPixel())) {
-                                        fullImage->setTransparentPixel(true);
-                                    }
+                                        if (spriteMask) {
+                                            spriteImage->overwriteMask(maskColors[(l - 1)]);
+                                        }
 
-                                    if (spriteMask) {
-                                        spriteImage->overwriteMask(maskColors[(l - 1)]);
+                                        const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * g_gameConfig.getSpriteSize();
+                                        fullImage->blit(framePos + spritePos, spriteImage);
                                     }
-
-                                    const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * g_gameConfig.getSpriteSize();
-                                    fullImage->blit(framePos + spritePos, spriteImage);
                                 }
                             }
                         }
@@ -945,6 +961,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr) {
         case ThingAttrDisplacement: return ThingFlagAttrDisplacement;
         case ThingAttrLight: return ThingFlagAttrLight;
         case ThingAttrElevation: return ThingFlagAttrElevation;
+        case ThingAttrFloorChange: return ThingFlagAttrFloorChange;
         case ThingAttrGround: return ThingFlagAttrGround;
         case ThingAttrWritable: return ThingFlagAttrWritable;
         case ThingAttrWritableOnce: return ThingFlagAttrWritableOnce;

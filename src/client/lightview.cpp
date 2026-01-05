@@ -96,17 +96,17 @@ void LightView::draw(const Rect& dest, const Rect& src)
     if (m_pool->getHashController().wasModified()) {
         updatePixels();
 
-        SpinLock::Guard guard(m_pool->getThreadLock());
+        SpinLock::Guard guard(m_lock);
         m_pixels[0].swap(m_pixels[1]);
-        updatePixel.store(true, std::memory_order_release);
+        updatePixel.store(true, std::memory_order_relaxed);
     }
     m_pool->getHashController().reset();
 
     g_drawPool.addAction([=, this] {
-        if (updatePixel.load(std::memory_order_acquire)) {
-            SpinLock::Guard guard(m_pool->getThreadLock());
+        if (updatePixel.load(std::memory_order_relaxed)) {
+            SpinLock::Guard guard(m_lock);
             m_texture->updatePixels(m_pixels[1].data());
-            updatePixel = false;
+            updatePixel.store(false, std::memory_order_relaxed);
         }
 
         updateCoords(dest, src);

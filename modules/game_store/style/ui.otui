@@ -154,6 +154,7 @@ StoreFlatLabel < UILabel
   text-offset: 3 3
   image-source:  /game_store/images/panel_flat
   image-border: 1
+  clipping: true
 
   $disabled:
     color: #dfdfdf88

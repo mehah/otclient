@@ -260,7 +260,7 @@ bool Thing::blockProjectile() const {
     return false;
 }
 
-bool Thing::isContainer() {
+bool Thing::isContainer() const {
     if (const auto t = getThingType(); t)
         return t->isContainer();
     return false;
@@ -498,6 +498,13 @@ bool Thing::hasElevation() const {
         return t->hasElevation();
     return false;
 }
+bool Thing::hasFloorChange() const
+{
+    if (const auto t = getThingType(); t)
+        return t->hasFloorChange();
+    return false;
+}
+
 bool Thing::hasAction() const {
     if (const auto t = getThingType(); t)
         return t->hasAction();

@@ -97,7 +97,7 @@ public:
     bool isGroundBorder() { return (m_flags & ThingFlagAttrGroundBorder); }
     bool isOnBottom() { return (m_flags & ThingFlagAttrOnBottom); }
     bool isOnTop() { return (m_flags & ThingFlagAttrOnTop); }
-    bool isContainer() { return (m_flags & ThingFlagAttrContainer); }
+    bool isContainer() const { return (m_flags & ThingFlagAttrContainer); }
     bool isStackable() { return (m_flags & ThingFlagAttrStackable); }
     bool isForceUse() { return (m_flags & ThingFlagAttrForceUse); }
     bool isMultiUse() { return (m_flags & ThingFlagAttrMultiUse); }
@@ -120,6 +120,7 @@ public:
     bool isTranslucent() { return (m_flags & ThingFlagAttrTranslucent); }
     bool hasDisplacement() { return (m_flags & ThingFlagAttrDisplacement); }
     bool hasElevation() { return (m_flags & ThingFlagAttrElevation); }
+    bool hasFloorChange() const { return (m_flags & ThingFlagAttrFloorChange); }
     bool isLyingCorpse() { return (m_flags & ThingFlagAttrLyingCorpse); }
     bool isAnimateAlways() { return (m_flags & ThingFlagAttrAnimateAlways); }
     bool hasMiniMapColor() { return (m_flags & ThingFlagAttrMinimapColor); }
@@ -237,7 +238,7 @@ private:
     std::vector<uint32_t> m_spritesIndex;
     std::vector<TextureData> m_textureData;
 
-    std::atomic_bool m_loading;
+    std::atomic_bool m_loading{ false };
 
     Timer m_lastTimeUsage;
 

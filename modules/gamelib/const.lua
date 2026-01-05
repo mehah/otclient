@@ -192,6 +192,7 @@ GameConcotions = 94
 GameAnthem = 95
 GameVipGroups = 96
 GameBosstiary = 97
+GameDoublePlayerGoodsMoney = 98
 GameLoadSprInsteadProtobuf = 100
 GameItemShader = 101
 GameCreatureShader = 102
@@ -220,6 +221,7 @@ GameTileAddThingWithStackpos = 124
 GameMapCache = 125
 GameForgeSkillStats = 126
 GameCharacterSkillStats = 127
+GameCreaturePaperdoll = 128
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
@@ -475,7 +477,7 @@ ExperienceRate = {
 
 PriceTypeEnum = {
     Market = 0,
-	Leader = 1
+    Leader = 1
 }
 
 -- Analyzer constants

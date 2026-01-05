@@ -47,6 +47,7 @@ void TextureManager::terminate()
     }
     m_textures.clear();
     m_animatedTextures.clear();
+    m_matrixCache.objects.clear();
     m_emptyTexture = nullptr;
 }
 

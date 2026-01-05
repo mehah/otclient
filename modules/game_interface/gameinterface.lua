@@ -45,6 +45,7 @@ local mobileConfig = {
 
 function init()
     g_ui.importStyle('styles/countwindow')
+    g_ui.importStyle('styles/countStashWindow')
 
     connect(g_game, {
         onGameStart = onGameStart,
@@ -100,7 +101,7 @@ function init()
     gameBottomLockPanel = gameRootPanel:recursiveGetChildById('bottomLock')
     gameRightLockPanel = gameRootPanel:recursiveGetChildById('rightLock')
     gameLeftLockPanel = gameRootPanel:recursiveGetChildById('leftLock')
-  
+
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)
@@ -457,7 +458,7 @@ function updateStretchShrink()
         -- Set gameMapPanel size to height = 11 * 32 + 2
         bottomSplitter:setMarginBottom(bottomSplitter:getMarginBottom() + (gameMapPanel:getHeight() - 32 * 11) - 10)
     end
-     -- Update action bar layout when window geometry changes
+    -- Update action bar layout when window geometry changes
     if modules.game_actionbar and modules.game_actionbar.updateVisibleWidgetsExternal then
         addEvent(function()
             modules.game_actionbar.updateVisibleWidgetsExternal()
@@ -881,6 +882,33 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end)
     end
 
+    if g_game.getClientVersion() >= 1410 then
+        if lookThing and not lookThing:isCreature() and not lookThing:isNotMoveable() and lookThing:isPickupable() then
+            local player = g_game.getLocalPlayer()
+            if player and player:isSupplyStashAvailable() then
+                local itemTier = lookThing:getTier() or 0
+                if itemTier <= 0 then
+                    menu:addSeparator()
+                    menu:addOption(tr("Stow"), function()
+                        stashItem(lookThing)
+                    end)
+                    menu:addOption(tr("Stow all items of this type"), function()
+                        g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
+                            lookThing:getStackPos(), 2)
+                    end)
+
+                    local isContainer = lookThing:isContainer()
+                    if isContainer then
+                        menu:addOption(tr('Stow container\'s content'), function()
+                            g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
+                                lookThing:getStackPos(), 1)
+                        end)
+                    end
+                end
+            end
+        end
+    end
+
     menu:display(menuPosition)
 end
 
@@ -1134,7 +1162,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                             -- For pickupable containers like quivers, backpacks, etc., open them instead of quicklooting
                             g_game.open(useThing)
                             return true
-						elseif table.find({3497, 3498, 3499, 3500, 3502, 12902}, useThing:getId()) then
+                        elseif table.find({ 3497, 3498, 3499, 3500, 3502, 12902 }, useThing:getId()) then
                             -- For depot chests, lockers, depot boxes, inbox, etc., always open them
                             g_game.open(useThing)
                             return true
@@ -1241,7 +1269,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                     -- ONLY quickloot containers/corpses in the game world
                     if (useThing:isContainer() or useThing:isLyingCorpse()) and not useThing:getParentContainer() then
                         -- Only handle containers that are in the game world (not in inventory)
-                        if table.find({3497, 3498, 3499, 3500, 3502, 12902}, useThing:getId()) then
+                        if table.find({ 3497, 3498, 3499, 3500, 3502, 12902 }, useThing:getId()) then
                             -- For depot chests, lockers, depot boxes, inbox, etc., always open them
                             g_game.open(useThing)
                             return true
@@ -1358,30 +1386,18 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
     return false
 end
 
-function moveStackableItem(item, toPos)
-    if countWindow then
-        return
-    end
-    if g_keyboard.isShiftPressed() then
-        g_game.move(item, toPos, 1)
-        return
-    elseif g_keyboard.isCtrlPressed() ~= modules.client_options.getOption('moveStack') then
-        g_game.move(item, toPos, item:getCount())
-        return
-    end
+local function handleItemInteraction(item, widget, callback)
     local count = item:getCount()
-
-    countWindow = g_ui.createWidget('CountWindow', rootWidget)
-    countWindow.hotkeyBlock = modules.game_hotkeys.createHotkeyBlock("stackable_item_dialog")
-    local itembox = countWindow:getChildById('item')
-    local scrollbar = countWindow:getChildById('countScrollBar')
+    widget.hotkeyBlock = modules.game_hotkeys.createHotkeyBlock("stackable_item_dialog")
+    local itembox = widget:getChildById('item')
+    local scrollbar = widget:getChildById('countScrollBar')
     itembox:setItemId(item:getId())
     itembox:setItemCount(count)
     scrollbar:setMaximum(count)
     scrollbar:setMinimum(1)
     scrollbar:setValue(count)
 
-    local spinbox = countWindow:getChildById('spinBox')
+    local spinbox = widget:getChildById('spinBox')
     spinbox:setMaximum(count)
     spinbox:setMinimum(0)
     spinbox:setValue(0)
@@ -1433,23 +1449,58 @@ function moveStackableItem(item, toPos)
         spinbox.onValueChange = spinBoxValueChange
     end
 
-    local okButton = countWindow:getChildById('buttonOk')
+    local okButton = widget:getChildById('buttonOk')
     local moveFunc = function()
-        g_game.move(item, toPos, itembox:getItemCount())
+        callback(itembox:getItemCount())
         okButton:getParent():destroy()
-        countWindow = nil
+        widget = nil
     end
-    local cancelButton = countWindow:getChildById('buttonCancel')
+    local cancelButton = widget:getChildById('buttonCancel')
     local cancelFunc = function()
         cancelButton:getParent():destroy()
-        countWindow = nil
+        widget = nil
     end
 
-    countWindow.onEnter = moveFunc
-    countWindow.onEscape = cancelFunc
+    widget.onEnter = moveFunc
+    widget.onEscape = cancelFunc
 
     okButton.onClick = moveFunc
     cancelButton.onClick = cancelFunc
+end
+
+function stashItem(item)
+    local count = item:getCount()
+    if count == 1 then
+        g_game.stashStowItem(item:getPosition(), item:getId(), count,
+            item:getStackPos(), 0)
+        return
+    end
+    countWindow = g_ui.createWidget('CountStashWindow', rootWidget)
+
+    handleItemInteraction(item, countWindow, function(amount)
+        g_game.stashStowItem(item:getPosition(), item:getId(), amount,
+            item:getStackPos(), 0)
+        countWindow = nil
+    end)
+end
+
+function moveStackableItem(item, toPos)
+    if countWindow then
+        return
+    end
+    if g_keyboard.isShiftPressed() then
+        g_game.move(item, toPos, 1)
+        return
+    elseif g_keyboard.isCtrlPressed() ~= modules.client_options.getOption('moveStack') then
+        g_game.move(item, toPos, item:getCount())
+        return
+    end
+
+    countWindow = g_ui.createWidget('CountWindow', rootWidget)
+    handleItemInteraction(item, countWindow, function(count)
+        g_game.move(item, toPos, count)
+        countWindow = nil
+    end)
 end
 
 function onSelectPanel(self, checked)
@@ -1517,32 +1568,32 @@ end
 
 function getBottomActionPanel()
     return gameBottomActionPanel
-  end
-  
-  function getLeftActionPanel()
-    return gameLeftActionPanel
-  end
-  
-  function getRightActionPanel()
-    return gameRightActionPanel
-  end
-  
-  function getBottomLockPanel()
-    return gameBottomLockPanel
-  end
-  
-  function getRightLockPanel()
-    return gameRightLockPanel
-  end
-  
-  function getLeftLockPanel()
-    return gameLeftLockPanel
-  end
+end
 
-  function getBottomSplitter()
+function getLeftActionPanel()
+    return gameLeftActionPanel
+end
+
+function getRightActionPanel()
+    return gameRightActionPanel
+end
+
+function getBottomLockPanel()
+    return gameBottomLockPanel
+end
+
+function getRightLockPanel()
+    return gameRightLockPanel
+end
+
+function getLeftLockPanel()
+    return gameLeftLockPanel
+end
+
+function getBottomSplitter()
     return bottomSplitter
-  end
-  
+end
+
 function findContentPanelAvailable(child, minContentHeight)
     if gameSelectedPanel and gameSelectedPanel:isVisible() and gameSelectedPanel:fits(child, minContentHeight, 0) >= 0 then
         return gameSelectedPanel

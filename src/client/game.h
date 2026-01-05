@@ -24,7 +24,6 @@
 
 #include "declarations.h"
 #include "staticdata.h"
-#include <framework/core/timer.h>
 
 #include "framework/core/declarations.h"
 
@@ -394,6 +393,8 @@ public:
 
     void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
 
+    void stashStowItem(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action);
+
     // highscore related
     void requestHighscore(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void processHighscore(std::string_view serverName, std::string_view world, uint8_t worldType, uint8_t battlEye,
@@ -415,7 +416,7 @@ public:
     void inspectionNormalObject(const Position& position);
     void inspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
     void requestBestiary();
-    void requestBestiaryOverview(std::string_view catName);
+    void requestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
     void requestBestiarySearch(uint16_t raceId);
     void requestSendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void requestSendCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage = 0, uint16_t page = 0);
@@ -442,10 +443,6 @@ public:
     auto getWalkMaxSteps() { return m_walkMaxSteps; }
     void setWalkMaxSteps(uint8_t v) { m_walkMaxSteps = v; }
 
-protected:
-    void enableBotCall() { m_denyBotCall = false; }
-    void disableBotCall() { m_denyBotCall = true; }
-
 private:
     void setAttackingCreature(const CreaturePtr& creature);
     void setFollowingCreature(const CreaturePtr& creature);
@@ -465,7 +462,6 @@ private:
 
     bool m_tileThingsLuaCallback{ false };
     bool m_online{ false };
-    bool m_denyBotCall{ false };
     bool m_dead{ false };
     bool m_expertPvpMode{ false };
     bool m_connectionFailWarned{ false };

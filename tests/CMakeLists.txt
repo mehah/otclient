@@ -21,6 +21,14 @@ function(otclient_add_gtest TARGET_NAME)
             GTest::gtest_main
     )
 
+    if(ANDROID)
+        target_link_libraries(${TARGET_NAME}
+            PRIVATE
+                log
+                c
+        )
+    endif()
+
     target_compile_definitions(${TARGET_NAME}
         PRIVATE
             CLIENT
@@ -43,3 +51,4 @@ function(otclient_add_gtest TARGET_NAME)
 endfunction()
 
 add_subdirectory(map)
+add_subdirectory(stdext)

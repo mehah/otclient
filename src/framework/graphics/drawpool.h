@@ -25,7 +25,6 @@
 #include "declarations.h"
 #include "framebuffer.h"
 #include "framework/core/timer.h"
-#include <framework/util/spinlock.h>
 
 #include "../stdext/storage.h"
 
@@ -56,8 +55,10 @@ struct DrawHashController
     }
 
     void reset() {
+        if (m_currentHash != 1)
+            m_lastHash = m_currentHash;
+
         m_hashs.clear();
-        m_lastHash = m_currentHash;
         m_currentHash = 0;
         m_lastObjectHash = 0;
     }
@@ -94,7 +95,7 @@ public:
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
     bool canRepaint();
-    void repaint() { if (hasFrameBuffer()) m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
+    void repaint() { m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
@@ -123,8 +124,6 @@ public:
     }
 
     void release();
-
-    auto& getThreadLock() { return m_threadLock; }
 
 protected:
 
@@ -199,11 +198,20 @@ private:
 
     void add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    void addAction(const std::function<void()>& action);
+    void addAction(const std::function<void()>& action, size_t hash = 0);
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
     void releaseFrameBuffer(const Rect& dest);
 
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
+
+    bool canRefresh() const
+    {
+        uint16_t refreshDelay = m_refreshDelay;
+        if (m_shaderRefreshDelay > 0 && (refreshDelay == 0 || m_shaderRefreshDelay < refreshDelay))
+            refreshDelay = m_shaderRefreshDelay;
+
+        return refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay;
+    }
 
     bool updateHash(const DrawMethod& method, const Texture* texture, const Color& color, bool hasCoord);
     PoolState getState(const TexturePtr& texture, Texture* textureAtlas, const Color& color);
@@ -333,10 +341,8 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    SpinLock m_threadLock;
-
     TextureAtlasPtr m_atlas;
-    std::atomic_bool m_shouldRepaint;
+    std::atomic_bool m_shouldRepaint{ false };
 
     friend class DrawPoolManager;
 };
