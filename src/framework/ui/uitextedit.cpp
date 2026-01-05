@@ -128,15 +128,53 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
 
         if (glyphsMustRecache) {
             m_glyphsSelectRectCache.clear();
+            m_glyphsSelectBgRectCache.clear();
+
+            const Point textScreenOffset = m_drawArea.topLeft() - m_textVirtualOffset;
+            const int lineHeight = m_font->getGlyphHeight();
+            const Size* glyphsSize = m_font->getGlyphsSize();
+            const Point* glyphsOffset = m_font->getGlyphsOffset();
+
             for (int i = visStart; i < visEnd; ++i) {
+                // Determine source for text drawing
                 const auto& dest = m_glyphsCoords[i].first;
                 const auto& src = m_glyphsCoords[i].second;
                 if (dest.isValid()) m_glyphsSelectRectCache.emplace_back(dest, src);
+
+                // Determine rect for background selection
+                if (i >= static_cast<int>(m_glyphsPositionsCache.size())) continue;
+
+                Point pos = textScreenOffset + m_glyphsPositionsCache[i];
+                int width = 0;
+
+                if (i + 1 < static_cast<int>(m_glyphsPositionsCache.size())) {
+                    Point nextPos = textScreenOffset + m_glyphsPositionsCache[i + 1];
+                    if (nextPos.y == pos.y) {
+                        width = nextPos.x - pos.x;
+                    }
+                }
+
+                if (width == 0) {
+                    uint8_t glyph = static_cast<uint8_t>(m_displayedText[i]);
+                    if (glyph >= 32) {
+                        int advanceGuess = glyphsOffset[glyph].x + glyphsSize[glyph].width();
+                        if (dest.isValid()) {
+                            advanceGuess = std::max(advanceGuess, dest.right() - pos.x);
+                        }
+                        if (glyph == ' ' && width == 0) advanceGuess = std::max(advanceGuess, lineHeight / 4);
+                        width = advanceGuess;
+                    } else if (glyph == '\n') {
+                        width = lineHeight / 4;
+                    }
+                }
+
+                if (width > 0)
+                    m_glyphsSelectBgRectCache.emplace_back(Rect(pos.x, pos.y, width, lineHeight));
             }
         }
 
-        for (const auto& it : m_glyphsSelectRectCache)
-            g_drawPool.addFilledRect(it.first, m_selectionBackgroundColor);
+        for (const auto& rect : m_glyphsSelectBgRectCache)
+            g_drawPool.addFilledRect(rect, m_selectionBackgroundColor);
 
         for (const auto& it : m_glyphsSelectRectCache)
             g_drawPool.addTexturedRect(it.first, texture, it.second, m_selectionColor);
