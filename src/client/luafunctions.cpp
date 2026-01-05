@@ -327,6 +327,8 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "isFollowing", &Game::isFollowing, &g_game);
     g_lua.bindSingletonFunction("g_game", "isConnectionOk", &Game::isConnectionOk, &g_game);
     g_lua.bindSingletonFunction("g_game", "getPing", &Game::getPing, &g_game);
+    g_lua.bindSingletonFunction("g_game", "getRecivedPacketsCount", &Game::getRecivedPacketsCount, &g_game);
+    g_lua.bindSingletonFunction("g_game", "getRecivedPacketsSize", &Game::getRecivedPacketsSize, &g_game);
     g_lua.bindSingletonFunction("g_game", "getContainer", &Game::getContainer, &g_game);
     g_lua.bindSingletonFunction("g_game", "getContainers", &Game::getContainers, &g_game);
     g_lua.bindSingletonFunction("g_game", "getVips", &Game::getVips, &g_game);

@@ -176,6 +176,9 @@ protected:
 public:
     void addPosition(const OutputMessagePtr& msg, const Position& position);
 
+    int getRecivedPacketsCount() { return m_recivedPackeds; }
+    int getRecivedPacketsSize() { return m_recivedPackedsSize; }
+
 private:
     void parseStoreButtonIndicators(const InputMessagePtr& msg);
     void parseSetStoreDeepLink(const InputMessagePtr& msg);
@@ -398,6 +401,8 @@ private:
     bool m_record{ false };
 
     ticks_t m_lastPartyAnalyzerCall{ 0 };
+    int m_recivedPackeds = 0;
+    int m_recivedPackedsSize = 0;
 
     std::string m_accountName;
     std::string m_accountPassword;

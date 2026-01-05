@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include "protocolgame.h"
 #include "staticdata.h"
 
 #include "framework/core/declarations.h"
@@ -345,6 +346,8 @@ public:
     void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 
     int getPing() { return m_ping; }
+    int getRecivedPacketsCount() { return m_protocolGame ? m_protocolGame->getRecivedPacketsCount() : 0; }
+    int getRecivedPacketsSize() { return m_protocolGame ? m_protocolGame->getRecivedPacketsSize() : 0; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
     stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
     stdext::map<int, Vip> getVips() { return m_vips; }

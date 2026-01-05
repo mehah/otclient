@@ -26,6 +26,7 @@
 #include "painter.h"
 #include "textureatlas.h"
 #include <framework/core/configmanager.h>
+#include <sstream>
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 
@@ -265,4 +266,15 @@ void DrawPoolManager::removeTextureFromAtlas(uint32_t id, bool smooth) {
         if (pool->m_atlas)
             pool->m_atlas->removeTexture(id, smooth);
     }
+}
+
+std::string DrawPoolManager::getAtlasStats() const
+{
+    std::stringstream ss;
+    const auto* mapAtlas = get(DrawPoolType::MAP)->getAtlas();
+    const auto* fgAtlas = get(DrawPoolType::FOREGROUND)->getAtlas();
+
+    ss << "map=" << (mapAtlas ? mapAtlas->getStats() : "disabled");
+    ss << " | fg=" << (fgAtlas ? fgAtlas->getStats() : "disabled");
+    return ss.str();
 }

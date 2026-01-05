@@ -502,6 +502,7 @@
     <ClCompile Include="..\src\framework\ui\uiwidgettext.cpp" />
     <ClCompile Include="..\src\framework\util\color.cpp" />
     <ClCompile Include="..\src\framework\util\crypt.cpp" />
+	<ClCompile Include="..\src\framework\util\stats.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\tools\datdump.cpp" />
   </ItemGroup>
@@ -693,6 +694,7 @@
     <ClInclude Include="..\src\framework\ui\uiwidget.h" />
     <ClInclude Include="..\src\framework\util\color.h" />
     <ClInclude Include="..\src\framework\util\crypt.h" />
+	<ClInclude Include="..\src\framework\util\stats.h" />
     <ClInclude Include="..\src\framework\util\matrix.h" />
     <ClInclude Include="..\src\framework\util\point.h" />
     <ClInclude Include="..\src\framework\util\rect.h" />

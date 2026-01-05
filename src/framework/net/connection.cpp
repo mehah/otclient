@@ -23,6 +23,7 @@
 
 #include "connection.h"
 
+#include "framework/util/stats.h"
 #include "framework/core/graphicalapplication.h"
 
 asio::io_service g_ioService;
@@ -47,7 +48,8 @@ Connection::~Connection()
 
 void Connection::poll()
 {
-    // reset must always be called prior to poll
+	// reset must always be called prior to poll
+	AutoStat s(STATS_MAIN, "PollConnection");
     g_ioService.reset();
     g_ioService.poll();
 }

@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include <framework/util/stats.h>
 
 #ifdef __has_include
 
@@ -498,6 +499,8 @@ T LuaInterface::castValue(int index)
 template<typename... T>
 int LuaInterface::luaCallGlobalField(const std::string_view global, const std::string_view field, const T&... args)
 {
+    AutoStat s(STATS_LUA, std::string(global) + ":" + std::string(field));
+
     g_lua.getGlobalField(global, field);
     if (!g_lua.isNil()) {
         const int numArgs = g_lua.polymorphicPush(args...);

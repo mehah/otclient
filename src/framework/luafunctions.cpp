@@ -32,6 +32,7 @@
 #include <framework/proxy/proxy.h>
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
+#include <framework/util/stats.h>
 
 #ifdef FRAMEWORK_GRAPHICS
 #include "framework/graphics/fontmanager.h"
@@ -40,6 +41,7 @@
 #include "framework/graphics/particlemanager.h"
 #include "framework/graphics/shadermanager.h"
 #include "framework/graphics/texturemanager.h"
+#include "framework/graphics/drawpoolmanager.h"
 #include "framework/html/htmlmanager.h"
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
@@ -123,6 +125,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_platform", "openUrl", &Platform::openUrl, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getCPUName", &Platform::getCPUName, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getTotalSystemMemory", &Platform::getTotalSystemMemory, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "getMemoryUsage", &Platform::getMemoryUsage, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getOSName", &Platform::getOSName, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getFileModificationTime", &Platform::getFileModificationTime, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getDevice", &Platform::getDevice, &g_platform);
@@ -231,9 +234,13 @@ void Application::registerLuaFunctions()
     // EventDispatcher
     g_lua.registerSingletonClass("g_dispatcher");
     g_lua.bindSingletonFunction("g_dispatcher", "addEvent", &EventDispatcher::addEvent, &g_dispatcher);
+    g_lua.bindSingletonFunction("g_dispatcher", "addEventEx", &EventDispatcher::addEventEx, &g_dispatcher);
     g_lua.bindSingletonFunction("g_dispatcher", "scheduleEvent", &EventDispatcher::scheduleEvent, &g_dispatcher);
+    g_lua.bindSingletonFunction("g_dispatcher", "scheduleEventEx", &EventDispatcher::scheduleEventEx, &g_dispatcher);
     g_lua.bindSingletonFunction("g_dispatcher", "cycleEvent", &EventDispatcher::cycleEvent, &g_dispatcher);
+    g_lua.bindSingletonFunction("g_dispatcher", "cycleEventEx", &EventDispatcher::cycleEventEx, &g_dispatcher);
     g_lua.bindSingletonFunction("g_dispatcher", "deferEvent", &EventDispatcher::deferEvent, &g_dispatcher);
+    g_lua.bindSingletonFunction("g_dispatcher", "deferEventEx", &EventDispatcher::deferEventEx, &g_dispatcher);
 
     // ResourceManager
     g_lua.registerSingletonClass("g_resources");
@@ -268,6 +275,18 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "updateExecutable", &ResourceManager::updateExecutable, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "createArchive", &ResourceManager::createArchive, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "decompressArchive", &ResourceManager::decompressArchive, &g_resources);
+
+    // Stats
+    g_lua.registerSingletonClass("g_stats");
+    g_lua.bindSingletonFunction("g_stats", "types", &Stats::types, &g_stats);
+    g_lua.bindSingletonFunction("g_stats", "get", &Stats::get, &g_stats);
+    g_lua.bindSingletonFunction("g_stats", "clear", &Stats::clear, &g_stats);
+    g_lua.bindSingletonFunction("g_stats", "clearAll", &Stats::clearAll, &g_stats);
+    g_lua.bindSingletonFunction("g_stats", "getSlow", &Stats::getSlow, &g_stats);
+    g_lua.bindSingletonFunction("g_stats", "clearSlow", &Stats::clearSlow, &g_stats);
+    g_lua.bindSingletonFunction("g_stats", "getSleepTime", &Stats::getSleepTime, &g_stats);
+    g_lua.bindSingletonFunction("g_stats", "resetSleepTime", &Stats::resetSleepTime, &g_stats);
+    g_lua.bindSingletonFunction("g_stats", "getWidgetsInfo", &Stats::getWidgetsInfo, &g_stats);
 
     // OTCv8 proxy system
     g_lua.registerSingletonClass("g_proxy");
@@ -340,6 +359,8 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_app", "setDrawEffectOnTop", &GraphicalApplication::setDrawEffectOnTop, &g_app);
 
     g_lua.bindSingletonFunction("g_app", "getFps", &GraphicalApplication::getFps, &g_app);
+    g_lua.bindSingletonFunction("g_app", "getGraphicsFps", &GraphicalApplication::getGraphicsFps, &g_app);
+    g_lua.bindSingletonFunction("g_app", "getProcessingFps", &GraphicalApplication::getProcessingFps, &g_app);
     g_lua.bindSingletonFunction("g_app", "getMaxFps", &GraphicalApplication::getMaxFps, &g_app);
     g_lua.bindSingletonFunction("g_app", "setMaxFps", &GraphicalApplication::setMaxFps, &g_app);
     g_lua.bindSingletonFunction("g_app", "getTargetFps", &GraphicalApplication::getTargetFps, &g_app);
@@ -416,6 +437,9 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_graphics", "getVendor", &Graphics::getVendor, &g_graphics);
     g_lua.bindSingletonFunction("g_graphics", "getRenderer", &Graphics::getRenderer, &g_graphics);
     g_lua.bindSingletonFunction("g_graphics", "getVersion", &Graphics::getVersion, &g_graphics);
+
+    g_lua.registerSingletonClass("g_atlas");
+    g_lua.bindSingletonFunction("g_atlas", "getStats", &DrawPoolManager::getAtlasStats, &g_drawPool);
 
     // Textures
     g_lua.registerSingletonClass("g_textures");
