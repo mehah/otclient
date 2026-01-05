@@ -86,7 +86,6 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     if (textLength == 0) {
         if (m_placeholderColor != Color::alpha && !m_placeholder.empty())
             m_placeholderFont->drawText(m_placeholder, m_drawArea, m_placeholderColor, m_placeholderAlign);
-        return;  // No text to render
     }
 	
     // This ensures TTF font offsets are always correctly applied
