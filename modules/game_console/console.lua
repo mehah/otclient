@@ -423,7 +423,9 @@ function switchChatOnCall()
     else
         local message = consoleTextEdit:getText()
         if message == '' then
-            toggleChat()
+            if not isChatEnabled() or modules.client_options.getOption('returnDisablesChat') then
+                toggleChat()
+            end
         end
     end
 end
