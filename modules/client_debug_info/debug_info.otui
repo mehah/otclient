@@ -99,9 +99,18 @@ MainWindow
     DebugLabel
       !text: tr('Widgets & Objects')
 
+    QtCheckBox
+      id: widgetsInfoToggle
+      !text: tr('Enabled')
+      text-auto-resize: true
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: prev.bottom
+      margin-top: 5
+      margin-bottom: 5
+
     DebugText
       id: widgetsInfo
-      text: Disabled, edit debug_info.lua to enable
+      text: ""
 
     DebugLabel
       !text: tr('Packets')

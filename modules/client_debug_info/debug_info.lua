@@ -10,6 +10,7 @@ local adaptiveRender = nil
 local slowMain = nil
 local slowRender = nil
 local widgetsInfo = nil
+local widgetsInfoToggle = nil
 local packets = nil
 local slowPackets = nil
 
@@ -18,6 +19,7 @@ local monitorEvent = nil
 local iter = 0
 local fps = {}
 local ping = {}
+local widgetsInfoEnabled = false
 
 function init()
 	debugInfoButton = modules.client_topmenu.addTopRightToggleButton("debugInfoButton", tr("Debug Info"),
@@ -47,6 +49,24 @@ function init()
 	slowRender = debugInfoWindow:recursiveGetChildById("slowRender")
 	slowPackets = debugInfoWindow:recursiveGetChildById("slowPackets")
 	widgetsInfo = debugInfoWindow:recursiveGetChildById("widgetsInfo")
+	widgetsInfoToggle = debugInfoWindow:recursiveGetChildById("widgetsInfoToggle")
+	if widgetsInfoToggle then
+		widgetsInfoToggle:setChecked(false)
+		widgetsInfoToggle.onCheckChange = function(_, checked)
+			widgetsInfoEnabled = checked
+			if checked then
+				widgetsInfo:setVisible(true)
+				widgetsInfo:setText(g_stats.getWidgetsInfo(10, true))
+			else
+				widgetsInfo:setText("")
+				widgetsInfo:setHeight(0)
+				widgetsInfo:setVisible(false)
+			end
+		end
+	end
+	widgetsInfo:setText("")
+	widgetsInfo:setHeight(0)
+	widgetsInfo:setVisible(false)
 
 	if adaptiveRender then
 		adaptiveRender:setText("Adaptive renderer not available")
@@ -55,7 +75,6 @@ function init()
 		atlas:setText("Atlas: " .. g_atlas.getStats())
 	end
 
-	lastSend = os.time()
 	g_stats.resetSleepTime()
 	lastSleepTimeReset = g_clock.micros()
 
@@ -129,8 +148,9 @@ function update()
 	elseif iter == 4 then
 		slowRender:setText(g_stats.getSlow(2, 10, 10, true))
 	elseif iter == 5 then
-		-- disabled because takes a lot of cpu
-		-- widgetsInfo:setText(g_stats.getWidgetsInfo(10, true))
+		if widgetsInfoEnabled then
+			widgetsInfo:setText(g_stats.getWidgetsInfo(10, true))
+		end
 	elseif iter == 6 then
 		packets:setText(g_stats.get(6, 10, true))
 		slowPackets:setText(g_stats.getSlow(6, 10, 10, true))
