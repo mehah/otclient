@@ -93,7 +93,7 @@ void Connection::connect(const std::string_view host, const uint16_t port, const
     m_connectCallback = connectCallback;
 
     m_resolver.async_resolve(
-        host.data(),
+        std::string(host),
         stdext::unsafe_cast<std::string>(port),
         [this](
             auto&& error,
