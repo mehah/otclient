@@ -73,9 +73,10 @@ UIWidget
     margin-top: 7
     height: 22
   
-    OptionCheckBox
+    OptionCheckBoxMarked
       id: returnDisablesChat
       !text: tr('Enter to disable chat')
+      !tooltip: tr('Enables disabling chat and enabling WASD when pressed Enter.')
 
   SmallReversedQtPanel
     anchors.left: parent.left
