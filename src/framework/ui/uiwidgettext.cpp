@@ -409,7 +409,7 @@ void UIWidget::setTTFFont(const std::string_view fontName, int fontSize, int str
     
     if (!g_fonts.fontExists(uniqueFontName)) {
 		
-        if (!g_fonts.importTTF(std::string(fontName), fontSize, strokeWidth, strokeColor)) {
+        if (g_fonts.importTTF(std::string(fontName), fontSize, strokeWidth, strokeColor).empty()) {
             g_logger.error("Failed to load TTF font: {}", fontName);
             return;
         }

@@ -50,7 +50,7 @@ bool FontManager::importFont(const std::string& file)
 
     if ((file.find(".ttf") != std::string::npos || file.find(".otf") != std::string::npos) 
         && file.find(".otfont") == std::string::npos) {
-        return importTTF(file, 12);
+        return !importTTF(file, 12).empty();
     }
 
     const auto& path = g_resources.guessFilePath(file, "otfont");
@@ -85,14 +85,14 @@ bool FontManager::importFont(const std::string& file)
     }
 }
 
-bool FontManager::importTTF(const std::string& file, int fontSize, int strokeWidth, const Color& strokeColor)
+std::string FontManager::importTTF(const std::string& file, int fontSize, int strokeWidth, const Color& strokeColor)
 {
     try {
         const auto& font = TTFLoader::load(file, fontSize, strokeWidth, strokeColor);
         
         if (!font) {
             g_logger.error("Failed to load TTF font: {}", file);
-            return false;
+            return "";
         }
 
         const auto& name = font->getName();
@@ -109,11 +109,11 @@ bool FontManager::importTTF(const std::string& file, int fontSize, int strokeWid
         if (!m_defaultFont)
             m_defaultFont = font;
         
-        return true;
+        return name;
         
     } catch (const stdext::exception& e) {
         g_logger.error("Unable to load TTF font from file '{}': {}", file, e.what());
-        return false;
+        return "";
     }
 }
 
