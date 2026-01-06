@@ -1126,7 +1126,7 @@ enum tileflags_t : uint32_t
     TILESTATE_NOLOGOUT = 1 << 3,
     TILESTATE_HARDCOREZONE = 1 << 4,
     TILESTATE_REFRESH = 1 << 5,
-
+    TILESTATE_ZONE_BRUSH = 0x0040,
     // internal usage
     TILESTATE_HOUSE = 1 << 6,
     TILESTATE_TELEPORT = 1 << 17,

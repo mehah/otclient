@@ -94,6 +94,18 @@ void Item::drawLight(const Point& dest, LightView* lightView) {
     drawAttachedLightEffect(dest, lightView);
 }
 
+void Item::drawToImage(Point dest, ImagePtr image)
+{
+    if (m_clientId == 0)
+        return;
+
+    const int xPattern = m_numPatternX;
+    const int yPattern = m_numPatternY;
+    const int zPattern = m_numPatternZ;
+
+    getThingType()->drawToImage(dest, xPattern, yPattern, zPattern, image);
+}
+
 void Item::setPosition(const Position& position, const uint8_t stackPos)
 {
     Thing::setPosition(position, stackPos);
@@ -328,7 +340,7 @@ void Item::unserializeItem(const BinaryTreePtr& in)
             switch (attrib) {
                 case ATTR_COUNT:
                 case ATTR_RUNE_CHARGES:
-                    setCount(in->getU8());
+                    setCount(g_game.getFeature(Otc::GameCountU16) ?  in->getU16() : in->getU8());
                     break;
                 case ATTR_CHARGES:
                     setCount(in->getU16());

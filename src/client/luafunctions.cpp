@@ -186,6 +186,27 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_map", "isForcingAnimations", &Map::isForcingAnimations, &g_map);
     g_lua.bindSingletonFunction("g_map", "isShowingAnimations", &Map::isShowingAnimations, &g_map);
     g_lua.bindSingletonFunction("g_map", "setShowAnimations", &Map::setShowAnimations, &g_map);
+    // Map image generation functions
+    g_lua.bindSingletonFunction("g_map", "initializeMapGenerator", &Map::initializeMapGenerator, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getAreasCount", &Map::getAreasCount, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getGeneratedAreasCount", &Map::getGeneratedAreasCount, &g_map);
+    g_lua.bindSingletonFunction("g_map", "setGeneratedAreasCount", &Map::setGeneratedAreasCount, &g_map);
+    g_lua.bindSingletonFunction("g_map", "addAreasToGenerator", &Map::addAreasToGenerator, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getMinPosition", &Map::getMinPosition, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getMaxPosition", &Map::getMaxPosition, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getMapTilesPerX", &Map::getMapTilesPerX, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getMinXToLoad", &Map::getMinXToLoad, &g_map);
+    g_lua.bindSingletonFunction("g_map", "setMinXToLoad", &Map::setMinXToLoad, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getMaxXToLoad", &Map::getMaxXToLoad, &g_map);
+    g_lua.bindSingletonFunction("g_map", "setMaxXToLoad", &Map::setMaxXToLoad, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getMinXToRender", &Map::getMinXToRender, &g_map);
+    g_lua.bindSingletonFunction("g_map", "setMinXToRender", &Map::setMinXToRender, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getMaxXToRender", &Map::getMaxXToRender, &g_map);
+    g_lua.bindSingletonFunction("g_map", "setMaxXToRender", &Map::setMaxXToRender, &g_map);
+    g_lua.bindSingletonFunction("g_map", "getShadowPercent", &Map::getShadowPercent, &g_map);
+    g_lua.bindSingletonFunction("g_map", "setShadowPercent", &Map::setShadowPercent, &g_map);
+    g_lua.bindSingletonFunction("g_map", "saveImage", &Map::saveImage, &g_map);
+    g_lua.bindSingletonFunction("g_map", "generateMapForZ", &Map::generateMapForZ, &g_map);
 #endif
     g_lua.bindSingletonFunction("g_map", "beginGhostMode", &Map::beginGhostMode, &g_map);
     g_lua.bindSingletonFunction("g_map", "endGhostMode", &Map::endGhostMode, &g_map);

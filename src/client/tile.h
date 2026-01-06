@@ -40,6 +40,7 @@ public:
     void onAddInMapView();
     void draw(const Point& dest, int flags, LightView* lightView = nullptr);
     void drawLight(const Point& dest, LightView* lightView);
+    bool drawToImage(const Point& dest, ImagePtr image);
 
     void clean();
 

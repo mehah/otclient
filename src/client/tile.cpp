@@ -35,6 +35,7 @@
 #include "framework/core/clock.h"
 #include "framework/core/eventdispatcher.h"
 #include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/image.h"
 
 Tile::Tile(const Position& position) : m_position(position) {}
 
@@ -1117,4 +1118,60 @@ bool Tile::isLoading() const {
     }
 
     return false;
+}
+
+bool Tile::drawToImage(const Point& dest, ImagePtr image)
+{
+    if (!image)
+        return false;
+
+    int x = dest.x;
+    int y = dest.y;
+
+    // first bottom items
+    m_drawElevation = 0;
+    for (const ThingPtr& thing : m_things) {
+
+        if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom())
+            break;
+
+        if (thing->isGround() || thing->isGroundBorder() || thing->isOnBottom()) {
+            // little hack to fix tables height
+            if (thing->getId() == 2322 || thing->getId() == 2323) {
+                m_drawElevation += thing->getElevation();
+                if (m_drawElevation > 24)
+                    m_drawElevation = 24;
+            }
+            thing->drawToImage(Point(x - m_drawElevation, y - m_drawElevation), image);
+        }
+
+        // little hack to fix tables height
+        if (thing->getId() != 2322 && thing->getId() != 2323) {
+            m_drawElevation += thing->getElevation();
+            if (m_drawElevation > 24)
+                m_drawElevation = 24;
+        }
+    }
+
+    // normal items
+    for (auto it = m_things.rbegin(); it != m_things.rend(); ++it) {
+        const ThingPtr& thing = *it;
+
+        if (thing->isOnTop() || thing->isOnBottom() || thing->isGroundBorder() || thing->isGround() || thing->isCreature())
+            break;
+        thing->drawToImage(Point(x - m_drawElevation, y - m_drawElevation), image);
+
+        m_drawElevation += thing->getElevation();
+        if (m_drawElevation > 24)
+            m_drawElevation = 24;
+    }
+
+    // top items
+    for (const ThingPtr& thing : m_things) {
+        if (thing->isOnTop()) {
+            thing->drawToImage(Point(x - m_drawElevation, y - m_drawElevation), image);
+        }
+    }
+
+    return !m_things.empty();
 }

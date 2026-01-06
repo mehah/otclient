@@ -887,6 +887,56 @@ Size ThingType::getBestTextureDimension(int w, int h, const int count)
     return bestDimension;
 }
 
+bool ThingType::drawToImage(const Point& dest, int xPattern, int yPattern, int zPattern, ImagePtr image)
+{
+    if (m_null || m_animationPhases == 0 || !image)
+        return false;
+
+    if (m_spritesIndex.empty())
+        return false;
+
+    // Clamp patterns to valid range
+    xPattern = xPattern % std::max<int>(1, m_numPatternX);
+    yPattern = yPattern % std::max<int>(1, m_numPatternY);
+    zPattern = zPattern % std::max<int>(1, m_numPatternZ);
+
+    const int animationPhase = 0;
+    const int spriteSize = g_gameConfig.getSpriteSize();
+    bool drewAnySprite = false;
+
+    // Draw sprite parts in correct order (layers, then width, then height)
+    for (int l = 0; l < m_layers; ++l) {
+        for (int w = 0; w < m_size.width(); ++w) {
+            for (int h = 0; h < m_size.height(); ++h) {
+                const uint32_t spriteIndex = getSpriteIndex(w, h, l, xPattern, yPattern, zPattern, animationPhase);
+                if (spriteIndex >= m_spritesIndex.size())
+                    continue;
+
+                const uint32_t spriteId = m_spritesIndex[spriteIndex];
+                if (spriteId == 0)
+                    continue;
+
+                const auto& spriteImage = g_sprites.getSpriteImageCached(spriteId);
+                if (!spriteImage)
+                    continue;
+
+                // Calculate destination using reference formula:
+                // For multi-tile sprites, parts are positioned relative to the base tile
+                // The formula ensures sprite draws from top-left corner towards bottom-right
+                int dx = dest.x + spriteSize * (m_size.width() - w - 1) - spriteSize * (m_size.width() - 1);
+                int dy = dest.y + spriteSize * (m_size.height() - h - 1) - spriteSize * (m_size.height() - 1);
+
+                // Note: Image::blit handles out-of-bounds coordinates, so negative values are OK
+                image->blit(Point(dx, dy), spriteImage);
+                drewAnySprite = true;
+            }
+        }
+    }
+
+    return drewAnySprite;
+}
+
+
 uint32_t ThingType::getSpriteIndex(const int w, const int h, const int l, const int x, const int y, const int z, const int a) const
 {
     uint32_t index = ((((((a % m_animationPhases)

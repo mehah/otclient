@@ -31,6 +31,7 @@ class Thing : public AttachableObject
 {
 public:
     virtual void draw(const Point& /*dest*/, bool /*drawThings*/ = true, LightView* = nullptr) {}
+    virtual void drawToImage(Point /*dest*/, ImagePtr /*image*/) {}  // For map image generation
     virtual void drawLight(const Point& /*dest*/, LightView*) {}
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }

@@ -51,6 +51,8 @@ public:
 
     void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color);
 
+    bool drawToImage(const Point& dest, int xPattern, int yPattern, int zPattern, ImagePtr image);
+
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }

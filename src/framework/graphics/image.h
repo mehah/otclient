@@ -36,10 +36,16 @@ public:
 
     void savePNG(const std::string& fileName);
 
+    // Map generator functions
+    void cut();  // Removes 2-tile (64px) margin from map images
+    void addShadow(uint8_t originalPercent);  // Applies shadow to entire image
+    bool wasBlited() const { return m_blited; }  // Returns true if blit() was called
+
     void overwriteMask(const Color& maskedColor, const Color& insideColor = Color::white, const Color& outsideColor = Color::alpha);
     void overwrite(const Color& color);
     void blit(const Point& dest, const ImagePtr& other);
     void paste(const ImagePtr& other);
+    void addShadowToSquare(const Point& dest, int squareSize, int shadowPercent);
     void resize(const Size& size) {
         if (m_size == size)
             return;
@@ -76,6 +82,7 @@ public:
 private:
     std::vector<uint8_t > m_pixels;
     Size m_size;
+    bool m_blited{ false };  // Tracks if any pixel was drawn via blit()
 
     int m_bpp;
     bool m_transparentPixel{ false };

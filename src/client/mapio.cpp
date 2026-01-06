@@ -25,20 +25,45 @@
 #include "game.h"
 #include "map.h"
 #include "tile.h"
+#include "item.h"
+#include "spritemanager.h"
 
 #include <framework/core/application.h>
+#include <framework/core/asyncdispatcher.h>
 #include <framework/core/binarytree.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/ui/uiwidget.h>
+#include <framework/graphics/image.h>
 
 #include "houses.h"
 #include "towns.h"
 
+#include <condition_variable>
+#include <memory>
+#include <mutex>
+#include <sstream>
+#include <thread>
+#include <atomic>
+#include <set>
+
 void Map::loadOtbm(const std::string& fileName)
 {
     try {
+        // Clear map at load - we want to load map part and limit RAM usage
+        // This prevents stale tiles from previous map parts appearing in generated images
+        cleanDynamicThings();
+        
+        for (auto& floor : m_floors) {
+            floor.tileBlocks.clear();
+        }
+        
+        m_waypoints.clear();
+        g_towns.clear();
+        g_houses.clear();
+        g_creatures.clearSpawns();
+
         if (!g_things.isOtbLoaded())
             throw Exception("OTB isn't loaded yet to load a map.");
 
@@ -99,6 +124,12 @@ void Map::loadOtbm(const std::string& fileName)
             }
         }
 
+        // Reset map generator data structures
+        m_mapAreas.clear();
+        m_mapTilesPerX.clear();
+        m_minPosition = Position(65535, 65535, 255);
+        m_maxPosition = Position(0, 0, 0);
+
         for (const auto& nodeMapData : node->getChildren()) {
             const uint8_t mapDataType = nodeMapData->getU8();
             if (mapDataType == OTBM_TILE_AREA) {
@@ -115,6 +146,43 @@ void Map::loadOtbm(const std::string& fileName)
                     HousePtr house = nullptr;
                     uint32_t flags = TILESTATE_NONE;
                     Position pos = basePos + nodeTile->getPoint();
+
+                    // Track min/max position and tiles per X for map generator
+                    if (m_maxXToLoad == -1) {
+                        // Only tracking map bounds, not loading tiles
+                        m_minPosition.x = std::min(m_minPosition.x, pos.x);
+                        m_minPosition.y = std::min(m_minPosition.y, pos.y);
+                        m_minPosition.z = std::min(m_minPosition.z, pos.z);
+                        m_maxPosition.x = std::max(m_maxPosition.x, pos.x);
+                        m_maxPosition.y = std::max(m_maxPosition.y, pos.y);
+                        m_maxPosition.z = std::max(m_maxPosition.z, pos.z);
+                        m_mapTilesPerX[pos.x]++;
+                    }
+
+                    // Skip loading tile if outside X range
+                    if (m_maxXToLoad != -1 && (pos.x < m_minXToLoad || pos.x > m_maxXToLoad)) {
+                        continue;
+                    }
+
+                    // Add to generator area list if within render range
+                    if (m_minXToRender <= pos.x && pos.x <= m_maxXToRender) {
+                        // For surface tiles (Z <= 7): generate areas from min loaded Z to tile Z
+                        // For underground tiles (Z > 7): generate areas from 8 to tile Z
+                        // This creates separate "view layers" - surface (0-7) and underground (8-15)
+                        int16_t startFloor = (pos.z <= 7) ? 0 : 8;
+                        for (int16_t allFloors = startFloor; allFloors <= pos.z; allFloors++) {
+                            uint32_t areaKey = allFloors + (pos.y / 8) * 16 + (pos.x / 8) * 262144;
+                            uint32_t positionInt = allFloors + (pos.y << 4) + (pos.x << 18);
+                            m_mapAreas[areaKey] = positionInt;
+                        }
+                    }
+                    
+                    // Debug: log unique z levels being added (limit spam)
+                    static std::set<int16_t> zLevelsLogged;
+                    if (zLevelsLogged.find(pos.z) == zLevelsLogged.end()) {
+                        g_logger.info("loadOtbm: First tile at Z={} found at ({}, {})", pos.z, pos.x, pos.y);
+                        zLevelsLogged.insert(pos.z);
+                    }
 
                     if (type == OTBM_HOUSETILE) {
                         const uint32_t hId = nodeTile->getU32();
@@ -144,6 +212,13 @@ void Map::loadOtbm(const std::string& fileName)
 
                                 if ((_flags & TILESTATE_REFRESH) == TILESTATE_REFRESH)
                                     flags |= TILESTATE_REFRESH;
+
+                                if (_flags & TILESTATE_ZONE_BRUSH) {
+                                    uint16_t zoneId = 0;
+                                    do {
+                                        zoneId = nodeTile->getU16();
+                                    } while (zoneId != 0);
+                                }
                                 break;
                             }
                             case OTBM_ATTR_ITEM:
@@ -547,5 +622,249 @@ void Map::saveOtcm(const std::string& fileName)
     }
 }
 
+// Map image generation implementation
+static std::unique_ptr<BS::thread_pool> g_mapGeneratorThreadPool;
+
+void mapPartGenerator(int x, int y, int z)
+{
+    std::stringstream path;
+    path << "exported_images/map/" << x << "_" << y << "_" << z << ".png";
+    g_map.drawMap(path.str(), x * 8, y * 8, z, 8);
+    g_map.increaseGeneratedAreasCount();
+}
+
+void Map::initializeMapGenerator(int threadsNumber)
+{
+    g_mapGeneratorThreadPool = std::make_unique<BS::thread_pool>(threadsNumber);
+    g_logger.info("Started {} map generator threads.", threadsNumber);
+}
+
+void Map::increaseGeneratedAreasCount()
+{
+    std::lock_guard<std::mutex> lock(m_generatedAreasCountMutex);
+    m_generatedAreasCount++;
+}
+
+void Map::addAreasToGenerator(int startAreaId, int endAreaId)
+{
+    if (!g_mapGeneratorThreadPool) {
+        g_logger.error("Map generator thread pool not initialized. Call initializeMapGenerator(threadsNumber) before adding areas to generator.");
+        return;
+    }
+
+    int i = 0;
+    uint32_t areaKey, x, y, z;
+    
+    // Debug: track Z levels in areas
+    std::set<int> zLevelsFound;
+    
+    for (auto iterator = m_mapAreas.begin(); iterator != m_mapAreas.end(); iterator++) {
+        if (startAreaId <= i && i <= endAreaId) {
+            // Use the KEY (areaKey) to decode area coordinates
+            // areaKey format: z + (y/8)*16 + (x/8)*262144
+            areaKey = iterator->first;
+            z = areaKey & 0x0F;                 // z is in bits 0-3
+            y = (areaKey >> 4) & 0x3FFF;        // y/8 is in bits 4-17
+            x = (areaKey >> 18) & 0x3FFF;       // x/8 is in bits 18-31
+            zLevelsFound.insert(z);
+            g_mapGeneratorThreadPool->detach_task([x, y, z]() { mapPartGenerator(x, y, z); });
+        }
+        i++;
+    }
+    
+    // Log Z levels found in this batch
+    std::string zList;
+    for (int zl : zLevelsFound) {
+        if (!zList.empty()) zList += ",";
+        zList += std::to_string(zl);
+    }
+    g_logger.info("addAreasToGenerator({}-{}): {} areas queued, Z levels: [{}]", 
+        startAreaId, endAreaId, std::min(endAreaId - startAreaId + 1, i), zList);
+}
+
+void Map::generateMapForZ(int16_t targetZ, uint8_t shadowPercent)
+{
+    if (!g_mapGeneratorThreadPool) {
+        g_logger.error("Map generator thread pool not initialized. Call initializeMapGenerator first.");
+        return;
+    }
+    
+    m_shadowPercent = shadowPercent;
+    
+    // Use the min/max position bounds that were set during loadOtbm
+    const int minX = m_minPosition.x / 8;
+    const int maxX = m_maxPosition.x / 8;
+    const int minY = m_minPosition.y / 8;
+    const int maxY = m_maxPosition.y / 8;
+    
+    g_logger.info("generateMapForZ: Generating for Z={}, X range: {}-{} (tiles {}-{}), Y range: {}-{} (tiles {}-{})",
+        targetZ, minX, maxX, m_minPosition.x, m_maxPosition.x, 
+        minY, maxY, m_minPosition.y, m_maxPosition.y);
+    
+    int generatedCount = 0;
+    
+    for (int x = minX; x <= maxX; ++x) {
+        for (int y = minY; y <= maxY; ++y) {
+            g_mapGeneratorThreadPool->detach_task([x, y, targetZ]() { 
+                mapPartGenerator(x, y, targetZ); 
+            });
+            generatedCount++;
+        }
+    }
+    
+    g_logger.info("generateMapForZ: Queued {} images for Z={}", generatedCount, targetZ);
+}
+
+void Map::drawMap(std::string fileName, int sx, int sy, int16_t sz, int size, uint32_t houseId)
+{
+    Position pos;
+    const int squareSize = g_gameConfig.getSpriteSize();
+    // Image is 2 tiles larger than area to accommodate 64x64 sprites extending beyond tile bounds
+    ImagePtr image(new Image(Size(squareSize * (size + 2), squareSize * (size + 2))));
+    
+    // m_shadowPercent == -1 means single layer mode (only current floor, transparent background)
+    // m_shadowPercent >= 0 means render lower floors with that shadow percentage
+    const bool singleLayerMode = (m_shadowPercent < 0);
+    
+    if (!singleLayerMode) {
+        // Determine the lowest floor to draw based on target floor
+        // For underground (z > 7): draw from floor 15 down to current floor+1
+        // For surface (z <= 7): draw from floor 7 down to current floor+1
+        int16_t lowestFloor = (sz <= 7) ? 7 : 15;
+
+        // Draw lower floors (stacked view) - these get shadow applied
+        int offset = 0;
+        for (int16_t z = lowestFloor; z > sz; z--) {
+            pos.z = z;
+            offset = z - sz;
+            for (int x = -offset; x <= size; x++) {
+                for (int y = -offset; y <= size; y++) {
+                    pos.x = sx + x;
+                    pos.y = sy + y;
+                    if (const TilePtr& tile = getTile(pos)) {
+                        int offX = x + 1 + offset;
+                        int offY = y + 1 + offset;
+                        if (offX < size + 2 && offY < size + 2) {
+                            Point dest(offX * squareSize, offY * squareSize);
+                            tile->drawToImage(dest, image);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Apply shadow to lower floors
+        // shadowPercent=30 means floors below are 70% brightness
+        image->addShadow(static_cast<uint8_t>(100 - m_shadowPercent));
+    }
+
+    // Draw current floor on top (no shadow)
+    pos.z = sz;
+    for (int x = 0; x <= size; x++) {
+        for (int y = 0; y <= size; y++) {
+            pos.x = sx + x;
+            pos.y = sy + y;
+            if (const TilePtr& tile = getTile(pos)) {
+                int offX = x + 1;
+                int offY = y + 1;
+                if (offX < size + 2 && offY < size + 2) {
+                    Point dest(offX * squareSize, offY * squareSize);
+                    tile->drawToImage(dest, image);
+                }
+            }
+        }
+    }
+
+    // Reduce image size - remove the 2-tile margin used for 64x64 items
+    image->cut();
+    
+    // Save to file (savePNG skips empty images via wasBlited check)
+    image->savePNG(fileName);
+}
+
+void Map::saveImage(const std::string& fileName, int minX, int minY, int maxX, int maxY, short z, bool drawLowerFloors)
+{
+    try {
+        // Maximum number of lower floors to render for depth visualization
+        // Set to 7 to match the standard Tibia client's Z-axis view range,
+        // which shows up to 7 floors below the current floor for underground areas
+        constexpr int MAX_LOWER_FLOORS = 7;
+
+        // Maximum dimension to prevent integer overflow in memory calculations
+        // This allows maps up to 10000x10000 tiles, which is sufficient for most use cases
+        constexpr int MAX_DIMENSION = 10000;
+
+        const int width = maxX - minX + 1;
+        const int height = maxY - minY + 1;
+
+        if (width <= 0 || height <= 0) {
+            g_logger.error("Invalid map dimensions for saveImage: width={}, height={}", width, height);
+            return;
+        }
+
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+            g_logger.error("Map dimensions too large for saveImage: width={}, height={} (max={})", width, height, MAX_DIMENSION);
+            return;
+        }
+
+        const int squareSize = g_gameConfig.getSpriteSize();
+        g_logger.info("saveImage: spriteSize={}, sprites loaded={}", squareSize, g_sprites.isLoaded());
+
+        // Check for overflow in image size calculation
+        if (width > MAX_DIMENSION / squareSize || height > MAX_DIMENSION / squareSize) {
+            g_logger.error("Image size would overflow: {}x{} with square size {}", width, height, squareSize);
+            return;
+        }
+
+        // Add margin of 1 tile on each side for large sprites (64x64) that extend beyond tile bounds
+        // This prevents clipping of isometric walls and other multi-tile sprites
+        const int margin = 1;
+        ImagePtr image = std::make_shared<Image>(Size((width + margin * 2) * squareSize, (height + margin * 2) * squareSize));
+
+        int tilesFound = 0;
+        int tilesWithItems = 0;
+
+        for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y) {
+                Position tilePos(minX + x, minY + y, z);
+                // Add margin offset to drawing position
+                const Point dest((x + margin) * squareSize, (y + margin) * squareSize);
+
+                if (drawLowerFloors && z > 0) {
+                    // Draw lower floors with shadow
+                    for (int floorOffset = MAX_LOWER_FLOORS; floorOffset >= 1; --floorOffset) {
+                        if (z - floorOffset < 0)
+                            continue;
+
+                        Position lowerPos(tilePos.x, tilePos.y, z - floorOffset);
+                        const auto& lowerTile = getTile(lowerPos);
+                        if (lowerTile) {
+                            lowerTile->drawToImage(dest, image);
+                            if (m_lowerFloorsShadowPercent > 0) {
+                                image->addShadowToSquare(dest, squareSize, m_lowerFloorsShadowPercent);
+                            }
+                        }
+                    }
+                }
+
+                // Draw current floor
+                const auto& tile = getTile(tilePos);
+                if (tile) {
+                    tilesFound++;
+                    if (!tile->isEmpty()) {
+                        tilesWithItems++;
+                    }
+                    tile->drawToImage(dest, image);
+                }
+            }
+        }
+
+        g_logger.info("saveImage: found {} tiles, {} have items", tilesFound, tilesWithItems);
+        image->savePNG(fileName);
+        g_logger.info("Map image saved to {}", fileName);
+    } catch (const stdext::exception& e) {
+        g_logger.error("Failed to save map image: {}", e.what());
+    }
+}
 #endif
 /* vim: set ts=4 sw=4 et: */

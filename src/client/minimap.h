@@ -98,7 +98,7 @@ public:
     std::pair<MinimapBlock_ptr, MinimapTile> threadGetTile(const Position& pos);
 
     bool loadImage(const std::string& fileName, const Position& topLeft, float colorFactor);
-    void saveImage(const std::string& fileName, const Rect& mapRect);
+    void saveImage(const std::string& fileName, int minX, int minY, int maxX, int maxY, short z);
     bool loadOtmm(const std::string& fileName);
     void saveOtmm(const std::string& fileName);
 

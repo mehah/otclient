@@ -30,6 +30,7 @@
 #include "framework/core/graphicalapplication.h"
 #include "framework/core/resourcemanager.h"
 #include "framework/graphics/image.h"
+#include <mutex>
 
 SpriteManager g_sprites;
 
@@ -353,4 +354,42 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
         g_logger.error("Failed to get sprite id {}: {}", id, e.what());
         return nullptr;
     }
+}
+
+// Sprite caching for map generation
+class SpriteCache
+{
+public:
+    SpriteCache()
+    {
+        if (g_sprites.isLoaded()) {
+            m_images.resize(g_sprites.getSpritesCount());
+            int i = 1;
+            bool isLoading = false;
+            for (auto& ptr : m_images) {
+                ptr = g_sprites.getSpriteImage(i++, isLoading);
+                // If sprite is still loading, it will be null - this is expected
+                // and will be handled by null checks when accessing later
+            }
+        }
+    }
+    
+    ImagePtr getSpriteImage(int id) const
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (id <= 0 || id > static_cast<int>(m_images.size())) {
+            return nullptr;
+        }
+        return m_images[id - 1]; // IDs start at 1
+    }
+    
+private:
+    std::vector<ImagePtr> m_images;
+    mutable std::mutex m_mutex;
+};
+
+ImagePtr SpriteManager::getSpriteImageCached(int id)
+{
+    static SpriteCache cache;
+    return cache.getSpriteImage(id);
 }

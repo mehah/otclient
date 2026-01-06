@@ -93,6 +93,58 @@ void Image::savePNG(const std::string& fileName)
     fin->close();
 }
 
+void Image::cut()
+{
+    if (!m_blited) {
+        // Empty image, nothing to cut
+        return;
+    }
+    
+    // Remove 2-tile (64px) margin that was added for large items (64x64 sprites)
+    const int margin = 64;  // 2 tiles * 32 pixels
+    const int newWidth = m_size.width() - margin;
+    const int newHeight = m_size.height() - margin;
+    
+    if (newWidth <= 0 || newHeight <= 0)
+        return;
+    
+    // Copy pixels from center region (offset by 32px) to new smaller buffer
+    std::vector<uint8_t> newPixels(newWidth * newHeight * m_bpp, 0);
+    const int srcOffset = 32;  // Start copying 1 tile (32px) from edge
+    
+    for (int y = 0; y < newHeight; ++y) {
+        for (int x = 0; x < newWidth; ++x) {
+            const int targetPos = (y * newWidth + x) * m_bpp;
+            const int sourcePos = ((y + srcOffset) * m_size.width() + x + srcOffset) * m_bpp;
+            
+            for (int c = 0; c < m_bpp; ++c) {
+                newPixels[targetPos + c] = m_pixels[sourcePos + c];
+            }
+        }
+    }
+    
+    m_pixels = std::move(newPixels);
+    m_size = Size(newWidth, newHeight);
+}
+
+void Image::addShadow(uint8_t originalPercent)
+{
+    assert(m_bpp == 4);
+    
+    if (originalPercent >= 100)
+        return;
+    
+    for (int p = 0; p < getPixelCount(); ++p) {
+        const int p4 = p * 4;
+        
+        if (m_pixels[p4 + 3] > 0) {  // Only affect non-transparent pixels
+            m_pixels[p4 + 0] = static_cast<uint8_t>((m_pixels[p4 + 0] * originalPercent) / 100);
+            m_pixels[p4 + 1] = static_cast<uint8_t>((m_pixels[p4 + 1] * originalPercent) / 100);
+            m_pixels[p4 + 2] = static_cast<uint8_t>((m_pixels[p4 + 2] * originalPercent) / 100);
+        }
+    }
+}
+
 void Image::overwriteMask(const Color& maskedColor, const Color& insideColor, const Color& outsideColor)
 {
     assert(m_bpp == 4);
@@ -140,11 +192,20 @@ void Image::blit(const Point& dest, const ImagePtr& other)
     if (!other)
         return;
 
+    m_blited = true;  // Mark that something was blitted
+
     const uint8_t* otherPixels = other->getPixelData();
     for (int p = 0; p < other->getPixelCount(); ++p) {
         const int x = p % other->getWidth();
         const int y = p / other->getWidth();
-        const int pos = ((dest.y + y) * m_size.width() + (dest.x + x)) * 4;
+        const int destX = dest.x + x;
+        const int destY = dest.y + y;
+
+        // Bounds check: skip pixels outside target image
+        if (destX < 0 || destX >= m_size.width() || destY < 0 || destY >= m_size.height())
+            continue;
+
+        const int pos = (destY * m_size.width() + destX) * 4;
 
         if (otherPixels[p * 4 + 3] != 0) {
             m_pixels[pos + 0] = otherPixels[p * 4 + 0];
@@ -276,4 +337,31 @@ ImagePtr Image::fromQRCode(const std::string& code, const int border)
     }
 
     return {};
+}
+
+void Image::addShadowToSquare(const Point& dest, int squareSize, int shadowPercent)
+{
+    assert(m_bpp == 4);
+
+    if (shadowPercent <= 0 || shadowPercent > 100)
+        return;
+
+    // clamp to 0-100 and invert so 100% shadow = fully dark
+    const int brightnessFactor = 100 - shadowPercent;
+
+    const int startX = std::max(0, dest.x);
+    const int startY = std::max(0, dest.y);
+    const int endX = std::min(m_size.width(), dest.x + squareSize);
+    const int endY = std::min(m_size.height(), dest.y + squareSize);
+
+    for (int y = startY; y < endY; ++y) {
+        for (int x = startX; x < endX; ++x) {
+            uint8_t* pixel = getPixel(x, y);
+            if (pixel && pixel[3] > 0) {  // Only affect non-transparent pixels
+                pixel[0] = static_cast<uint8_t>(pixel[0] * brightnessFactor / 100);  // R
+                pixel[1] = static_cast<uint8_t>(pixel[1] * brightnessFactor / 100);  // G
+                pixel[2] = static_cast<uint8_t>(pixel[2] * brightnessFactor / 100);  // B
+            }
+        }
+    }
 }

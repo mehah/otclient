@@ -303,9 +303,24 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
     }
 }
 
-void Minimap::saveImage(const std::string&, const Rect&)
+void Minimap::saveImage(const std::string& fileName, int minX, int minY, int maxX, int maxY, short z)
 {
-    //TODO
+    ImagePtr image(new Image(Size(maxX - minX, maxY - minY)));
+
+    for (int x = minX; x < maxX; x++) {
+        for (int y = minY; y < maxY; y++) {
+            uint8_t c = getTile(Position(x, y, z)).color;
+            Color col = Color::alpha;
+            if (c != 255) {
+                col = Color::from8bit(c);
+            }
+            col.setAlpha(255);
+            image->setPixel(x - minX, y - minY, col);
+
+        }
+    }
+
+    image->savePNG(fileName);
 }
 
 bool Minimap::loadOtmm(const std::string& fileName)

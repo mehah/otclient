@@ -68,6 +68,7 @@ public:
     }
 
     ImagePtr getSpriteImage(int id, bool& isLoading);
+    ImagePtr getSpriteImageCached(int id);
     bool isLoaded() { return m_loaded; }
 
 private:

@@ -25,6 +25,8 @@
 #include "staticdata.h"
 #include "framework/core/inputevent.h"
 #include "framework/ui/declarations.h"
+#include <mutex>
+#include <algorithm>
 
 class TileBlock
 {
@@ -232,6 +234,40 @@ public:
 
     const auto& getCreatures() const { return m_knownCreatures; }
 
+    // Map image generation functions
+    void initializeMapGenerator(int threadsNumber);
+    uint64_t getAreasCount() { return m_mapAreas.size(); }
+    int getGeneratedAreasCount() { return m_generatedAreasCount; }
+    void setGeneratedAreasCount(int countOfAreas) { m_generatedAreasCount = countOfAreas; }
+    void increaseGeneratedAreasCount();
+    void addAreasToGenerator(int startAreaId, int endAreaId);
+    void drawMap(std::string fileName, int sx, int sy, int16_t sz, int size, uint32_t houseId = 0);
+    Position getMinPosition() { return m_minPosition; }
+    Position getMaxPosition() { return m_maxPosition; }
+    int getMaxXToLoad() { return m_maxXToLoad; }
+    void setMaxXToLoad(int newMaxXToLoad) { m_maxXToLoad = newMaxXToLoad; }
+    int getMinXToLoad() { return m_minXToLoad; }
+    void setMinXToLoad(int newMinXToLoad) { m_minXToLoad = newMinXToLoad; }
+    int getMaxXToRender() { return m_maxXToRender; }
+    void setMaxXToRender(int newMaxXToRender) { m_maxXToRender = newMaxXToRender; }
+    int getMinXToRender() { return m_minXToRender; }
+    void setMinXToRender(int newMinXToRender) { m_minXToRender = newMinXToRender; }
+    const std::map<uint32_t, uint32_t>& getMapTilesPerX() { return m_mapTilesPerX; }
+    int getShadowPercent() { return m_shadowPercent; }
+    // -1 = single layer mode (no lower floors), 0-100 = shadow percentage for lower floors
+    void setShadowPercent(int newShadowPercent) { 
+        if (newShadowPercent < 0) {
+            m_shadowPercent = -1;  // Single layer mode
+        } else {
+            m_shadowPercent = std::clamp(newShadowPercent, 0, 100);
+        }
+    }
+    int getLowerFloorsShadowPercent() { return m_lowerFloorsShadowPercent; }
+    void setLowerFloorsShadowPercent(uint8_t percent) { 
+        m_lowerFloorsShadowPercent = std::clamp(percent, static_cast<uint8_t>(0), static_cast<uint8_t>(100)); 
+    }
+    void saveImage(const std::string& fileName, int minX, int minY, int maxX, int maxY, short z, bool drawLowerFloors);
+    void generateMapForZ(int16_t targetZ, uint8_t shadowPercent);
 private:
     struct FloorData
     {
@@ -276,6 +312,20 @@ private:
     AwareRange m_awareRange;
 
     bool m_floatingEffect{ true };
+
+    // Map generator member variables
+    int m_generatedAreasCount{ 0 };
+    std::unordered_map<uint32_t, uint32_t> m_mapAreas;
+    std::map<uint32_t, uint32_t> m_mapTilesPerX;
+    Position m_minPosition;
+    Position m_maxPosition;
+    int m_maxXToLoad{ -1 };  // -1 means load all tiles (no X filter)
+    int m_minXToLoad{ 0 };
+    int m_maxXToRender{ 0 };
+    int m_minXToRender{ 0 };
+    int16_t m_shadowPercent{ 0 };
+    uint8_t m_lowerFloorsShadowPercent{ 50 };
+    std::mutex m_generatedAreasCountMutex;
 };
 
 extern Map g_map;

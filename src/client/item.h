@@ -77,6 +77,7 @@ public:
 
     void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
     void drawLight(const Point& dest, LightView* lightView) override;
+    void drawToImage(Point dest, ImagePtr image) override;
 
     void setId(uint32_t id) override;
 
