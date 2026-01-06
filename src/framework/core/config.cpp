@@ -21,9 +21,9 @@
  */
 
 #include "config.h"
-#include "resourcemanager.h"
 
-#include <framework/otml/otml.h>
+#include "resourcemanager.h"
+#include "framework/otml/otmldocument.h"
 
 Config::Config()
 {

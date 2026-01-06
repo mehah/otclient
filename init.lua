@@ -7,6 +7,7 @@ Services = {
     --status = "http://localhost/login.php", --./client_entergame | ./client_topmenu
     --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
     --createAccount = "http://localhost/clientcreateaccount.php", --./client_entergame -- createAccount.lua
+    --getCoinsUrl = "http://localhost/?subtopic=shop&step=terms", --./game_market
 }
 
 --[[
@@ -107,7 +108,7 @@ local function loadModules()
     end
 
     -- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
-     g_modules.enableAutoReload()
+    -- g_modules.enableAutoReload()
 end
 
 -- run updater, must use data.zip

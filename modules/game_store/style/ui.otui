@@ -154,6 +154,7 @@ StoreFlatLabel < UILabel
   text-offset: 3 3
   image-source:  /game_store/images/panel_flat
   image-border: 1
+  clipping: true
 
   $disabled:
     color: #dfdfdf88
@@ -161,7 +162,7 @@ StoreFlatLabel < UILabel
 storeCategory < UIWidget
   size: 180 22
 
-  image-source: /images/game/actionbar/1pixel-down-frame
+  image-source: /images/ui/1pixel_down_frame
   image-border: 5
   
   UIWidget

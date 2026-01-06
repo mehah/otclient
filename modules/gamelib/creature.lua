@@ -13,6 +13,20 @@ CreatureTypeSummonOwn = 3
 CreatureTypeSummonOther = 4
 CreatureTypeHidden = 5
 
+VocationsServer = {
+    None = 0,
+    Sorcerer = 1,
+    Druid = 2,
+    Paladin = 3,
+    Knight = 4,
+    MasterSorcerer = 5,
+    ElderDruid = 6,
+    RoyalPaladin = 7,
+    EliteKnight = 8,
+    Monk = 9,
+    ExaltedMonk = 10,
+}
+
 VocationsClient = {
     None = 0,
     Knight = 1,
@@ -26,7 +40,6 @@ VocationsClient = {
     MasterSorcerer = 13,
     ElderDruid = 14,
     ExaltedMonk = 15,
-
 }
 -- @}
 

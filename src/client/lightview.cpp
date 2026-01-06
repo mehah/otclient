@@ -21,11 +21,11 @@
  */
 
 #include "lightview.h"
-#include "map.h"
 
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpoolmanager.h>
+#include "gameconfig.h"
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/painter.h"
 
 LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
     g_mainDispatcher.addEvent([this, size] {
@@ -33,6 +33,9 @@ LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIG
         m_texture->setSmooth(true);
     });
 }
+
+bool LightView::isEnabled() const { return m_pool->isEnabled(); }
+void LightView::setEnabled(const bool v) { m_pool->setEnable(v); }
 
 void LightView::resize(const Size& size, const uint16_t tileSize) {
     if (!m_texture || (m_mapSize == size && m_tileSize == tileSize))
@@ -93,17 +96,17 @@ void LightView::draw(const Rect& dest, const Rect& src)
     if (m_pool->getHashController().wasModified()) {
         updatePixels();
 
-        SpinLock::Guard guard(m_pool->getThreadLock());
+        SpinLock::Guard guard(m_lock);
         m_pixels[0].swap(m_pixels[1]);
-        updatePixel.store(true, std::memory_order_release);
+        updatePixel.store(true, std::memory_order_relaxed);
     }
     m_pool->getHashController().reset();
 
     g_drawPool.addAction([=, this] {
-        if (updatePixel.load(std::memory_order_acquire)) {
-            SpinLock::Guard guard(m_pool->getThreadLock());
+        if (updatePixel.load(std::memory_order_relaxed)) {
+            SpinLock::Guard guard(m_lock);
             m_texture->updatePixels(m_pixels[1].data());
-            updatePixel = false;
+            updatePixel.store(false, std::memory_order_relaxed);
         }
 
         updateCoords(dest, src);

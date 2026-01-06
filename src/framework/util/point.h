@@ -22,9 +22,6 @@
 
 #pragma once
 
-#include <cmath>
-#include <ostream>
-
 template<class T>
 class TSize;
 
@@ -94,6 +91,18 @@ public:
 
     friend std::istream& operator>>(std::istream& in, TPoint& point) {
         return in >> point.x >> point.y;
+    }
+};
+
+template <class T>
+struct fmt::formatter<TPoint<T>, char> {
+    constexpr auto parse(format_parse_context& ctx) const
+        -> decltype(ctx.begin()) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const TPoint<T>& p, FormatContext& ctx) const
+        -> decltype(ctx.out()) {
+        return fmt::format_to(ctx.out(), "{} {}", p.x, p.y);
     }
 };
 

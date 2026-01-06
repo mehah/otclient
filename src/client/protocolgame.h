@@ -22,39 +22,9 @@
 
 #pragma once
 
-#include "creature.h"
 #include "declarations.h"
-#include "protocolcodes.h"
-#include <framework/net/protocol.h>
-#include <string>
-
-struct BossCooldownData {
-    uint32_t bossRaceId;
-    uint64_t cooldownTime;
-    
-    BossCooldownData(uint32_t raceId, uint64_t cooldown)
-        : bossRaceId(raceId), cooldownTime(cooldown) {}
-};
-
-struct PartyMemberData {
-    uint32_t memberID;
-    uint8_t highlight;
-    uint64_t loot;
-    uint64_t supply;
-    uint64_t damage;
-    uint64_t healing;
-    
-    PartyMemberData(uint32_t id, uint8_t highlightValue, uint64_t lootValue, uint64_t supplyValue, uint64_t damageValue, uint64_t healingValue)
-        : memberID(id), highlight(highlightValue), loot(lootValue), supply(supplyValue), damage(damageValue), healing(healingValue) {}
-};
-
-struct PartyMemberName {
-    uint32_t memberID;
-    std::string memberName;
-    
-    PartyMemberName(uint32_t id, const std::string& name)
-        : memberID(id), memberName(name) {}
-};
+#include "framework/net/protocol.h"
+#include "staticdata.h"
 
 class ProtocolGame final : public Protocol
 {
@@ -160,7 +130,7 @@ public:
     void sendTransferCoins(std::string_view recipient, uint16_t amount);
     void sendOpenTransactionHistory(uint8_t entriesPerPage);
     void sendMarketLeave();
-    void sendMarketBrowse(uint8_t browseId, uint16_t browseType);
+    void sendMarketBrowse(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
     void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
@@ -176,10 +146,11 @@ public:
     void sendOpenRewardHistory();
     void sendGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
     void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
+    void sendStashStow(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action);
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
     void sendRequestBestiary();
-    void sendRequestBestiaryOverview(std::string_view catName);
+    void sendRequestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
     void sendRequestBestiarySearch(uint16_t raceId);
     void sendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void sendCyclopediaRequestCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage, uint16_t page);
@@ -345,6 +316,7 @@ private:
     void parseTaskHuntingData(const InputMessagePtr& msg);
     void parseExperienceTracker(const InputMessagePtr& msg);
     void parseLootContainers(const InputMessagePtr& msg);
+    void parseVirtue(const InputMessagePtr& msg);
     void parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg);
     void parseCyclopediaHousesInfo(const InputMessagePtr& msg);
     void parseCyclopediaHouseList(const InputMessagePtr& msg);
@@ -390,11 +362,18 @@ private:
     void parseBestiaryMonsterData(const InputMessagePtr& msg);
     void parseBestiaryCharmsData(const InputMessagePtr& msg);
 
+    // 15x
+    void parseWeaponProficiencyExperience(const InputMessagePtr& msg);
+    void parseWeaponProficiencyInfo(const InputMessagePtr& msg);
+
     void parseHighscores(const InputMessagePtr& msg);
     void parseAttachedEffect(const InputMessagePtr& msg);
     void parseDetachEffect(const InputMessagePtr& msg);
     void parseCreatureShader(const InputMessagePtr& msg);
     void parseMapShader(const InputMessagePtr& msg);
+
+    void parseAttachedPaperdoll(const InputMessagePtr& msg);
+    void parseDetachPaperdoll(const InputMessagePtr& msg);
 
     MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
 
@@ -415,11 +394,13 @@ public:
     Position getPosition(const InputMessagePtr& msg);
 
 private:
+    PaperdollPtr getPaperdoll(const InputMessagePtr& msg) const;
+
     bool m_enableSendExtendedOpcode{ false };
     bool m_gameInitialized{ false };
     bool m_mapKnown{ false };
     bool m_firstRecv{ true };
-    bool m_record {false};
+    bool m_record{ false };
 
     ticks_t m_lastPartyAnalyzerCall{ 0 };
 

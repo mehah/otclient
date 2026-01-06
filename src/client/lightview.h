@@ -22,10 +22,11 @@
 
 #pragma once
 
-#include "declarations.h"
-#include "thingtype.h"
+#include "framework/graphics/coordsbuffer.h"
+#include "framework/luaengine/luaobject.h"
+#include "staticdata.h"
 #include <framework/graphics/declarations.h>
-#include <framework/graphics/framebuffer.h>
+#include <framework/util/spinlock.h>
 
 class LightView final : public LuaObject
 {
@@ -46,8 +47,8 @@ public:
     }
 
     bool isDark() const { return m_isDark; }
-    bool isEnabled() const { return m_pool->isEnabled(); }
-    void setEnabled(const bool v) { m_pool->setEnable(v); }
+    bool isEnabled() const;
+    void setEnabled(const bool v);
     void clear() {
         m_lightData.lights.clear();
         m_lightData.tiles.assign(m_mapSize.area(), {});
@@ -70,6 +71,8 @@ private:
 
     void updateCoords(const Rect& dest, const Rect& src);
     void updatePixels();
+
+    SpinLock m_lock;
 
     bool m_isDark{ false };
 

@@ -66,9 +66,6 @@ function show()
     BlessingController.ui:raise()
     BlessingController.ui:focus()
     setBlessingView()
-    BlessingController:scheduleEvent(function()
-        BlessingController.ui:centerIn('parent')
-    end, 1, "LazyHtml")
 end
 
 function hide()

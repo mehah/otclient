@@ -19,23 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#include <framework/graphics/drawpoolmanager.h>
 
 #include "uianchorlayout.h"
 #include "uigridlayout.h"
 #include "uihorizontallayout.h"
+#include "uilayout.h"
 #include "uitranslator.h"
 #include "uiverticallayout.h"
 #include "uiwidget.h"
-#include <framework/html/htmlnode.h>
-
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/texture.h>
-#include <framework/graphics/texturemanager.h>
-
-#include <framework/core/eventdispatcher.h>
-
-#include <atomic>
-#include <framework/html/htmlmanager.h>
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/texturemanager.h"
+#include "framework/html/htmlmanager.h"
+#include "framework/html/htmlnode.h"
+#include "framework/otml/otmlnode.h"
 
 namespace {
     inline std::string toLower(std::string value)
@@ -807,12 +804,16 @@ void UIWidget::drawIcon(const Rect& screenCoords) const
 
 void UIWidget::setIcon(const std::string& iconFile)
 {
-    g_dispatcher.addEvent([&, iconFile = iconFile] {
-        m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
-        if (m_icon && !m_iconClipRect.isValid()) {
-            m_iconClipRect = Rect(0, 0, m_icon->getSize());
+     const auto self = static_self_cast<UIWidget>();
+    g_dispatcher.addEvent([self, iconFile = iconFile] {
+        if (self->isDestroyed())
+            return;
+
+        self->m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
+        if (self->m_icon && !self->m_iconClipRect.isValid()) {
+            self->m_iconClipRect = Rect(0, 0, self->m_icon->getSize());
         }
 
-        repaint();
+        self->repaint();
     });
 }

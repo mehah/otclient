@@ -50,8 +50,6 @@ class PlatformWindow
     using OnInputEventCallback = std::function<void(const InputEvent&)>;
 
 public:
-    static constexpr float DEFAULT_DISPLAY_DENSITY = 1.f;
-
     virtual void init() = 0;
     virtual void terminate() = 0;
 
@@ -100,7 +98,13 @@ public:
     int getDisplayWidth() { return getDisplaySize().width(); }
     int getDisplayHeight() { return getDisplaySize().height(); }
     float getDisplayDensity() { return m_displayDensity; }
-    void setDisplayDensity(const float v) { m_displayDensity = v; }
+    void setDisplayDensity(const float v) { 
+        if (m_displayDensity == v) {
+            return;
+        }
+        m_displayDensity = v; 
+        onDisplayDensityChanged(v);
+    }
 
     Size getUnmaximizedSize() { return m_unmaximizedSize; }
     Size getSize() { return m_size; }
@@ -135,6 +139,8 @@ public:
 protected:
 
     virtual int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) = 0;
+
+    virtual void onDisplayDensityChanged(float /*newDensity*/) {}
 
     void updateUnmaximizedCoords();
 

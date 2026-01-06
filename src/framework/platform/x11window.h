@@ -29,6 +29,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
+inline constexpr auto X11None = None;
+
+#ifdef None
+#undef None
+#endif
+
 #ifdef OPENGL_ES
 #include <EGL/egl.h>
 #else

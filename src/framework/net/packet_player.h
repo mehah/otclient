@@ -22,11 +22,12 @@
 
 #pragma once
 
-#include <deque>
-#include <framework/core/eventdispatcher.h>
 #include <framework/net/outputmessage.h>
 
-class PacketPlayer : public LuaObject {
+#include "framework/core/declarations.h"
+
+class PacketPlayer : public LuaObject
+{
 public:
     PacketPlayer(const std::string_view& file);
     virtual ~PacketPlayer();

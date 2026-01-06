@@ -22,34 +22,10 @@
 
 #pragma once
 
-#include "container.h"
-#include "creature.h"
 #include "declarations.h"
-#include "outfit.h"
-#include "protocolgame.h"
-#include <bitset>
-#include <framework/core/timer.h>
+#include "staticdata.h"
 
-struct UnjustifiedPoints
-{
-    bool operator==(const UnjustifiedPoints& other) const
-    {
-        return killsDay == other.killsDay &&
-            killsDayRemaining == other.killsDayRemaining &&
-            killsWeek == other.killsWeek &&
-            killsWeekRemaining == other.killsWeekRemaining &&
-            killsMonth == other.killsMonth &&
-            killsMonthRemaining == other.killsMonthRemaining &&
-            skullTime == other.skullTime;
-    }
-    uint8_t killsDay;
-    uint8_t killsDayRemaining;
-    uint8_t killsWeek;
-    uint8_t killsWeekRemaining;
-    uint8_t killsMonth;
-    uint8_t killsMonthRemaining;
-    uint8_t skullTime;
-};
+#include "framework/core/declarations.h"
 
 struct BlessData
 {
@@ -839,7 +815,7 @@ public:
     void sendPartyAnalyzerPriceType();
     void sendPartyAnalyzerPriceValue(); // For action 3, will get items from cyclopedia
     void sendPartyAnalyzerAction(uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items = {});
-    
+
     // outfit related
     void requestOutfit();
     void changeOutfit(const Outfit& outfit);
@@ -899,6 +875,7 @@ public:
 
     // 870 only
     void equipItem(const ItemPtr& item);
+    void equipItemId(const uint16_t itemId, const uint8_t tier);
     void mount(bool mount);
 
     // 910 only
@@ -953,9 +930,9 @@ public:
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }
     bool isDead() { return m_dead; }
-    bool isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
-    bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
-    bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
+    bool isAttacking();
+    bool isFollowing();
+    bool isConnectionOk();
     auto mapUpdatedAt() const { return m_mapUpdatedAt; }
     void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 
@@ -983,7 +960,7 @@ public:
 
     // market related
     void leaveMarket();
-    void browseMarket(uint8_t browseId, uint8_t browseType);
+    void browseMarket(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
     void createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void cancelMarketOffer(uint32_t timestamp, uint16_t counter);
     void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
@@ -1008,6 +985,8 @@ public:
 
     void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
 
+    void stashStowItem(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action);
+
     // highscore related
     void requestHighscore(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void processHighscore(std::string_view serverName, std::string_view world, uint8_t worldType, uint8_t battlEye,
@@ -1029,7 +1008,7 @@ public:
     void inspectionNormalObject(const Position& position);
     void inspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
     void requestBestiary();
-    void requestBestiaryOverview(std::string_view catName);
+    void requestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
     void requestBestiarySearch(uint16_t raceId);
     void requestSendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void requestSendCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage = 0, uint16_t page = 0);
@@ -1056,10 +1035,6 @@ public:
     auto getWalkMaxSteps() { return m_walkMaxSteps; }
     void setWalkMaxSteps(uint8_t v) { m_walkMaxSteps = v; }
 
-protected:
-    void enableBotCall() { m_denyBotCall = false; }
-    void disableBotCall() { m_denyBotCall = true; }
-
 private:
     void setAttackingCreature(const CreaturePtr& creature);
     void setFollowingCreature(const CreaturePtr& creature);
@@ -1079,7 +1054,6 @@ private:
 
     bool m_tileThingsLuaCallback{ false };
     bool m_online{ false };
-    bool m_denyBotCall{ false };
     bool m_dead{ false };
     bool m_expertPvpMode{ false };
     bool m_connectionFailWarned{ false };

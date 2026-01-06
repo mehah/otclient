@@ -23,8 +23,6 @@
 #pragma once
 
 #include <framework/config.h>
-#include <functional>
-#include <string>
 
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1

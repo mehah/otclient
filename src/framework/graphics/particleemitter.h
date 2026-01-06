@@ -24,7 +24,8 @@
 
 #include "declarations.h"
 #include <framework/global.h>
-#include <framework/otml/otml.h>
+
+#include "framework/otml/declarations.h"
 
 class ParticleEmitter
 {

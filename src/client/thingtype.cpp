@@ -21,23 +21,34 @@
  */
 
 #include "thingtype.h"
+
+#include "animator.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "lightview.h"
-#include "localplayer.h"
-#include "map.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
-
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/filestream.h>
+#include "framework/core/asyncdispatcher.h"
+#include "framework/core/filestream.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/image.h"
+#include "framework/otml/otmlnode.h"
 #include <framework/core/graphicalapplication.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/image.h>
-#include <framework/graphics/texture.h>
-#include <framework/otml/otml.h>
 
 const static TexturePtr m_textureNull;
+
+namespace {
+    std::string_view categoryName(const ThingCategory category)
+    {
+        switch (category) {
+            case ThingCategoryItem: return "item";
+            case ThingCategoryCreature: return "creature";
+            case ThingCategoryEffect: return "effect";
+            case ThingCategoryMissile: return "missile";
+            default: return "unknown";
+        }
+    }
+}
 
 void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCategory category, const appearances::Appearance& appearance)
 {
@@ -102,6 +113,10 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
 
 void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 {
+    if (flags.floorchange()) {
+        m_flags |= ThingFlagAttrFloorChange;
+    }
+
     if (flags.has_bank()) {
         m_groundSpeed = flags.bank().waypoints();
         m_flags |= ThingFlagAttrGround;
@@ -181,10 +196,21 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 
     if (flags.has_hook()) {
         const auto& hookDirection = flags.hook();
-        if (hookDirection.east()) {
-            m_flags |= ThingFlagAttrHookEast;
-        } else if (hookDirection.south()) {
-            m_flags |= ThingFlagAttrHookSouth;
+        if (hookDirection.has_south()) {
+            const auto hookType = hookDirection.south();
+            if (hookType == appearances::HOOK_TYPE_SOUTH) {
+                m_flags |= ThingFlagAttrHookSouth;
+            } else if (hookType == appearances::HOOK_TYPE_EAST) {
+                m_flags |= ThingFlagAttrHookEast;
+            }
+        }
+        if (hookDirection.has_east()) {
+            const auto hookType = hookDirection.east();
+            if (hookType == appearances::HOOK_TYPE_SOUTH) {
+                m_flags |= ThingFlagAttrHookSouth;
+            } else if (hookType == appearances::HOOK_TYPE_EAST) {
+                m_flags |= ThingFlagAttrHookEast;
+            }
         }
     }
 
@@ -306,7 +332,9 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
     // player_corpse
     // cyclopediaitem
     // ammo
-
+    if (flags.has_ammo() && flags.ammo()) {
+        m_flags |= ThingFlagAttrAmmo;
+    }
     if (flags.has_show_off_socket() && flags.show_off_socket()) {
         m_flags |= ThingFlagAttrPodium;
     }
@@ -611,22 +639,33 @@ void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& scree
     g_drawPool.resetShaderProgram();
 }
 
-void ThingType::draw(const Point& dest, const int layer, const int xPattern, const int yPattern, const int zPattern, const int animationPhase, const Color& color, const bool drawThings, const LightViewPtr& lightView)
+void ThingType::draw(const Point& dest, const int layer, const int xPattern, const int yPattern, const int zPattern, const int animationPhase, const Color& color, const bool drawThings, LightView* lightView)
 {
-    if (m_null)
+    // items:
+    // layer - item layer (example: in old clients, a modified dat file was using this to show which tiles could be fished)
+    // xPattern - ground pattern 1 / count or fluid based coordinate
+    // yPattern - ground pattern 2 / count or fluid based coordinate
+    // zPattern - ground pattern 3 (eg. zaoan roofs)
+
+    // outfits:
+    // layer = outfit layer (normal / mask)
+    // xPattern = direction
+    // yPattern = addon layer
+    // zPattern = mounted state
+
+    if (m_null || m_animationPhases == 0)
         return;
 
-    if (animationPhase >= m_animationPhases)
-        return;
+    // outfits like 126 and 127 don't have animation
+    // this line fixes a bug that makes them disappear while moving
+    int animationFrameId = animationPhase % m_animationPhases;
 
-    TexturePtr texture;
-    if (g_drawPool.getCurrentType() != DrawPoolType::LIGHT) {
-        texture = getTexture(animationPhase); // texture might not exists, neither its rects.
-        if (!texture)
-            return;
+    const auto& texture = getTexture(animationFrameId);
+    if (!texture) {
+        return; // texture might not exists, neither its rects.
     }
 
-    const auto& textureData = m_textureData[animationPhase];
+    const auto& textureData = m_textureData[animationFrameId];
 
     const uint32_t frameIndex = getTextureIndex(layer, xPattern, yPattern, zPattern);
     if (frameIndex >= textureData.pos.size())
@@ -659,26 +698,25 @@ const TexturePtr& ThingType::getTexture(const int animationPhase)
 
     auto& textureData = m_textureData[animationPhase];
 
-    auto& animationPhaseTexture = textureData.source;
-
-    if (animationPhaseTexture) return animationPhaseTexture;
-
-    bool async = g_app.isLoadingAsyncTexture();
-    if (g_game.isUsingProtobuf() && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
-        async = false;
-
-    if (!async) {
-        loadTexture(animationPhase);
+    if (textureData.source)
         return textureData.source;
-    }
 
-    if (!m_loading) {
-        m_loading = true;
+    bool expected = false;
+    if (m_loading.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
+        bool async = g_app.isLoadingAsyncTexture();
+        if (g_game.isUsingProtobuf() && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
+            async = false;
+
+        if (!async) {
+            loadTexture(animationPhase);
+            m_loading.store(false, std::memory_order_release);
+            return textureData.source;
+        }
 
         auto action = [this] {
             for (int_fast8_t i = -1; ++i < m_animationPhases;)
                 loadTexture(i);
-            m_loading = false;
+            m_loading.store(false, std::memory_order_release);
         };
 
         g_asyncDispatcher.detach_task(std::move(action));
@@ -731,12 +769,17 @@ void ThingType::loadTexture(const int animationPhase)
                             if (isLoading)
                                 return;
 
-                            // verifies that the first block in the lower right corner is transparent.
-                            if (!spriteImage || spriteImage->hasTransparentPixel()) {
-                                fullImage->setTransparentPixel(true);
-                            }
+                            if (!spriteImage) {
+                                if (spriteId != 0) {
+                                    g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, animationPhase);
+                                    return;
+                                }
+                            } else {
+                                // verifies that the first block in the lower right corner is transparent.
+                                if (spriteImage->hasTransparentPixel()) {
+                                    fullImage->setTransparentPixel(true);
+                                }
 
-                            if (spriteImage) {
                                 if (spriteMask) {
                                     spriteImage->overwriteMask(maskColors[(l - 1)]);
                                 }
@@ -757,12 +800,17 @@ void ThingType::loadTexture(const int animationPhase)
                                     if (isLoading)
                                         return;
 
-                                    // verifies that the first block in the lower right corner is transparent.
-                                    if (h == 0 && w == 0 && (!spriteImage || spriteImage->hasTransparentPixel())) {
-                                        fullImage->setTransparentPixel(true);
-                                    }
+                                    if (!spriteImage) {
+                                        if (spriteId != 0) {
+                                            g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
+                                            return;
+                                        }
+                                    } else {
+                                        // verifies that the first block in the lower right corner is transparent.
+                                        if (h == 0 && w == 0 && spriteImage->hasTransparentPixel()) {
+                                            fullImage->setTransparentPixel(true);
+                                        }
 
-                                    if (spriteImage) {
                                         if (spriteMask) {
                                             spriteImage->overwriteMask(maskColors[(l - 1)]);
                                         }
@@ -913,6 +961,7 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr) {
         case ThingAttrDisplacement: return ThingFlagAttrDisplacement;
         case ThingAttrLight: return ThingFlagAttrLight;
         case ThingAttrElevation: return ThingFlagAttrElevation;
+        case ThingAttrFloorChange: return ThingFlagAttrFloorChange;
         case ThingAttrGround: return ThingFlagAttrGround;
         case ThingAttrWritable: return ThingFlagAttrWritable;
         case ThingAttrWritableOnce: return ThingFlagAttrWritableOnce;
@@ -963,6 +1012,33 @@ ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr) {
 }
 
 bool ThingType::isTall(const bool useRealSize) { return useRealSize ? getRealSize() > g_gameConfig.getSpriteSize() : getHeight() > 1; }
+int ThingType::getAnimationPhases() { return m_animator ? m_animator->getAnimationPhases() : m_animationPhases; }
+
+int ThingType::getMeanPrice() {
+    static constexpr std::array<std::pair<uint32_t, uint32_t>, 3> forcedPrices = { {
+        {3043, 10000},// Crystal Coin
+        {3031, 1}, // Gold Coin
+        {3035, 100} // Platinum Coin
+    } };
+
+    const uint32_t itemId = getId();
+
+    const auto it = std::ranges::find_if(forcedPrices, [itemId](const auto& pair) { return pair.first == itemId; });
+
+    if (it != forcedPrices.end()) {
+        return it->second;
+    }
+
+    const auto npcCount = m_npcData.size();
+    if (npcCount == 0) {
+        return 0;
+    }
+
+    const int totalBuyPrice = std::accumulate(m_npcData.begin(), m_npcData.end(), 0,
+        [](int sum, const auto& npc) { return sum + npc.buyPrice; });
+
+    return totalBuyPrice / static_cast<int>(npcCount);
+}
 
 #ifdef FRAMEWORK_EDITOR
 void ThingType::serialize(const FileStreamPtr& fin)

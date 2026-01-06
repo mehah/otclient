@@ -21,22 +21,18 @@
  */
 
 #include "graphicalapplication.h"
-#include "garbagecollection.h"
 
-#include "framework/stdext/time.h"
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/graphics.h>
-#include <framework/graphics/image.h>
-#include <framework/graphics/particlemanager.h>
-#include <framework/graphics/texturemanager.h>
-#include <framework/input/mouse.h>
-#include <framework/platform/platformwindow.h>
-#include <framework/ui/uimanager.h>
-#include <framework/ui/uiwidget.h>
+#include "asyncdispatcher.h"
+#include "clock.h"
+#include "eventdispatcher.h"
+#include "garbagecollection.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/graphics.h"
+#include "framework/graphics/image.h"
+#include "framework/graphics/particlemanager.h"
+#include "framework/graphics/texturemanager.h"
+#include "framework/input/mouse.h"
+#include "framework/ui/uimanager.h"
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>
@@ -46,6 +42,7 @@
 #include <emscripten/emscripten.h>
 #endif
 #include <framework/html/htmlmanager.h>
+#include <framework/platform/platformwindow.h>
 
 GraphicalApplication g_app;
 
@@ -160,6 +157,21 @@ void GraphicalApplication::mainLoop() {
 }
 #endif
 
+bool GraphicalApplication::canDrawMap() const {
+    using enum DrawPoolType;
+
+    if (!m_drawEvents->canDraw(MAP))
+        return false;
+
+    static constexpr std::array<DrawPoolType, 3> types{ MAP, LIGHT, FOREGROUND_MAP };
+
+    for (DrawPoolType type : types) {
+        if (g_drawPool.isDrawing(type))
+            return false;
+    }
+    return true;
+}
+
 void GraphicalApplication::run()
 {
     // run the first poll
@@ -194,10 +206,19 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (m_drawEvents->canDraw(DrawPoolType::MAP)) {
+            const bool canDrawForeground = !g_drawPool.isDrawing(DrawPoolType::FOREGROUND) && m_drawEvents->canDraw(DrawPoolType::FOREGROUND);
+
+            if (canDrawMap()) {
+                if (canDrawForeground) {
+                    tasks.emplace_back(g_asyncDispatcher.submit_task([] {
+                        g_ui.render(DrawPoolType::FOREGROUND);
+                    }));
+                }
+
                 m_drawEvents->preLoad();
 
-                for (const auto type : { DrawPoolType::LIGHT , DrawPoolType::FOREGROUND, DrawPoolType::FOREGROUND_MAP }) {
+                static constexpr std::array<DrawPoolType, 2> types{ DrawPoolType::LIGHT, DrawPoolType::FOREGROUND_MAP };
+                for (const auto type : types) {
                     if (m_drawEvents->canDraw(type)) {
                         tasks.emplace_back(g_asyncDispatcher.submit_task([this, type] {
                             m_drawEvents->draw(type);
@@ -209,7 +230,7 @@ void GraphicalApplication::run()
 
                 tasks.wait();
                 tasks.clear();
-            } else if (m_drawEvents->canDraw(DrawPoolType::FOREGROUND)) {
+            } else if (canDrawForeground) {
                 g_ui.render(DrawPoolType::FOREGROUND);
             }
 
@@ -304,7 +325,7 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 }
 
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
-
+bool GraphicalApplication::isScaled() { return g_window.getDisplayDensity() != 1.f; }
 void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     if (m_drawEvents && m_drawEvents->isUsingProtobuf())
         v = true;
