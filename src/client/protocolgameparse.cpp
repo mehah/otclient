@@ -3845,7 +3845,7 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
         }
 
         const auto& thing = getThing(msg);
-        if (thing->isLocalPlayer()) {
+        if (thing && thing->isLocalPlayer()) {
             thing->static_self_cast<LocalPlayer>()->resetPreWalk();
         }
 
@@ -4063,7 +4063,9 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         const uint16_t speed = msg->getU16();
 
         if (g_game.getClientVersion() >= 1281) {
-            addCreatureIcon(msg, creature->getId());
+            if (creature) {
+                addCreatureIcon(msg, creature->getId());
+            }
         }
 
         const uint8_t skull = msg->getU8();
@@ -4090,7 +4092,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                 if (m_localPlayer->getId() != masterId) {
                     creatureType = Proto::CreatureTypeSummonOther;
                 }
-            } else if (creatureType == Proto::CreatureTypePlayer) {
+            } else if (creature && creatureType == Proto::CreatureTypePlayer) {
                 uint8_t vocationId = msg->getU8();
                 creature->setVocation(vocationId);
             }
