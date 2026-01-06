@@ -1,0 +1,7 @@
+Module
+  name: game_exaltationforge
+  description: game_exaltationforge
+  scripts: [ game_exaltationforge, menu/* ]
+  sandboxed: true
+  @onLoad: init()
+  @onUnload: terminate()

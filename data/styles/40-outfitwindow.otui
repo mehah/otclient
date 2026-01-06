@@ -470,21 +470,14 @@ OutfitWindow < MainWindow
         id: preset
         height: 20
 
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
-          size: 12 12
-          font: Verdana Bold-11px
-          text: Preset:
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
+          text: Preset:
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name
@@ -498,21 +491,14 @@ OutfitWindow < MainWindow
         id: outfit
         height: 20
 
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
           text: Outfit:
-          size: 12 12
-          font: Verdana Bold-11px
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name
@@ -525,21 +511,14 @@ OutfitWindow < MainWindow
         id: mount
         height: 20
 
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
-          size: 12 12
-          font: Verdana Bold-11px
           text: Mount:
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name
@@ -557,25 +536,18 @@ OutfitWindow < MainWindow
             self:setHeight(0)
           end
 
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
           text: Familiar:
-          size: 12 12
-          font: Verdana Bold-11px
           width: 84
           @onSetup: |
             if not g_game.getFeature(GamePlayerFamiliars) then
               self:hide()
             end
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
 
         FlatPanel
           id: name
@@ -592,21 +564,14 @@ OutfitWindow < MainWindow
         id: wings
         height: 20
         visible:false
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
-          size: 12 12
-          font: Verdana Bold-11px
           text: Wings:
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name
@@ -619,21 +584,14 @@ OutfitWindow < MainWindow
         id: aura
         height: 20
         visible:false
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
-          size: 12 12
-          font: Verdana Bold-11px
           text: Aura:
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name
@@ -646,21 +604,14 @@ OutfitWindow < MainWindow
         id: shader
         height: 20
         visible:false
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
-          size: 12 12
-          font: Verdana Bold-11px
           text: Shader:
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name
@@ -673,21 +624,14 @@ OutfitWindow < MainWindow
         id: healthBar
         height: 20
         visible:false
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
-          size: 12 12
-          font: Verdana Bold-11px
           text: Health Bar:
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name
@@ -700,21 +644,14 @@ OutfitWindow < MainWindow
         id: effects
         height: 20
         visible:false
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
-          size: 12 12
-          font: Verdana Bold-11px
           text: Effects:
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name
@@ -727,21 +664,14 @@ OutfitWindow < MainWindow
         id: title
         height: 20
         visible:false
-        CheckBoxCircle
+        CheckBox
           id: check
           anchors.verticalCenter: parent.verticalCenter
           anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round 
           text-offset: 15 0
-          size: 12 12
-          font: Verdana Bold-11px
           text: title :
           width: 84
-          color: #c0c0c0
-          image-source: /images/ui/checkboxcircle
-          image-clip: 0 0 12 12
-
-          $hover !disabled:
-            color: #C0C0C0
         
         FlatPanel
           id: name

@@ -1,0 +1,13 @@
+Module
+  name: game_topbar
+  description: Top bar options panel for health circle and stats bar configuration.
+  author: gabp
+  version: 1.0.0
+
+  autoload: true
+  autoload-priority: 1001
+  sandboxed: true
+  dependencies: [ game_interface, game_healthcircle ]
+  scripts: [ game_topbar ]
+  @onLoad: init()
+  @onUnload: terminate()

@@ -26,8 +26,8 @@
 #include "framework/net/outputmessage.h"
 #include "protocolcodes.h"
 #include "thingtypemanager.h"
-#include "thingtype.h"
 #include "framework/util/crypt.h"
+#include "thingtype.h"
 
 void ProtocolGame::onSend() {}
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
@@ -1039,7 +1039,7 @@ void ProtocolGame::sendInspectionNormalObject(const Position& position)
 
 void ProtocolGame::sendInspectionObject(const Otc::InspectObjectTypes inspectionType, const uint16_t itemId, const uint8_t itemCount)
 {
-    if (inspectionType != Otc::INSPECT_NPCTRADE && inspectionType != Otc::INSPECT_CYCLOPEDIA) {
+    if (inspectionType != Otc::INSPECT_NPCTRADE && inspectionType != Otc::INSPECT_CYCLOPEDIA && inspectionType != Otc::INSPECT_PROFICIENCY) {
         return;
     }
 
@@ -1058,19 +1058,12 @@ void ProtocolGame::sendRequestBestiary()
     send(msg);
 }
 
-void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName, bool search, std::vector<uint16_t> raceIds)
+void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBestiaryRequestOverview);
-    msg->addU8(search ? 0x01 : 0x00);
-    if (search) {
-        msg->addU16(static_cast<uint16_t>(raceIds.size()));
-        for (const uint16_t raceId : raceIds) {
-            msg->addU16(raceId);
-        }
-    } else {
-        msg->addString(catName);
-    }
+    msg->addU8(0x00);
+    msg->addString(catName);
     send(msg);
 }
 
@@ -1247,6 +1240,64 @@ void ProtocolGame::sendRequestUsefulThings(const uint8_t offerId)
     msg->addU8(Proto::ClientRequestStoreOffers);
     msg->addU8(Otc::Store_Type_Actions_t::OPEN_USEFUL_THINGS);
     msg->addU8(offerId);
+    send(msg);
+}
+
+void ProtocolGame::sendWeaponProficiencyAction(const uint8_t proficiencyType, const uint16_t itemId)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientWeaponProficiencyAction);
+    msg->addU8(proficiencyType);
+    if (proficiencyType != 1) {
+        msg->addU16(itemId);
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendWeaponProficiencyApply(uint16_t itemId, const std::vector<std::pair<uint8_t, uint8_t>>& perks)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientWeaponProficiencyAction);
+    msg->addU8(Proto::WEAPON_PROFICIENCY_APPLY_PERKS);
+    msg->addU16(itemId);
+    msg->addU8(perks.size());
+    for (const auto& perk : perks) {
+        msg->addU8(perk.first);   // level
+        msg->addU8(perk.second);  // position
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendForgeAction(Otc::ForgeActions_t forgeAction, bool convergence, uint16_t itemid1, uint8_t tier, uint16_t itemid2, bool usedCore, bool reduceTierLoss)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeEnter);
+    msg->addU8(static_cast<uint8_t>(forgeAction));
+    msg->addU8(convergence ? 1 : 0);
+    msg->addU16(itemid1);
+    msg->addU8(tier);
+    msg->addU16(itemid2);
+
+    if (!convergence) {
+        msg->addU8(usedCore ? 1 : 0);
+        msg->addU8(reduceTierLoss ? 1 : 0);
+    }
+
+    send(msg);
+}
+
+void ProtocolGame::sendForgeHistory(uint32_t pageId)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeBrowseHistory);
+    msg->addU8(pageId);
+    send(msg);
+}
+
+void ProtocolGame::sendResourceBalance()
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(237);
     send(msg);
 }
 
@@ -1435,6 +1486,21 @@ void ProtocolGame::sendCloseImbuingWindow()
     send(msg);
 }
 
+void ProtocolGame::sendImbuementWindowAction(const uint8_t type, const uint16_t itemId, const Position& pos, const uint8_t stackpos)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(0xB2);  // same opcode as parseImbuementWindow on server
+    msg->addU8(type);  // 1 = SELECT_ITEM, 2 = SCROLL
+
+    if (type == 1) {  // SELECT_ITEM
+        addPosition(msg, pos);
+        msg->addU16(itemId);
+        msg->addU8(stackpos);
+    }
+
+    send(msg);
+}
+
 void ProtocolGame::sendOpenRewardWall()
 {
     const auto& msg = std::make_shared<OutputMessage>();
@@ -1556,5 +1622,100 @@ void ProtocolGame::openContainerQuickLoot(const uint8_t action, const uint8_t ca
     } else if (action == 1 || action == 2 || action == 5 || action == 6) {
         msg->addU8(category);
     }
+    send(msg);
+}
+
+void ProtocolGame::sendOpenDestinyWheel(const uint32_t playerId)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientOpenDestinyWheel);
+    msg->addU32(playerId);
+    send(msg);
+}
+
+void ProtocolGame::sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uint32_t greenGemId, uint32_t redGemId, uint32_t blueGemId, uint32_t purpleGemId)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientApplyWheelPoints);
+
+    // Send points for all 36 slots
+    for (size_t i = 0; i < 36; ++i) {
+        if (i < pointsInvested.size()) {
+            msg->addU16(pointsInvested[i]);
+        } else {
+            msg->addU16(0);
+        }
+    }
+
+    // Send gem vessel data (hasGem + gemIndex for each domain)
+    // Green gem (domain 0)
+    if (greenGemId != static_cast<uint32_t>(-1)) {
+        msg->addU8(1); // hasGem = true
+        msg->addU16(static_cast<uint16_t>(greenGemId)); // gemIndex
+    } else {
+        msg->addU8(0); // hasGem = false
+    }
+
+    // Red gem (domain 1)
+    if (redGemId != static_cast<uint32_t>(-1)) {
+        msg->addU8(1); // hasGem = true
+        msg->addU16(static_cast<uint16_t>(redGemId)); // gemIndex
+    } else {
+        msg->addU8(0); // hasGem = false
+    }
+
+    // Blue gem (domain 2)
+    if (blueGemId != static_cast<uint32_t>(-1)) {
+        msg->addU8(1); // hasGem = true
+        msg->addU16(static_cast<uint16_t>(blueGemId)); // gemIndex
+    } else {
+        msg->addU8(0); // hasGem = false
+    }
+
+    // Purple gem (domain 3)
+    if (purpleGemId != static_cast<uint32_t>(-1)) {
+        msg->addU8(1); // hasGem = true
+        msg->addU16(static_cast<uint16_t>(purpleGemId)); // gemIndex
+    } else {
+        msg->addU8(0); // hasGem = false
+    }
+
+    send(msg);
+}
+
+void ProtocolGame::sendGemAtelierAction(uint8_t action, uint8_t param1, uint16_t param2, bool param3)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+
+    msg->addU8(0xE7);
+    msg->addU8(action);
+
+    uint8_t encodedParam = param1;
+    if (action == 0 || action == 2 || action == 3) {
+        if (encodedParam == 0 && param2 != 0) {
+            encodedParam = static_cast<uint8_t>(param2 & 0xFF);
+        }
+        msg->addU8(encodedParam);
+    } else if (action == 1) {
+        // Reveal
+        msg->addU8(encodedParam);
+    } else if (action == 4) {
+        // ImproveGrade: param1 (fragmentType), następnie pos (u8) z param2
+        msg->addU8(encodedParam);
+        msg->addU8(static_cast<uint8_t>(param2 & 0xFF));
+    } else {
+        // Fallback: wyślij tylko jeden bajt parametru
+        msg->addU8(encodedParam);
+    }
+    send(msg);
+}
+
+void ProtocolGame::requestRewardChestCollect(const Position& pos, const uint16_t itemId, const uint8_t stackpos)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestRewardChestCollect);
+    addPosition(msg, pos);
+    msg->addU16(itemId);
+    msg->addU8(stackpos);
     send(msg);
 }

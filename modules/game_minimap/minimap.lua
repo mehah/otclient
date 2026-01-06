@@ -1,292 +1,337 @@
-local iconTopMenu = nil
--- @ Minimap
-local minimapWidget = nil -- bot fix
+-- Minimap Module
+minimapWidget = nil
+minimapWindow = nil
+
 local otmm = true
+local fullmapView = false
+local oldZoom = nil
 local oldPos = nil
-local fullscreenWidget
-local virtualFloor = 7
-local currentDayTime = {
-    h = 12,
-    m = 0
-}
 
-local function refreshVirtualFloors()
-    mapController.ui.layersPanel.layersMark:setMarginTop(((virtualFloor + 1) * 4) - 3)
-    mapController.ui.layersPanel.automapLayers:setImageClip((virtualFloor * 14) .. ' 0 14 67')
+-- Store original/default panel for minimap restoration
+local defaultMinimapPanel = nil
+local defaultMinimapIndex = nil
+
+-- Helper function to calculate time display position
+local function checkXByHour(x)
+  local y0 = 62
+  local incremento = y0 / 12
+  local result = math.floor(y0 + (x * incremento))
+  if result > 124 then
+    result = result - 124
+  end
+  return result
 end
 
-local function onPositionChange()
-    local player = g_game.getLocalPlayer()
-    if not player then
-        return
-    end
-
-    local pos = player:getPosition()
-    if not pos then
-        return
-    end
-
-    local minimapWidget = mapController.ui.minimapBorder.minimap
-    if not (minimapWidget) or minimapWidget:isDragging() then
-        return
-    end
-
-    if not minimapWidget.fullMapView then
-        minimapWidget:setCameraPosition(pos)
-    end
-
-    minimapWidget:setCrossPosition(pos)
-    virtualFloor = pos.z
-    refreshVirtualFloors()
+-- Update floor indicator image
+local function updateFloorImage(posZ)
+  if minimapWindow and minimapWindow.floorPosition then
+    minimapWindow.floorPosition:setImageClip((posZ) * 14 .. " 0 14 67")
+  end
 end
 
+-- Position change callback
+local function onPositionChange(creature, newPos, oldPos)
+  local player = g_game.getLocalPlayer()
+  if not player then
+    return
+  end
+
+  local pos = player:getPosition()
+  if not pos then
+    return
+  end
+
+  if not minimapWidget or minimapWidget:isDragging() then
+    return
+  end
+
+  if not fullmapView then
+    minimapWidget:setCameraPosition(pos)
+  end
+
+  minimapWidget:setCrossPosition(pos)
+
+  if newPos and oldPos and newPos.z ~= oldPos.z then
+    updateFloorImage(pos.z)
+  end
+end
+
+-- Server time callback
+local function onServerTime(hours, minutes)
+  if not minimapWindow or not minimapWindow.centerMap then
+    return
+  end
+  minimapWindow.centerMap:setImageClip(checkXByHour(hours) .. " 0 31 31")
+end
+
+-- Controller setup
 mapController = Controller:new()
 mapController:setUI('minimap', modules.game_interface.getMainRightPanel())
 
-function onChangeWorldTime(hour, minute)
---[[ 
-
-check 
-tfs c++ (old) : void ProtocolGame::sendWorldTime()
-tfs lua (new) : function Player.sendWorldTime(self, time)
-Canary: void ProtocolGame::sendTibiaTime(int32_t time)
- ]]
-
-    currentDayTime = {
-        h = hour % 24,
-        m = minute
-    }
-
-    mapController:scheduleEvent(function()
-        local nextH = currentDayTime.h
-        local nextM = currentDayTime.m + 12
-        if nextM >= 60 then
-            nextH = nextH + 1
-            nextM = nextM - 60
-        end
-
-        onChangeWorldTime(nextH, nextM)
-    end, 30000, 'dayTime')
-
-    local position = math.floor((124 / (24 * 60)) * ((hour * 60) + minute))
-    local mainWidth = 31
-    local secondaryWidth = 0
-
-    if (position + 31) >= 124 then
-        secondaryWidth = ((position + 31) - 124) + 1
-        mainWidth = 31 - secondaryWidth
-    end
-
-    mapController.ui.rosePanel.ambients.main:setWidth(mainWidth)
-    mapController.ui.rosePanel.ambients.secondary:setWidth(secondaryWidth)
-
-    if secondaryWidth == 0 then
-        mapController.ui.rosePanel.ambients.secondary:hide()
-    else
-        mapController.ui.rosePanel.ambients.secondary:setImageClip('0 0 ' .. secondaryWidth .. ' 31')
-        mapController.ui.rosePanel.ambients.secondary:show()
-    end
-
-    if mainWidth == 0 then
-        mapController.ui.rosePanel.ambients.main:hide()
-    else
-        mapController.ui.rosePanel.ambients.main:setImageClip(position .. ' 0 ' .. mainWidth .. ' 31')
-        mapController.ui.rosePanel.ambients.main:show()
-    end
-end
-
 function mapController:onInit()
-    self.ui.minimapBorder.minimap:getChildById('floorUpButton'):hide()
-    self.ui.minimapBorder.minimap:getChildById('floorDownButton'):hide()
-    self.ui.minimapBorder.minimap:getChildById('zoomInButton'):hide()
-    self.ui.minimapBorder.minimap:getChildById('zoomOutButton'):hide()
-    self.ui.minimapBorder.minimap:getChildById('resetButton'):hide()
+  minimapWindow = self.ui
+  minimapWidget = minimapWindow:recursiveGetChildById('minimap')
+
+  -- Allow minimap to be placed in main right panel (and other panels)
+  minimapWindow.allowInMainRightPanel = true
+
+  -- Hide built-in minimap buttons (we use custom ones from OTUI)
+  local floorUpButton = minimapWidget:getChildById('floorUpButton')
+  local floorDownButton = minimapWidget:getChildById('floorDownButton')
+  local zoomInButton = minimapWidget:getChildById('zoomInButton')
+  local zoomOutButton = minimapWidget:getChildById('zoomOutButton')
+  local resetButton = minimapWidget:getChildById('resetButton')
+
+  if floorUpButton then floorUpButton:hide() end
+  if floorDownButton then floorDownButton:hide() end
+  if zoomInButton then zoomInButton:hide() end
+  if zoomOutButton then zoomOutButton:hide() end
+  if resetButton then resetButton:hide() end
+
+  -- Setup minimap window (skip if no close/minimize buttons)
+  local closeButton = self.ui:getChildById('closeButton')
+  local minimizeButton = self.ui:getChildById('minimizeButton')
+  if closeButton and minimizeButton then
+    self.ui:setup()
+  end
+
+  -- Setup mouse wheel on floor position widget for floor change
+  if minimapWindow.floorPosition then
+    minimapWindow.floorPosition.onMouseWheel = function(widget, mousePos, direction)
+      if direction == MouseWheelUp then
+        minimapWidget:floorUp(1)
+      elseif direction == MouseWheelDown then
+        minimapWidget:floorDown(1)
+      end
+      updateFloorImage(minimapWidget:getCameraPosition().z)
+      return true
+    end
+  end
+
+  -- Save default position after UI is initialized
+  addEvent(function()
+    saveMinimapDefaultPosition()
+  end, 100)
 end
 
 function mapController:onGameStart()
-    mapController:registerEvents(g_game, {
-        onChangeWorldTime = onChangeWorldTime
-    })
+  mapController:registerEvents(g_game, {
+    onServerTime = onServerTime
+  })
 
-    mapController:registerEvents(LocalPlayer, {
-        onPositionChange = onPositionChange
-    }):execute()
+  mapController:registerEvents(LocalPlayer, {
+    onPositionChange = onPositionChange
+  }):execute()
 
-    -- Load Map
-    g_minimap.clean()
+  -- Load Map
+  g_minimap.clean()
 
-    local minimapFile = '/minimap'
-    local loadFnc = nil
+  local minimapFile = '/minimap'
+  local loadFnc = nil
 
-    if otmm then
-        minimapFile = minimapFile .. '.otmm'
-        loadFnc = g_minimap.loadOtmm
-    else
-        minimapFile = minimapFile .. '_' .. g_game.getClientVersion() .. '.otcm'
-        loadFnc = g_map.loadOtcm
-    end
+  if otmm then
+    minimapFile = minimapFile .. '.otmm'
+    loadFnc = g_minimap.loadOtmm
+  else
+    minimapFile = minimapFile .. '_' .. g_game.getClientVersion() .. '.otcm'
+    loadFnc = g_map.loadOtcm
+  end
 
-    if g_resources.fileExists(minimapFile) then
-        loadFnc(minimapFile)
-    end
+  if g_resources.fileExists(minimapFile) then
+    loadFnc(minimapFile)
+  end
 
-    self.ui.minimapBorder.minimap:load()
+  minimapWidget:load()
 end
 
 function mapController:onGameEnd()
-    -- Save Map
-    if otmm then
-        g_minimap.saveOtmm('/minimap.otmm')
-    else
-        g_map.saveOtcm('/minimap_' .. g_game.getClientVersion() .. '.otcm')
-    end
+  -- Save Map
+  if otmm then
+    g_minimap.saveOtmm('/minimap.otmm')
+  else
+    g_map.saveOtcm('/minimap_' .. g_game.getClientVersion() .. '.otcm')
+  end
 
-    self.ui.minimapBorder.minimap:save()
+  minimapWidget:save()
 end
 
 function mapController:onTerminate()
-    if iconTopMenu then
-        iconTopMenu:destroy()
-        iconTopMenu = nil
-    end
+  -- Cleanup if needed
 end
 
-function zoomIn()
-    mapController.ui.minimapBorder.minimap:zoomIn()
+-- Public functions called from OTUI
+
+function zoom(zoomIn)
+  if not minimapWidget then return end
+  if zoomIn then
+    minimapWidget:zoomIn()
+  else
+    minimapWidget:zoomOut()
+  end
 end
 
-function zoomOut()
-    mapController.ui.minimapBorder.minimap:zoomOut()
+function floor(floorUp)
+  if not minimapWidget then return end
+  if floorUp then
+    minimapWidget:floorUp(1)
+  else
+    minimapWidget:floorDown(1)
+  end
+  updateFloorImage(minimapWidget:getCameraPosition().z)
 end
 
-function openCyclopediaMap()
-    if g_game.getClientVersion() >= 1310 then
-        modules.game_cyclopedia.toggle('map')
-    else
-        return fullscreen()
-    end
+function center()
+  if not minimapWidget then return end
+  minimapWidget:reset()
 end
 
-function fullscreen()
-    local minimapWidget = mapController.ui.minimapBorder.minimap
-    if not minimapWidget then
-        minimapWidget = fullscreenWidget
-    end
-    local zoom;
+function compassMove(direction)
+  if not minimapWidget then return end
 
-    if not minimapWidget then
-        return
-    end
-
-    if minimapWidget.fullMapView then
-        fullscreenWidget = nil
-        minimapWidget:setParent(mapController.ui.minimapBorder)
-        minimapWidget:fill('parent')
-        mapController.ui:show()
-        zoom = minimapWidget.zoomMinimap
-        g_keyboard.unbindKeyDown('Escape')
-        minimapWidget.fullMapView = false
-    else
-        fullscreenWidget = minimapWidget
-        mapController.ui:hide(true)
-        minimapWidget:setParent(modules.game_interface.getRootPanel())
-        minimapWidget:fill('parent')
-        zoom = minimapWidget.zoomFullmap
-        g_keyboard.bindKeyDown('Escape', fullscreen)
-        minimapWidget.fullMapView = true
-    end
-
-    local pos = oldPos or minimapWidget:getCameraPosition()
-    oldPos = minimapWidget:getCameraPosition()
-    minimapWidget:setZoom(zoom)
-    minimapWidget:setCameraPosition(pos)
+  local moveAmount = 10
+  if direction == 'north' then
+    minimapWidget:move(0, moveAmount)
+  elseif direction == 'south' then
+    minimapWidget:move(0, -moveAmount)
+  elseif direction == 'east' then
+    minimapWidget:move(-moveAmount, 0)
+  elseif direction == 'west' then
+    minimapWidget:move(moveAmount, 0)
+  elseif direction == 'northeast' then
+    minimapWidget:move(-moveAmount, moveAmount)
+  elseif direction == 'northwest' then
+    minimapWidget:move(moveAmount, moveAmount)
+  elseif direction == 'southeast' then
+    minimapWidget:move(-moveAmount, -moveAmount)
+  elseif direction == 'southwest' then
+    minimapWidget:move(moveAmount, -moveAmount)
+  end
 end
 
-function upLayer()
-    if virtualFloor == 0 then
-        return
-    end
-
-    mapController.ui.minimapBorder.minimap:floorUp(1)
-    virtualFloor = virtualFloor - 1
-    refreshVirtualFloors()
+function onClose()
+  -- Called when minimap window is closed
 end
 
-function downLayer()
-    if virtualFloor == 15 then
-        return
-    end
-
-    mapController.ui.minimapBorder.minimap:floorDown(1)
-    virtualFloor = virtualFloor + 1
-    refreshVirtualFloors()
-end
-
-function onClickRoseButton(dir)
-    if dir == 'north' then
-        mapController.ui.minimapBorder.minimap:move(0, 1)
-    elseif dir == 'north-east' then
-        mapController.ui.minimapBorder.minimap:move(-1, 1)
-    elseif dir == 'east' then
-        mapController.ui.minimapBorder.minimap:move(-1, 0)
-    elseif dir == 'south-east' then
-        mapController.ui.minimapBorder.minimap:move(-1, -1)
-    elseif dir == 'south' then
-        mapController.ui.minimapBorder.minimap:move(0, -1)
-    elseif dir == 'south-west' then
-        mapController.ui.minimapBorder.minimap:move(1, -1)
-    elseif dir == 'west' then
-        mapController.ui.minimapBorder.minimap:move(1, 0)
-    elseif dir == 'north-west' then
-        mapController.ui.minimapBorder.minimap:move(1, 1)
-    end
-end
-
-function resetMap()
-    mapController.ui.minimapBorder.minimap:reset()
-    local player = g_game.getLocalPlayer()
-    if player then
-        virtualFloor = player:getPosition().z
-        refreshVirtualFloors()
-    end
-end
+-- Accessor functions
 
 function getMiniMapUi()
-    return mapController.ui.minimapBorder.minimap
+  return minimapWidget
 end
 
-function extendedView(extendedView)
-    if extendedView then
-        if not iconTopMenu then
-            iconTopMenu = modules.client_topmenu.addTopRightToggleButton('miniMap', tr('Show miniMap'),
-                '/images/topbuttons/minimap', toggle)
-            iconTopMenu:setOn(mapController.ui:isVisible())
-            mapController.ui:setBorderColor('black')
-            mapController.ui:setBorderWidth(2)
-        end
-    else
-        if iconTopMenu then
-            iconTopMenu:destroy()
-            iconTopMenu = nil
-        end
-        mapController.ui:setBorderColor('alpha')
-        mapController.ui:setBorderWidth(0)
-        local mainRightPanel = modules.game_interface.getMainRightPanel()
-        if not mainRightPanel:hasChild(mapController.ui) then
-            mainRightPanel:insertChild(1, mapController.ui)
-        end
-        mapController.ui:show()
-
-    end
-    mapController.ui.moveOnlyToMain = not extendedView
+function getMinimapWindow()
+  return minimapWindow
 end
 
-function toggle()
-    if iconTopMenu:isOn() then
-        mapController.ui:hide()
-        iconTopMenu:setOn(false)
-    else
-        mapController.ui:show()
-        iconTopMenu:setOn(true)
+-- Panel management functions
+
+function restoreMinimapToDefault()
+  if not minimapWindow then
+    return false
+  end
+
+  local targetPanel = defaultMinimapPanel or modules.game_interface.getMainRightPanel()
+  if not targetPanel then
+    return false
+  end
+
+  local currentParent = minimapWindow:getParent()
+  if currentParent == targetPanel then
+    return true
+  end
+
+  if currentParent then
+    currentParent:removeChild(minimapWindow)
+
+    local currentParentId = currentParent:getId()
+    if currentParentId == "horizontalLeftPanel" or currentParentId == "horizontalRightPanel" then
+      if currentParent:getChildCount() == 0 then
+        currentParent:setPhantom(true)
+      end
     end
+
+    -- Auto-fit old parent height
+    if currentParent.fitAllChildren then
+      currentParent:fitAllChildren()
+    end
+  end
+
+  minimapWindow:setWidth(minimapWindow.defaultWidth or 178)
+  minimapWindow:setHeight(minimapWindow.defaultHeight or 178)
+
+  local insertIndex = defaultMinimapIndex or 1
+  targetPanel:insertChild(insertIndex, minimapWindow)
+
+  return true
+end
+
+function saveMinimapDefaultPosition()
+  if not minimapWindow then
+    return
+  end
+
+  local parent = minimapWindow:getParent()
+  if parent and parent:getClassName() == 'UIMiniWindowContainer' then
+    defaultMinimapPanel = parent
+    defaultMinimapIndex = parent:getChildIndex(minimapWindow)
+  end
+end
+
+function moveMinimapToPanel(panel, height, index)
+  if not minimapWindow or not panel then
+    return nil
+  end
+
+  local oldParent = minimapWindow:getParent()
+  local panelId = panel:getId()
+
+  if string.find(panelId, "horizontal") then
+    addEvent(function()
+      minimapWindow:setParent(panel)
+      if height then
+        minimapWindow:setHeight(height)
+      end
+      expandMinimapForHorizontalPanel(panel)
+
+      -- Auto-fit old parent height
+      if oldParent and oldParent.fitAllChildren then
+        oldParent:fitAllChildren()
+      end
+    end)
+  else
+    minimapWindow:setParent(panel)
+    if height then
+      minimapWindow:setHeight(height)
+    end
+
+    -- Auto-fit old parent height
+    if oldParent and oldParent.fitAllChildren then
+      oldParent:fitAllChildren()
+    end
+  end
+
+  minimapWindow:open()
+
+  return minimapWindow
+end
+
+function expandMinimapForHorizontalPanel(panel)
+  if not minimapWindow or not panel then
+    return
+  end
+
+  -- Use addEvent to ensure the resize happens after the widget is fully placed
+  addEvent(function()
+    if not minimapWindow or not panel then
+      return
+    end
+
+    local panelWidth = panel:getWidth()
+    local panelHeight = panel:getHeight()
+
+    -- Use 100% of available width and height
+    minimapWindow:setWidth(panelWidth)
+    minimapWindow:setHeight(panelHeight)
+
+    panel:setPhantom(false)
+  end)
 end

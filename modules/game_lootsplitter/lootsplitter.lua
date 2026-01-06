@@ -3,10 +3,18 @@ advancedOptions = nil
 advancedConfig = {}
 
 function init()
+  -- ensure window styles are available before loading the UI
+  g_ui.importStyle('/styles/10-windows')
+
   lootsplitter = g_ui.displayUI('lootsplitter')
-  lootsplitter:hide()
+  if lootsplitter then
+    lootsplitter:hide()
+  end
+
   advancedOptions = g_ui.loadUI('advanced', g_ui.getRootWidget())
-  advancedOptions:hide()
+  if advancedOptions then
+    advancedOptions:hide()
+  end
 end
 
 function terminate()
@@ -14,9 +22,14 @@ function terminate()
       lootsplitter:destroy()
       lootsplitter = nil
   end
+  if advancedOptions then
+      advancedOptions:destroy()
+      advancedOptions = nil
+  end
 end
 
 function toggle()
+  if not lootsplitter then return end
   if lootsplitter:isVisible() then
       lootsplitter:hide()
   else
@@ -25,11 +38,15 @@ function toggle()
 end
 
 function show()
-  lootsplitter:show()
+  if lootsplitter then
+    lootsplitter:show()
+  end
 end
 
 function hide()
-  lootsplitter:hide()
+  if lootsplitter then
+    lootsplitter:hide()
+  end
 end
 
 local function round(num, numDecimalPlaces)

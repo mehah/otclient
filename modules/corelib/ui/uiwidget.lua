@@ -25,6 +25,28 @@ function UIWidget:setTitle(title)
     self:setColor("#c0c0c0")
 end
 
+function UIWidget:getEmptySlot(widget)
+    local childsSize = 0
+    for _, child in pairs(self:getChildren()) do
+        if child:isVisible() and widget:getId() ~= child:getId() then
+            childsSize = child:getHeight() + childsSize
+        end
+    end
+
+    return self:getHeight() - childsSize
+end
+
+function UIWidget:getChildInPanel()
+    local childsSize = 0
+    for _, child in pairs(self:getChildren()) do
+        if child:isVisible() then
+            childsSize = 1 + childsSize
+        end
+    end
+
+    return childsSize
+end
+
 function UIWidget:parseColoredText(text, default_color)
     default_color = default_color or "#ffffff"
     local result, last_pos = "", 1
@@ -709,4 +731,12 @@ function UIWidget:__childFor(moduleName, expr, html, index)
         widget = self,
         fnc = scan
     })
+end
+
+function UIWidget:setActionId(actionId)
+    self.actionId = actionId
+end
+
+function UIWidget:getActionId()
+    return self.actionId
 end

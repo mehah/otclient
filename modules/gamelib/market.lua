@@ -57,14 +57,20 @@ MarketCategory = {
     WandsRods = 21,
     PremiumScrolls = 22,
     TibiaCoins = 23,
-    CreatureProducts = 24,
+    CreatureProducs = 24,
     Quivers = 25,
-    SoulCores = 26,
+    SoulCore = 26,
+    FistWeapons = 27,
+    Unknown3 = 28,
+    Unknown4 = 29,
+    Gold = 30,
+    Unassigned = 31,
+    WeaponsAll = 32,
     MetaWeapons = 255
 }
 
 MarketCategory.First = MarketCategory.Armors
-MarketCategory.Last = MarketCategory.SoulCores
+MarketCategory.Last = MarketCategory.TibiaCoins
 
 MarketCategoryWeapons = {
     [MarketCategory.Ammunition] = {

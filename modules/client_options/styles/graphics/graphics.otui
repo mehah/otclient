@@ -27,43 +27,93 @@ UIWidget
     OptionCheckBoxMarked
       id: fullscreen
       !text: 'Full Screen Mode'
-      !tooltip: 'Ctrl+Shift+F'
+      !tooltip: 'Full Screen Mode.\nCtrl+Shift+F'
 
   SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 5
-    height:55
-    
+    height: 75
+
     OptionCheckBoxMarked
       id: vsync
       !text: tr('V-Sync')
-      !tooltip: tr('Limits your fps based on monitor refresh rate')
+      anchors.top: parent.top
+      anchors.left: parent.left
+      !tooltip: tr('It might help to uncheck this option if your frame rate is low. \nHowever, disabling V-Sync can lead to screen tearing.')
 
-  
     OptionCheckBoxMarked
-      id: showFps
-      !tooltip: tr('Show frame rate')
-      !text: tr('Show frame rate')
-      anchors.top: prev.bottom
+      id: noFrameCheckBox
+      !text: tr('No Frame Rate Limit')
+      anchors.top: vsync.bottom
+      anchors.left: parent.left
+      !tooltip: tr('If you check this option, the client will try to produce as many \nframes as possible. If you find your computers performance is bad \nwhen running RubinOT, you should rather try to set a frame rate limit.')
 
-    OptionScaleScroll
-      id: backgroundFrameRate
-      !text: tr('Game framerate limit: %s', 'max')
-      anchors.top: prev.bottom
+    UIWidget
+      id: fpsScrollHelp
+      size: 12 12
       margin-top: 5
-      &minimumScrollValue: 1
-      &maximumScrollValue: 501
-      &scrollSize: 21
+      anchors.top: prev.top
+      anchors.top: prev.bottom
+      anchors.right: parent.right
+      margin-right: 3
+      image-source: /images/skin/show-gui-help-grey
+      !tooltip: tr('By using this slider, you can modify the preset frame rate limit \nfrom 10 to 500 fps frames per second. If you find your \ncomputers performance is bad when running RubinOT, you should try \nreducing the frame rate. Note that this function is not available if \nyou have checked "No Frame Rate Limit".')
+
+    HorizontalScrollBar
+      id: backgroundFrameRate
+      width: 175
+      anchors.top: prev.top
+      anchors.right: parent.right
+      step: 27
+      margin-right: 25
+      margin-top: 1
+      pixels-scroll: true
+      value: 60
+      minimum: 40
+      maximum: 240
+      default-scroll: true
+      @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+    Label
+      id: fpsLabel
+      font: Verdana Bold-11px
+      text-auto-resize: true
+      color: #c0c0c0
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: parent.left
+      margin-left: 17
+      $disabled:
+        color: #707070
       @onSetup: |
         local value = modules.client_options.getOption('backgroundFrameRate')
-        local text = value
-        if value <= 0 or value >= 501 then
-          text = 'max'
+        if value <= 0 or value > 240 then
+          self:setText(tr('Frame Rate Limit: max'))
+        else
+          self:setText(tr('Frame Rate Limit: %d', value))
         end
+    
+    UIWidget
+      id: currentFpsHelp
+      size: 12 12
+      margin-top: 5
+      anchors.top: prev.top
+      anchors.top: fpsScrollHelp.bottom
+      anchors.right: parent.right
+      margin-right: 3
+      image-source: /images/skin/show-gui-help-grey
+      !tooltip: tr('If you are logged into the game, you can see your current frame \nrate here. Press Alt+F8 to show or hide your current frame rate in \nthe game window.')
 
-        self:setText(tr('Game framerate limit: %s', text))
+    Label
+      id: currentFpsLabel
+      font: Verdana Bold-11px
+      text-auto-resize: true
+      color: #c0c0c0
+      text: Current Frame Rate: 0 fps
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: parent.left
+      margin-left: 17
 
   SmallReversedQtPanel
     anchors.left: parent.left

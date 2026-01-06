@@ -204,15 +204,6 @@ private:
 
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
-    bool canRefresh() const
-    {
-        uint16_t refreshDelay = m_refreshDelay;
-        if (m_shaderRefreshDelay > 0 && (refreshDelay == 0 || m_shaderRefreshDelay < refreshDelay))
-            refreshDelay = m_shaderRefreshDelay;
-
-        return refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay;
-    }
-
     bool updateHash(const DrawMethod& method, const Texture* texture, const Color& color, bool hasCoord);
     PoolState getState(const TexturePtr& texture, Texture* textureAtlas, const Color& color);
 

@@ -124,6 +124,11 @@ public:
     void sendRequestStoreHome();
     void sendRequestStorePremiumBoost();
     void sendRequestUsefulThings(const uint8_t offerId);
+    void sendWeaponProficiencyAction(const uint8_t proficiencyType, const uint16_t itemId);
+    void sendWeaponProficiencyApply(uint16_t itemId, const std::vector<std::pair<uint8_t, uint8_t>>& perks);
+    void sendForgeAction(Otc::ForgeActions_t forgeAction, bool convergence, uint16_t itemid1, uint8_t tier, uint16_t itemid2, bool usedCore = false, bool reduceTierLoss = false);
+    void sendResourceBalance();
+    void sendForgeHistory(uint32_t pageId);
     void sendRequestStoreOfferById(uint32_t offerId, uint8_t sortOrder = 0, uint8_t serviceType = 0);
     void sendRequestStoreSearch(const std::string_view searchText, uint8_t sortOrder = 0, uint8_t serviceType = 0);
     void sendOpenStore(uint8_t serviceType, std::string_view category);
@@ -139,6 +144,7 @@ public:
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
     void sendCloseImbuingWindow();
+    void sendImbuementWindowAction(uint8_t type, uint16_t itemId = 0, const Position& pos = Position(), uint8_t stackpos = 0);
     void sendOpenRewardWall();
     void sendOpenRewardHistory();
     void sendGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
@@ -147,7 +153,7 @@ public:
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
     void sendRequestBestiary();
-    void sendRequestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
+    void sendRequestBestiaryOverview(std::string_view catName);
     void sendRequestBestiarySearch(uint16_t raceId);
     void sendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void sendCyclopediaRequestCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage, uint16_t page);
@@ -159,8 +165,13 @@ public:
     void sendQuickLoot(const uint8_t variant, const Position& pos, const uint16_t itemId, const uint8_t stackpos);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
-    void sendInspectionNormalObject(const Position& position);
+    // wheel of destiny related
+    void sendOpenDestinyWheel(uint32_t playerId);
+    void sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uint32_t greenGemId, uint32_t redGemId, uint32_t blueGemId, uint32_t purpleGemId);
+    void sendGemAtelierAction(uint8_t action, uint8_t param1, uint16_t param2, bool param3 = false);
     void sendInspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
+    void sendInspectionNormalObject(const Position& position);
+    void requestRewardChestCollect(const Position& pos, const uint16_t itemId, const uint8_t stackpos);
 
     // otclient only
     void sendChangeMapAwareRange(uint8_t xrange, uint8_t yrange);
@@ -193,6 +204,7 @@ private:
     void parseUnjustifiedStats(const InputMessagePtr& msg);
     void parsePvpSituations(const InputMessagePtr& msg);
     void parsePreset(const InputMessagePtr& msg);
+    void parseDestinyWheel(const InputMessagePtr& msg);
     void parseCreatureType(const InputMessagePtr& msg);
     void parsePlayerHelpers(const InputMessagePtr& msg) const;
     void parseMessage(const InputMessagePtr& msg);
@@ -246,6 +258,8 @@ private:
     void parseCreatureMark(const InputMessagePtr& msg);
     void parseTrappers(const InputMessagePtr& msg);
     void parseOpenForge(const InputMessagePtr& msg);
+    void parseForgeResult(const InputMessagePtr& msg);
+    void parseForgeHistory(const InputMessagePtr& msg);
     void setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const;
     void addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const;
     void parseCloseForgeWindow(const InputMessagePtr& msg);
@@ -358,8 +372,9 @@ private:
     void parseBestiaryCharmsData(const InputMessagePtr& msg);
 
     // 15x
-    void parseWeaponProficiencyExperience(const InputMessagePtr& msg);
-    void parseWeaponProficiencyInfo(const InputMessagePtr& msg);
+    void parseProficiency(const InputMessagePtr& msg);
+    void parseProficiencyExperience(const InputMessagePtr& msg);
+
 
     void parseHighscores(const InputMessagePtr& msg);
     void parseAttachedEffect(const InputMessagePtr& msg);

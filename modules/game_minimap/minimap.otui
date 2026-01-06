@@ -1,285 +1,223 @@
-PhantomMiniWindow
-  id: mainmappanel
-  draggable: true
-  phantom: false
-  &panelHeight: 116
-  height: 116
+InvisibleMinimapButton < UIButton
+  opacity: 0
+  size: 15 15
+
+MapMiniWindow
+  id: minimapWindow
+  &type: 'miniMap'
+  @onClose: modules.game_minimap.onClose()
+
+  Minimap
+    id: minimap
+    anchors.fill: parent
+    margin: 15 4 4 4
 
   UIWidget
-    id: minimapBorder
+    id: title
+    size: 58 10
+    focusable: false
     anchors.top: parent.top
-    anchors.left: parent.left
-    margin-top: 5
-    margin-left: 8
-    size: 115 111
-    image-source: /images/ui/1pixel_down_frame
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 3
+    image-source: /images/game/minimap/mapview-label
+    phantom: true
 
-    Minimap
-      id: minimap
-      anchors.fill: parent
-      margin: 1
+  ResizeBorder
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    height: 3
+    enabled: true
+    minimum: 200
+    maximum: 200
 
   UIWidget
-    id: layersPanel
-    size: 20 68
-    anchors.bottom: parent.bottom
+    id: centerMap
+    size: 29 32
     anchors.right: parent.right
-    margin-right: 7
+    anchors.top: parent.top
+    margin-top: 23
+    margin-right: 14
+    image-source: /images/automap/timedisplay_scroll
+    image-clip: 64 0 34 34
+    @onClick: modules.game_minimap.center()
 
-    UIWidget
-      id: automapLayers
-      image-source: /images/automap/automap_indicator_maplayers
-      anchors.left: parent.left
-      anchors.bottom: parent.bottom
-      image-clip: 98 0 14 67
-      size: 14 67
+  UIWidget
+    id: glass
+    size: 47 46
+    image-source: /images/game/minimap/timedisplay-glass
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-top: 17
+    margin-right: 5
 
-    UIWidget
-      image-source: /images/ui/vertical_line_dark
-      margin-left: 2
-      margin-top: 4
-      margin-bottom: 4
-      anchors.left: automapLayers.right
+  InvisibleMinimapButton
+    anchors.right: glass.right
+    anchors.verticalCenter: glass.verticalCenter
+    @onClick: modules.game_minimap.compassMove('east')
+
+  InvisibleMinimapButton
+    anchors.left: glass.left
+    anchors.verticalCenter: glass.verticalCenter
+    @onClick: modules.game_minimap.compassMove('west')
+
+  InvisibleMinimapButton
+    anchors.top: glass.top
+    anchors.horizontalCenter: glass.horizontalCenter
+    @onClick: modules.game_minimap.compassMove('north')
+
+  InvisibleMinimapButton
+    anchors.bottom: glass.bottom
+    anchors.horizontalCenter: glass.horizontalCenter
+    @onClick: modules.game_minimap.compassMove('south')
+
+  InvisibleMinimapButton
+    anchors.top: glass.top
+    anchors.left: glass.left
+    @onClick: modules.game_minimap.compassMove('northwest')
+
+  InvisibleMinimapButton
+    anchors.top: glass.top
+    anchors.right: glass.right
+    @onClick: modules.game_minimap.compassMove('northeast')
+
+  InvisibleMinimapButton
+    anchors.bottom: glass.bottom
+    anchors.left: glass.left
+    @onClick: modules.game_minimap.compassMove('southwest')
+
+  InvisibleMinimapButton
+    anchors.bottom: glass.bottom
+    anchors.right: glass.right
+    @onClick: modules.game_minimap.compassMove('southeast')
+
+  InvisibleMinimapButton
+    anchors.verticalCenter: glass.verticalCenter
+    anchors.horizontalCenter: glass.horizontalCenter
+    @onClick: modules.game_minimap.center()
+
+  Label
+    id: floorPosition
+    image-source: /images/automap/automap_indicator_maplayers
+    size: 14 67
+    image-clip: 98 0 14 67
+    anchors.left: parent.left
+    anchors.bottom: fullSize.top
+    margin-left: 10
+    margin-bottom: 5
+    visible: false
+
+    UIButton
       anchors.top: parent.top
-      anchors.bottom: parent.bottom
-      width: 1
+      anchors.left: parent.left
+      size: 16 32
+      @onClick: modules.game_minimap.floor(true)
 
-    UIWidget
-      id: layersMark
-      anchors.left: prev.right
-      anchors.top: automapLayers.top
-      image-source: /images/automap/automap_indicator_slider_left
-      margin-top: 28
-
-    Button
-      image-source: /images/automap/automap_phantom
-      anchors.left: automapLayers.left
-      anchors.right: automapLayers.right
-      anchors.top: automapLayers.top
-      anchors.bottom: automapLayers.verticalCenter
-      @onClick: upLayer()
-
-    Button
-      image-source: /images/automap/automap_phantom
-      anchors.left: automapLayers.left
-      anchors.right: automapLayers.right
-      anchors.top: automapLayers.verticalCenter
-      anchors.bottom: automapLayers.bottom
-      @onClick: downLayer()
+    UIButton
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      size: 16 32
+      @onClick: modules.game_minimap.floor(false)
 
   Button
-    id: fullMap
-    image-source: /images/automap/automap_buttons
-    image-clip: 0 0 20 20
-    anchors.right: layersPanel.left
-    anchors.bottom: minimapBorder.bottom
-    margin-right: 4
+    id: floorUp
     size: 20 20
-    @onClick: openCyclopediaMap()
+    image-source: /images/game/minimap/floor_up
+    image-clip: 0 0 20 20
+    anchors.left: parent.left
+    anchors.bottom: next.top
+    margin-left: 5
+    margin-bottom: 2
+    tooltip: Change Layer (Ctrl + Mouse Wheel or Alt+PageUp for a higher floor, Alt+PageDown for a lower floor)
+    tooltip-delayed: true
 
-    $hover !disabled:
+    $hover !pressed:
       image-clip: 0 0 20 20
 
-    $pressed !disabled:
-      image-clip: 20 0 20 20
-
-  Button
-    id: zoomIn
-    image-source: /images/automap/automap_buttons
-    image-clip: 0 40 20 20
-    anchors.right: fullMap.right
-    anchors.bottom: fullMap.top
-    margin-bottom: 2
-    size: 20 20
-    @onClick: zoomIn()
-
-    $hover !disabled:
-      image-clip: 0 40 20 20
-
-    $pressed !disabled:
-      image-clip: 20 40 20 20
-
-  Button
-    id: zoomOut
-    image-source: /images/automap/automap_buttons
-    image-clip: 0 20 20 20
-    anchors.right: fullMap.right
-    anchors.bottom: zoomIn.top
-    margin-bottom: 2
-    size: 20 20
-    @onClick: zoomOut()
-
-    $hover !disabled:
+    $pressed:
       image-clip: 0 20 20 20
 
-    $pressed !disabled:
-      image-clip: 20 20 20 20
+    @onClick: modules.game_minimap.floor(true)
 
-  UIWidget
-    id: rosePanel
-    anchors.top: minimapBorder.top
-    anchors.right: layersPanel.right
-    size: 43 43
+  Button
+    id: floorDown
+    size: 20 20
+    image-source: /images/game/minimap/floor_down
+    image-clip: 0 0 20 20
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-left: 5
+    margin-bottom: 5
+    tooltip: Change Layer (Ctrl + Mouse Wheel or Alt+PageUp for a higher floor, Alt+PageDown for a lower floor)
+    tooltip-delayed: true
 
-    UIWidget
-      id: ambients
-      anchors.centerIn: parent
-      size: 31 31
+    $hover !pressed:
+      image-clip: 0 0 20 20
 
-      UIWidget
-        id: main
-        image-source: /images/automap/timedisplay_scroll
-        anchors.left: parent.left
-        anchors.top: parent.top
-        image-clip: 100 0 24 31
-        size: 24 31
+    $pressed:
+      image-clip: 0 20 20 20
 
-      UIWidget
-        id: secondary
-        image-source: /images/automap/timedisplay_scroll
-        anchors.left: main.right
-        anchors.top: parent.top
-        image-clip: 0 0 7 31
-        size: 7 31
+    @onClick: modules.game_minimap.floor(false)
 
-      Button
-        image-source: /images/automap/automap_phantom
-        anchors.fill: parent
-        @onClick: resetMap()
+  Button
+    id: zoomInWidget
+    size: 20 20
+    image-source: /images/game/minimap/automap-button-zoomin-up
+    image-clip: 0 0 20 20
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-right: 5
+    margin-bottom: 5
+    tooltip: Zoom in (Alt + End)
+    tooltip-delayed: true
 
-    UIWidget
-      id: rose
-      anchors.fill: parent
-      image-source: /images/automap/automap_rose
-      image-clip: 0 0 43 43
-      phantom: true
+    $hover !pressed:
+      image-clip: 0 0 20 20
 
-    Button
-      image-source: /images/automap/automap_rose
-      image-clip: 14 0 15 8
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-left: 14
-      size: 15 8
-      @onClick: |
-        onClickRoseButton('north')
+    $pressed:
+      image-clip: 0 0 20 20
+      image-source: /images/game/minimap/automap-button-zoomin-down
 
-      $hover !disabled:
-        image-clip: 14 0 15 8
+    @onClick: modules.game_minimap.zoom(true)
 
-      $pressed !disabled:
-        image-clip: 57 0 15 8
+  Button
+    id: zoomOutWidget
+    size: 20 20
+    image-source: /images/game/minimap/automap-button-zoomout-up
+    image-clip: 0 0 20 20
+    anchors.right: parent.right
+    anchors.bottom: zoomInWidget.top
+    margin-right: 5
+    margin-bottom: 2
+    tooltip: Zoom out (Alt + Home)
+    tooltip-delayed: true
 
-    Button
-      image-source: /images/automap/automap_rose
-      image-clip: 28 0 15 15
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-left: 28
-      size: 15 15
-      @onClick: |
-        onClickRoseButton('north-east')
+    $hover !pressed:
+      image-clip: 0 0 20 20
 
-      $hover !disabled:
-        image-clip: 28 0 15 15
+    $pressed:
+      image-clip: 0 0 20 20
+      image-source: /images/game/minimap/automap-button-zoomout-down
 
-      $pressed !disabled:
-        image-clip: 114 0 15 15
+    @onClick: modules.game_minimap.zoom(false)
 
-    Button
-      image-source: /images/automap/automap_rose
-      image-clip: 35 14 8 15
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-left: 35
-      margin-top: 14
-      size: 8 15
-      @onClick: |
-        onClickRoseButton('east')
+  Button
+    id: fullSize
+    size: 20 20
+    image-source: /images/game/minimap/automap-button-cyclopediamap-up
+    image-clip: 0 0 20 20
+    anchors.left: parent.left
+    anchors.bottom: zoomOutWidget.top
+    margin-bottom: 2
+    margin-left: 5
+    tooltip: Go to Cyclopedia Map
+    tooltip-delayed: true
+    @onClick: modules.game_cyclopedia.toggle("map")
+        
 
-      $hover !disabled:
-        image-clip: 35 14 8 15
+    $hover !pressed:
+      image-clip: 0 0 20 20
 
-      $pressed !disabled:
-        image-clip: 164 14 8 15  
-
-    Button
-      image-source: /images/automap/automap_rose
-      image-clip: 28 28 15 15
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-left: 28
-      margin-top: 28
-      size: 15 15
-      @onClick: |
-        onClickRoseButton('south-east')
-
-      $hover !disabled:
-        image-clip: 28 28 15 15
-
-      $pressed !disabled:
-        image-clip: 200 28 15 15
-
-    Button
-      image-source: /images/automap/automap_rose
-      image-clip: 14 35 15 8
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-left: 14
-      margin-top: 35
-      size: 15 8
-      @onClick: |
-        onClickRoseButton('south')
-
-      $hover !disabled:
-        image-clip: 14 35 15 8
-
-      $pressed !disabled:
-        image-clip: 229 35 15 8
-
-    Button
-      image-source: /images/automap/automap_rose
-      image-clip: 0 28 15 15
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-top: 28
-      size: 15 15
-      @onClick: |
-        onClickRoseButton('south-west')
-
-      $hover !disabled:
-        image-clip: 0 28 15 15
-
-      $pressed !disabled:
-        image-clip: 258 28 15 15
-
-    Button
-      image-source: /images/automap/automap_rose
-      image-clip: 0 14 8 15
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-top: 14
-      size: 8 15
-      @onClick: |
-        onClickRoseButton('west')
-
-      $hover !disabled:
-        image-clip: 0 14 8 15
-
-      $pressed !disabled:
-        image-clip: 301 14 8 15
-
-    Button
-      image-source: /images/automap/automap_rose
-      image-clip: 0 0 15 15
-      anchors.left: parent.left
-      anchors.top: parent.top
-      size: 15 15
-      @onClick: |
-        onClickRoseButton('north-west')
-
-      $hover !disabled:
-        image-clip: 0 0 15 15
-
-      $pressed !disabled:
-        image-clip: 344 0 15 15
+    $pressed:
+      image-clip: 0 0 20 20
+      image-source: /images/game/minimap/automap-button-cyclopediamap-down

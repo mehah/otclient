@@ -325,3 +325,11 @@ function table.remove_if(t, fnc)
     end
     return t;
 end
+
+function table.reserve(n, value)
+  local t = {}
+  for i = 1, n do
+    t[i] = value
+  end
+  return t
+end

@@ -541,6 +541,14 @@ function toggleAdventurerStyle(hasBlessing)
     end
 end
 
+function getLeftSlotItem()
+    local player = g_game.getLocalPlayer()
+    if not player then
+        return nil
+    end
+    return player:getInventoryItem(InventorySlotLeft)
+end
+
 function onBlessingsChange(blessings, blessVisualState)
     toggleAdventurerStyle(blessings == 1)
     local blessedButton = getInventoryUi().blessings
@@ -561,4 +569,12 @@ function onBlessingsChange(blessings, blessVisualState)
     elseif blessVisualState == 3 then
         blessedButton:setImageSource('/images/inventory/button_blessings_green')
     end
+end
+
+function onLeftSlotChange(itemId)
+    if not g_game.isOnline() then
+        return
+    end
+
+    modules.game_interface.StatsBar.onUpdateProficiencyWidget(itemId == 0)
 end

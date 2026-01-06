@@ -341,6 +341,44 @@ PhantomMiniWindow < UIMiniWindow
     id: closeButton
     phantom: true
 
+MapMiniWindow < UIMiniWindow
+  width: 178
+  height: 178
+  text-offset: 20 1
+  text-align: topLeft
+  image-source: /images/ui/map-borderimage
+  image-border: 4
+  image-border-top: 4
+  image-border-bottom: 4
+  focusable: false
+  draggable: true
+  &minimizedHeight: 19
+  &save: true
+
+  $!first:
+    margin-top: 2
+
+  UIWidget
+    id: miniwindowTopBar
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-right: 3
+    margin-left: 3
+    margin-top: 3
+    height: 15
+    phantom: true
+
+  ResizeBorder
+    id: bottomResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 3
+    enabled: true
+    minimum: 40
+    maximum: 200
+
 FloatingInputWindow < UIWindow
   anchors.centerIn: parent
   font: verdana-11px-antialised

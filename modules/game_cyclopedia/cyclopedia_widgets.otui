@@ -1183,7 +1183,9 @@ RuneSlot < InventoryItemCyclopedia
   id: slot18
 
   &position: {x=65535, y=18, z=0}
-  
+
+ 
+
 TrackerButton < Panel
   height: 34
   margin-bottom: 5

@@ -338,13 +338,13 @@ TopStatsBarLargeOnTop < UIWidget
     id: health
     anchors.top: icons.top
     anchors.left: parent.left
-    anchors.right: icons.left
+    anchors.right: proficiencyPanel.left
     !statsbar-type: 'health'
     !statsbar-size: 'large'
     !statsbar-orientation: 'horizontal'
     statsbar-text: true
     margin-left: 15
-    margin-right: 7
+    margin-right: 6
     height: 27
 
   StatsBarUp
@@ -383,6 +383,37 @@ TopStatsBarLargeOnTop < UIWidget
     margin-left: 12
     margin-right: 18
     height: 0
+
+  Panel
+    id: proficiencyPanel
+    size: 29 29
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 4
+    UIWidget
+      id: highlightProficiencyButton
+      size: 29 29
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: -1
+      margin-left: -1
+      visible: false
+      phantom: true
+      image-source: /images/game/topbar/highlight-proficiency-large-button
+    UIButton
+      id: proficiencyButton
+      size: 27 27
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-large-button
+      image-clip: 0 0 27 27
+      !tooltip: tr('Open Weapon Proficiency Dialog')
+      tooltip-delayed: true
+      @onClick: modules.game_proficiency.requestOpenWindow()
+      $hover !pressed:
+        image-clip: 0 0 27 27
+      $pressed:
+        image-clip: 0 27 27 27
 
 TopStatsBarParallelOnTop < UIWidget
   StatsBarTopWithShrink
@@ -444,6 +475,37 @@ TopStatsBarParallelOnTop < UIWidget
     size: 103 14
     layout:
       type: horizontalBox
+
+  Panel
+    id: proficiencyPanel
+    size: 15 15
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 4
+    UIWidget
+      id: highlightProficiencyButton
+      size: 15 15
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: -1
+      margin-left: -1
+      visible: false
+      phantom: true
+      image-source: /images/game/topbar/highlight-proficiency-button
+    UIButton
+      id: proficiencyButton
+      size: 13 13
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-button
+      image-clip: 0 0 13 13
+      !tooltip: tr('Open Weapon Proficiency Dialog')
+      tooltip-delayed: true
+      @onClick: modules.game_proficiency.requestOpenWindow()
+      $hover !pressed:
+        image-clip: 0 0 13 13
+      $pressed:
+        image-clip: 0 13 13 13
 
 TopStatsBarDefaultOnTop < UIWidget
   StatsBarTopWithShrink
@@ -508,6 +570,74 @@ TopStatsBarDefaultOnTop < UIWidget
     layout:
       type: horizontalBox
 
+  UIButton
+    id: proficiencyButton
+    size: 13 13
+    anchors.top: proficiencyPanel.top
+    anchors.right: proficiencyPanel.left
+    margin-right: 3
+    image-source: /images/game/topbar/proficiency-button
+    image-clip: 0 0 13 13
+    !tooltip: tr('Open Weapon Proficiency Dialog')
+    tooltip-delayed: true
+    @onClick: modules.game_proficiency.requestOpenWindow()
+    $hover !pressed:
+      image-clip: 0 0 13 13
+    $pressed:
+      image-clip: 0 13 13 13
+  UIWidget
+    id: highlightProficiencyButton
+    size: 15 15
+    anchors.top: prev.top
+    anchors.left: prev.left
+    margin-top: -1
+    margin-left: -1
+    visible: false
+    phantom: true
+    image-source: /images/game/topbar/highlight-proficiency-button
+
+  Panel
+    id: proficiencyPanel
+    size: 103 13
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 8
+    UIWidget
+      id: proficiencyBg
+      size: 100 13
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-bg
+      !tooltip: tr('Proficiency Progress: 0 / 1750')
+      tooltip-delayed: true
+      ProgressBarSD
+        id: starProgress
+        anchors.fill: parent
+        image-source: /images/game/proficiency/proficiency-progress
+        margin: 1 1 1 1
+        percent: 0
+      Label
+        id: proficiencyLabel
+        anchors.fill: parent
+        text-align: center
+        text-auto-resize: true
+        font: Verdana Bold-11px
+        color: #f4f4f4
+        text: 0%
+        phantom: true
+    UIWidget
+      id: proficiencyIcon
+      anchors.top: parent.top
+      anchors.right: prev.right
+      size: 9 11
+      margin-top: 1
+      margin-right: -4
+      phantom: true
+      on: false
+      image-source: /images/game/topbar/icon-proficiencytree-off
+      $on:
+        image-source: /images/game/topbar/icon-proficiencytree-on
+
 TopStatsBarCompactOnTop < UIWidget
   StatsBarTopWithShrink
     anchors.fill: parent
@@ -527,13 +657,13 @@ TopStatsBarCompactOnTop < UIWidget
     id: health
     anchors.top: icons.top
     anchors.left: parent.left
-    anchors.right: icons.left
+    anchors.right: proficiencyPanel.left
     !statsbar-type: 'health'
     !statsbar-size: 'small'
     !statsbar-orientation: 'horizontal'
     statsbar-text: true
     margin-left: 15
-    margin-right: 7
+    margin-right: 6
     height: 14
 
   StatsBarUp
@@ -572,6 +702,37 @@ TopStatsBarCompactOnTop < UIWidget
     margin-left: 12
     margin-right: 18
     height: 0
+
+  Panel
+    id: proficiencyPanel
+    size: 15 15
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 4
+    UIWidget
+      id: highlightProficiencyButton
+      size: 15 15
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: -1
+      margin-left: -1
+      visible: false
+      phantom: true
+      image-source: /images/game/topbar/highlight-proficiency-button
+    UIButton
+      id: proficiencyButton
+      size: 13 13
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-button
+      image-clip: 0 0 13 13
+      !tooltip: tr('Open Weapon Proficiency Dialog')
+      tooltip-delayed: true
+      @onClick: modules.game_proficiency.requestOpenWindow()
+      $hover !pressed:
+        image-clip: 0 0 13 13
+      $pressed:
+        image-clip: 0 13 13 13
 
 TopStatsBar < UIWidget
   TopStatsBarLargeOnTop
@@ -960,13 +1121,13 @@ TopStatsBarLargeOnBottom < UIWidget
     id: health
     anchors.top: icons.top
     anchors.left: parent.left
-    anchors.right: icons.left
+    anchors.right: proficiencyPanel.left
     !statsbar-type: 'health'
     !statsbar-size: 'large'
     !statsbar-orientation: 'horizontal'
     statsbar-text: true
     margin-left: 7
-    margin-right: 7
+    margin-right: 6
     margin-top: 0
     margin-bottom: 6
     height: 27
@@ -1007,6 +1168,37 @@ TopStatsBarLargeOnBottom < UIWidget
     margin-top: 8
     margin-right: 6
     height: 0
+
+  Panel
+    id: proficiencyPanel
+    size: 29 29
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 4
+    UIWidget
+      id: highlightProficiencyButton
+      size: 29 29
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: -1
+      margin-left: -1
+      visible: false
+      phantom: true
+      image-source: /images/game/topbar/highlight-proficiency-large-button
+    UIButton
+      id: proficiencyButton
+      size: 27 27
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-large-button
+      image-clip: 0 0 27 27
+      !tooltip: tr('Open Weapon Proficiency Dialog')
+      tooltip-delayed: true
+      @onClick: modules.game_proficiency.requestOpenWindow()
+      $hover !pressed:
+        image-clip: 0 0 27 27
+      $pressed:
+        image-clip: 0 27 27 27
 
 TopStatsBarParallelOnBottom < UIWidget
   StatsBarBottomWithShrink
@@ -1067,6 +1259,37 @@ TopStatsBarParallelOnBottom < UIWidget
     size: 103 14
     layout:
       type: horizontalBox
+
+  Panel
+    id: proficiencyPanel
+    size: 15 15
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 4
+    UIWidget
+      id: highlightProficiencyButton
+      size: 15 15
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: -1
+      margin-left: -1
+      visible: false
+      phantom: true
+      image-source: /images/game/topbar/highlight-proficiency-button
+    UIButton
+      id: proficiencyButton
+      size: 13 13
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-button
+      image-clip: 0 0 13 13
+      !tooltip: tr('Open Weapon Proficiency Dialog')
+      tooltip-delayed: true
+      @onClick: modules.game_proficiency.requestOpenWindow()
+      $hover !pressed:
+        image-clip: 0 0 13 13
+      $pressed:
+        image-clip: 0 13 13 13
 
 TopStatsBarDefaultOnBottom < UIWidget
   StatsBarBottomWithShrink
@@ -1129,6 +1352,74 @@ TopStatsBarDefaultOnBottom < UIWidget
     layout:
       type: horizontalBox
 
+  UIButton
+    id: proficiencyButton
+    size: 13 13
+    anchors.top: proficiencyPanel.top
+    anchors.right: proficiencyPanel.left
+    margin-right: 3
+    image-source: /images/game/topbar/proficiency-button
+    image-clip: 0 0 13 13
+    !tooltip: tr('Open Weapon Proficiency Dialog')
+    tooltip-delayed: true
+    @onClick: modules.game_proficiency.requestOpenWindow()
+    $hover !pressed:
+      image-clip: 0 0 13 13
+    $pressed:
+      image-clip: 0 13 13 13
+  UIWidget
+    id: highlightProficiencyButton
+    size: 15 15
+    anchors.top: prev.top
+    anchors.left: prev.left
+    margin-top: -1
+    margin-left: -1
+    visible: false
+    phantom: true
+    image-source: /images/game/topbar/highlight-proficiency-button
+
+  Panel
+    id: proficiencyPanel
+    size: 103 13
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 8
+    UIWidget
+      id: proficiencyBg
+      size: 100 13
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-bg
+      !tooltip: tr('Proficiency Progress: 0 / 1750')
+      tooltip-delayed: true
+      ProgressBarSD
+        id: starProgress
+        anchors.fill: parent
+        image-source: /images/game/proficiency/proficiency-progress
+        margin: 1 1 1 1
+        percent: 0
+      Label
+        id: proficiencyLabel
+        anchors.fill: parent
+        text-align: center
+        text-auto-resize: true
+        font: Verdana Bold-11px
+        color: #f4f4f4
+        text: 0%
+        phantom: true
+    UIWidget
+      id: proficiencyIcon
+      anchors.top: parent.top
+      anchors.right: prev.right
+      size: 9 11
+      margin-top: 1
+      margin-right: -4
+      phantom: true
+      on: false
+      image-source: /images/game/topbar/icon-proficiencytree-off
+      $on:
+        image-source: /images/game/topbar/icon-proficiencytree-on
+
 TopStatsBarCompactOnBottom < UIWidget
   StatsBarBottomWithShrink
     anchors.fill: parent
@@ -1149,13 +1440,13 @@ TopStatsBarCompactOnBottom < UIWidget
     id: health
     anchors.top: icons.top
     anchors.left: parent.left
-    anchors.right: icons.left
+    anchors.right: proficiencyPanel.left
     !statsbar-type: 'health'
     !statsbar-size: 'small'
     !statsbar-orientation: 'horizontal'
     statsbar-text: true
     margin-left: 7
-    margin-right: 7
+    margin-right: 6
     height: 14
 
   StatsBarUp
@@ -1193,3 +1484,34 @@ TopStatsBarCompactOnBottom < UIWidget
     margin-top: 6
     margin-right: 6
     height: 0
+
+  Panel
+    id: proficiencyPanel
+    size: 15 15
+    anchors.top: icons.top
+    anchors.right: icons.left
+    margin-right: 4
+    UIWidget
+      id: highlightProficiencyButton
+      size: 15 15
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: -1
+      margin-left: -1
+      visible: false
+      phantom: true
+      image-source: /images/game/topbar/highlight-proficiency-button
+    UIButton
+      id: proficiencyButton
+      size: 13 13
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/game/topbar/proficiency-button
+      image-clip: 0 0 13 13
+      !tooltip: tr('Open Weapon Proficiency Dialog')
+      tooltip-delayed: true
+      @onClick: modules.game_proficiency.requestOpenWindow()
+      $hover !pressed:
+        image-clip: 0 0 13 13
+      $pressed:
+        image-clip: 0 13 13 13

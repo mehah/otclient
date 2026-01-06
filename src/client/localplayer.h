@@ -45,6 +45,9 @@ public:
     void setExperience(uint64_t experience);
     void setLevel(uint16_t level, uint8_t levelPercent);
     void setMana(uint32_t mana, uint32_t maxMana);
+    void setHarmony(uint8_t harmony, uint8_t maxHarmony = 5);
+    void setVirtue(uint8_t virtue);
+    void setIsSerene(bool serene);
     void setManaShield(uint32_t manaShield, uint32_t maxManaShield);
     void setMagicLevel(uint16_t magicLevel, uint16_t magicLevelPercent);
     void setBaseMagicLevel(uint16_t baseMagicLevel);
@@ -98,6 +101,10 @@ public:
     uint32_t getHealth() { return m_health; }
     uint32_t getMaxHealth() { return m_maxHealth; }
     uint64_t getExperience() { return m_experience; }
+    uint8_t getHarmony() { return m_harmony; }
+    uint8_t getMaxHarmony() { return m_maxHarmony; }
+    uint8_t getVirtue() { return m_virtue; }
+    bool getIsSerene() const { return m_isSerene; }
 
     const std::vector<uint16_t>& getSpells() { return m_spells; }
     ItemPtr getInventoryItem(const Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
@@ -214,6 +221,10 @@ private:
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
     uint16_t m_storeExpBoostTime{ 0 };
+    uint8_t m_harmony{ 0 };
+    uint8_t m_maxHarmony{ 0 };
+    uint8_t m_virtue{ 0 };
+    bool m_isSerene{ false };
 
     uint8_t m_attackElement{ 0 };
     uint8_t m_convertedElement{ 0 };

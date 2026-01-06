@@ -27,7 +27,13 @@
 
 #include "framework/core/declarations.h"
 
- //@bindsingleton g_game
+struct WeaponProficiencyPerk
+{
+    uint8_t level;
+    uint8_t perk;
+};
+
+//@bindsingleton g_game
 class Game
 {
 public:
@@ -108,7 +114,7 @@ protected:
                                 const std::vector<std::tuple<uint16_t, std::string>>& shaderList);
 
     // npc trade
-    static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items);
+    static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items, uint16_t currency, std::string currencyName);
     static void processPlayerGoods(uint64_t money, const std::vector<std::tuple<ItemPtr, uint16_t>>& goods);
     static void processCloseNpcTrade();
 
@@ -153,6 +159,11 @@ protected:
     static void processUpdateBestiaryCharmsData(const BestiaryCharmsData& charmData);
     static void processBosstiaryInfo(const std::vector<BosstiaryData>& boss);
     static void processBosstiarySlots(const BosstiarySlotsData& data);
+
+    // exaltation forge
+    static void processOpenExaltationForge(const ForgeOpenData& data);
+    static void onForgeResult(const ForgeResult& data);
+    static void onForgeHistory(uint32_t currentPage, uint32_t lastPage, const std::vector<ForgeHistory>& data);
 
     friend class ProtocolGame;
     friend class Map;
@@ -303,6 +314,14 @@ public:
     void sendRequestStoreHome();
     void sendRequestStorePremiumBoost();
     void sendRequestUsefulThings(const uint8_t serviceType);
+
+    // wheel of destiny related
+    void sendOpenDestinyWheel(uint32_t playerId);
+    void sendApplyWheelPoints(const std::vector<uint16_t>& pointsInvested, uint32_t greenGemId, uint32_t redGemId, uint32_t blueGemId, uint32_t purpleGemId);
+    void sendGemAtelierAction(uint8_t action, uint8_t param1, uint16_t param2, bool param3 = false);
+
+    void sendWeaponProficiencyAction(const uint8_t proficiencyType, const uint16_t itemId = 0);
+    void sendWeaponProficiencyApply(uint16_t itemId, const std::map<uint8_t, uint8_t>& perks);
     void sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType);
     void sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType);
     void openStore(uint8_t serviceType = 0, std::string_view category = "");
@@ -382,6 +401,8 @@ public:
     void clearImbuement(uint8_t slot);
     void closeImbuingWindow();
     void imbuementDurations(bool isOpen = false);
+    void selectImbuementItem(uint16_t itemId, const Position& pos, uint8_t stackpos);
+    void selectImbuementScroll();
 
     void enableTileThingLuaCallback(const bool value) { m_tileThingsLuaCallback = value; }
     bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
@@ -405,13 +426,15 @@ public:
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
 
+    void requestRewardChestCollect(const Position& pos, const uint16_t itemId, const uint8_t stackpos);
+
     void sendGmTeleport(const Position& pos);
 
     // cyclopedia related
     void inspectionNormalObject(const Position& position);
     void inspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
     void requestBestiary();
-    void requestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
+    void requestBestiaryOverview(std::string_view catName);
     void requestBestiarySearch(uint16_t raceId);
     void requestSendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void requestSendCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage = 0, uint16_t page = 0);
@@ -427,6 +450,12 @@ public:
     void processCyclopediaCharacterOffenceStats(const CyclopediaCharacterOffenceStats& data);
     void processCyclopediaCharacterDefenceStats(const CyclopediaCharacterDefenceStats& data);
     void processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStats& data);
+
+    // exaltation forge related
+    void sendForgeAction(Otc::ForgeActions_t forgeAction, bool convergence, uint16_t itemid1, uint8_t tier, uint16_t itemid2, bool usedCore = false, bool reduceTierLoss = false);
+    void sendResourceBalance();
+    void sendForgeHistory(uint32_t pageId);
+    void parseItemClasses(const ForgeData& forgeData);
 
     void updateMapLatency() {
         if (!m_mapUpdateTimer.first) {

@@ -1,108 +1,239 @@
 UIWidget
   anchors.fill: parent
   visible: false
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
+
+  ScrollablePanel
+    id: scrollPanel
     anchors.top: parent.top
-
-    height: 22
-  
-    OptionCheckBox
-      id: displayNames
-      !text: tr('Display creature names')
-
-  SmallReversedQtPanel
     anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-  
-    OptionCheckBox
-      id: displayHealth
-      !text: tr('Display creature health bars')
+    anchors.right: scrollBar.left
+    anchors.bottom: parent.bottom
+    margin-right: 5
+    vertical-scrollbar: scrollBar
 
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-  
-    OptionCheckBox
-      id: displayMana
-      !text: tr('Display player mana bar')
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
+      height: 22
 
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
+      OptionCheckBox
+        id: displayNames
+        !text: tr('Display creature names')
 
-    $!mobile:
-      height: 0
-      margin-top: 0
-      visible: false
-  
-    OptionCheckBox
-      id: rightJoystick
-      !text: tr('Joystick in RightPanel')
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      OptionCheckBox
+        id: displayHealth
+        !text: tr('Display creature health bars')
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      OptionCheckBox
+        id: displayMana
+        !text: tr('Display player mana bar')
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
 
       $!mobile:
+        height: 0
+        margin-top: 0
         visible: false
-      
-  SmallReversedQtPanel
-    anchors.left: parent.left
+
+      OptionCheckBox
+        id: rightJoystick
+        !text: tr('Joystick in RightPanel')
+
+        $!mobile:
+          visible: false
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      height: 22
+      margin-top: 7
+
+      UIWidget
+        id: hudScaleHelp
+        size: 12 12
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 3
+        image-source: /images/skin/show-gui-help-grey
+        !tooltip: tr('Scale of the HUD elements.')
+
+      HorizontalScrollBar
+        id: hudScale
+        width: 175
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 25
+        step: 27
+        default-scroll: true
+        pixels-scroll: true
+        minimum: 0
+        maximum: 5
+        value: 0
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+      Label
+        id: hudScaleLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 17
+        @onSetup: |
+          local value = modules.client_options.getOption('hudScale')
+          self:setText(tr('HUD Scale: %d', value))
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      height: 22
+      margin-top: 7
+
+      UIWidget
+        id: creatureInformationScaleHelp
+        size: 12 12
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 3
+        image-source: /images/skin/show-gui-help-grey
+        !tooltip: tr('Scale of creature information (names and health bars).')
+
+      HorizontalScrollBar
+        id: creatureInformationScale
+        width: 175
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 25
+        step: 27
+        default-scroll: true
+        pixels-scroll: true
+        minimum: 0
+        maximum: 9
+        value: 0
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+      Label
+        id: creatureInformationScaleLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 17
+        @onSetup: |
+          local value = modules.client_options.getOption('creatureInformationScale')
+          self:setText(tr('Creature Info Scale: %d', value))
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      UIWidget
+        id: staticTextScaleHelp
+        size: 12 12
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 3
+        image-source: /images/skin/show-gui-help-grey
+        !tooltip: tr('Scale of static text messages.')
+
+      HorizontalScrollBar
+        id: staticTextScale
+        width: 175
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 25
+        step: 27
+        default-scroll: true
+        pixels-scroll: true
+        minimum: 0
+        maximum: 9
+        value: 0
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+      Label
+        id: staticTextScaleLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 17
+        @onSetup: |
+          local value = modules.client_options.getOption('staticTextScale')
+          self:setText(tr('Static Text Scale: %d', value))
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      UIWidget
+        id: animatedTextScaleHelp
+        size: 12 12
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 3
+        image-source: /images/skin/show-gui-help-grey
+        !tooltip: tr('Scale of animated text messages.')
+
+      HorizontalScrollBar
+        id: animatedTextScale
+        width: 175
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 25
+        step: 27
+        default-scroll: true
+        pixels-scroll: true
+        minimum: 0
+        maximum: 9
+        value: 0
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+      Label
+        id: animatedTextScaleLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 17
+        @onSetup: |
+          local value = modules.client_options.getOption('animatedTextScale')
+          self:setText(tr('Animated Text Scale: %d', value))
+
+  VerticalQtScrollBar
+    id: scrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
     anchors.right: parent.right
-    anchors.top: prev.bottom
-    height: 22
-    margin-top: 7
-    OptionScaleScroll
-      id: hudScale
-      anchors.fill: parent
-      &minimumScrollValue: 1
-      &maximumScrollValue: 5
-      &scrollSize: 21
-
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    height: 22
-    margin-top: 7
-    OptionScaleScroll
-      id: creatureInformationScale
-      anchors.fill: parent
-      &minimumScrollValue: 1
-      &maximumScrollValue: 9
-      &scrollSize: 21
-
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-
-    OptionScaleScroll
-      id: staticTextScale
-      anchors.fill: parent
-      &minimumScrollValue: 1
-      &maximumScrollValue: 9
-      &scrollSize: 21
-
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-
-    OptionScaleScroll
-      id: animatedTextScale
-      anchors.fill: parent
-      &minimumScrollValue: 1
-      &maximumScrollValue: 9
-      &scrollSize: 21
+    step: 28
+    pixels-scroll: true

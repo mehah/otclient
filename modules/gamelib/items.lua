@@ -75,6 +75,30 @@ function ItemsDatabase.setRarityItem(widget, item, style)
     end
 end
 
+function ItemsDatabase.clearRarityItem(widget)
+    if not widget then
+        return
+    end
+
+    -- Reset to default item image
+    widget:setImageClip(nil)
+    widget:setImageSource('/images/ui/item')
+
+    -- Clear tier widget
+    if widget.tier then
+        widget.tier:setVisible(false)
+        widget.tier:setImageClip(nil)
+    end
+
+    -- Clear charges and duration
+    if widget.charges then
+        widget.charges:setText("")
+    end
+    if widget.duration then
+        widget.duration:setText("")
+    end
+end
+
 function ItemsDatabase.getColorForRarity(rarity)
     return ItemsDatabase.rarityColors[rarity] or TextColors.white
 end

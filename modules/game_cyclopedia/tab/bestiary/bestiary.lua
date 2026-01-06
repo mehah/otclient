@@ -14,13 +14,8 @@ Cyclopedia.storedBosstiaryTrackerData = Cyclopedia.storedBosstiaryTrackerData or
 local animusMasteryPoints = 0
 
 function Cyclopedia.loadBestiaryOverview(name, creatures, animusMasteryPoints)
-    if (name == "Result" or name == "") and #creatures > 0 then
-        if #creatures == 1 then
-            g_game.requestBestiarySearch(creatures[1].id)
-            Cyclopedia.ShowBestiaryCreature()
-        else
+    if name == "Result" then
         Cyclopedia.loadBestiarySearchCreatures(creatures)
-        end
     else
         Cyclopedia.loadBestiaryCreatures(creatures)
     end
@@ -50,14 +45,6 @@ function showBestiary()
     -- This ensures Track Kills status is properly loaded from cache
     Cyclopedia.initializeTrackerData()
     Cyclopedia.ensureStoredRaceIDsPopulated()
-
-    -- Bind Enter key to search when SearchEdit is focused
-    g_keyboard.bindKeyDown('Enter', function()
-        if UI and UI:isVisible() and UI.SearchEdit:getText() ~= "" then
-            Cyclopedia.BestiarySearch()
-        end
-    end, UI.SearchEdit)
-
     
     g_game.requestBestiary()
 end
@@ -319,7 +306,7 @@ function Cyclopedia.ShowBestiaryCreatures(Category)
     UI.ListBase.CategoryList:setVisible(false)
     UI.ListBase.CreatureInfo:setVisible(false)
     UI.ListBase.CreatureList:setVisible(true)
-    g_game.requestBestiaryOverview(Category, false, {})
+    g_game.requestBestiaryOverview(Category)
 end
 
 function Cyclopedia.CreateBestiaryCategoryItem(Data)
@@ -360,15 +347,16 @@ function Cyclopedia.loadBestiarySearchCreatures(data)
     local page = 1
     Cyclopedia.Bestiary.Search[page] = {}
 
-    for i = 1, #data do
-        if (i - 1) % maxCategoriesPerPage == 0 and i > 1 then
+    for i = 0, #data do
+        if i % maxCategoriesPerPage == 0 and i > 0 then
             page = page + 1
             Cyclopedia.Bestiary.Search[page] = {}
         end
         local creature = {
             id = data[i].id,
             currentLevel = data[i].currentLevel,
-            AnimusMasteryBonus = data[i].creatureAnimusMasteryBonus or 0,
+            AnimusMasteryBonus = data[i].AnimusMasteryBonus,
+
         }
 
         table.insert(Cyclopedia.Bestiary.Search[page], creature)
@@ -420,12 +408,10 @@ end
 function Cyclopedia.BestiarySearch()
     local text = UI.SearchEdit:getText()
     local raceList = g_things.getRacesByName(text)
-    local list = {}
-    for _, race in pairs(raceList) do
-        list[#list + 1] = race.raceId
+    if #raceList > 0 then
+        g_game.requestBestiarySearch(raceList[1].raceId)
     end
 
-    g_game.requestBestiaryOverview("Result", true, list)
     UI.SearchEdit:setText("")
 end
 

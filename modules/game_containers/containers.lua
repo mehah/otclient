@@ -590,6 +590,8 @@ function sortContainerItems(container, sortMode)
         local itemWidget = container.itemsPanel:getChildById('item' .. slot)
         if itemWidget then
             itemWidget:setItem(nil)
+            -- Clear rarity, tier, charges and duration images when removing item
+            ItemsDatabase.clearRarityItem(itemWidget)
         end
     end
     

@@ -1,0 +1,233 @@
+UIWidget
+  anchors.fill: parent
+  visible: false
+
+  ScrollablePanel
+    id: scrollPanel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: scrollBar.left
+    anchors.bottom: parent.bottom
+    margin-right: 5
+    vertical-scrollbar: scrollBar
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
+      height: 22
+
+      OptionCheckBoxMarked
+        id: healthCheckBox
+        !text: tr('Health circle')
+        !tooltip: tr('Show health red circle.')
+        @onCheckChange: |
+          if self:isChecked() then
+            modules.game_healthcircle.setHealthCircle(true)
+          else
+            modules.game_healthcircle.setHealthCircle(false)
+          end
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      OptionCheckBoxMarked
+        id: manaCheckBox
+        !text: tr('Mana circle')
+        !tooltip: tr('Show mana blue circle.')
+        @onCheckChange: |
+          if self:isChecked() then
+            modules.game_healthcircle.setManaCircle(true)
+          else
+            modules.game_healthcircle.setManaCircle(false)
+          end
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      OptionCheckBoxMarked
+        id: experienceCheckBox
+        !text: tr('Experience circle')
+        !tooltip: tr('Show experience yellow circle.')
+        @onCheckChange: |
+          if self:isChecked() then
+            modules.game_healthcircle.setExpCircle(true)
+          else
+            modules.game_healthcircle.setExpCircle(false)
+          end
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      OptionCheckBoxMarked
+        id: skillCheckBox
+        !text: tr('Skill circle')
+        !tooltip: tr('Show skill purple circle.')
+        @onCheckChange: |
+          if self:isChecked() then
+            modules.game_healthcircle.setSkillCircle(true)
+          else
+            modules.game_healthcircle.setSkillCircle(false)
+          end
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 32
+
+      Label
+        !text: tr('Skill:')
+        anchors.left: parent.left
+        margin-left: 18
+        color: #c0c0c0ff
+        anchors.verticalCenter: parent.verticalCenter
+
+      QtComboBox
+        id: chooseSkillComboBox
+        width: 120
+        margin-left: 10
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        mouse-scroll: false
+        @onTextChange: modules.game_healthcircle.setSkillType(self:getCurrentOption().data)
+
+      UIWidget
+        !tooltip: tr('Choose skill to show in skill circle.')
+        image-source: /images/icons/show_gui_help_grey
+        size: 12 12
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 3
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      UIWidget
+        id: distFromCenHelp
+        size: 12 12
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 3
+        image-source: /images/skin/show-gui-help-grey
+        !tooltip: tr('Set distance from center.')
+
+      HorizontalScrollBar
+        id: distFromCenScrollbar
+        width: 175
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 25
+        step: 27
+        default-scroll: true
+        pixels-scroll: true
+        minimum: 0
+        maximum: 100
+        value: 0
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+      Label
+        id: distFromCenLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 17
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      UIWidget
+        id: opacityHelp
+        size: 12 12
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 3
+        image-source: /images/skin/show-gui-help-grey
+        !tooltip: tr('Set circle opacity.')
+
+      HorizontalScrollBar
+        id: opacityScrollbar
+        width: 175
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 25
+        step: 27
+        default-scroll: true
+        pixels-scroll: true
+        minimum: 20
+        maximum: 100
+        value: 100
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+      Label
+        id: opacityLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 17
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 32
+
+      Label
+        !text: tr('Bar Style:')
+        anchors.left: parent.left
+        margin-left: 18
+        color: #c0c0c0ff
+        anchors.verticalCenter: parent.verticalCenter
+
+      QtComboBox
+        id: chooseStatsBarPlacement
+        width: 120
+        margin-left: 10
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        mouse-scroll: false
+        @onTextChange: modules.game_topbar.updateStatsBar()
+
+      QtComboBox
+        id: chooseStatsBarDimension
+        width: 120
+        margin-left: 10
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.right: parent.right
+        anchors.left: prev.right
+        mouse-scroll: false
+        @onTextChange: modules.game_topbar.updateStatsBar()
+
+  VerticalQtScrollBar
+    id: scrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 28
+    pixels-scroll: true

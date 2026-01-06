@@ -42,19 +42,53 @@ function assignSpell(button)
     local paramLabel = ActionBarController:findWidget("#paramLabel")
     local paramText = ActionBarController:findWidget("#paramText")
     ActionBarController:findWidget("#dev"):setVisible(dev)
-    local playerVocation = translateVocation(player:getVocation())
+    
+    -- Mapeamento de vocações do servidor para IDs de classe do cliente (spells)
+    local ServerToClientVocationMap = {
+      [1]  = {4, 8},  [11] = {4, 8},   -- Knight
+      [2]  = {3, 7},  [12] = {3, 7},   -- Paladin
+      [3]  = {1, 5},  [13] = {1, 5},   -- Sorcerer
+      [4]  = {2, 6},  [14] = {2, 6},   -- Druid
+      [5]  = {9, 10}, [15] = {9, 10},  -- Monk
+    }
+    
+    local serverVocation = player:getVocation()
+    local playerVocations = ServerToClientVocationMap[serverVocation] or {}
     local playerLevel = player:getLevel()
     local spells = modules.gamelib.SpellInfo['Default']
     local defaultIconsFolder = SpelllistSettings['Default'].iconFile
-    local showAllSpells = (playerVocation == 0)
-    for spellName, spellData in pairs(spells) do
-        if showAllSpells or table.contains(spellData.vocations, playerVocation) then
+    local showAllSpells = (#playerVocations == 0)
+    
+  --  print("DEBUG: Server Vocation =", serverVocation, "Client Vocations =", table.concat(playerVocations, ","), "Level =", playerLevel)
+   -- print("DEBUG: spells table exists?", spells ~= nil, "spells count:", spells and #spells or 0)
+    
+    local spellCount = 0
+    local debugIndex = 0
+    for spellName, spellData in pairs(spells or {}) do
+        debugIndex = debugIndex + 1
+        if debugIndex <= 5 then
+         --   print("DEBUG SPELL:", spellName, "vocations:", table.concat(spellData.vocations or {}, ","))
+        end
+        
+        local canUseSpell = showAllSpells
+        if not canUseSpell and spellData.vocations then
+            for _, spellVoc in ipairs(spellData.vocations) do
+                if table.contains(playerVocations, spellVoc) then
+                    canUseSpell = true
+                    break
+                end
+            end
+        end
+        
+        if canUseSpell then
+            spellCount = spellCount + 1
             local widget = g_ui.createWidget('SpellPreview', spellList)
-            local spellId = spellData.clientId
-            local clip = Spells.getImageClip(spellId)
+            local spellDisplayName = spellData.name or spellName
+            local iconId = tonumber(spellData.clientId) or Spells.getClientId(spellDisplayName)
+            local clip = iconId and Spells.getImageClip(iconId, 'Default') or "0 0 32 32"
             radio:addWidget(widget)
             widget:setId(spellData.id)
-            widget:setText(spellName .. "\n" .. spellData.words)
+            widget:setText(spellDisplayName .. "\n" .. spellData.words)
             widget.voc = spellData.vocations
             widget.param = spellData.parameter
             widget.source = defaultIconsFolder
@@ -74,6 +108,8 @@ function assignSpell(button)
             end
         end
     end
+    
+  --  print("DEBUG: Total spells shown =", spellCount)
     local widgets = spellList:getChildren()
     table.sort(widgets, function(a, b)
         return a:getText() < b:getText()
@@ -83,12 +119,9 @@ function assignSpell(button)
     end
     if button.cache.spellData and not button.cache.isRuneSpell then
         local spellData = button.cache.spellData
-        local spellId = spellData.clientId
-        if not spellId then
-            print("Warning Spell ID not found L81 modules/game_actionbar/logics/ActionAssignmentWindows.lua")
-            return
-        end
-        local clip = Spells.getImageClip(spellId, 'Default')
+        local spellDisplayName = spellData.name or Spells.getSpellNameByWords(spellData.words)
+        local iconId = tonumber(spellData.clientId) or (spellDisplayName and Spells.getClientId(spellDisplayName))
+        local clip = iconId and Spells.getImageClip(iconId, 'Default') or "0 0 32 32"
         imageWidget:setImageSource(defaultIconsFolder)
         imageWidget:setImageClip(clip)
         paramLabel:setOn(spellData.parameter)

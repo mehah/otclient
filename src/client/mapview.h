@@ -86,6 +86,9 @@ public:
     void setDrawManaBar(const bool enable) { m_drawManaBar = enable; }
     bool isDrawingManaBar() const { return m_drawManaBar; }
 
+    void setDrawHarmony(const bool enable) { m_drawHarmony = enable; }
+    bool isDrawingHarmony() const { return m_drawHarmony; }
+
     void move(int32_t x, int32_t y);
 
     void setShader(std::string_view name, float fadein, float fadeout);
@@ -255,6 +258,7 @@ private:
     bool m_shaderSwitchDone{ true };
     bool m_drawHealthBars{ true };
     bool m_drawManaBar{ true };
+    bool m_drawHarmony{ true };
     bool m_drawNames{ true };
     bool m_smooth{ true };
     bool m_follow{ true };

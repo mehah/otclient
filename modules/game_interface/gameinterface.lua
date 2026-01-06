@@ -46,7 +46,6 @@ local mobileConfig = {
 function init()
     g_ui.importStyle('styles/countwindow')
     g_ui.importStyle('styles/countStashWindow')
-
     connect(g_game, {
         onGameStart = onGameStart,
         onGameEnd = onGameEnd,
@@ -106,8 +105,9 @@ function init()
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)
     else
-        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or modules.client_options.getOption('showLeftExtraPanel')
-        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
+       local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
+         modules.client_options.getOption('showLeftExtraPanel')
+       leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
@@ -253,8 +253,9 @@ function onGameStart()
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)
     else
-        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or modules.client_options.getOption('showLeftExtraPanel')
-        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
+	local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
+					modules.client_options.getOption('showLeftExtraPanel')
+	leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
@@ -263,6 +264,19 @@ function onGameStart()
         gameRightPanel:setMarginBottom(mobileConfig.mobileHeightShortcuts)
         gameLeftPanel:setMarginBottom(mobileConfig.mobileHeightJoystick)
     end
+
+    -- Initialize horizontal left panel based on saved option
+    showLeftHorizontalPanel(modules.client_options.getOption('showHorizontalLeftPanel'))
+
+    -- Initialize horizontal right panel based on saved option
+    showRightHorizontalPanel(modules.client_options.getOption('showHorizontalRightPanel'))
+
+    -- Auto-fit gameMainRightPanel height after all modules loaded
+    scheduleEvent(function()
+        if gameMainRightPanel and gameMainRightPanel.fitAllChildren then
+            gameMainRightPanel:fitAllChildren()
+        end
+    end, 100)
 end
 
 function onGameEnd()
@@ -609,6 +623,16 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         menu:addOption(tr('Look'), function()
             g_game.look(lookThing)
         end, shortcut)
+
+        if lookThing and not lookThing:isCreature() and not lookThing:isNotMoveable() and lookThing:isPickupable() then
+            menu:addOption(tr('Inspect'), function() g_game.inspectionNormalObject(lookThing:getPosition()) end)
+            menu:addOption(tr('Cyclopedia'),
+                function() modules.game_cyclopedia.Cyclopedia.Items.onRedirect(lookThing:getId()) end)
+            if lookThing:getProficiencyId() > 0 then
+                menu:addOption(tr('Weapon Proficiency'),
+                    function() modules.game_proficiency.requestOpenWindow(lookThing) end)
+            end
+        end
     end
 
     if not classic and not mobile then
@@ -656,6 +680,15 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end
         if useThing:isUnwrapable() then
             menu:addOption(tr('Unwrap'), onWrapItem)
+        end
+
+        local rewards = { 19250 }
+        if table.contains(rewards, useThing:getId()) then
+            menu:addOption(tr('Collect all'),
+                function()
+                    g_game.requestRewardChestCollect(useThing:getPosition(), useThing:getId(),
+                        useThing:getStackPos())
+                end)
         end
 
         if g_game.getFeature(GameBrowseField) and useThing:getPosition().x ~= 0xffff then
@@ -879,26 +912,32 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end)
     end
 
-    if g_game.getClientVersion() >= 1410 then
+ if g_game.getClientVersion() >= 1410 then
         if lookThing and not lookThing:isCreature() and not lookThing:isNotMoveable() and lookThing:isPickupable() then
             local player = g_game.getLocalPlayer()
             if player and player:isSupplyStashAvailable() then
                 local itemTier = lookThing:getTier() or 0
                 if itemTier <= 0 then
-                    menu:addSeparator()
-                    menu:addOption(tr("Stow"), function()
-                        stashItem(lookThing)
-                    end)
-                    menu:addOption(tr("Stow all items of this type"), function()
-                        g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
-                            lookThing:getStackPos(), 2)
-                    end)
-
+                    if not isGoldCoin(useThing:getId()) and useThing:isMarketable() then
+                        menu:addSeparator()
+                        menu:addOption(tr("Stow"), function()
+                            stashItem(lookThing)
+                        end)
+                        menu:addOption(tr("Stow all items of this type"), function()
+                            g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
+                                lookThing:getStackPos(), SUPPLY_STASH_ACTION_STOW_STACK)
+                        end)
+                    end
                     local isContainer = lookThing:isContainer()
                     if isContainer then
                         menu:addOption(tr('Stow container\'s content'), function()
-                            g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
-                                lookThing:getStackPos(), 1)
+                            if modules.client_options.getOption('stowContainer') then
+                                modules.game_stash.stowContainerContent(useThing, nil,
+                                    false)
+                            else
+                                g_game.stashStowItem(lookThing:getPosition(), lookThing:getId(), 0,
+                                    lookThing:getStackPos(), SUPPLY_STASH_ACTION_STOW_CONTAINER)
+                            end
                         end)
                     end
                 end
@@ -1383,7 +1422,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
     return false
 end
 
-local function handleItemInteraction(item, widget, callback)
+function handleItemInteraction(item, widget, callback)
     local count = item:getCount()
     widget.hotkeyBlock = modules.game_hotkeys.createHotkeyBlock("stackable_item_dialog")
     local itembox = widget:getChildById('item')
@@ -1445,16 +1484,39 @@ local function handleItemInteraction(item, widget, callback)
         spinbox:setValue(value)
         spinbox.onValueChange = spinBoxValueChange
     end
-
-    local okButton = widget:getChildById('buttonOk')
+  local function cleanupAndDestroy()
+ 	        -- Unbind keyboard events
+ 	        g_keyboard.unbindKeyPress('Up', spinbox)
+ 	        g_keyboard.unbindKeyPress('Down', spinbox)
+ 	        g_keyboard.unbindKeyPress('Right', spinbox)
+ 	        g_keyboard.unbindKeyPress('Left', spinbox)
+ 	        g_keyboard.unbindKeyPress('PageUp', spinbox)
+ 	        g_keyboard.unbindKeyPress('PageDown', spinbox)
+ 	
+ 	        -- Clear callbacks to release references
+			spinbox.onValueChange = nil
+ 	        scrollbar.onValueChange = nil
+ 	
+ 	        -- Re-enable hotkeys
+ 	        if widget.hotkeyBlock then
+ 	            modules.game_hotkeys.enableHotkeys(widget.hotkeyBlock)
+ 	            widget.hotkeyBlock = nil
+ 	        end
+ 	
+ 	        -- Destroy the widget
+ 	        widget:destroy()
+ 	    end
+		
+	local okButton = widget:getChildById('buttonOk')
     local moveFunc = function()
-        callback(itembox:getItemCount())
-        okButton:getParent():destroy()
+        local itemCount = itembox:getItemCount()
+        cleanupAndDestroy()
+        callback(itemCount)
         widget = nil
     end
     local cancelButton = widget:getChildById('buttonCancel')
     local cancelFunc = function()
-        cancelButton:getParent():destroy()
+        cleanupAndDestroy()
         widget = nil
     end
 
@@ -1527,8 +1589,26 @@ function getMainRightPanel()
     return gameMainRightPanel
 end
 
+function fitMainRightPanel()
+    if gameMainRightPanel and gameMainRightPanel.fitAllChildren then
+        gameMainRightPanel:fitAllChildren()
+    end
+end
+
 function getLeftPanel()
     return gameLeftPanel
+end
+
+function getContainerPanel()
+    local containerPanel = g_settings.getNumber("containerPanel")
+    if containerPanel >= 4 then
+        containerPanel = containerPanel - 4
+        return gameRightPanel:getChildByIndex(math.min(containerPanel, gameRightPanel:getChildCount()))
+    end
+    if gameLeftPanel:getChildCount() == 0 then
+        return getRightPanel()
+    end
+    return gameLeftPanel:getChildByIndex(math.min(containerPanel, gameLeftPanel:getChildCount()))
 end
 
 function getRightExtraPanel()
@@ -1592,13 +1672,27 @@ function getBottomSplitter()
 end
 
 function findContentPanelAvailable(child, minContentHeight)
+    -- Special restriction: only minimap can be placed in horizontalLeftPanel
+    local childId = child:getId()
+    local isMinimapWidget = (childId == "minimapWindow")
+
     if gameSelectedPanel and gameSelectedPanel:isVisible() and gameSelectedPanel:fits(child, minContentHeight, 0) >= 0 then
-        return gameSelectedPanel
+        -- Block non-minimap widgets from horizontalLeftPanel
+        if gameSelectedPanel:getId() == "horizontalLeftPanel" and not isMinimapWidget then
+            -- Skip this panel, will try others below
+        else
+            return gameSelectedPanel
+        end
     end
 
     for k, v in pairs(panelsList) do
         if v.panel ~= gameSelectedPanel and v.panel:isVisible() and v.panel:fits(child, minContentHeight, 0) >= 0 then
-            return v.panel
+            -- Block non-minimap widgets from horizontalLeftPanel
+            if v.panel:getId() == "horizontalLeftPanel" and not isMinimapWidget then
+                -- Skip this panel
+            else
+                return v.panel
+            end
         end
     end
 
@@ -1617,9 +1711,10 @@ function setupViewMode(mode)
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)
-    else
-        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or modules.client_options.getOption('showLeftExtraPanel')
-        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
+	else
+   local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
+				modules.client_options.getOption('showLeftExtraPanel')
+			leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
@@ -1735,6 +1830,14 @@ function onIncreaseLeftPanels()
     if not modules.client_options.getOption('showLeftExtraPanel') then
         modules.client_options.setOption('showLeftExtraPanel', true)
         leftIncreaseSidePanels:setEnabled(false)
+
+        -- Update horizontal left panel width if active
+        if modules.client_options.getOption('showHorizontalLeftPanel') then
+            addEvent(function()
+                setLeftHorizontalWidth()
+            end)
+        end
+
         -- Update action bars when left extra panel is shown
         if modules.game_actionbar and modules.game_actionbar.updateVisibleWidgetsExternal then
             addEvent(function()
@@ -1771,6 +1874,14 @@ function onDecreaseLeftPanels()
         if g_platform.isMobile() then
             leftDecreaseSidePanels:setEnabled(false)
         end
+
+        -- Update horizontal left panel width if active
+        if modules.client_options.getOption('showHorizontalLeftPanel') then
+            addEvent(function()
+                setLeftHorizontalWidth()
+            end)
+        end
+
         -- Update action bars when left extra panel is hidden
         if modules.game_actionbar and modules.game_actionbar.updateVisibleWidgetsExternal then
             addEvent(function()
@@ -1782,6 +1893,11 @@ function onDecreaseLeftPanels()
 
     if not g_platform.isMobile() then
         if modules.client_options.getOption('showLeftPanel') then
+            -- Prevent closing left panel if horizontal left panel is active
+            if modules.client_options.getOption('showHorizontalLeftPanel') then
+                return
+            end
+
             modules.client_options.setOption('showLeftPanel', false)
             movePanel(gameLeftPanel)
             leftDecreaseSidePanels:setEnabled(false)
@@ -1800,6 +1916,10 @@ function onIncreaseRightPanels()
     rightIncreaseSidePanels:setEnabled(false)
     rightDecreaseSidePanels:setEnabled(true)
     modules.client_options.setOption('showRightExtraPanel', true)
+    -- Update horizontal right panel width
+    addEvent(function()
+        setRightHorizontalWidth()
+    end)
     -- Update action bars when right extra panel is shown
     if modules.game_actionbar and modules.game_actionbar.updateVisibleWidgetsExternal then
         addEvent(function()
@@ -1813,6 +1933,10 @@ function onDecreaseRightPanels()
     rightDecreaseSidePanels:setEnabled(false)
     movePanel(gameRightExtraPanel)
     modules.client_options.setOption('showRightExtraPanel', false)
+    -- Update horizontal right panel width
+    addEvent(function()
+        setRightHorizontalWidth()
+    end)
     -- Update action bars when right extra panel is hidden
     if modules.game_actionbar and modules.game_actionbar.updateVisibleWidgetsExternal then
         addEvent(function()
@@ -1869,9 +1993,15 @@ function testExtendedView(mode)
         gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
     else
         -- Reset to normal view
-        gameMainRightPanel:setHeight(200)
+        -- gameMainRightPanel:setHeight(200)
         gameMainRightPanel:setMarginTop(0)
         gameMainRightPanel:setImageColor('white')
+        if gameMainRightPanel.fitAllChildren then
+            gameMainRightPanel:fitAllChildren()
+        else
+            -- opcional: deixa 0 e quem usa (módulos) ajusta
+            gameMainRightPanel:setHeight(0)
+        end
 
         local buttons = { leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
             leftDecreaseSidePanels }
@@ -1951,4 +2081,275 @@ function toggleFocus(value, reason)
     gameLeftPanel:setFocusable(value)
     gameRightExtraPanel:setFocusable(value)
     gameLeftExtraPanel:setFocusable(value)
+end
+
+function getHorizontalLeftPanel()
+    if not horizontalLeftPanel then
+        return createHorizontalLeftPanel()
+    end
+    return horizontalLeftPanel
+end
+
+function getHorizontalRightPanel()
+    if not horizontalRightPanel then
+        return createHorizontalRightPanel()
+    end
+    return horizontalRightPanel
+end
+
+function createHorizontalRightPanel()
+    if horizontalRightPanel then return horizontalRightPanel end
+    if not gameRootPanel then
+        return nil
+    end
+
+    -- Create the panel (GameSidePanel)
+    horizontalRightPanel = g_ui.createWidget('GameSidePanel', gameRootPanel)
+    horizontalRightPanel:setId('horizontalRightPanel')
+    horizontalRightPanel:addAnchor(AnchorRight, 'parent', AnchorRight)
+    horizontalRightPanel:addAnchor(AnchorTop, 'parent', AnchorTop)
+    horizontalRightPanel:setHeight(0)
+    horizontalRightPanel:setWidth(0)
+    horizontalRightPanel:setFocusable(false)
+    horizontalRightPanel:setVisible(true)
+    horizontalRightPanel:setPhantom(true) -- [FIX] Start as phantom when empty to allow drops through to panels below
+
+
+    return horizontalRightPanel
+end
+
+function createHorizontalLeftPanel()
+    if horizontalLeftPanel then return horizontalLeftPanel end
+    if not gameRootPanel then
+        return nil
+    end
+
+    -- Create the panel (GameSidePanel)
+    horizontalLeftPanel = g_ui.createWidget('GameSidePanel', gameRootPanel)
+    horizontalLeftPanel:setId('horizontalLeftPanel')
+    horizontalLeftPanel:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+    horizontalLeftPanel:addAnchor(AnchorTop, 'parent', AnchorTop)
+    horizontalLeftPanel:setHeight(0)
+    horizontalLeftPanel:setWidth(0)
+    horizontalLeftPanel:setFocusable(false)
+    horizontalLeftPanel:setVisible(true)
+    horizontalLeftPanel:setPhantom(true) -- [FIX] Start as phantom when empty to allow drops through to panels below
+
+
+    return horizontalLeftPanel
+end
+
+function showRightHorizontalPanel(visible)
+    -- Create panel dynamically if needed
+    local panel = horizontalRightPanel
+    if not panel then
+        panel = createHorizontalRightPanel()
+    end
+
+    if not panel then
+        return
+    end
+
+    if visible then
+        panel:setHeight(200) -- FIXED HEIGHT
+        setRightHorizontalWidth()
+
+        -- Adjust gameMainRightPanel to anchor below the horizontal panel
+        if gameMainRightPanel then
+            gameMainRightPanel:breakAnchors()
+            gameMainRightPanel:addAnchor(AnchorRight, 'parent', AnchorRight)
+            gameMainRightPanel:addAnchor(AnchorTop, 'horizontalRightPanel', AnchorBottom)
+
+            -- Auto-fit height after minimap moved to horizontal panel
+            scheduleEvent(function()
+                if gameMainRightPanel and gameMainRightPanel.fitAllChildren then
+                    gameMainRightPanel:fitAllChildren()
+                end
+            end, 50)
+        end
+
+        -- Adjust extra panel if it exists
+        if gameRightExtraPanel then
+            gameRightExtraPanel:breakAnchors()
+            gameRightExtraPanel:addAnchor(AnchorRight, 'gameRightPanel', AnchorLeft)
+            gameRightExtraPanel:addAnchor(AnchorTop, 'horizontalRightPanel', AnchorBottom)
+            gameRightExtraPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        end
+    else
+        -- Move children from horizontal panel back to main right panel before hiding
+        if panel then
+            local children = panel:getChildren()
+            for _, child in pairs(children) do
+                if child and gameMainRightPanel then
+                    child:setParent(gameMainRightPanel)
+                    gameMainRightPanel:moveChildToIndex(child, 1)
+                end
+            end
+        end
+
+        -- Notify minimap to return to main panel with default height
+        if modules.game_minimap and modules.game_minimap.returnToMainPanel then
+            modules.game_minimap.returnToMainPanel()
+        end
+
+        panel:setHeight(0)
+        panel:setWidth(0)
+
+        -- Restore gameMainRightPanel to anchor to parent top
+        if gameMainRightPanel then
+            gameMainRightPanel:breakAnchors()
+            gameMainRightPanel:addAnchor(AnchorRight, 'parent', AnchorRight)
+            gameMainRightPanel:addAnchor(AnchorTop, 'parent', AnchorTop)
+
+            -- Auto-fit height after children moved back
+            if gameMainRightPanel.fitAllChildren then
+                gameMainRightPanel:fitAllChildren()
+            end
+        end
+
+        -- Restore extra panel
+        if gameRightExtraPanel then
+            gameRightExtraPanel:breakAnchors()
+            gameRightExtraPanel:addAnchor(AnchorRight, 'gameRightPanel', AnchorLeft)
+            gameRightExtraPanel:addAnchor(AnchorTop, 'parent', AnchorTop)
+            gameRightExtraPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        end
+    end
+end
+
+function showLeftHorizontalPanel(visible)
+    -- Create panel dynamically if needed
+    local panel = horizontalLeftPanel
+    if not panel then
+        panel = createHorizontalLeftPanel()
+    end
+
+    if not panel then
+        return
+    end
+
+    if visible then
+        panel:setHeight(200) -- FIXED HEIGHT
+        setLeftHorizontalWidth()
+
+        -- Adjust gameLeftPanel to anchor below the horizontal panel
+        if gameLeftPanel then
+            gameLeftPanel:breakAnchors()
+            gameLeftPanel:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+            gameLeftPanel:addAnchor(AnchorTop, 'horizontalLeftPanel', AnchorBottom)
+            gameLeftPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        end
+
+        -- Adjust extra panel if it exists
+        if gameLeftExtraPanel then
+            gameLeftExtraPanel:breakAnchors()
+            gameLeftExtraPanel:addAnchor(AnchorLeft, 'gameLeftPanel', AnchorRight)
+            gameLeftExtraPanel:addAnchor(AnchorTop, 'horizontalLeftPanel', AnchorBottom)
+            gameLeftExtraPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        end
+    else
+        -- NAO move children automaticamente - deixa o minimap gerenciar sua propria posicao
+        -- Apenas esconde o panel
+
+        panel:setHeight(0)
+        panel:setWidth(0)
+
+        -- Restore gameLeftPanel to anchor to parent top
+        if gameLeftPanel then
+            gameLeftPanel:breakAnchors()
+            gameLeftPanel:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+            gameLeftPanel:addAnchor(AnchorTop, 'parent', AnchorTop)
+            gameLeftPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        end
+
+        -- Restore extra panel
+        if gameLeftExtraPanel then
+            gameLeftExtraPanel:breakAnchors()
+            gameLeftExtraPanel:addAnchor(AnchorLeft, 'gameLeftPanel', AnchorRight)
+            gameLeftExtraPanel:addAnchor(AnchorTop, 'parent', AnchorTop)
+            gameLeftExtraPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        end
+    end
+end
+
+-- Set horizontal panel width based on actual visible side panels width
+function setRightHorizontalWidth()
+    if not horizontalRightPanel then return end
+
+    -- Calculate total width based on the RIGHT side panels that exist
+    -- The horizontal panel should span the same width as the vertical panels below it
+    local totalWidth = 0
+
+    -- Get width of gameRightPanel (main right sidebar)
+    if gameRightPanel and gameRightPanel:isOn() and gameRightPanel:getWidth() > 0 then
+        totalWidth = totalWidth + gameRightPanel:getWidth()
+    end
+
+    -- Add extra panel width if visible and on
+    if gameRightExtraPanel and gameRightExtraPanel:isOn() and gameRightExtraPanel:getWidth() > 0 then
+        totalWidth = totalWidth + gameRightExtraPanel:getWidth()
+    end
+
+    -- Fallback: if no width calculated, use default
+    if totalWidth == 0 then
+        totalWidth = 178 -- default single panel width
+    end
+
+    horizontalRightPanel:setWidth(totalWidth)
+end
+
+function setLeftHorizontalWidth()
+    if not horizontalLeftPanel then return end
+
+    -- Calculate total width based on the LEFT side panels
+    local totalWidth = 0
+
+    -- Get width of gameLeftPanel (main left sidebar)
+    if gameLeftPanel and gameLeftPanel:isOn() and gameLeftPanel:getWidth() > 0 then
+        totalWidth = totalWidth + gameLeftPanel:getWidth()
+    end
+
+    -- Add extra panel width if visible and on
+    if gameLeftExtraPanel and gameLeftExtraPanel:isOn() and gameLeftExtraPanel:getWidth() > 0 then
+        totalWidth = totalWidth + gameLeftExtraPanel:getWidth()
+    end
+
+    -- Fallback: if no width calculated, use default
+    if totalWidth == 0 then
+        totalWidth = 178 -- default single panel width
+    end
+
+    horizontalLeftPanel:setWidth(totalWidth)
+
+    -- Auto-resize minimap if it's in the horizontal panel
+    local children = horizontalLeftPanel:getChildren()
+    for _, child in pairs(children) do
+        if child:getId() == "minimapWindow" then
+            child:setWidth(totalWidth)
+            break
+        end
+    end
+end
+
+-- Check if widgets overflow the horizontal panel and move them (RTC-style)
+function checkHorizontalPanel(widget)
+    if not widget then return end
+
+    local relativeHeight = 0
+    local totalHeight = widget:getHeight() + 10 -- margin de erro
+
+    local moveWidgets = {}
+    local children = widget:getChildren()
+    for _, child in pairs(children) do
+        relativeHeight = relativeHeight + child:getHeight()
+        if relativeHeight > totalHeight then
+            table.insert(moveWidgets, child)
+        end
+    end
+
+    for _, w in pairs(moveWidgets) do
+        if gameRightPanel then
+            addEvent(function() w:setParent(gameRightPanel) end)
+        end
+    end
 end

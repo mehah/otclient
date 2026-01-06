@@ -118,3 +118,9 @@ function g_game.closeContainerByItemId(itemId, tier)
     end
     return #containersToClose > 0
 end
+
+function g_game.doThing(enabled)
+    -- This function is used to enable/disable automatic actions
+    -- It's a placeholder that can be extended if needed
+    -- For now, it's just a no-op function to prevent errors
+end

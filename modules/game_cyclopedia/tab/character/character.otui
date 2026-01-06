@@ -1321,7 +1321,7 @@ UIWidget
       anchors.right: parent.right
       image-source: /images/ui/2pixel_up_frame_borderimage
       image-border: 5
-      CheckBoxCircle
+      CheckBox
         id: inventory
         width: 85
         text: Inventory
@@ -1332,7 +1332,7 @@ UIWidget
         margin-left: 8
         margin-top: 8
         @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
-      CheckBoxCircle
+      CheckBox
         id: depot
         width: 85
         text: Depot
@@ -1342,7 +1342,7 @@ UIWidget
         anchors.left: inventory.right
         margin-left: 10
         @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
-      CheckBoxCircle
+      CheckBox
         id: stash
         width: 100
         text: Supply Stash
@@ -1352,7 +1352,7 @@ UIWidget
         anchors.left: depot.left
         margin-top: 8
         @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
-      CheckBoxCircle
+      CheckBox
         id: inbox
         width: 100
         text: Inbox
@@ -1362,7 +1362,7 @@ UIWidget
         anchors.left: depot.right
         margin-left: 30
         @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
-      CheckBoxCircle
+      CheckBox
         id: store
         width: 100
         text: Store Inbox
@@ -1444,6 +1444,7 @@ UIWidget
         text: Mounts
         color: #C0C0C0
         text-offset: 15 0
+        margin-bottom: 3
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: outfits.right
         @onClick: modules.game_cyclopedia.Cyclopedia.characterAppearancesFilter(self)
@@ -1454,6 +1455,7 @@ UIWidget
         color: #C0C0C0
         text-offset: 15 0
         anchors.verticalCenter: parent.verticalCenter
+        margin-bottom: 3
         anchors.left: mounts.right
         @onClick: modules.game_cyclopedia.Cyclopedia.characterAppearancesFilter(self)
       ComboBox

@@ -25,6 +25,7 @@
 #include "game.h"
 #include "item.h"
 #include "framework/luaengine/luainterface.h"
+#include <unordered_map>
 
 int push_luavalue(const Outfit& outfit)
 {
@@ -307,6 +308,8 @@ int push_luavalue(const Imbuement& i)
     g_lua.setField("successRate");
     g_lua.pushInteger(i.protectionCost);
     g_lua.setField("protectionCost");
+    g_lua.pushInteger(i.tier);
+    g_lua.setField("tier");
     return 1;
 }
 
@@ -1604,6 +1607,106 @@ int push_luavalue(const ForgeOpenData& data) {
     return 1;
 }
 
+int push_luavalue(const ForgeResult& data)
+{
+    g_lua.createTable(0, 11);
+
+    g_lua.pushInteger(data.actionType);  g_lua.setField("actionType");
+    g_lua.pushInteger(data.convergence); g_lua.setField("convergence");
+    g_lua.pushInteger(data.success);     g_lua.setField("success");
+
+    g_lua.pushInteger(data.leftItemId);  g_lua.setField("leftItemId");
+    g_lua.pushInteger(data.leftTier);    g_lua.setField("leftTier");
+
+    g_lua.pushInteger(data.rightItemId); g_lua.setField("rightItemId");
+    g_lua.pushInteger(data.rightTier);   g_lua.setField("rightTier");
+
+    g_lua.pushInteger(data.bonus);       g_lua.setField("bonus");
+    g_lua.pushInteger(data.coreCount);   g_lua.setField("coreCount");
+    g_lua.pushInteger(data.extraItemId); g_lua.setField("extraItemId");
+    g_lua.pushInteger(data.extraTier);   g_lua.setField("extraTier");
+
+    return 1;
+}
+
+int push_luavalue(const ForgeHistory& data)
+{
+    g_lua.createTable(0, 4);
+    g_lua.pushString(data.date);
+    g_lua.setField("date");
+    g_lua.pushString(data.action);
+    g_lua.setField("action");
+    g_lua.pushString(data.details);
+    g_lua.setField("details");
+    g_lua.pushBoolean(data.bonus);
+    g_lua.setField("bonus");
+    return 1;
+}
+
+int push_luavalue(const std::vector<ForgeHistory>& data)
+{
+    g_lua.createTable(data.size(), 0);
+    for (size_t i = 0; i < data.size(); ++i) {
+        push_luavalue(data[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    return 1;
+}
+
+int push_luavalue(const ForgeData& data) {
+    g_lua.createTable(0, 5);
+
+    g_lua.createTable(0, data.classificationTable.size());
+    for (auto& [classId, tiers] : data.classificationTable) {
+        g_lua.createTable(0, tiers.size());
+        for (auto& [tierId, cost] : tiers) {
+            g_lua.pushInteger(cost);
+            g_lua.setField(std::to_string(tierId));
+        }
+        g_lua.setField(std::to_string(classId));
+    }
+    g_lua.setField("classificationTable");
+
+    g_lua.createTable(0, data.exaltedCores.size());
+    for (auto& [tier, cores] : data.exaltedCores) {
+        g_lua.pushInteger(cores);
+        g_lua.setField(std::to_string(tier));
+    }
+    g_lua.setField("exaltedCores");
+
+    g_lua.createTable(0, data.convergenceFusion.size());
+    for (auto& [tier, price] : data.convergenceFusion) {
+        g_lua.pushInteger(price);
+        g_lua.setField(std::to_string(tier));
+    }
+    g_lua.setField("convergenceFusion");
+
+    g_lua.createTable(0, data.convergenceTransfer.size());
+    for (auto& [tier, price] : data.convergenceTransfer) {
+        g_lua.pushInteger(price);
+        g_lua.setField(std::to_string(tier));
+    }
+    g_lua.setField("convergenceTransfer");
+
+    g_lua.createTable(0, 13);
+    g_lua.pushInteger(data.config.dustPercent); g_lua.setField("dustPercent");
+    g_lua.pushInteger(data.config.dustToSliver); g_lua.setField("dustToSliver");
+    g_lua.pushInteger(data.config.sliverToCore); g_lua.setField("sliverToCore");
+    g_lua.pushInteger(data.config.dustPercentUpgrade); g_lua.setField("dustPercentUpgrade");
+    g_lua.pushInteger(data.config.maxDust); g_lua.setField("maxDust");
+    g_lua.pushInteger(data.config.maxDustCap); g_lua.setField("maxDustCap");
+    g_lua.pushInteger(data.config.dustNormalFusion); g_lua.setField("dustNormalFusion");
+    g_lua.pushInteger(data.config.dustConvergenceFusion); g_lua.setField("dustConvergenceFusion");
+    g_lua.pushInteger(data.config.dustNormalTransfer); g_lua.setField("dustNormalTransfer");
+    g_lua.pushInteger(data.config.dustConvergenceTransfer); g_lua.setField("dustConvergenceTransfer");
+    g_lua.pushInteger(data.config.baseChance); g_lua.setField("baseChance");
+    g_lua.pushInteger(data.config.improvedChance); g_lua.setField("improvedChance");
+    g_lua.pushInteger(data.config.tierLossReduction); g_lua.setField("tierLossReduction");
+    g_lua.setField("config");
+
+    return 1;
+}
+
 // Custom structs implementations
 int push_luavalue(const BossCooldownData& data) {
     g_lua.createTable(0, 2);
@@ -1611,6 +1714,26 @@ int push_luavalue(const BossCooldownData& data) {
     g_lua.setField("bossRaceId");
     g_lua.pushInteger(data.cooldownTime);
     g_lua.setField("cooldownTime");
+    return 1;
+}
+
+int push_luavalue(const WeaponProficiencyPerk& perk)
+{
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(static_cast<int>(perk.level));
+    g_lua.setField("level");
+    g_lua.pushInteger(static_cast<int>(perk.perk));
+    g_lua.setField("perk");
+    return 1;
+}
+
+int push_luavalue(const std::vector<WeaponProficiencyPerk>& perks)
+{
+    g_lua.createTable(0, perks.size());
+    for (size_t i = 0; i < perks.size(); ++i) {
+        g_lua.pushInteger(static_cast<int>(perks[i].perk));  // position (value)
+        g_lua.rawSeti(static_cast<int>(perks[i].level));    // level (key)
+    }
     return 1;
 }
 
@@ -1637,5 +1760,92 @@ int push_luavalue(const PartyMemberName& data) {
     g_lua.setField("memberID");
     g_lua.pushString(data.memberName);
     g_lua.setField("memberName");
+    return 1;
+}
+
+bool luavalue_cast(const int index, std::vector<uint16_t>& data)
+{
+    if (!g_lua.isTable(index))
+        return false;
+
+    data.clear();
+    g_lua.pushNil();
+    while (g_lua.next(index < 0 ? index - 1 : index)) {
+        if (g_lua.isNumber(-1)) {
+            data.push_back(static_cast<uint16_t>(g_lua.popInteger()));
+        } else {
+            g_lua.pop();
+        }
+    }
+    return true;
+}
+
+int push_luavalue(const std::vector<uint32_t>& data)
+{
+    g_lua.createTable(data.size(), 0);
+    for (size_t i = 0; i < data.size(); ++i) {
+        g_lua.pushInteger(data[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    return 1;
+}
+
+int push_luavalue(const std::vector<std::map<std::string, uint32_t>>& data)
+{
+    g_lua.createTable(data.size(), 0);
+    for (size_t i = 0; i < data.size(); ++i) {
+        g_lua.createTable(0, 8);
+        const auto& gem = data[i];
+        for (const auto& pair : gem) {
+            g_lua.pushString(pair.first);
+            g_lua.pushInteger(pair.second);
+            g_lua.rawSet();
+        }
+        g_lua.rawSeti(i + 1);
+    }
+    return 1;
+}
+
+int push_luavalue(const std::map<uint16_t, uint8_t>& data)
+{
+    g_lua.createTable(0, data.size());
+    for (const auto& pair : data) {
+        g_lua.pushInteger(pair.first);
+        g_lua.pushInteger(pair.second);
+        g_lua.rawSet();
+    }
+    return 1;
+}
+
+int push_luavalue(const std::map<uint8_t, uint8_t>& data)
+{
+    g_lua.createTable(0, data.size());
+    for (const auto& pair : data) {
+        g_lua.pushInteger(pair.first);
+        g_lua.pushInteger(pair.second);
+        g_lua.rawSet();
+    }
+    return 1;
+}
+
+int push_luavalue(const std::map<uint32_t, Imbuement>& data)
+{
+    g_lua.createTable(0, data.size());
+    for (const auto& pair : data) {
+        g_lua.pushInteger(pair.first);
+        push_luavalue(pair.second);
+        g_lua.rawSet();
+    }
+    return 1;
+}
+
+int push_luavalue(const std::map<uint16_t, uint16_t>& data)
+{
+    g_lua.createTable(0, data.size());
+    for (const auto& pair : data) {
+        g_lua.pushInteger(pair.first);
+        g_lua.pushInteger(pair.second);
+        g_lua.rawSet();
+    }
     return 1;
 }

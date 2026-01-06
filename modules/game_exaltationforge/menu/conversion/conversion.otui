@@ -1,0 +1,237 @@
+ForgePanel < Panel
+  width: 153
+  color: #dfdfdf
+  text-align: top
+  !text: tr('Convert Dust')
+  padding-top: 21
+  image-source: /images/ui/window_new
+  image-border: 4
+  color: #BFBFBF
+  font: verdana-11px-monochrome
+  draggable: false
+
+ForgeTextWithIcon < Panel
+  Label
+    id: value
+    text: Generate 66666
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-align: center
+    text-auto-resize: true
+  UIWidget
+    id: icon
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/game/forge/icon-currency-sliver
+
+ForgeTextWithIcon2 < Panel
+  id: forgeTextWithIcon2
+  Label
+    id: value
+    text: 100
+    anchors.left: parent.left
+    text-align: left
+    text-auto-resize: true
+  UIWidget
+    id: icon
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/game/forge/icon-currency-sliver
+  Label
+    id: value2
+    text: to 101
+    anchors.left: prev.right
+    margin-left: 5
+    text-align: left
+    text-auto-resize: true
+  UIWidget
+    id: icon2
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/game/forge/icon-currency-sliver
+
+ForgeItem < Panel
+  id: forgeItem
+  size: 60 80
+  Item
+    id: item
+    size: 64 64
+    margin-left: 3
+    anchors.top: parent.top
+  UIWidget
+    id: image
+    anchors.top: prev.top
+    anchors.left: prev.left
+    image-source: /images/game/forge/dust
+    size: 64 64
+  Panel
+    id: countPanel
+    image-source: /images/ui/item
+    image-border: 10
+    anchors.top: item.bottom
+    margin-top: 2
+    anchors.left: prev.left
+    anchors.right: prev.right
+    size: 86 22
+    Label
+      id: value
+      text: 100
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-right: 5
+      text-align: center
+      text-auto-resize: true
+    UIWidget
+      id: icon
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      margin-left: 5
+      image-source: /images/game/forge/icon-currency-sliver
+
+ConversionWindow < Panel
+  id: conversionWindow
+  visible: false
+  margin-top: 5
+  margin-bottom: 5
+  ForgePanel
+    id: convertDustPanel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 1
+    ForgeItem
+      id: forgeItem
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      margin-top: 10
+    UIWidget
+      id: arrowImage
+      anchors.horizontalCenter: prev.horizontalCenter
+      anchors.top: prev.bottom
+      margin-top: 18
+      image-source: /images/game/forge/icon-arrow-downlarge.png
+    Button
+      id: convertDustProcced
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: prev.horizontalCenter
+      margin-left: 2
+      size: 84 66
+      margin-top: 11
+    UIItem
+      id: rewardItem
+      anchors.horizontalCenter: prev.horizontalCenter
+      anchors.verticalCenter: prev.verticalCenter
+      size: 64 64
+      phantom: true
+    ForgeTextWithIcon
+      id: forgeTextWithIcon
+      anchors.top: convertDustProcced.bottom
+      margin-top: 5
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-right: 6
+      margin-left: 6
+      height: 15
+  ForgePanel
+    id: convertSilverPanel
+    text: Convert Silver
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.bottom: prev.bottom
+    margin-left: 5
+    ForgeItem
+      id: forgeItem
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      margin-top: 10
+    UIWidget
+      id: arrowImage
+      anchors.horizontalCenter: prev.horizontalCenter
+      anchors.top: prev.bottom
+      margin-top: 18
+      image-source: /images/game/forge/icon-arrow-downlarge.png
+    Button
+      id: silverButtonProcced
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: prev.horizontalCenter
+      margin-left: 2
+      size: 84 66
+      margin-top: 11
+    UIItem
+      id: rewardItem
+      anchors.horizontalCenter: prev.horizontalCenter
+      anchors.verticalCenter: prev.verticalCenter
+      size: 64 64
+      phantom: true	  
+    ForgeTextWithIcon
+      id: forgeTextWithIcon
+      anchors.top: prev.bottom
+      margin-top: 5
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-right: 6
+      margin-left: 6
+      height: 15
+  ForgePanel
+    id: dustLimitPanel
+    text: Increase Dust Limit
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 5
+    anchors.bottom: prev.bottom
+    ForgeItem
+      id: forgeItem
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      margin-top: 10
+    UIWidget
+      id: arrowImage
+      anchors.horizontalCenter: prev.horizontalCenter
+      anchors.top: prev.bottom
+      margin-top: 18
+      image-source: /images/game/forge/icon-arrow-downlarge.png
+    Button
+      id: DustLimitProcced
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-left: 11
+      margin-right: 10
+      height: 66
+      margin-top: 11
+    UIWidget
+      id: DustLimitButtonImage1
+      anchors.top: prev.top
+      margin-top: 5
+      anchors.left: prev.left
+      margin-left: 5
+      image-source: /images/game/forge/dust
+      size: 64 64
+      phantom: true
+    UIWidget
+      id: DustLimitButtonImage2
+      anchors.top: prev.top
+      margin-top: -10
+      anchors.left: prev.left
+      margin-left: 60
+      image-source: /images/game/forge/dust
+      size: 64 64	  
+      phantom: true
+    Label
+      anchors.horizontalCenter: DustLimitProcced.horizontalCenter
+      anchors.top: DustLimitProcced.bottom
+      margin-top: 3
+      text: Raise limit from
+    ForgeTextWithIcon2
+      id:  ForgeTextWithIcon2
+      anchors.top: prev.bottom
+      margin-top: 1
+      anchors.left: prev.left
+      anchors.right: parent.right
+      margin-right: 6
+      height: 15

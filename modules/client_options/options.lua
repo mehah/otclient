@@ -457,12 +457,14 @@ function show()
     controller.ui:show()
     controller.ui:raise()
     controller.ui:focus()
+    startFpsUpdate()
 end
 
 function hide()
     -- Save all settings when closing the options window
     g_settings.save()
     controller.ui:hide()
+    stopFpsUpdate()
 end
 
 function saveOptions()
@@ -792,4 +794,27 @@ function openOptionsCategory(category, subcategory)
         end
     end
     return false
+end
+
+function updateCurrentFps()
+    if panels.graphicsPanel then
+        local currentFpsLabel = panels.graphicsPanel:recursiveGetChildById('currentFpsLabel')
+        if currentFpsLabel then
+            local fps = g_app.getFps()
+            currentFpsLabel:setText(tr('Current Frame Rate: %d fps', fps))
+        end
+    end
+end
+
+function startFpsUpdate()
+    if not fpsUpdateEvent then
+        fpsUpdateEvent = cycleEvent(updateCurrentFps, 500)
+    end
+end
+
+function stopFpsUpdate()
+    if fpsUpdateEvent then
+        removeEvent(fpsUpdateEvent)
+        fpsUpdateEvent = nil
+    end
 end

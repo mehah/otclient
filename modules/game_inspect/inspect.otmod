@@ -1,0 +1,8 @@
+Module
+  name: game_inspect
+  description: Game Inspect
+  author: R!ck && ZLukSrT#8740 && Christianlb
+  sandboxed: true
+  scripts: [ inspect ]
+  @onLoad: init()
+  @onUnload: terminate()

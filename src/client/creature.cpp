@@ -198,7 +198,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         p.scale(g_app.getCreatureInformationScale());
     }
 
-    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
+    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 31, 4);
     auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
 
     if (!isScaled) {
@@ -217,10 +217,15 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     if (backgroundRect.bottom() == parentRect.bottom())
         textRect.moveTop(backgroundRect.top() - offset);
 
-    // health rect is based on background rect, so no worries
-    Rect healthRect = backgroundRect.expanded(-1);
-    healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
+    const int innerBarWidth = std::max<int>(1, backgroundRect.width() - 2);
+    const auto computeBarWidth = [innerBarWidth](const double ratio) {
+        const double clampedRatio = std::clamp(ratio, 0.0, 1.0);
+        return static_cast<int>(std::round(clampedRatio * innerBarWidth));
+    };
+
+    Rect healthRect = backgroundRect.expanded(-1);
+    healthRect.setWidth(computeBarWidth(m_healthPercent / 100.0));
     Rect barsRect = backgroundRect;
 
     if ((drawFlags & Otc::DrawBars) && (g_game.getClientVersion() >= 1100 ? !isNpc() : true)) {
@@ -242,12 +247,49 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
 
                 barsRect.moveTop(barsRect.bottom());
                 g_drawPool.addFilledRect(barsRect, Color::black);
+                backgroundRect.moveTop(backgroundRect.bottom());
 
-                Rect manaRect = barsRect.expanded(-1);
+                g_drawPool.addFilledRect(backgroundRect, Color::black);
+
+                Rect manaRect = backgroundRect.expanded(-1);
                 const double maxMana = player->getMaxMana();
-                manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
+                const double manaRatio = maxMana > 0.0 ? static_cast<double>(player->getMana()) / maxMana : 1.0;
+                manaRect.setWidth(computeBarWidth(manaRatio));
 
                 g_drawPool.addFilledRect(manaRect, Color::blue);
+            }
+        }
+        if (drawFlags & Otc::DrawHarmony && isLocalPlayer()) {
+            if (const auto& player = g_game.getLocalPlayer()) {
+                const uint8_t vocationId = player->getVocation();
+                if (vocationId == 5 || vocationId == 15) { // monk note todo use const Otc:: ( protobuf ? )
+                    // Harmony
+                    backgroundRect.moveTop(backgroundRect.bottom());
+                    g_drawPool.addFilledRect(backgroundRect, Color::black);
+                    constexpr int harmonySlots = 5;
+                    const auto filledHarmony = std::min<int>(player->getHarmony(), harmonySlots);
+                    for (int i = 0; i < harmonySlots; i++) {
+                        Rect subBarRect = backgroundRect.expanded(-1);
+                        subBarRect.setX(backgroundRect.x() + 1 + i * (5 + 1));
+                        subBarRect.setWidth(5);
+                        Color subBarColor;
+                        if (i < filledHarmony) {
+                            subBarColor = Color(0xFF, 0x98, 0x54);
+                        } else {
+                            subBarColor = Color(64, 64, 64);
+                        }
+                        g_drawPool.addFilledRect(subBarRect, subBarColor);
+                    }
+                    // Serene
+                    backgroundRect.moveTop(backgroundRect.bottom());
+                    Rect sereneBackgroundRect(backgroundRect.center().x - (11 / 2) - 1, backgroundRect.y(), 11 + 2, backgroundRect.height() - 2 + 2);
+                    g_drawPool.addFilledRect(sereneBackgroundRect, Color::black);
+                    Color sereneColor = player->getIsSerene() ? Color(0xD4, 0x37, 0xFF) : Color(64, 64, 64);
+                    Rect sereneSubBarRect = sereneBackgroundRect.expanded(-1);
+                    sereneSubBarRect.setWidth(11);
+                    sereneSubBarRect.setHeight(backgroundRect.height() - 2);
+                    g_drawPool.addFilledRect(sereneSubBarRect, sereneColor);
+                }
             }
         }
 

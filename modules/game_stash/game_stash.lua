@@ -7,6 +7,20 @@ stashItems = {}
 
 function resetSelectAmount()
     if stashSelectAmount then
+        -- Unbind keyboard events before destroy
+        g_keyboard.unbindKeyPress('Up', stashSelectAmount)
+        g_keyboard.unbindKeyPress('Down', stashSelectAmount)
+        g_keyboard.unbindKeyPress('Right', stashSelectAmount)
+        g_keyboard.unbindKeyPress('Left', stashSelectAmount)
+        g_keyboard.unbindKeyPress('PageUp', stashSelectAmount)
+        g_keyboard.unbindKeyPress('PageDown', stashSelectAmount)
+
+        -- Clear scrollbar callback
+        local scrollbar = stashSelectAmount:getChildById('countScrollBar')
+        if scrollbar then
+            scrollbar.onValueChange = nil
+        end
+
         stashSelectAmount:destroy()
         stashSelectAmount = nil
     end

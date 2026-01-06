@@ -6,64 +6,168 @@ UIWidget
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: parent.top
+    height: 66
 
-    height: 60
-  
-    OptionCheckBox
-      id: enableLights
-      !text: tr('Enable lights')
+    Panel
+      id: lightsToggleRow
+      height: 22
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
 
-    OptionScaleScroll
-      id: ambientLight
-      anchors.top: prev.bottom
-      &minimumScrollValue: 0
-      &maximumScrollValue: 100
-      &scrollSize: 21
-      @onSetup: |
-        local value = modules.client_options.getOption('ambientLight')
-        self:setText(string.format('Ambient light: %s%%', value))
+      OptionCheckBox
+        id: enableLights
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 12
+        !text: tr('Enable lights')
 
-    OptionScaleScroll
-      id: shadowFloorIntensity
-      anchors.top: prev.bottom
-      &minimumScrollValue: 0
-      &maximumScrollValue: 100
-      &scrollSize: 21
-      @onSetup: |
-        local value = modules.client_options.getOption('shadowFloorIntensity')
-        self:setText(string.format('Floor Shadowing Intensity: %s%%', value))
+    Panel
+      id: ambientRow
+      height: 22
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: lightsToggleRow.bottom
 
-    OptionScaleScroll
-      id: floorFading
-      anchors.top: prev.bottom
-      &minimumScrollValue: 0
-      &maximumScrollValue: 1000
-      &scrollSize: 21
-      @onSetup: |
-        local value = modules.client_options.getOption('floorFading')
-        self:setText(tr('Floor Fading: %s ms', value))
+      Label
+        id: ambientLightLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 17
+        $disabled:
+          color: #707070
+        @onSetup: |
+          local value = modules.client_options.getOption('ambientLight')
+          if value <= 0 or value > 100 then
+            self:setText(tr('Ambient Light: max'))
+          else
+            self:setText(tr('Ambient Light: %d', value))
+          end
+
+      HorizontalScrollBar
+        id: ambientLight
+        width: 175
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 25
+        step: 27
+        pixels-scroll: true
+        value: 100
+        minimum: 0
+        maximum: 100
+        default-scroll: true
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+    Panel
+      id: shadowRow
+      height: 22
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: ambientRow.bottom
+
+      Label
+        id: shadowFloorIntensityLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 17
+        $disabled:
+          color: #707070
+        @onSetup: |
+          local value = modules.client_options.getOption('shadowFloorIntensity')
+          if value <= 0 or value > 100 then
+            self:setText(tr('Shadow Floor Intensity: max'))
+          else
+            self:setText(tr('Shadow Floor Intensity: %d', value))
+          end
+
+      HorizontalScrollBar
+        id: shadowFloorIntensity
+        width: 175
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 25
+        step: 27
+        pixels-scroll: true
+        value: 100
+        minimum: 30
+        maximum: 100
+        default-scroll: true
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
 
   SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 7
-    height: 32
-  
-    Label
-      !text: 'Floor View Mode:'
-      anchors.left: parent.left
-      margin-left: 18
-      color: #c0c0c0ff
-      anchors.verticalCenter: parent.verticalCenter
+    height: 50
 
-    QtComboBox
-      id: floorViewMode
-      width: 180
-      margin-left: 10
-      anchors.verticalCenter: prev.verticalCenter
-      anchors.left: prev.right
-      mouse-scroll: false
+    Panel
+      id: floorViewModeRow
+      height: 22
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
+
+      Label
+        id: floorViewModeLabel
+        !text: 'Floor View Mode:'
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 18
+        color: #c0c0c0ff
+
+      QtComboBox
+        id: floorViewMode
+        width: 175
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 25
+        mouse-scroll: false
+
+    Panel
+      id: floorFadingRow
+      height: 22
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: floorViewModeRow.bottom
+
+      Label
+        id: floorFadingLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 17
+        $disabled:
+          color: #707070
+        @onSetup: |
+          local value = modules.client_options.getOption('floorFading')
+          if value <= 0 or value > 1000 then
+            self:setText(tr('Floor Fading: max'))
+          else
+            self:setText(tr('Floor Fading: %d ms', value))
+          end
+
+      HorizontalScrollBar
+        id: floorFading
+        width: 175
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 25
+        step: 27
+        pixels-scroll: true
+        value: 500
+        minimum: 0
+        maximum: 1000
+        default-scroll: true
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
 
   SmallReversedQtPanel
     anchors.left: parent.left
@@ -83,7 +187,7 @@ UIWidget
     anchors.top: prev.bottom
     margin-top: 7
     height: 22
-  
+
     OptionCheckBoxMarked
       id: limitVisibleDimension
       !text: tr('Limit Visible Dimension')
@@ -95,11 +199,11 @@ UIWidget
     anchors.top: prev.bottom
     margin-top: 7
     height: 22
-  
+
     OptionCheckBox
       id: floatingEffect
       !text: 'Draw Floating Effects'
-      
+
   SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
@@ -107,12 +211,37 @@ UIWidget
     margin-top: 7
     height: 22
 
-    OptionScaleScroll
+    Label
+      id: effectAlphaScrollLabel
+      font: Verdana Bold-11px
+      text-auto-resize: true
+      color: #c0c0c0
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 17
+      $disabled:
+        color: #707070
+      @onSetup: |
+        local value = modules.client_options.getOption('setEffectAlphaScroll')
+        if value <= 0 or value > 100 then
+          self:setText(tr('Effect Opacity: max'))
+        else
+          self:setText(tr('Effect Opacity: %d', value))
+        end
+
+    HorizontalScrollBar
       id: setEffectAlphaScroll
-      anchors.fill: parent
-      &minimumScrollValue: 10
-      &maximumScrollValue: 100
-      &scrollSize: 21
+      width: 175
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 25
+      step: 27
+      pixels-scroll: true
+      value: 100
+      minimum: 20
+      maximum: 100
+      default-scroll: true
+      @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
 
   SmallReversedQtPanel
     anchors.left: parent.left
@@ -121,9 +250,34 @@ UIWidget
     margin-top: 7
     height: 22
 
-    OptionScaleScroll
+    Label
+      id: missileAlphaScrollLabel
+      font: Verdana Bold-11px
+      text-auto-resize: true
+      color: #c0c0c0
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 17
+      $disabled:
+        color: #707070
+      @onSetup: |
+        local value = modules.client_options.getOption('setMissileAlphaScroll')
+        if value <= 0 or value > 100 then
+          self:setText(tr('Missile Opacity: max'))
+        else
+          self:setText(tr('Missile Opacity: %d', value))
+        end
+
+    HorizontalScrollBar
       id: setMissileAlphaScroll
-      anchors.fill: parent
-      &minimumScrollValue: 10
-      &maximumScrollValue: 100
-      &scrollSize: 21
+      width: 175
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 25
+      step: 27
+      pixels-scroll: true
+      value: 100
+      minimum: 20
+      maximum: 100
+      default-scroll: true
+      @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())

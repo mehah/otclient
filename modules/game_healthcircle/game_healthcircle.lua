@@ -27,8 +27,6 @@ manaShieldImageSizeThin = 0
 manaShieldCircleOffsetX = -52
 manaShieldCircleOffsetY = 7
 
-optionPanel = nil
-
 isHealthCircle = not g_settings.getBoolean('healthcircle_hpcircle')
 isManaCircle = not g_settings.getBoolean('healthcircle_mpcircle')
 isExpCircle = g_settings.getBoolean('healthcircle_expcircle')
@@ -91,11 +89,8 @@ function init()
         skillCircleFront:setVisible(false)
     end
 
-    -- Add option window in options module
-    addToOptionsModule()
-
     connect(g_game, {
-        onGameStart = setPlayerValues
+        onGameStart = onGameStart
     })
 end
 
@@ -126,13 +121,9 @@ function terminate()
     terminateOnGeometryChange()
     terminateOnLoginChange()
 
-    -- Delete from options module
-    destroyOptionsModule()
-
     disconnect(g_game, {
-        onGameStart = setPlayerValues
+        onGameStart = onGameStart
     })
-    statsBarMenuLoaded = false
 end
 
 -------------------------------------------------
@@ -656,106 +647,9 @@ function setCircleOpacity(value)
 end
 
 -------------------------------------------------
--- Option Settings--------------------------------
+-- Game Events
 -------------------------------------------------
 
-optionPanel = nil
-healthCheckBox = nil
-manaCheckBox = nil
-experienceCheckBox = nil
-skillCheckBox = nil
-chooseSkillComboBox = nil
-chooseStatsBarDimension = nil
-chooseStatsBarPlacement = nil
-distFromCenScrollbar = nil
-opacityScrollbar = nil
-
-function addToOptionsModule()
-    -- Add to options module
-    optionPanel = g_ui.loadUI('option_healthcircle', modules.client_options:getPanel())
-
-    -- UI values
-    healthCheckBox = optionPanel:recursiveGetChildById('healthCheckBox')
-    manaCheckBox = optionPanel:recursiveGetChildById('manaCheckBox')
-    experienceCheckBox = optionPanel:recursiveGetChildById('experienceCheckBox')
-    skillCheckBox = optionPanel:recursiveGetChildById('skillCheckBox')
-    chooseSkillComboBox = optionPanel:recursiveGetChildById('chooseSkillComboBox')
-    chooseStatsBarDimension = optionPanel:recursiveGetChildById('chooseStatsBarDimension')
-    chooseStatsBarPlacement = optionPanel:recursiveGetChildById('chooseStatsBarPlacement')
-    distFromCenScrollbar = optionPanel:recursiveGetChildById('distFromCenScrollbar')
-    opacityScrollbar = optionPanel:recursiveGetChildById('opacityScrollbar')
-
-    -- ComboBox start values
-    chooseSkillComboBox:addOption('Magic Level', 'magic')
-    chooseSkillComboBox:addOption('Fist Fighting', 'fist')
-    chooseSkillComboBox:addOption('Club Fighting', 'club')
-    chooseSkillComboBox:addOption('Sword Fighting', 'sword')
-    chooseSkillComboBox:addOption('Axe Fighting', 'axe')
-    chooseSkillComboBox:addOption('Distance Fighting', 'distance')
-    chooseSkillComboBox:addOption('Shielding', 'shielding')
-    chooseSkillComboBox:addOption('Fishing', 'fishing')
-
-    chooseStatsBarPlacement:addOption(tr('Top'), 'top')
-    chooseStatsBarPlacement:addOption(tr('Bottom'), 'bottom')
-
-    chooseStatsBarDimension:addOption(tr('Hide'), 'hide')
-    chooseStatsBarDimension:addOption(tr('Compact'), 'compact')
-    chooseStatsBarDimension:addOption(tr('Default'), 'default')
-    chooseStatsBarDimension:addOption(tr('Large'), 'large')
-    chooseStatsBarDimension:addOption(tr('Parallel'), 'parallel')
-
-    statsBarMenuLoaded = true
-
-    chooseStatsBarDimension:setCurrentOptionByData(g_settings.getString('statsbar_dimension'), true)
-    chooseStatsBarPlacement:setCurrentOptionByData(g_settings.getString('statsbar_placement'), true)
-
-    -- Set values
-    healthCheckBox:setChecked(isHealthCircle)
-    manaCheckBox:setChecked(isManaCircle)
-    experienceCheckBox:setChecked(isExpCircle)
-    skillCheckBox:setChecked(isSkillCircle)
-
-    -- Prevent skill overwritten before initialize
-    skillsLoaded = true
-
-    distFromCenScrollbar:setText(tr('Distance') .. ': ' .. distanceFromCenter)
-    distFromCenScrollbar:setValue(distanceFromCenter)
-    opacityScrollbar:setText(tr('Opacity') .. ': ' .. opacityCircle)
-    opacityScrollbar:setValue(opacityCircle * 100)
-    modules.client_options.addButton("Interface", "HP/MP Circle", optionPanel)
-end
-
-function updateStatsBar()
-    if statsBarMenuLoaded then
-        modules.game_interface.updateStatsBar(chooseStatsBarDimension:getCurrentOption().data,
-            chooseStatsBarPlacement:getCurrentOption().data)
-    end
-end
-
-function setPlayerValues()
-    local skillType = skillTypes[g_game.getCharacterName()]
-    if not skillType then
-        skillType = 'magic'
-    end
-    chooseSkillComboBox:setCurrentOptionByData(skillType, true)
-end
-
-function setStatsBarOption(dimension, placement)
-    chooseStatsBarDimension:setCurrentOptionByData(dimension, true)
-    chooseStatsBarPlacement:setCurrentOptionByData(placement, true)
-end
-
-function destroyOptionsModule()
-    healthCheckBox = nil
-    manaCheckBox = nil
-    experienceCheckBox = nil
-    skillCheckBox = nil
-    chooseSkillComboBox = nil
-    distFromCenScrollbar = nil
-    opacityScrollbar = nil
-    chooseStatsBarDimension = nil
-    chooseStatsBarPlacement = nil
-
-    modules.client_options.removeButton("Interface", "HP/MP Circle")
-    optionPanel = nil
+function onGameStart()
+    whenMapResizeChange()
 end

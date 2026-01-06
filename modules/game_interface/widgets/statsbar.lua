@@ -51,6 +51,7 @@ local skillsTuples = {
 }
 
 StatsBar = {}
+local lastProficiencyCache = {}
 
 function getConfigurations()
     -- This method will return all the stats bar configurations.
@@ -244,17 +245,17 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
 
     local manashield = 0
     local maxManaShield = 0
-    
+
     if player.getManaShield then
         manashield = player:getManaShield()
     end
-    
+
     if not bar.mana.defaultHeight then
         bar.mana.defaultHeight = bar.mana:getHeight()
     end
 
     bar.mana:setValue(mana, maxMana)
-    
+
     if player.getMaxManaShield then
         maxManaShield = player:getMaxManaShield()
     end
@@ -446,8 +447,9 @@ function constructStatsBar(dimension, placement)
 
         reloadSkillsTab(statsBar[dimensionOnPlacement].skills, statsBar[dimensionOnPlacement])
         StatsBar.reloadCurrentStatsBarQuickInfo()
+        StatsBar.switchCurrentLayout()
 
-        modules.game_healthcircle.setStatsBarOption()
+        modules.game_topbar.setStatsBarOption()
     else
         print("No stats bar found for:", dimensionOnPlacement .. " on constructStatsBar()")
     end
@@ -498,7 +500,7 @@ local function openDropMenu(mousePos)
     menu:addSeparator()
     menu:addOption(tr('Hide Customisable Status Bars'), function()
         StatsBar.hideAll()
-        modules.game_healthcircle.setStatsBarOption("hide")
+        modules.game_topbar.setStatsBarOption("hide")
     end)
 
     menu:display(mousePos)
@@ -621,7 +623,7 @@ end
 function StatsBar.OnGameStart()
     StatsBar.loadSettings()
     StatsBar.reloadCurrentTab()
-    modules.game_healthcircle.setStatsBarOption()
+    modules.game_topbar.setStatsBarOption()
 end
 
 function createStatsBarWidgets(statsBar)
@@ -760,6 +762,200 @@ function StatsBar.onHungryChange(regenerationTime, alert)
                 icon:destroy()
                 icon = nil
             end
+        end
+    end
+end
+
+-- Proficiency integration
+function StatsBar.switchCurrentLayout()
+    if table.empty(lastProficiencyCache) then
+        return
+    end
+
+    -- No layout large, compact e parallel, garantir que nenhum elemento de progresso seja exibido
+    if currentStats.dimension == "large" or currentStats.dimension == "compact" or currentStats.dimension == "parallel" then
+        local statsBar = StatsBar.getCurrentStatsBarWithPosition and StatsBar.getCurrentStatsBarWithPosition()
+        if statsBar then
+            local percentBar = statsBar:recursiveGetChildById('starProgress')
+            local percentLabel = statsBar:recursiveGetChildById('proficiencyLabel')
+            local proficiencyIcon = statsBar:recursiveGetChildById('proficiencyIcon')
+            local proficiencyBg = statsBar:recursiveGetChildById('proficiencyBg')
+            if percentBar then percentBar:setVisible(false) end
+            if percentLabel then percentLabel:setVisible(false) end
+            if proficiencyIcon then proficiencyIcon:setVisible(false) end
+            if proficiencyBg then proficiencyBg:setVisible(false) end
+            -- Atualizar o highlight se houver dados em cache
+            if not table.empty(lastProficiencyCache) then
+                local highlightButton = statsBar:recursiveGetChildById('highlightProficiencyButton')
+                if highlightButton then
+                    highlightButton:setVisible(lastProficiencyCache.hasUnnusedPerk)
+                end
+            end
+        end
+    end
+
+    StatsBar.onUpdateProficiencyData(lastProficiencyCache.itemCache, lastProficiencyCache.hasUnnusedPerk,
+        lastProficiencyCache.thingType)
+end
+
+function onUpdateProficiencyWidget(hidePercentBar)
+    local statsBar = StatsBar.getCurrentStatsBarWithPosition()
+    if not statsBar then return end
+
+    local statsPanel = statsBar:recursiveGetChildById('stats')
+    local proficiencyPanel = statsBar:recursiveGetChildById('proficiencyPanel')
+    local proficiencyButton = statsBar:recursiveGetChildById('proficiencyButton')
+
+    if not proficiencyPanel or not proficiencyButton then
+        return
+    end
+
+    -- No layout large, compact e parallel, apenas mostrar/ocultar o botão
+    if currentStats.dimension == "large" or currentStats.dimension == "compact" or currentStats.dimension == "parallel" then
+        proficiencyButton:setVisible(not hidePercentBar)
+        proficiencyPanel:setVisible(not hidePercentBar)
+        -- Garantir que nenhum elemento de progresso seja exibido
+        local percentBar = statsBar:recursiveGetChildById('starProgress')
+        local percentLabel = statsBar:recursiveGetChildById('proficiencyLabel')
+        local proficiencyIcon = statsBar:recursiveGetChildById('proficiencyIcon')
+        local proficiencyBg = statsBar:recursiveGetChildById('proficiencyBg')
+        if percentBar then percentBar:setVisible(false) end
+        if percentLabel then percentLabel:setVisible(false) end
+        if proficiencyIcon then proficiencyIcon:setVisible(false) end
+        if proficiencyBg then proficiencyBg:setVisible(false) end
+        -- Atualizar o highlight se houver dados em cache
+        if not table.empty(lastProficiencyCache) then
+            local highlightButton = statsBar:recursiveGetChildById('highlightProficiencyButton')
+            if highlightButton then
+                highlightButton:setVisible(lastProficiencyCache.hasUnnusedPerk)
+            end
+        end
+        return
+    end
+
+    -- Para outros layouts, atualiza o painel completo
+    if currentStats.dimension == "default" then
+        if hidePercentBar then
+            if statsPanel then
+                statsPanel:setMarginRight(45)
+            end
+            proficiencyPanel:setSize(tosize("0 13"))
+            proficiencyButton:setMarginRight(-4)
+        else
+            if statsPanel then
+                statsPanel:setMarginRight(-14)
+            end
+            proficiencyPanel:setSize(tosize("103 13"))
+            proficiencyPanel:setMarginRight(8)
+            proficiencyButton:setMarginRight(3)
+        end
+    end
+end
+
+function StatsBar.onUpdateProficiencyData(itemCache, hasUnnusedPerk, thingType)
+    local statsBar = StatsBar.getCurrentStatsBarWithPosition and StatsBar.getCurrentStatsBarWithPosition()
+    if not statsBar or not itemCache or not thingType then return end
+
+    local highlightButton = statsBar:recursiveGetChildById('highlightProficiencyButton')
+    local percentBar = statsBar:recursiveGetChildById('starProgress')
+    local percentLabel = statsBar:recursiveGetChildById('proficiencyLabel')
+    local proficiencyIcon = statsBar:recursiveGetChildById('proficiencyIcon')
+
+    -- No layout large, compact e parallel, apenas atualiza o highlight do botão e retorna imediatamente
+    if currentStats.dimension == "large" or currentStats.dimension == "compact" or currentStats.dimension == "parallel" then
+        -- Garantir que nenhum elemento de progresso seja exibido no layout large/compact
+        if percentBar then percentBar:setVisible(false) end
+        if percentLabel then percentLabel:setVisible(false) end
+        if proficiencyIcon then proficiencyIcon:setVisible(false) end
+        local proficiencyBg = statsBar:recursiveGetChildById('proficiencyBg')
+        if proficiencyBg then proficiencyBg:setVisible(false) end
+        -- Atualizar o highlight do botão
+        -- Se não encontrou na primeira busca, tentar buscar novamente
+        if not highlightButton then
+            highlightButton = statsBar:recursiveGetChildById('highlightProficiencyButton')
+        end
+        if highlightButton then
+            highlightButton:setVisible(hasUnnusedPerk)
+        end
+        if modules.game_sidebuttons and modules.game_sidebuttons.onProficiencyHighlight then
+            modules.game_sidebuttons.onProficiencyHighlight(hasUnnusedPerk)
+        end
+        lastProficiencyCache = { itemCache = itemCache, hasUnnusedPerk = hasUnnusedPerk, thingType = thingType }
+        return
+    end
+
+    -- Check if module is properly loaded and initialized
+    if not modules.game_proficiency or
+        not modules.game_proficiency.ProficiencyData or
+        type(modules.game_proficiency.ProficiencyData) ~= 'table' then
+        -- Module not loaded or not properly initialized - hide all proficiency UI elements
+        if highlightButton then highlightButton:setVisible(false) end
+        if percentBar then percentBar:setVisible(false) end
+        if percentLabel then percentLabel:setVisible(false) end
+        if proficiencyIcon then proficiencyIcon:setVisible(false) end
+        return
+    end
+
+    local proficiencyId = thingType:getProficiencyId()
+    if not proficiencyId or proficiencyId == 0 then return end
+
+    local perkCount = modules.game_proficiency.ProficiencyData:getPerkLaneCount(proficiencyId) or 0
+    if perkCount == 0 then return end
+
+    local item = Item.create(thingType:getId())
+    if not item then return end
+
+    local maxAvailableLevel = perkCount + 2
+    local weaponLevel = modules.game_proficiency.ProficiencyData:getCurrentLevelByExp(item, itemCache.exp or 0, true)
+    local nextLevel = math.min(maxAvailableLevel, weaponLevel + 1)
+    local percent = modules.game_proficiency.ProficiencyData:getLevelPercent(itemCache.exp or 0, nextLevel, item)
+    local maxLevelExperience = modules.game_proficiency.ProficiencyData:getMaxExperienceByLevel(nextLevel, item)
+
+    if percentBar then
+        percentBar:setPercent(percent)
+        percentBar:setTooltip(string.format("Proficiency Progress: %s / %s", comma_value(itemCache.exp or 0),
+            comma_value(maxLevelExperience)))
+    end
+
+    if percentLabel then
+        percentLabel:setText(percent .. "%")
+    end
+
+    if highlightButton then
+        highlightButton:setVisible(hasUnnusedPerk)
+    end
+
+    if proficiencyIcon then
+        proficiencyIcon:setOn(hasUnnusedPerk)
+    end
+
+    if modules.game_sidebuttons and modules.game_sidebuttons.onProficiencyHighlight then
+        modules.game_sidebuttons.onProficiencyHighlight(hasUnnusedPerk)
+    end
+
+    lastProficiencyCache = { itemCache = itemCache, hasUnnusedPerk = hasUnnusedPerk, thingType = thingType }
+end
+
+function StatsBar.clearProficiencyCache()
+    lastProficiencyCache = {}
+    local statsBar = StatsBar.getCurrentStatsBar and StatsBar.getCurrentStatsBar()
+    if statsBar then
+        local percentBar = statsBar:recursiveGetChildById('starProgress')
+        local percentLabel = statsBar:recursiveGetChildById('proficiencyLabel')
+        local highlightButton = statsBar:recursiveGetChildById('highlightProficiencyButton')
+        local proficiencyIcon = statsBar:recursiveGetChildById('proficiencyIcon')
+        if percentBar then
+            percentBar:setPercent(0)
+            percentBar:setTooltip("")
+        end
+        if percentLabel then
+            percentLabel:setText("0%")
+        end
+        if highlightButton then
+            highlightButton:setVisible(false)
+        end
+        if proficiencyIcon then
+            proficiencyIcon:setOn(false)
         end
     end
 end

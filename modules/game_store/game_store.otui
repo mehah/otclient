@@ -50,23 +50,29 @@ RowStore < StoreLightFlatPanel
     anchors.top: parent.top
     anchors.left: parent.left
     margin: 5 0 0 5
+    layout:
+      type: anchors
+    border-width: 0
+    background-color: #4a4a4a
+    image-source: ""
 
   Label
     id: lblName
     anchors.top: parent.top
     anchors.left: prev.right
     anchors.right: parent.right
-    margin: 8 0 0 8
+    margin: 8 8 0 8
+
     text-auto-resize: true
     text-wrap: true
   Panel
     id: StackOffers
-    margin-left: 31
+    width: 150
     height: 80
     margin-top: 12
     anchors.top: prev.bottom
-    anchors.left: image.right
     anchors.right: parent.right
+    margin-right: 5
     layout:
       type: grid
       cell-size: 145 20
@@ -93,7 +99,7 @@ MenuCategoryStore < UIWidget
     image-clip: 0 22 166 22
 
 StoreWindow
-  size: 780 537
+  size: 790 640
   !text: tr('Store')
   color: #909090
   visible: false
@@ -206,8 +212,10 @@ StoreWindow
     icon-align: center
     icon-source: images/iconTransfer
     size: 64 20
+    @onClick: modules.game_store.onGiftWindow()
 
   StoreButton
+    id: auctionCharacter
     anchors.top: transferPoints.top
     !tooltip: tr('Setup up an auction to sell you currents characters.')
     anchors.left: transferPoints.right
@@ -215,6 +223,7 @@ StoreWindow
     icon-align: center
     icon-source: images/icon-trade
     size: 64 20
+    @onClick: modules.game_store.openBaazarWindow()
 
   HorizontalSeparator
     anchors.bottom: prev.top
@@ -255,13 +264,16 @@ StoreWindow
     image-source: /game_cyclopedia/images/button_clear_search
     image-color: white
     opacity: 0.8
+    enabled: false
     @onClick: modules.game_store.search()
-    $hover:
+    $hover !disabled:
       opacity: 1.0
       image-color: white
     $pressed:
       opacity: 1.0
       image-color: gray
+    $disabled:
+      opacity: 0.5
 
   StoreLightFlatPanel
     id: panelItem
@@ -329,34 +341,99 @@ StoreWindow
 
     Box
       id: image
-      size: 96 96
+      size: 124 124      
       anchors.top: lblName.bottom
       anchors.left: scrollList.right
       margin: 8 0 0 8
+      image-source: /game_store/images/panel_container
+      image-border: 3
+      layout:
+        type: anchors
 
     Panel
-      id: StackOffers
+      id: buyButtonsPanel
       anchors.top: prev.top
       anchors.left: prev.right
       anchors.right: parent.right
       margin-left: 10
-      layout:
-        type: grid
-        cell-size: 145 50
-        cell-spacing: 3
-        flow: true
-        fit-children: true
+      size: 145 70
+      
+      StoreButton
+        id: btnBuy1
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 23
+        !text: tr('Buy')
+        font: cipsoftFont
+        image-color: #75bfff
+        visible: true
+        enabled: true
+        opacity: 1.0
 
-    StoreFlatLabel
-      id: lblDescription
+      StoreFlatPanel
+        id: lblPrice1
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 20
+        margin-top: 3
+        text-align: center
+        text-offset: -18 0
+        image-color: #1111118c
+        text: 0
+        icon: /images/ui/tibiaCoin
+        icon-align: center
+        icon-offset: 10 0
+        visible: true
+        phantom: false
+
+      StoreButton
+        id: btnBuy2
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 5
+        height: 23
+        !text: tr('Buy')
+        font: cipsoftFont
+        image-color: #75bfff
+        visible: false
+        enabled: true
+        opacity: 1.0
+
+      StoreFlatPanel
+        id: lblPrice2
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 20
+        margin-top: 3
+        text-align: center
+        text-offset: -18 0
+        image-color: #1111118c
+        text: 0
+        icon: /images/ui/tibiaCoin
+        icon-align: center
+        icon-offset: 10 0
+        visible: false
+        phantom: false
+
+    Panel
+      id: descriptionPanel
       anchors.top: image.bottom
       anchors.left: scrollList.right
       anchors.right: parent.right
       anchors.bottom: scrollList.bottom
       margin-left: 8
       margin-top: 7
-      text-auto-resize: true
-      text-wrap: true
+      image-source: /game_store/images/panel_flat
+      image-border: 1
+      padding: 5
+      
+      UIWidget
+        id: lblDescription
+        anchors.fill: parent
 
   QtPanel
     id: transferHistory

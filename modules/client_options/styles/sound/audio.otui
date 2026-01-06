@@ -1,36 +1,83 @@
 UIWidget
   anchors.fill: parent
   visible: false
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
+
+  ScrollablePanel
+    id: scrollPanel
     anchors.top: parent.top
-    height: 22
-
-    OptionCheckBox
-      id: enableAudio
-      !text: tr('Enable audio')
-
-  SmallReversedQtPanel
     anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 44
-  
-    OptionCheckBox
-      id: enableMusicSound
-      !text: tr('Enable music sound')
+    anchors.right: scrollBar.left
+    anchors.bottom: parent.bottom
+    margin-right: 5
+    vertical-scrollbar: scrollBar
 
-    OptionScaleScroll
-      id: musicSoundVolume
-      margin-top: 5
-      anchors.top: prev.bottom
+    SmallReversedQtPanel
       anchors.left: parent.left
       anchors.right: parent.right
-      &minimumScrollValue: 1
-      &maximumScrollValue: 100
-      &scrollSize: 21
-      @onSetup: |
-        local value = modules.client_options.getOption('musicSoundVolume')
-        self:setText(tr('Music volume: %d', value))
+      anchors.top: parent.top
+      height: 22
+
+      OptionCheckBox
+        id: enableAudio
+        !text: tr('Enable audio')
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      OptionCheckBox
+        id: enableMusicSound
+        !text: tr('Enable music sound')
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      UIWidget
+        id: musicSoundVolumeHelp
+        size: 12 12
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 3
+        image-source: /images/skin/show-gui-help-grey
+        !tooltip: tr('Adjust the music volume level.')
+
+      HorizontalScrollBar
+        id: musicSoundVolume
+        width: 175
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 25
+        step: 27
+        default-scroll: true
+        pixels-scroll: true
+        minimum: 0
+        maximum: 100
+        value: 0
+        @onValueChange: modules.client_options.setOption(self:getId(), self:getValue())
+
+      Label
+        id: musicSoundVolumeLabel
+        font: Verdana Bold-11px
+        text-auto-resize: true
+        color: #c0c0c0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 17
+        @onSetup: |
+          local value = modules.client_options.getOption('musicSoundVolume')
+          self:setText(tr('Music volume: %d', value))
+
+  VerticalQtScrollBar
+    id: scrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 28
+    pixels-scroll: true

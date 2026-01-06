@@ -2,7 +2,6 @@ local UI = nil
 local virtualFloor = 7
 
 function showMap()
-    g_minimap.saveOtmm('/minimap.otmm')
     UI = g_ui.loadUI("map", contentContainer)
     UI:show()
     controllerCyclopedia:registerEvents(LocalPlayer, {

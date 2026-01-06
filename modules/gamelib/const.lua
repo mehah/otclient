@@ -1,4 +1,6 @@
 -- @docconsts @{
+GOLD_COINS = 3031
+
 FloorHigher = 0
 FloorLower = 15
 
@@ -9,6 +11,17 @@ SkullWhite = 3
 SkullRed = 4
 SkullBlack = 5
 SkullOrange = 6
+
+
+WEAPON_NONE = 0
+WEAPON_SWORD = 1
+WEAPON_AXE = 2
+WEAPON_CLUB = 3
+WEAPON_FIST = 4
+WEAPON_BOW = 5
+WEAPON_CROSSBOW = 6
+WEAPON_WANDROD = 7
+WEAPON_THROW = 8
 
 ShieldNone = 0
 ShieldWhiteYellow = 1
@@ -22,6 +35,11 @@ ShieldYellowNoSharedExpBlink = 8
 ShieldBlueNoSharedExp = 9
 ShieldYellowNoSharedExp = 10
 ShieldGray = 11
+
+uint8Max = 255
+uint16Max = 65535
+uint32Max = 4294967295
+uint64Max = 18446744073709551615
 
 EmblemNone = 0
 EmblemGreen = 1
@@ -437,6 +455,8 @@ ResourceTypes = {
     LESSER_GEMS = 81,
     REGULAR_GEMS = 82,
     GREATER_GEMS = 83,
+    LESSER_FRAGMENT = 84,
+    GREATER_FRAGMENT = 85,
     WHEEL_OF_DESTINY = 86,
     COIN_NORMAL = 90,
     COIN_TRANSFERRABLE = 91,
@@ -490,3 +510,8 @@ PARTYANALYZERACTION_PRICETYPE = 1
 PARTYANALYZERACTION_PRICEVALUE = 2
 
 -- @}
+
+SUPPLY_STASH_ACTION_STOW_ITEM = 0
+SUPPLY_STASH_ACTION_STOW_CONTAINER = 1
+SUPPLY_STASH_ACTION_STOW_STACK = 2
+SUPPLY_STASH_ACTION_WITHDRAW = 3

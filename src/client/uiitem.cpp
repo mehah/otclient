@@ -55,7 +55,9 @@ void UIItem::drawSelf(const DrawPoolType drawPane)
         m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement());
         g_drawPool.releaseFrameBuffer(getPaddingRect());
 
-        if (m_font && (m_alwaysShowCount && (m_item->isStackable() || m_item->isChargeable())) && m_item->getCountOrSubType() > 1) {
+   // Modificação na linha 58 do src/client/uiitem.cpp
+if (m_font && ((m_alwaysShowCount && m_item->getCountOrSubType() > 0) || 
+((!m_alwaysShowCount) && (m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1))) {
             static constexpr Color STACK_COLOR(231, 231, 231);
             const auto& count = m_item->getCountOrSubType();
             const auto& countText = count < 1000 ? std::to_string(count) : fmt::format("{}k", count / 1000.f);

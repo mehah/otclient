@@ -205,6 +205,15 @@ function Player:hasVip(creatureName)
     return false
 end
 
+function Player:isInProtectionZone()
+    local states = self:getStates()
+    if not states then return false end
+
+    return bit.band(states, PlayerStates.Pz) ~= 0
+end
+
+
+
 function Player:isMounted()
     local outfit = self:getOutfit()
     return outfit.mount ~= nil and outfit.mount > 0

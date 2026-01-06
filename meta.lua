@@ -1213,6 +1213,11 @@ function g_game.requestQuickLootBlackWhiteList(filter, size, listedItems) end
 ---@param useMainAsFallback boolean
 function g_game.openContainerQuickLoot(action, category, pos, itemId, stackpos, useMainAsFallback) end
 
+---@param pos Position
+---@param itemId integer
+---@param stackpos integer
+function g_game.requestRewardChestCollect(pos, itemId, stackpos) end
+
 --------------------------------
 --------- g_gameConfig ---------
 --------------------------------

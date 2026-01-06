@@ -77,6 +77,8 @@ function reloadMainPanelSizes()
                         panel:setHeight(combined_height + panel.panelHeight)
                         total_height = total_height + combined_height
                     else
+                        -- When collapsed, set height to panelHeight + shrink extra
+                        panel:setHeight(panel.panelHeight + PANEL_CONSTANTS.HEIGHT_EXTRA_SHRINK)
                         total_height = total_height + PANEL_CONSTANTS.HEIGHT_EXTRA_SHRINK
                     end
                 end
@@ -85,7 +87,13 @@ function reloadMainPanelSizes()
             end
         end
     end
-    main_panel:setHeight(total_height)
+
+    -- Use fitAllChildren if available, otherwise fallback to manual height
+    if main_panel.fitAllChildren then
+        main_panel:fitAllChildren()
+    else
+        main_panel:setHeight(total_height)
+    end
     right_panel:fitAll()
 end
 
@@ -93,9 +101,17 @@ local function refreshOptionsSizes()
     if optionsShrink then
         optionsController.ui:setOn(false)
         optionsController.ui.offPanel:show()
+        -- Hide options and specials but keep store visible
+        optionsController.ui.onPanel.options:hide()
+        optionsController.ui.onPanel.specials:hide()
+        optionsController.ui.onPanel.resizer:hide()
     else
         optionsController.ui:setOn(true)
         optionsController.ui.offPanel:hide()
+        -- Show options and specials
+        optionsController.ui.onPanel.options:show()
+        optionsController.ui.onPanel.specials:show()
+        optionsController.ui.onPanel.resizer:show()
     end
     reloadMainPanelSizes()
 end
@@ -172,7 +188,7 @@ optionsController:setUI('mainoptionspanel', modules.game_interface.getMainRightP
 
 function optionsController:onInit()
     createButton_large('Store shop', tr('Store shop'), '/images/options/store_large', toggleStore,
-    false, 8)
+        false, 8)
 
     if not optionPanel then
         optionPanel = g_ui.loadUI('option_control_buttons', modules.client_options:getPanel())
@@ -181,10 +197,10 @@ function optionsController:onInit()
 end
 
 function toggleStore()
-    if  g_game.getFeature(GameIngameStore) then
+    if g_game.getFeature(GameIngameStore) then
         modules.game_store.toggle() -- cipsoft packets
     else
-        modules.game_shop.toggle() -- custom
+        modules.game_shop.toggle()  -- custom
     end
 end
 
@@ -192,7 +208,7 @@ function optionsController:onTerminate()
     if optionPanel then
         optionPanel:destroy()
         optionPanel = nil
-        modules.client_options.removeButton("Interface", "Control Buttons")  -- hot reload
+        modules.client_options.removeButton("Interface", "Control Buttons") -- hot reload
     end
     if controlButton1400 then
         controlButton1400:destroy()
@@ -233,7 +249,8 @@ function optionsController:onGameStart()
     end, 50, "onGameStart")
     if g_game.getClientVersion() >= 1400 and not controlButton1400 then
         controlButton1400 = modules.game_mainpanel.addToggleButton('controButtons', tr('Manage control buttons'),
-        '/images/options/button_control', function() modules.client_options.openOptionsCategory("Interface", "Control Buttons") end, false, 1)
+            '/images/options/button_control',
+            function() modules.client_options.openOptionsCategory("Interface", "Control Buttons") end, false, 1)
         controlButton1400:setOn(false)
     end
 end

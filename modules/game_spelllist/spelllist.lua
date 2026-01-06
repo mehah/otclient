@@ -210,9 +210,9 @@ function initializeSpelllist()
             tmpLabel:setText(spellName .. '\n\'' .. info.words .. '\'')
             tmpLabel:setPhantom(false)
 
-            local iconId = tonumber(info.clientId)
+            local iconId = tonumber(info.clientId) or Spells.getClientId(spellName)
             if not iconId then
-                perror('Spell icon \'' .. info.icon .. '\' not found.')
+                perror('Spell icon \'' .. tostring(info.icon) .. '\' not found.')
             end
 
             tmpLabel:setHeight(SpelllistSettings[SpelllistProfile].iconSize.height + 4)

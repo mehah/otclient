@@ -30,18 +30,25 @@ ActionButton < UIButton
 
     Panel
       id: gray
-      anchors.fill: parent
+      anchors.left: parent.left
+      anchors.top: parent.top
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin: -1
       image-source: /images/ui/ditherpattern
+      opacity: 0.5
       visible: false
     Label
       id: text
-      size: 30 27
+      size: 32 32
       anchors.fill: prev
       text-wrap: true
       text-align: center
       margin: 1
       font: small-9px
       phantom: true
+      image-size: 32 32
+      image-offset: 0 0
       Panel
         id: gray
         anchors.fill: parent

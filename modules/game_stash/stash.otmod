@@ -1,0 +1,10 @@
+Module
+  name: game_stash
+  description: Manages enter game and character list windows
+  author: ZLukSrT#8740
+  sandboxed: true
+  website: https://hadesot.com.br/
+  scripts: [ stash ]
+  @onLoad: init()
+  @onUnload: terminate()
+

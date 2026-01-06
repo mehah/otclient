@@ -334,6 +334,50 @@ ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const 
     return ret;
 }
 
+ThingTypeList ThingTypeManager::getProficiencyThings()
+{
+    ThingTypeList ret;
+
+    // Get all items that have market data
+    const auto& itemTypes = findThingTypeByAttr(ThingAttrMarket, ThingCategoryItem);
+
+    for (const auto& type : itemTypes) {
+        const auto& marketData = type->getMarketData();
+
+        // Check if item belongs to weapon categories used in proficiency system
+        // Based on WeaponProficiency.ItemCategory from proficiency.lua:
+        // Axes = 17, Clubs = 18, DistanceWeapons = 19, Swords = 20, WandsRods = 21, FistWeapons = 27
+        if (marketData.category == 17 ||  // ITEM_CATEGORY_AXES
+            marketData.category == 18 ||  // ITEM_CATEGORY_CLUBS  
+            marketData.category == 19 ||  // ITEM_CATEGORY_DISTANCE_WEAPONS
+            marketData.category == 20 ||  // ITEM_CATEGORY_SWORDS
+            marketData.category == 21 ||  // ITEM_CATEGORY_WANDS_RODS
+            marketData.category == 27) {  // ITEM_CATEGORY_FIST_WEAPONS
+            ret.emplace_back(type);
+        }
+    }
+
+    return ret;
+}
+
+std::string ThingTypeManager::getCyclopediaItemName(uint16_t itemId)
+{
+    const auto& thingType = getThingType(itemId, ThingCategoryItem);
+    if (!thingType) {
+        return "";
+    }
+
+    const auto& marketData = thingType->getMarketData();
+    if (!marketData.name.empty()) {
+        return marketData.name;
+    }
+
+    // Fallback: try to get name from thing type attributes
+    // This might not work depending on how names are stored in your dat file
+    return "";
+}
+
+
 const RaceType& ThingTypeManager::getRaceData(uint32_t raceId)
 {
     for (const auto& raceData : m_monsterRaces) {
@@ -597,14 +641,14 @@ void ThingTypeManager::loadXml(const std::string& file)
                         while (begin[i] <= end[i])
                             parseItemType(++begin[i], element);
                 }
-            }
         }
+    }
 
         m_xmlLoaded = true;
         g_logger.debug("items.xml read successfully.");
-    } catch (const std::exception& e) {
-        g_logger.error("Failed to load '{}' (XML file): {}", file, e.what());
-    }
+} catch (const std::exception& e) {
+    g_logger.error("Failed to load '{}' (XML file): {}", file, e.what());
+}
 }
 
 #endif

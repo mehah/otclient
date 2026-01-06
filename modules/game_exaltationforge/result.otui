@@ -1,0 +1,53 @@
+MainWindow
+  size: 400 201
+  text: Fusion Result
+  Button
+    id: close
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    size: 43 20
+    text: Close
+  HorizontalSeparator
+    id: separator
+    anchors.bottom: prev.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 10
+  Item
+    id: previewItem1
+    image-source:
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 64 64
+  Item
+    id: previewItem2
+    image-source:
+    anchors.top: parent.top
+    anchors.right: parent.right
+    size: 64 64
+  UIWidget
+    id: arrowsIcon1
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-right: 13
+    image-source: /images/game/forge/icon-arrow-rightlarge
+  UIWidget
+    id: arrowsIcon2
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/game/forge/icon-arrow-rightlarge
+  UIWidget
+    id: arrowsIcon3
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/game/forge/icon-arrow-rightlarge
+  Label
+    id: resultText
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 35
+    text: Your fussion attempt.
+    visible: false
+    text-auto-resize: true

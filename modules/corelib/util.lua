@@ -466,3 +466,36 @@ function pdumpWidgetId(widget, indent)
         pdumpWidgetId(child, newIndent)
     end
 end
+
+function comma_value(amount)
+    local formatted = tostring(amount)
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then
+            break
+        end
+    end
+    return formatted
+end
+
+function convertGold(amount, shortValue)
+    local formatType = 0
+    if shortValue and amount > 9999999999 then
+        formatType = 1
+        amount = math.floor(amount / 1000)
+    end
+
+    local formatted = tostring(amount)
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then
+            break
+        end
+    end
+
+    if formatType == 1 then
+        formatted = formatted .. " k"
+    end
+
+    return formatted
+end

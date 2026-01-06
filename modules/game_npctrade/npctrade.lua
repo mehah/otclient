@@ -1,9 +1,11 @@
 BUY = 1
 SELL = 2
 CURRENCY = 'gold'
+CURRENCYID = GOLD_COINS
 CURRENCY_DECIMAL = false
 WEIGHT_UNIT = 'oz'
 LAST_INVENTORY = 10
+SORT_BY = 'name'
 
 npcWindow = nil
 itemsPanel = nil
@@ -13,59 +15,163 @@ searchText = nil
 setupPanel = nil
 quantity = nil
 quantityScroll = nil
+amountText = nil
+idLabel = nil
 nameLabel = nil
 priceLabel = nil
+currencyMoneyLabel = nil
 moneyLabel = nil
 weightDesc = nil
 weightLabel = nil
 capacityDesc = nil
 capacityLabel = nil
 tradeButton = nil
+itemButton = nil
+headPanel = nil
+currencyItem = nil
+itemBorder = nil
+currencyLabel = nil
 buyTab = nil
 sellTab = nil
 initialized = false
 
 showWeight = true
-buyWithBackpack = nil
-ignoreCapacity = nil
-ignoreEquipped = nil
+local buyWithBackpack = false
+local ignoreCapacity = false
+local ignoreEquipped = true
 showAllItems = nil
 sellAllButton = nil
-
+sellAllWithDelayButton = nil
 playerFreeCapacity = 0
 playerMoney = 0
 tradeItems = {}
 playerItems = {}
+sellAllWhitelist = {}
 selectedItem = nil
 
 cancelNextRelease = nil
+sellAllWithDelayEvent = nil
+
+function saveData()
+    local player = g_game.getLocalPlayer()
+    if not player then return end
+
+    local file = "/characterdata/" .. player:getId() .. "/sellAllWhitelist.json"
+    local status, result = pcall(function() return json.encode(sellAllWhitelist, 2) end)
+    if not status then
+        return g_logger.error("Error while saving profile sellAllWhitelist. Data won't be saved. Details: " .. result)
+    end
+
+    if result:len() > 100 * 1024 * 1024 then
+        return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
+    end
+    g_resources.writeFileContents(file, result)
+end
+
+function loadData()
+    local player = g_game.getLocalPlayer()
+    if not player then return end
+
+    local file = "/characterdata/" .. player:getId() .. "/sellAllWhitelist.json"
+    if g_resources.fileExists(file) then
+        local status, result = pcall(function()
+            return json.decode(g_resources.readFileContents(file))
+        end)
+        if not status then
+            return g_logger.error(
+                "Error while reading profiles file. To fix this problem you can delete storage.json. Details: " .. result)
+        end
+        sellAllWhitelist = result
+    else
+        sellAllWhitelist = {}
+    end
+end
+
+function removeItemInList(clientId)
+    if type(clientId) ~= "number" then
+        return
+    end
+    if not table.contains(sellAllWhitelist, clientId) then
+        return
+    end
+    for k, v in pairs(sellAllWhitelist) do
+        if v == clientId then
+            table.remove(sellAllWhitelist, k)
+            break
+        end
+    end
+end
+
+function inWhiteList(clientId)
+    if not clientId then
+        clientId = 0
+    end
+    if not sellAllWhitelist then
+        return false
+    end
+
+    return table.contains(sellAllWhitelist, clientId)
+end
+
+function addToWhitelist(clientId)
+    if type(clientId) ~= "number" then
+        return
+    end
+
+    if table.contains(sellAllWhitelist, clientId) then
+        return
+    end
+
+    table.insert(sellAllWhitelist, clientId)
+end
+
+local function attachNpcWindow()
+    if npcWindow:getParent() then
+        return true
+    end
+
+    local panel = modules.game_interface.findContentPanelAvailable(npcWindow, npcWindow:getMinimumHeight())
+    if not panel then
+        return false
+    end
+
+    local fits = panel:fits(npcWindow, npcWindow:getMinimumHeight(), 0)
+    if fits < 0 then
+        return false
+    end
+
+    panel:addChild(npcWindow)
+    return true
+end
 
 function init()
-    npcWindow = g_ui.displayUI('npctrade')
+    npcWindow = g_ui.loadUI('npctrade')
+    npcWindow:setContentMinimumHeight(130)
+    npcWindow:show()
     npcWindow:setVisible(false)
 
-    itemsPanel = npcWindow:recursiveGetChildById('itemsPanel')
+    npcWindow:setContentHeight(130)
+    npcWindow:setup()
+
+    itemsPanel = npcWindow:recursiveGetChildById('contentsPanel')
     searchText = npcWindow:recursiveGetChildById('searchText')
 
     setupPanel = npcWindow:recursiveGetChildById('setupPanel')
     quantityScroll = setupPanel:getChildById('quantityScroll')
-    nameLabel = setupPanel:getChildById('name')
+    amountText = setupPanel:getChildById('amountText')
+
     priceLabel = setupPanel:getChildById('price')
+    currencyMoneyLabel = setupPanel:getChildById('currencyMoneyLabel')
     moneyLabel = setupPanel:getChildById('money')
-    weightDesc = setupPanel:getChildById('weightDesc')
-    weightLabel = setupPanel:getChildById('weight')
-    capacityDesc = setupPanel:getChildById('capacityDesc')
-    capacityLabel = setupPanel:getChildById('capacity')
+    itemButton = setupPanel:getChildById('item')
     tradeButton = npcWindow:recursiveGetChildById('tradeButton')
+    headPanel = npcWindow:recursiveGetChildById('headPanel')
+    currencyItem = headPanel:getChildById('currencyItem')
+    itemBorder = headPanel:getChildById('itemBorder')
+    currencyLabel = headPanel:getChildById('currencyLabel')
 
-    buyWithBackpack = npcWindow:recursiveGetChildById('buyWithBackpack')
-    ignoreCapacity = npcWindow:recursiveGetChildById('ignoreCapacity')
-    ignoreEquipped = npcWindow:recursiveGetChildById('ignoreEquipped')
-    showAllItems = npcWindow:recursiveGetChildById('showAllItems')
-    sellAllButton = npcWindow:recursiveGetChildById('sellAllButton')
-
-    buyTab = npcWindow:getChildById('buyTab')
-    sellTab = npcWindow:getChildById('sellTab')
+    buyTab = npcWindow:recursiveGetChildById('buyTab')
+    sellTab = npcWindow:recursiveGetChildById('sellTab')
 
     radioTabs = UIRadioGroup.create()
     radioTabs:addWidget(buyTab)
@@ -74,12 +180,12 @@ function init()
     radioTabs.onSelectionChange = onTradeTypeChange
 
     cancelNextRelease = false
-
     if g_game.isOnline() then
         playerFreeCapacity = g_game.getLocalPlayer():getFreeCapacity()
     end
 
     connect(g_game, {
+        onGameStart = start,
         onGameEnd = hide,
         onOpenNpcTrade = onOpenNpcTrade,
         onCloseNpcTrade = onCloseNpcTrade,
@@ -98,6 +204,8 @@ function terminate()
     initialized = false
     npcWindow:destroy()
 
+    sellAllWhitelist = {}
+
     disconnect(g_game, {
         onGameEnd = hide,
         onOpenNpcTrade = onOpenNpcTrade,
@@ -113,6 +221,11 @@ end
 
 function show()
     if g_game.isOnline() then
+        if not attachNpcWindow() then
+            return
+        end
+        tradeItems[BUY] = tradeItems[BUY] or {}
+        tradeItems[SELL] = tradeItems[SELL] or {}
         if #tradeItems[BUY] > 0 then
             radioTabs:selectWidget(buyTab)
         else
@@ -121,15 +234,55 @@ function show()
 
         npcWindow:show()
         npcWindow:raise()
-        npcWindow:focus()
+
+        if npcWindow and npcWindow:isVisible() then
+            npcWindow:getParent():moveChildToIndex(npcWindow, #npcWindow:getParent():getChildren())
+            npcWindow.close = function() closeNpcTrade() end
+            npcWindow:focus()
+            setupPanel:enable()
+        end
     end
 end
 
+function start()
+    local benchmark = g_clock.millis()
+    loadData()
+    g_logger.info("Sell All Whitelist Loot loaded in " .. (g_clock.millis() - benchmark) / 1000 .. " seconds.")
+end
+
 function hide()
+    if not npcWindow then
+        return
+    end
+
+    saveData()
+
     npcWindow:hide()
+
+    toggleNPCFocus(false)
+    -- modules.game_console.getConsole():focus()
+
+    local layout = itemsPanel:getLayout()
+    layout:disableUpdates()
+
+    clearSelectedItem()
+
+    searchText:clearText()
+    setupPanel:disable()
+    itemsPanel:destroyChildren()
+
+    if radioItems then
+        radioItems:destroy()
+        radioItems = nil
+    end
+
+    layout:enableUpdates()
+    layout:update()
 end
 
 function onItemBoxChecked(widget)
+    itemButton:setItemId(0)
+    quantityScroll:setValue(0)
     if widget:isChecked() then
         local item = widget.item
         selectedItem = item
@@ -138,14 +291,15 @@ function onItemBoxChecked(widget)
 
         if getCurrentTradeType() == SELL then
             quantityScroll:setValue(quantityScroll:getMaximum())
+            amountText:setText(quantityScroll:getMaximum())
         end
     end
 end
 
 function onQuantityValueChange(quantity)
     if selectedItem then
-        weightLabel:setText(string.format('%.2f', selectedItem.weight * quantity) .. ' ' .. WEIGHT_UNIT)
-        priceLabel:setText(formatCurrency(getItemPrice(selectedItem)))
+        priceLabel:setText(comma_value(formatCurrency(getItemPrice(selectedItem))))
+        amountText:setText(quantity)
     end
 end
 
@@ -154,28 +308,75 @@ function onTradeTypeChange(radioTabs, selected, deselected)
     selected:setOn(true)
     deselected:setOn(false)
 
-    local currentTradeType = getCurrentTradeType()
-    buyWithBackpack:setVisible(currentTradeType == BUY)
-    ignoreCapacity:setVisible(currentTradeType == BUY)
-    ignoreEquipped:setVisible(currentTradeType == SELL)
-    showAllItems:setVisible(currentTradeType == SELL)
-    sellAllButton:setVisible(currentTradeType == SELL)
-
     refreshTradeItems()
     refreshPlayerGoods()
 end
 
 function onTradeClick()
+    if not selectedItem then return end
+    removeEvent(sellAllWithDelayEvent)
     if getCurrentTradeType() == BUY then
-        g_game.buyItem(selectedItem.ptr, quantityScroll:getValue(), ignoreCapacity:isChecked(),
-                       buyWithBackpack:isChecked())
+        g_game.buyItem(selectedItem.ptr, quantityScroll:getValue(), ignoreCapacity, buyWithBackpack)
     else
-        g_game.sellItem(selectedItem.ptr, quantityScroll:getValue(), ignoreEquipped:isChecked())
+        g_game.sellItem(selectedItem.ptr, quantityScroll:getValue(), ignoreEquipped)
     end
 end
 
 function onSearchTextChange()
     refreshPlayerGoods()
+    clearSelectedItem()
+end
+
+function handleIgnoreCapacity(menu)
+    local ignoreCapacityText = ignoreCapacity and tr('Do not ignore capacity') or tr('Ignore capacity')
+    menu:addOption(ignoreCapacityText, function()
+        ignoreCapacity = not ignoreCapacity; refreshPlayerGoods()
+    end, "")
+end
+
+function onExtraMenu()
+    local mousePosition = g_window.getMousePosition()
+    if cancelNextRelease then
+        cancelNextRelease = false
+        return false
+    end
+
+    local menu = g_ui.createWidget('PopupMenu')
+    menu:setGameMenu(true)
+    menu:addOption(tr('Sort by name'), function()
+        SORT_BY = 'name'; refreshPlayerGoods()
+    end, "", SORT_BY == 'name')
+    menu:addOption(tr('Sort by price'), function()
+        SORT_BY = 'price'; refreshPlayerGoods()
+    end, "", SORT_BY == 'price')
+    menu:addOption(tr('Sort by weight'), function()
+        SORT_BY = 'weight'; refreshPlayerGoods()
+    end, "", SORT_BY == 'weight')
+    menu:addSeparator()
+    if getCurrentTradeType() == BUY then
+        if CURRENCYID == GOLD_COINS then
+            local text = tr('Buy in shopping bags')
+            if buyWithBackpack then
+                text = tr('Do not buy in shopping bags')
+            end
+            menu:addOption(tr(text), onBuyWithBackpackChange, "")
+        end
+        handleIgnoreCapacity(menu)
+    else
+        local equippedState = true
+        if ignoreEquipped then
+            equippedState = false
+        end
+        menu:addOption(tr('Sell equipped'),
+            function()
+                ignoreEquipped = not ignoreEquipped; refreshTradeItems(); refreshPlayerGoods()
+            end, "", equippedState)
+    end
+    menu:addSeparator()
+    menu:addOption(tr('Show search field'), function() end, "", true)
+    menu:addOption(tr('Do not show a warning when trading large amounts'), function() end, "", false)
+    menu:display(mousePosition)
+    return true
 end
 
 function itemPopup(self, mousePosition, mouseButton)
@@ -184,27 +385,69 @@ function itemPopup(self, mousePosition, mouseButton)
         return false
     end
 
+    local itemWidget = self:getChildById('item')
+    if not itemWidget then
+        itemWidget = self
+    end
+
     if mouseButton == MouseRightButton then
         local menu = g_ui.createWidget('PopupMenu')
         menu:setGameMenu(true)
-        menu:addOption(tr('Look'), function()
-            return g_game.inspectNpcTrade(self:getItem())
+        menu:addOption(tr('Look'), function() return g_game.inspectNpcTrade(itemWidget:getItem()) end)
+        menu:addOption(tr('Inspect'), function()
+            g_game.inspectionObject(1, itemWidget:getItem():getId(), 0)
         end)
+        menu:addSeparator()
+        menu:addOption(tr('Sort by name'), function()
+            SORT_BY = 'name'; refreshPlayerGoods()
+        end, "", SORT_BY == 'name')
+        menu:addOption(tr('Sort by price'), function()
+            SORT_BY = 'price'; refreshPlayerGoods()
+        end, "", SORT_BY == 'price')
+        menu:addOption(tr('Sort by weight'), function()
+            SORT_BY = 'weight'; refreshPlayerGoods()
+        end, "", SORT_BY == 'weight')
+        menu:addSeparator()
+        if getCurrentTradeType() == BUY then
+            if CURRENCYID == GOLD_COINS then
+                local text = tr('Buy in shopping bags')
+                if buyWithBackpack then
+                    text = tr('Do not buy in shopping bags')
+                end
+                menu:addOption(tr(text), onBuyWithBackpackChange, "")
+            end
+            handleIgnoreCapacity(menu)
+        else
+            local equippedState = true
+            if ignoreEquipped then
+                equippedState = false
+            end
+
+            menu:addOption(tr('Sell equipped'),
+                function()
+                    ignoreEquipped = not ignoreEquipped; refreshTradeItems(); refreshPlayerGoods()
+                end, "", equippedState)
+        end
+        menu:addSeparator()
+        menu:addOption(tr('Show search field'), function() end, "", true)
+        menu:addOption(tr('Do not show a warning when trading large amounts'), function() end, "", false)
         menu:display(mousePosition)
         return true
-    elseif ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton) or
-        (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
+    elseif ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton)
+            or (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
         cancelNextRelease = true
-        g_game.inspectNpcTrade(self:getItem())
+        g_game.inspectNpcTrade(itemWidget:getItem())
         return true
     end
     return false
 end
 
 function onBuyWithBackpackChange()
+    buyWithBackpack = not buyWithBackpack
     if selectedItem then
         refreshItem(selectedItem)
     end
+    refreshPlayerGoods()
 end
 
 function onIgnoreCapacityChange()
@@ -226,23 +469,19 @@ end
 
 function setShowWeight(state)
     showWeight = state
-    weightDesc:setVisible(state)
-    weightLabel:setVisible(state)
 end
 
 function setShowYourCapacity(state)
-    capacityDesc:setVisible(state)
-    capacityLabel:setVisible(state)
-    ignoreCapacity:setVisible(state)
+
 end
 
 function clearSelectedItem()
-    nameLabel:clearText()
-    weightLabel:clearText()
-    priceLabel:clearText()
-    tradeButton:disable()
+    priceLabel:setText("0")
     quantityScroll:setMinimum(0)
     quantityScroll:setMaximum(0)
+    quantityScroll:setValue(0)
+    quantityScroll:setOn(true)
+    amountText:setText('0')
     if selectedItem then
         radioItems:selectWidget(nil)
         selectedItem = nil
@@ -264,7 +503,7 @@ function getItemPrice(item, single)
         amount = quantityScroll:getValue()
     end
     if getCurrentTradeType() == BUY then
-        if buyWithBackpack:isChecked() then
+        if buyWithBackpack then
             if item.ptr:isStackable() then
                 return item.price * amount + 20
             else
@@ -276,15 +515,13 @@ function getItemPrice(item, single)
 end
 
 function getSellQuantity(item)
-    if not item or not playerItems[item:getId()] then
-        return 0
-    end
+    if not item or not playerItems[item:getId()] then return 0 end
     local removeAmount = 0
-    if ignoreEquipped:isChecked() then
+    if ignoreEquipped then
         local localPlayer = g_game.getLocalPlayer()
         for i = 1, LAST_INVENTORY do
             local inventoryItem = localPlayer:getInventoryItem(i)
-            if inventoryItem and inventoryItem:getId() == item:getId() then
+            if inventoryItem and (inventoryItem:getId() == item:getId() and inventoryItem:getTier() == item:getTier()) then
                 removeAmount = removeAmount + inventoryItem:getCount()
             end
         end
@@ -294,24 +531,25 @@ end
 
 function canTradeItem(item)
     if getCurrentTradeType() == BUY then
-        return
-            (ignoreCapacity:isChecked() or (not ignoreCapacity:isChecked() and playerFreeCapacity >= item.weight)) and
-                playerMoney >= getItemPrice(item, true)
+        return (ignoreCapacity or (not ignoreCapacity and playerFreeCapacity >= item.weight)) and
+            getPlayerMoney() >= getItemPrice(item, true)
     else
         return getSellQuantity(item.ptr) > 0
     end
 end
 
 function refreshItem(item)
-    nameLabel:setText(item.name)
+    priceLabel:setText(formatCurrency(getItemPrice(item)))
+    itemButton:setItem(item.ptr)
+    itemButton.onMouseRelease = itemPopup
 
     if getCurrentTradeType() == BUY then
         local capacityMaxCount = math.floor(playerFreeCapacity / item.weight)
-        if ignoreCapacity:isChecked() then
-            capacityMaxCount = 65535
+        if ignoreCapacity then
+            capacityMaxCount = uint32Max
         end
-        local priceMaxCount = math.floor(playerMoney / getItemPrice(item, true))
-        local finalCount = math.max(0, math.min(getMaxAmount(), math.min(priceMaxCount, capacityMaxCount)))
+        local priceMaxCount = math.floor(getPlayerMoney() / getItemPrice(item, true))
+        local finalCount = math.max(0, math.min(getMaxAmount(item), math.min(priceMaxCount, capacityMaxCount)))
         quantityScroll:setMinimum(1)
         quantityScroll:setMaximum(finalCount)
     else
@@ -319,19 +557,31 @@ function refreshItem(item)
         quantityScroll:setMaximum(math.max(0, math.min(getMaxAmount(), getSellQuantity(item.ptr))))
     end
 
-    onQuantityValueChange(quantityScroll:getValue())
+    local text = tonumber(amountText:getText())
+    if not text then
+        amountText:setText(quantityScroll:getMinimum())
+    elseif text < quantityScroll:getMinimum() then
+        amountText:setText(quantityScroll:getMinimum())
+    elseif text > quantityScroll:getMaximum() then
+        amountText:setText(quantityScroll:getMaximum())
+    end
 
     setupPanel:enable()
+    g_mouse.bindPress(itemButton,
+        function(mousePos, mouseMoved) if g_keyboard.isShiftPressed() then g_game.inspectNpcTrade(itemButton:getItem()) end end)
 end
 
 function refreshTradeItems()
+    if not g_game.isOnline() then
+        return
+    end
+
     local layout = itemsPanel:getLayout()
     layout:disableUpdates()
 
     clearSelectedItem()
 
     searchText:clearText()
-    setupPanel:disable()
     itemsPanel:destroyChildren()
 
     if radioItems then
@@ -340,26 +590,39 @@ function refreshTradeItems()
     radioItems = UIRadioGroup.create()
 
     local currentTradeItems = tradeItems[getCurrentTradeType()]
-    for key, item in pairs(currentTradeItems) do
+    for key, item in ipairs(currentTradeItems) do
+        if getCurrentTradeType() == SELL and not canTradeItem(item) then
+            goto continue
+        end
         local itemBox = g_ui.createWidget('NPCItemBox', itemsPanel)
+        itemBox:setId("itemBox_" .. item.name)
         itemBox.item = item
 
-        local text = ''
-        local name = item.name
-        text = text .. name
-        if showWeight then
-            local weight = string.format('%.2f', item.weight) .. ' ' .. WEIGHT_UNIT
-            text = text .. '\n' .. weight
-        end
         local price = formatCurrency(item.price)
-        text = text .. '\n' .. price
-        itemBox:setText(text)
+        local informationText = 'Price ' .. price
+
+        if showWeight and item.weight > 0 then
+            local weight = string.format('%.2f', item.weight) .. ' ' .. WEIGHT_UNIT
+            informationText = informationText .. ', ' .. weight
+        end
+
+        local description = string.format('%s\n%s', short_text(item.name, 15), short_text(informationText, 16))
+        itemBox.nameLabel:setText(description, true)
 
         local itemWidget = itemBox:getChildById('item')
         itemWidget:setItem(item.ptr)
-        itemWidget.onMouseRelease = itemPopup
+        itemBox.onMouseRelease = itemPopup
+
+        if (string.len(item.name) > 15) or (string.len(informationText) > 16) then
+            itemBox:setTooltip(string.format('%s\n%s', item.name, informationText))
+        end
+
+        if not canTradeItem(item) then
+            itemBox.nameLabel:setColor('#707070')
+        end
 
         radioItems:addWidget(itemBox)
+        ::continue::
     end
 
     layout:enableUpdates()
@@ -367,32 +630,55 @@ function refreshTradeItems()
 end
 
 function refreshPlayerGoods()
-    if not initialized then
-        return
-    end
+    if not initialized then return end
 
-    checkSellAllTooltip()
-
-    moneyLabel:setText(formatCurrency(playerMoney))
-    capacityLabel:setText(string.format('%.2f', playerFreeCapacity) .. ' ' .. WEIGHT_UNIT)
+    moneyLabel:setText(comma_value(formatCurrency(getPlayerMoney())))
 
     local currentTradeType = getCurrentTradeType()
     local searchFilter = searchText:getText():lower()
     local foundSelectedItem = false
 
+    local itemWidgets = {}
     local items = itemsPanel:getChildCount()
     for i = 1, items do
         local itemWidget = itemsPanel:getChildByIndex(i)
+        table.insert(itemWidgets, itemWidget)
+    end
+
+    local function sortByName(a, b)
+        return a.item.name:lower() < b.item.name:lower()
+    end
+
+    local function sortByPrice(a, b)
+        return a.item.price < b.item.price
+    end
+
+    local function sortByWeight(a, b)
+        return a.item.weight < b.item.weight
+    end
+
+    if SORT_BY == "name" then
+        table.sort(itemWidgets, sortByName)
+    elseif SORT_BY == "price" then
+        table.sort(itemWidgets, sortByPrice)
+    elseif SORT_BY == "weight" then
+        table.sort(itemWidgets, sortByWeight)
+    end
+
+    for index, itemWidget in ipairs(itemWidgets) do
+        itemsPanel:moveChildToIndex(itemWidget, index)
+    end
+
+    for _, itemWidget in ipairs(itemWidgets) do
         local item = itemWidget.item
 
         local canTrade = canTradeItem(item)
         itemWidget:setOn(canTrade)
-        itemWidget:setEnabled(canTrade)
-
-        local searchCondition = (searchFilter == '') or
-                                    (searchFilter ~= '' and string.find(item.name:lower(), searchFilter) ~= nil)
-        local showAllItemsCondition = (currentTradeType == BUY) or (showAllItems:isChecked()) or
-                                          (currentTradeType == SELL and not showAllItems:isChecked() and canTrade)
+        itemWidget.nameLabel:setEnabled(canTrade)
+        local searchFilterEscaped = string.searchEscape(searchFilter)
+        local searchCondition = (searchFilterEscaped == '') or
+            (searchFilterEscaped ~= '' and string.find(item.name:lower(), searchFilterEscaped) ~= nil)
+        local showAllItemsCondition = (currentTradeType == BUY) or (currentTradeType == SELL and canTrade)
         itemWidget:setVisible(searchCondition and showAllItemsCondition)
 
         if selectedItem == item and itemWidget:isEnabled() and itemWidget:isVisible() then
@@ -409,11 +695,35 @@ function refreshPlayerGoods()
     end
 end
 
-function onOpenNpcTrade(items)
+function onOpenNpcTrade(items, currencyId, currencyName)
+    CURRENCYID = currencyId
+    currencyItem:setItemId(currencyId)
+    currencyItem:setVisible(true)
+    itemBorder:setVisible(true)
+    currencyItem:setItemCount(100)
+    currencyItem:setShowCount(false)
+    currencyMoneyLabel:setText('Gold:')
+
+    if currencyId ~= GOLD_COINS and currencyName == '' then
+        currencyName = getItemServerName(currencyId)
+        buyWithBackpack = false
+        currencyMoneyLabel:setText('Stock:')
+    elseif currencyName ~= '' then
+        currencyItem:setVisible(false)
+        itemBorder:setVisible(false)
+        currencyMoneyLabel:setText('Stock:')
+    end
+
+    currencyName = currencyName ~= '' and currencyName or 'Gold Coin'
+    currencyLabel:setText(short_text(currencyName, 11))
+    currencyLabel:removeTooltip()
+    if #currencyName > 11 then
+        currencyLabel:setTooltip(currencyName)
+    end
+
     tradeItems[BUY] = {}
     tradeItems[SELL] = {}
-
-    for key, item in pairs(items) do
+    for _, item in pairs(items) do
         if item[4] > 0 then
             local newItem = {}
             newItem.ptr = item[1]
@@ -433,17 +743,23 @@ function onOpenNpcTrade(items)
         end
     end
 
-    refreshTradeItems()
     addEvent(show) -- player goods has not been parsed yet
+    scheduleEvent(refreshTradeItems, 50)
+    scheduleEvent(refreshPlayerGoods, 50)
+    if tradeButton:getText() == "Ok" then
+        tradeButton:setText("Buy")
+    end
 end
 
 function closeNpcTrade()
+    -- g_game.doThing(false)
     g_game.closeNpcTrade()
-    hide()
+    -- g_game.doThing(true)
+    addEvent(hide)
 end
 
 function onCloseNpcTrade()
-    hide()
+    addEvent(hide)
 end
 
 function onPlayerGoods(money, items)
@@ -500,6 +816,8 @@ end
 function checkSellAllTooltip()
     sellAllButton:setEnabled(true)
     sellAllButton:removeTooltip()
+    sellAllWithDelayButton:setEnabled(true)
+    sellAllWithDelayButton:removeTooltip()
 
     local total = 0
     local info = ''
@@ -511,46 +829,361 @@ function checkSellAllTooltip()
             amount = getSellQuantity(data.ptr)
             if amount > 0 then
                 if data and amount > 0 then
-                    info = info .. (not first and '\n' or '') .. amount .. ' ' .. data.name .. ' (' .. data.price *
-                               amount .. ' gold)'
+                    info = info .. (not first and "\n" or "") ..
+                        amount .. " " ..
+                        data.name .. " (" ..
+                        data.price * amount .. " gold)"
 
                     total = total + (data.price * amount)
-                    if first then
-                        first = false
-                    end
+                    if first then first = false end
                 end
             end
         end
     end
     if info ~= '' then
-        info = info .. '\nTotal: ' .. total .. ' gold'
+        info = info .. "\nTotal: " .. total .. " gold"
         sellAllButton:setTooltip(info)
+        sellAllWithDelayButton:setTooltip(info)
     else
         sellAllButton:setEnabled(false)
+        sellAllWithDelayButton:setEnabled(false)
     end
 end
 
 function formatCurrency(amount)
     if CURRENCY_DECIMAL then
-        return string.format('%.02f', amount / 100.0) .. ' ' .. CURRENCY
+        return string.format("%.02f", amount / 100.0)
     else
-        return amount .. ' ' .. CURRENCY
+        if amount >= 1000000000 then
+            local k = math.floor(amount / 1000)
+            return k .. " k"
+        end
+        return amount
     end
 end
 
-function getMaxAmount()
+function getMaxAmount(item)
     if getCurrentTradeType() == SELL and g_game.getFeature(GameDoubleShopSellAmount) then
         return 10000
     end
+
+    if item and getCurrentTradeType() == BUY and item.ptr:isStackable() then
+        return 10000
+    end
+
     return 100
 end
 
-function sellAll()
-    for itemid, item in pairs(playerItems) do
-        local item = Item.create(itemid)
-        local amount = getSellQuantity(item)
-        if amount > 0 then
-            g_game.sellItem(item, amount, ignoreEquipped:isChecked())
+function sellAll(delayed, exceptions)
+    -- backward support
+    if type(delayed) == "table" then
+        exceptions = delayed
+        delayed = false
+    end
+    exceptions = exceptions or {}
+    removeEvent(sellAllWithDelayEvent)
+    local queue = {}
+    for _, entry in ipairs(tradeItems[SELL]) do
+        local id = entry.ptr:getId()
+        if not table.find(exceptions, id) then
+            local sellQuantity = getSellQuantity(entry.ptr)
+            while sellQuantity > 0 do
+                local maxAmount = math.min(sellQuantity, getMaxAmount())
+                if delayed then
+                    g_game.sellItem(entry.ptr, maxAmount, ignoreEquipped)
+                    sellAllWithDelayEvent = scheduleEvent(function() sellAll(true) end, 1100)
+                    return
+                end
+                table.insert(queue, { entry.ptr, maxAmount, ignoreEquipped })
+                sellQuantity = sellQuantity - maxAmount
+            end
         end
     end
+    for _, entry in ipairs(queue) do
+        g_game.sellItem(entry[1], entry[2], entry[3])
+    end
+end
+
+function getPlayerMoney()
+    local player = g_game.getLocalPlayer()
+    playerMoney = player:getResourceBalance(ResourceTypes.BANK_BALANCE) +
+        player:getResourceBalance(ResourceTypes.GOLD_EQUIPPED)
+    -- if CURRENCYID ~= GOLD_COINS and CURRENCYID > 0 then
+    --   playerMoney = player:getResourceValue(ResourceNpcTrade)
+    -- elseif CURRENCYID == 0 then
+    --   playerMoney = player:getResourceValue(ResourceNpcStorageTrade)
+    -- end
+
+    return playerMoney
+end
+
+function onAmountEdit(self)
+    local text = tonumber(self:getText())
+    if not text then
+        return
+    end
+
+    local minValue = quantityScroll:getMinimum()
+    local maxValue = quantityScroll:getMaximum()
+    if minValue > text then
+        self:setText(minValue, false)
+        text = minValue
+    elseif maxValue < text then
+        self:setText(maxValue, false)
+        text = maxValue
+    end
+
+    quantityScroll:setValue(text)
+    onQuantityValueChange(tonumber(text))
+end
+
+function clearSearch()
+    searchText:setText('')
+    clearSelectedItem()
+end
+
+function onTypeFieldsHover(widget, hovered)
+    if not npcWindow then
+        return true
+    end
+
+    if not hovered and npcWindow:getBorderTopWidth() > 0 then
+        return
+    end
+
+    modules.game_interface.toggleFocus(hovered, "npctrade")
+end
+
+function toggleNPCFocus(visible)
+    modules.game_interface.toggleFocus(visible, "npctrade")
+    if visible then
+        npcWindow:setBorderWidth(2)
+        npcWindow:setBorderColor('white')
+    else
+        npcWindow:setBorderWidth(0)
+        modules.game_interface.toggleInternalFocus()
+    end
+end
+
+function checkItemToSell(self)
+    local parent = self:getParent()
+    local checkBox = parent:recursiveGetChildById('sellCheckbox')
+    local gray = parent:recursiveGetChildById('gray')
+    if checkBox:isChecked() then
+        self:setBackgroundColor("#404040")
+        checkBox:setChecked(false)
+        gray:setVisible(true)
+    else
+        self:setBackgroundColor("#585858")
+        checkBox:setChecked(true)
+        gray:setVisible(false)
+    end
+end
+
+function SellItemList(items, window)
+    if not g_game.isOnline() then
+        return
+    end
+
+    window:hide()
+
+    local total = 0
+
+    local itemsToSend = {}
+    local maxItems = math.min(#items, 300)
+
+    for i = 1, maxItems do
+        local widget = items[i]
+        if widget and widget.sellCheckbox:isChecked() and widget.item.ptr and widget.item.ptr:getId() > 0 then
+            local quantity = getSellQuantity(widget.item.ptr)
+            total = total + (quantity * widget.item.price)
+
+            table.insert(itemsToSend, {
+                itemId = widget.item.ptr:getId(),
+                count = widget.item.ptr:getCountOrSubType(),
+                amount = quantity,
+                ignoreEquipped = ignoreEquipped
+            })
+        end
+    end
+
+    g_game.sellAllItems(itemsToSend)
+    window:destroy()
+    displayInfoBox("Quick Sell", string.format("You have sold %d items for %d gold.", #items, total))
+end
+
+local function updateBlacklist(window)
+    if not window then
+        return
+    end
+
+    local list = window:recursiveGetChildById('itemsList')
+    if not list then
+        return
+    end
+
+    list:destroyChildren()
+
+    local count = 0
+    for i, itemId in pairs(sellAllWhitelist) do
+        count = count + 1
+        local widget = g_ui.createWidget('QuickSellItemBox', list)
+        local color = (count % 2) == 0 and '#414141' or '#484848'
+        widget:setId(itemId)
+        widget.itemName:setText(getItemServerName(itemId))
+        widget.itemId:setItemId(itemId)
+        widget:setBackgroundColor(color)
+        widget:getChildById('buttonItemClear').onClick = function()
+            removeItemInList(itemId)
+            updateBlacklist(window)
+        end
+    end
+end
+
+function openBlacklist()
+    local blacklistWindow = g_ui.loadUI('styles/blacklist', g_ui.getRootWidget())
+    if not blacklistWindow then
+        onTradeAllClick()
+        return
+    end
+
+    blacklistWindow:show()
+    blacklistWindow:raise()
+    blacklistWindow:focus()
+
+    -- updateBlacklist(blacklistWindow)
+
+    local close = function()
+        if blacklistWindow then
+            blacklistWindow:destroy()
+        end
+        onTradeAllClick()
+    end
+
+    blacklistWindow.contentPanel.closeButton.onClick = close
+end
+
+function onTradeAllClick()
+    if getCurrentTradeType() == BUY then
+        return
+    end
+
+    local radio = UIRadioGroup.create()
+    window = g_ui.loadUI('styles/quicksell', g_ui.getRootWidget())
+    if not window then
+        return true
+    end
+
+    -- window:setText("Quick Sell")
+    window:show(true)
+    window:raise()
+    window:focus()
+
+    local saleValue = 0
+    local currentTradeItems = tradeItems[getCurrentTradeType()]
+    for key, item in pairs(currentTradeItems) do
+        if getCurrentTradeType() == SELL and not canTradeItem(item) then
+            goto continue
+        elseif inWhiteList(item.ptr:getId()) then
+            goto continue
+        end
+
+        local itemSquare = g_ui.createWidget('ItemQuickSell', window.contentPanel.itemsList)
+
+        itemSquare:setId("itemSquare_" .. item.name)
+        itemSquare.item = item
+        itemSquare.nameLabel:setText(getSellQuantity(item.ptr) .. "x " .. item.name, true)
+        itemSquare.priceLabel:setText(item.price, true)
+
+        itemSquare.sellCheckbox.onCheckChange = function(self)
+            local price = item.price * getSellQuantity(item.ptr)
+            saleValue = saleValue + (self:isChecked() and price or -price)
+            window.contentPanel.total:setText("Total: " .. formatMoney(saleValue, ",") .. " gps")
+        end
+
+        itemSquare.itemButton:setBackgroundColor("#585858")
+        itemSquare.sellCheckbox:setChecked(true)
+
+        local itemWidget = itemSquare:getChildById('item')
+        itemWidget:setItem(item.ptr)
+
+        radio:addWidget(itemSquare)
+        ::continue::
+    end
+
+    local items = window.contentPanel.itemsList:getChildren()
+    table.sort(items, function(a, b)
+        local priceA = tonumber(a.priceLabel:getText())
+        local priceB = tonumber(b.priceLabel:getText())
+        return priceA > priceB
+    end)
+    for i, widget in ipairs(items) do
+        window.contentPanel.itemsList:moveChildToIndex(widget, i)
+    end
+
+    local close = function()
+        window:destroy()
+    end
+
+    local sell = function()
+        local warningWindow = nil
+        local selectedItems = {}
+        local notWorthItems = {}
+        local items = window.contentPanel.itemsList:getChildren()
+        for i, widget in ipairs(items) do
+            if widget.sellCheckbox:isChecked() then
+                table.insert(selectedItems, widget.item)
+                if tonumber(widget.priceLabel:getText()) < widget.item.ptr:getAverageMarketValue() then
+                    table.insert(notWorthItems, widget.item)
+                end
+            end
+        end
+
+        if #selectedItems <= 0 then
+            return
+        end
+
+        if #notWorthItems > 0 then
+            local message = ""
+            for i, item in ipairs(notWorthItems) do
+                message = message .. string.format("  - %s\n", item.name)
+            end
+            local yesCallback = function()
+                SellItemList(items, window)
+                if warningWindow then
+                    warningWindow:destroy()
+                    warningWindow = nil
+                end
+            end
+            local noCallback = function()
+                if window then
+                    window:show()
+                else
+                end
+                if warningWindow then
+                    warningWindow:destroy()
+                    warningWindow = nil
+                end
+            end
+            window:hide()
+            warningWindow = g_ui.createWidget('WarningQuickWindow', rootWidget)
+            warningWindow.itemTextWarning:setText(message)
+            warningWindow.itemTextWarning:setEditable(false)
+            warningWindow.itemTextWarning:setCursorVisible(false)
+            warningWindow:getChildById('okButton').onClick = yesCallback
+            warningWindow:getChildById('cancelButton').onClick = noCallback
+            warningWindow:show()
+            warningWindow:focus()
+        else
+            SellItemList(items, window)
+        end
+    end
+
+    window.contentPanel.blackListButton.onClick = function()
+        close(); openBlacklist()
+    end
+    window.contentPanel.cancelButton.onClick = close
+    window.onEscape = close
+    window.contentPanel.okButton.onClick = sell
+    window.onEnter = sell
 end

@@ -1,142 +1,179 @@
 UIWidget
   anchors.fill: parent
   visible: false
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
+
+  ScrollablePanel
+    id: scrollPanel
     anchors.top: parent.top
-    height: 22
-
-    OptionCheckBox
-      id: enableHighlightMouseTarget
-      !text: tr('Highlight mouse target')
-
-  SmallReversedQtPanel
     anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
+    anchors.right: scrollBar.left
+    anchors.bottom: parent.bottom
+    margin-right: 5
+    vertical-scrollbar: scrollBar
 
-    OptionCheckBox
-      id: showDragIcon
-      !text: tr('Show item icon while dragging')
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
+      height: 22
 
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
+      OptionCheckBox
+        id: enableHighlightMouseTarget
+        !text: tr('Highlight mouse target')
 
-    $mobile:
-      height: 0
-      margin-top: 0
-      visible: false
-  
-    OptionCheckBox
-      id: showLeftPanel
-      !text: tr('Show left panel')
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      OptionCheckBox
+        id: showDragIcon
+        !text: tr('Show item icon while dragging')
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
 
       $mobile:
+        height: 0
+        margin-top: 0
         visible: false
 
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-  
-    OptionCheckBox
-      id: showRightExtraPanel
-      !text: tr('Show an extra right panel')
-      
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    height: 22
-    margin-top: 5
+      OptionCheckBox
+        id: showHorizontalLeftPanel
+        !text: tr('Show Horizontal left panel')
 
-    OptionCheckBoxMarked
-      id: showSpellGroupCooldowns
-      !text: tr('Show spell group cooldowns')
-      !tooltip: tr('Can be enabled only in version 8.7x or higher')
+        $mobile:
+          visible: false
 
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 32
-  
-    Label
-      !text: 'Crosshair:'
+    SmallReversedQtPanel
       anchors.left: parent.left
-      margin-left: 18
-      color: #c0c0c0ff
-      anchors.verticalCenter: parent.verticalCenter
-
-    QtComboBox
-      id: crosshair
-      width: 120
-      margin-left: 10
-      anchors.verticalCenter: prev.verticalCenter
-      anchors.left: prev.right
-      mouse-scroll: false
-
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 86
-
-    Label
-      !text: 'Colourise Loot Value: '
-      anchors.left: parent.left
-      anchors.top: parent.top
-      margin-left: 10
-      margin-top: -25
-      color: #c0c0c0ff
-      anchors.verticalCenter: parent.verticalCenter
-
-    QtComboBox
-      id: frames
-      width: 120
-      margin-left: 10
-      anchors.verticalCenter: prev.verticalCenter
-      anchors.left: prev.right
-      mouse-scroll: false
-
-      
-    UIWidget
-      id: toolTipWidget
-      image-source: /images/icons/show_gui_help_grey
-      size: 12 12  
       anchors.right: parent.right
-      margin-right: 3
-      !tooltip: tr('If you select Frames or Corners, your loot will be marked with \ndifferent colours in loot messages, containers and the Bestiary.\n\nThe colour depends on the loot value, which can be determined in\n the Items Cyclopedia, either using the NPC buy value, the average\n Market price or your own preferred value.')
-      
-    OptionCheckBoxMarked
-      id: showExpiryInInvetory
-      anchors.top: frames.bottom
-      margin-top: 5
-      !text: tr('Show Expiry In Inventory')
-      !tooltip: tr('Check this box to see how much time or how many charges are left \non your equipped items')
-
-    OptionCheckBoxMarked
-      id: showExpiryInContainers
       anchors.top: prev.bottom
-      margin-top: 5
-      !text: tr('Show Expiry In Containers')
-      !tooltip: tr('Check this box to see how mmuch time or how many charges the \nitems in your open containers have left')
+      margin-top: 7
+      height: 22
 
-    OptionCheckBoxMarked
-      id: showExpiryOnUnusedItems
+      $mobile:
+        height: 0
+        margin-top: 0
+        visible: false
+
+      OptionCheckBox
+        id: showHorizontalRightPanel
+        !text: tr('Show Horizontal right panel')
+
+        $mobile:
+          visible: false
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
       anchors.top: prev.bottom
+      margin-top: 7
+      height: 22
+
+      OptionCheckBox
+        id: showRightExtraPanel
+        !text: tr('Show an extra right panel')
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      height: 22
       margin-top: 5
-      !text: tr('Show Expiry On Unused Items')
-      !tooltip: tr('Check this box to see how much time or how many charges are left\n on items that have not been used yet')
-      enabled: false
+
+      OptionCheckBoxMarked
+        id: showSpellGroupCooldowns
+        !text: tr('Show spell group cooldowns')
+        !tooltip: tr('Can be enabled only in version 8.7x or higher')
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 32
+
+      Label
+        !text: 'Crosshair:'
+        anchors.left: parent.left
+        margin-left: 18
+        color: #c0c0c0ff
+        anchors.verticalCenter: parent.verticalCenter
+
+      QtComboBox
+        id: crosshair
+        width: 120
+        margin-left: 10
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        mouse-scroll: false
+
+    SmallReversedQtPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      margin-top: 7
+      height: 86
+
+      Label
+        !text: 'Colourise Loot Value: '
+        anchors.left: parent.left
+        anchors.top: parent.top
+        margin-left: 10
+        margin-top: -25
+        color: #c0c0c0ff
+        anchors.verticalCenter: parent.verticalCenter
+
+      QtComboBox
+        id: frames
+        width: 120
+        margin-left: 10
+        anchors.verticalCenter: prev.verticalCenter
+        anchors.left: prev.right
+        mouse-scroll: false
+
+
+      UIWidget
+        id: toolTipWidget
+        image-source: /images/icons/show_gui_help_grey
+        size: 12 12
+        anchors.right: parent.right
+        margin-right: 3
+        !tooltip: tr('If you select Frames or Corners, your loot will be marked with \ndifferent colours in loot messages, containers and the Bestiary.\n\nThe colour depends on the loot value, which can be determined in\n the Items Cyclopedia, either using the NPC buy value, the average\n Market price or your own preferred value.')
+
+      OptionCheckBoxMarked
+        id: showExpiryInInvetory
+        anchors.top: frames.bottom
+        margin-top: 5
+        !text: tr('Show Expiry In Inventory')
+        !tooltip: tr('Check this box to see how much time or how many charges are left \non your equipped items')
+
+      OptionCheckBoxMarked
+        id: showExpiryInContainers
+        anchors.top: prev.bottom
+        margin-top: 5
+        !text: tr('Show Expiry In Containers')
+        !tooltip: tr('Check this box to see how mmuch time or how many charges the \nitems in your open containers have left')
+
+      OptionCheckBoxMarked
+        id: showExpiryOnUnusedItems
+        anchors.top: prev.bottom
+        margin-top: 5
+        !text: tr('Show Expiry On Unused Items')
+        !tooltip: tr('Check this box to see how much time or how many charges are left\n on items that have not been used yet')
+        enabled: false
+
+  VerticalQtScrollBar
+    id: scrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 28
+    pixels-scroll: true

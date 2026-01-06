@@ -249,3 +249,29 @@ MiniPremiumButton < UIButton
   $pressed:
     image-clip: 0 22 26 22
 
+Button4 < UIButton
+  font: verdana-11px-antialised
+  color: white
+  size: 106 23
+  text-offset: 0 1
+  image-source: /images/ui/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+
+  $hover !disabled:
+    image-clip: 0 23 22 23
+
+  $pressed:
+    image-clip: 0 46 22 23
+
+  $disabled:
+    color: #C0C0C0
+    text-offset: 1 2
+    image-clip: 0 46 22 23
+    change-cursor-image: false
+    
+  $on:
+    image-clip: 0 46 22 23

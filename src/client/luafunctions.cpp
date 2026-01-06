@@ -82,6 +82,8 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "getThingType", &ThingTypeManager::getThingType, &g_things);
     g_lua.bindSingletonFunction("g_things", "getThingTypes", &ThingTypeManager::getThingTypes, &g_things);
     g_lua.bindSingletonFunction("g_things", "findThingTypeByAttr", &ThingTypeManager::findThingTypeByAttr, &g_things);
+    g_lua.bindSingletonFunction("g_things", "getProficiencyThings", &ThingTypeManager::getProficiencyThings, &g_things);
+    g_lua.bindSingletonFunction("g_things", "getCyclopediaItemName", &ThingTypeManager::getCyclopediaItemName, &g_things);
     g_lua.bindSingletonFunction("g_things", "getRaceData", &ThingTypeManager::getRaceData, &g_things);
     g_lua.bindSingletonFunction("g_things", "getRacesByName", &ThingTypeManager::getRacesByName, &g_things);
 
@@ -357,6 +359,11 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "sendRequestStoreOfferById", &Game::sendRequestStoreOfferById, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendRequestStorePremiumBoost", &Game::sendRequestStorePremiumBoost, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendRequestUsefulThings", &Game::sendRequestUsefulThings, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendOpenDestinyWheel", &Game::sendOpenDestinyWheel, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendApplyWheelPoints", &Game::sendApplyWheelPoints, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendGemAtelierAction", &Game::sendGemAtelierAction, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendWeaponProficiencyAction", &Game::sendWeaponProficiencyAction, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendWeaponProficiencyApply", &Game::sendWeaponProficiencyApply, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendRequestStoreHome", &Game::sendRequestStoreHome, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestTransactionHistory", &Game::requestTransactionHistory, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestStoreOffers", &Game::requestStoreOffers, &g_game);
@@ -373,6 +380,8 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "applyImbuement", &Game::applyImbuement, &g_game);
     g_lua.bindSingletonFunction("g_game", "clearImbuement", &Game::clearImbuement, &g_game);
     g_lua.bindSingletonFunction("g_game", "closeImbuingWindow", &Game::closeImbuingWindow, &g_game);
+    g_lua.bindSingletonFunction("g_game", "selectImbuementItem", &Game::selectImbuementItem, &g_game);
+    g_lua.bindSingletonFunction("g_game", "selectImbuementScroll", &Game::selectImbuementScroll, &g_game);
     g_lua.bindSingletonFunction("g_game", "isUsingProtobuf", &Game::isUsingProtobuf, &g_game);
     g_lua.bindSingletonFunction("g_game", "enableTileThingLuaCallback", &Game::enableTileThingLuaCallback, &g_game);
     g_lua.bindSingletonFunction("g_game", "isTileThingLuaCallbackEnabled", &Game::isTileThingLuaCallbackEnabled, &g_game);
@@ -384,6 +393,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "sendQuickLoot", &Game::sendQuickLoot, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestQuickLootBlackWhiteList", &Game::requestQuickLootBlackWhiteList, &g_game);
     g_lua.bindSingletonFunction("g_game", "openContainerQuickLoot", &Game::openContainerQuickLoot, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestRewardChestCollect", &Game::requestRewardChestCollect, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendGmTeleport", &Game::sendGmTeleport, &g_game);
     g_lua.bindSingletonFunction("g_game", "inspectionNormalObject", &Game::inspectionNormalObject, &g_game);
     g_lua.bindSingletonFunction("g_game", "inspectionObject", &Game::inspectionObject, &g_game);
@@ -403,6 +413,9 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "requestOpenRewardHistory", &Game::requestOpenRewardHistory, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestGetRewardDaily", &Game::requestGetRewardDaily, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendRequestTrackerQuestLog", &Game::sendRequestTrackerQuestLog, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendForgeAction", &Game::sendForgeAction, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendForgeHistory", &Game::sendForgeHistory, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendResourceBalance", &Game::sendResourceBalance, &g_game);
 
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
@@ -744,6 +757,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("getDefaultAction", &ThingType::getDefaultAction);
     g_lua.bindClassMemberFunction<ThingType>("getName", &ThingType::getName);
     g_lua.bindClassMemberFunction<ThingType>("getDescription", &ThingType::getDescription);
+    g_lua.bindClassMemberFunction<ThingType>("getProficiencyId", &ThingType::getProficiencyId);
     g_lua.bindClassMemberFunction<ThingType>("isAmmo", &ThingType::isAmmo);
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindClassMemberFunction<ThingType>("exportImage", &ThingType::exportImage);
@@ -765,6 +779,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getDurationTime", &Item::getDurationTime);
     g_lua.bindClassMemberFunction<Item>("getTier", &Item::getTier);
     g_lua.bindClassMemberFunction<Item>("getCharges", &Item::getCharges);
+    g_lua.bindClassMemberFunction<Item>("getWeaponType", &Item::getWeaponType);
+    g_lua.bindClassMemberFunction<Item>("getProficiencyId", &Item::getProficiencyId);
 
     g_lua.bindClassMemberFunction<Item>("isStackable", &Item::isStackable);
     g_lua.bindClassMemberFunction<Item>("isMarketable", &Item::isMarketable);

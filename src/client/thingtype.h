@@ -161,6 +161,7 @@ public:
     PLAYER_ACTION getDefaultAction() { return m_defaultAction; }
 
     uint16_t getClassification() { return m_upgradeClassification; }
+    uint16_t getProficiencyId();
     const auto& getSprites() { return m_spritesIndex; }
 
     // additional
@@ -223,6 +224,7 @@ private:
     uint16_t m_groundSpeed{ 0 };
     uint16_t m_maxTextLength{ 0 };
     uint16_t m_upgradeClassification{ 0 };
+    uint16_t m_proficiencyId{ 0 };
 
     uint64_t m_flags{ 0 };
 

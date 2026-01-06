@@ -718,3 +718,38 @@ void LocalPlayer::setStoreExpBoostTime(uint16_t value)
 
     m_storeExpBoostTime = value;
 }
+
+
+void LocalPlayer::setHarmony(const uint8_t harmony, const uint8_t maxHarmony)
+{
+    if (m_harmony == harmony && m_maxHarmony == maxHarmony)
+        return;
+
+    const uint8_t oldHarmony = m_harmony;
+    const uint8_t oldMaxHarmony = m_maxHarmony;
+    m_harmony = harmony;
+    m_maxHarmony = maxHarmony;
+
+    callLuaField("onHarmonyChange", harmony, maxHarmony, oldHarmony, oldMaxHarmony);
+}
+
+void LocalPlayer::setVirtue(const uint8_t virtue)
+{
+    if (m_virtue == virtue)
+        return;
+
+    const uint8_t oldVirtue = m_virtue;
+    m_virtue = virtue;
+
+    callLuaField("onVirtueChange", virtue, oldVirtue);
+}
+
+void LocalPlayer::setIsSerene(const bool serene)
+{
+    if (m_isSerene == serene)
+        return;
+
+    m_isSerene = serene;
+
+    callLuaField("onSereneChange", serene);
+}

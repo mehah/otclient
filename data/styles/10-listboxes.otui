@@ -1,8 +1,7 @@
 TextList < UIScrollArea
+  image-source: /images/ui/scrollarea
+  image-border: 1
   layout: verticalBox
-  border-width: 1
-  border-color: #272727
-  background-color: #636363
   padding: 1
   auto-focus: none
 

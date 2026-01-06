@@ -71,6 +71,8 @@ public:
     ThingType* getRawThingType(uint16_t id, ThingCategory category);
 
     const ThingTypeList& getThingTypes(ThingCategory category);
+    ThingTypeList getProficiencyThings();
+    std::string getCyclopediaItemName(uint16_t itemId);
 
     uint32_t getDatSignature() { return m_datSignature; }
     uint16_t getContentRevision() { return m_contentRevision; }
