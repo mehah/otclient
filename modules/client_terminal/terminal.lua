@@ -201,6 +201,7 @@ function init()
             addLine(line.text, line.color)
         end
     end
+    toggle()
 end
 
 function terminate()
