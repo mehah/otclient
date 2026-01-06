@@ -1125,11 +1125,11 @@ const Light& Creature::getLight() const
 }
 
 ThingType* Creature::getThingType() const {
-    return g_things.getRawThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory());
+    return g_things.getRawThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory(), m_outfit.getResourceId());
 }
 
 ThingType* Creature::getMountThingType() const {
-    return m_outfit.hasMount() ? g_things.getRawThingType(m_outfit.getMount(), ThingCategoryCreature) : nullptr;
+    return m_outfit.hasMount() ? g_things.getRawThingType(m_outfit.getMount(), ThingCategoryCreature, m_outfit.getMountResourceId()) : nullptr;
 }
 
 uint16_t Creature::getCurrentAnimationPhase(const bool mount)
@@ -1221,14 +1221,17 @@ void Creature::onDispatcherAttachEffect(const AttachedEffectPtr& effect) {
 
         effect->m_outfitOwner = outfit;
 
+        ThingType* effectThingType = effect->getThingType();
+
         Outfit newOutfit = outfit;
         newOutfit.setTemp(true);
-        newOutfit.setCategory(effect->getThingType()->getCategory());
+        newOutfit.setCategory(effectThingType->getCategory());
         if (newOutfit.isCreature())
-            newOutfit.setId(effect->getThingType()->getId());
+            newOutfit.setId(effectThingType->getId());
         else
-            newOutfit.setAuxId(effect->getThingType()->getId());
+            newOutfit.setAuxId(effectThingType->getId());
 
+        newOutfit.setResourceId(effectThingType->getResourceId());
         setOutfit(newOutfit);
     }
 }

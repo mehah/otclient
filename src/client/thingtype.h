@@ -37,8 +37,8 @@ using namespace otclient::protobuf;
 class ThingType final : public LuaObject
 {
 public:
-    void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
-    void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
+    void unserializeAppearance(uint16_t clientId, AssetResourcePtr resource, ThingCategory category, const appearances::Appearance& appearance);
+    void unserialize(uint16_t clientId, uint16_t resourceId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
     void applyAppearanceFlags(const appearances::AppearanceFlags& flags);
 
@@ -220,6 +220,7 @@ private:
     PLAYER_ACTION m_defaultAction{ 0 };
 
     uint16_t m_id{ 0 };
+    uint16_t m_resourceId{ 0 };
     uint16_t m_groundSpeed{ 0 };
     uint16_t m_maxTextLength{ 0 };
     uint16_t m_upgradeClassification{ 0 };

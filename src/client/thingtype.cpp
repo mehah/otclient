@@ -27,6 +27,7 @@
 #include "gameconfig.h"
 #include "lightview.h"
 #include "spritemanager.h"
+#include "thingtypemanager.h"
 #include "framework/core/asyncdispatcher.h"
 #include "framework/core/filestream.h"
 #include "framework/graphics/drawpoolmanager.h"
@@ -49,10 +50,11 @@ namespace {
     }
 }
 
-void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCategory category, const appearances::Appearance& appearance)
+void ThingType::unserializeAppearance(const uint16_t clientId, AssetResourcePtr resource, const ThingCategory category, const appearances::Appearance& appearance)
 {
     m_null = false;
     m_id = clientId;
+    m_resourceId = resource->getId();
     m_category = category;
     m_name = appearance.name();
     m_description = appearance.description();
@@ -78,7 +80,7 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
 
             m_animationPhases += std::max<int>(1, spritesPhases.size());
 
-            if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
+            if (const auto& sheet = resource->getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
                 m_size = sheet->getSpriteSize() / g_gameConfig.getSpriteSize();
             }
 
@@ -370,10 +372,11 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
     }
 }
 
-void ThingType::unserialize(const uint16_t clientId, const ThingCategory category, const FileStreamPtr& fin)
+void ThingType::unserialize(const uint16_t clientId, const uint16_t resourceId, const ThingCategory category, const FileStreamPtr& fin)
 {
     m_null = false;
     m_id = clientId;
+    m_resourceId = resourceId;
     m_category = category;
 
     int count = 0;
@@ -763,7 +766,7 @@ void ThingType::loadTexture(const int animationPhase)
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             auto spriteId = m_spritesIndex[spriteIndex];
                             bool isLoading = false;
-                            const auto& spriteImage = g_sprites.getSpriteImage(spriteId, isLoading);
+                            const auto& spriteImage = g_things.getSpriteImage(spriteId, m_resourceId, isLoading);
 
                             if (isLoading)
                                 return;
@@ -794,7 +797,7 @@ void ThingType::loadTexture(const int animationPhase)
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     auto spriteId = m_spritesIndex[spriteIndex];
                                     bool isLoading = false;
-                                    const auto& spriteImage = g_sprites.getSpriteImage(spriteId, isLoading);
+                                    const auto& spriteImage = g_things.getSpriteImage(spriteId, m_resourceId, isLoading);
 
                                     if (isLoading)
                                         return;

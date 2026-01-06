@@ -32,6 +32,10 @@ public:
     virtual ImagePtr getSpriteImage(int id, bool& isLoading) = 0;
     virtual int getSpritesCount() const = 0;
     virtual void unload() = 0;
+    virtual void reload() = 0;
+
+    virtual void init() = 0;
+    virtual void terminate() = 0;
 };
 
 class FileMetadata
@@ -51,17 +55,16 @@ private:
     uint32_t spriteId = 0;
 };
 
-//@bindsingleton g_sprites
 class LegacySpriteManager : public ISpriteManager
 {
 public:
-    void init();
-    void terminate();
+    void init() override;
+    void terminate() override;
 
     bool loadSpr(std::string file);
     bool loadRegularSpr(std::string file);
     bool loadCwmSpr(std::string file);
-    void reload();
+    void reload() override;
     void unload();
 
 #ifdef FRAMEWORK_EDITOR
@@ -73,7 +76,7 @@ public:
 
     ImagePtr getSpriteImage(int id) {
         bool isLoading = false;
-        return  getSpriteImage(id, isLoading);
+        return getSpriteImage(id, isLoading);
     }
 
     ImagePtr getSpriteImage(int id, bool& isLoading);
@@ -191,12 +194,11 @@ public:
     std::string file;
 };
 
-//@bindsingleton g_spriteAppearances
 class ProtobufSpriteManager : public ISpriteManager
 {
 public:
-    void init();
-    void terminate();
+    void init() override;
+    void terminate() override;
 
     void unload();
 

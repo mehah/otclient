@@ -77,6 +77,8 @@ public:
     uint32_t getDatSignature(const uint16_t resourceId = 0) const;
     uint16_t getContentRevision(const uint16_t resourceId = 0) const;
 
+    ImagePtr getSpriteImage(int id, uint16_t resourceId, bool& isLoading);
+
     bool isDatLoaded() {
         // return the state of the first resource encountered
         for (const auto& resource : m_assetResources) {
@@ -90,6 +92,12 @@ public:
     }
     bool isValidDatId(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const;
 
+    void reloadSprites() {
+        for (const auto& resource : m_assetResources)
+            if (resource)
+                resource->reloadSprites();
+    }
+
 private:
 
     // loaded spr/dat/assets storage
@@ -98,7 +106,7 @@ private:
 
     ThingTypePtr m_nullThingType;
 
-    // to do: resourceId support
+    // to do: m_resourceId support
     RaceList m_monsterRaces;
 
 #ifdef FRAMEWORK_EDITOR
@@ -116,9 +124,14 @@ private:
 
 extern ThingTypeManager g_things;
 
-class AssetResource
+class AssetResource : public std::enable_shared_from_this<AssetResource>
 {
 public:
+    void init(uint16_t resourceId);
+    void terminate();
+
+    uint16_t getId() const { return m_resourceId; }
+    
     uint32_t getDatSignature() const { return m_datSignature; }
     uint16_t getContentRevision() const { return m_contentRevision; }
 
@@ -136,6 +149,15 @@ public:
 
     // protobuf assets
     bool loadAppearances(const std::string& file);
+    SpriteSheetPtr getSheetBySpriteId(int id, bool load = true);
+
+    // common
+    ImagePtr getSpriteImage(int id, bool& isLoading);
+
+    void reloadSprites() {
+        if (spriteManager)
+            spriteManager->reload();
+    }
 
 private:
     ThingTypeList m_thingTypes[ThingLastCategory];
@@ -148,7 +170,7 @@ private:
     uint32_t m_datSignature{ 0 };
     uint16_t m_contentRevision{ 0 };
     uint16_t m_clientVersion{ 0 };
-    uint16_t resourceId{ 0 };
+    uint16_t m_resourceId{ 0 };
 
     bool m_datLoaded{ false };
 

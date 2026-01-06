@@ -424,6 +424,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     if (getFeature(Otc::GamePlayerMounts)) {
         Outfit mountOutfit;
         mountOutfit.setId(currentOutfit.getMount());
+        mountOutfit.setResourceId(currentOutfit.getMountResourceId());
         mountOutfit.setCategory(ThingCategoryCreature);
 
         virtualMountCreature = std::make_shared<Creature>();
@@ -434,6 +435,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     if (getFeature(Otc::GamePlayerFamiliars)) {
         Outfit familiarOutfit;
         familiarOutfit.setId(currentOutfit.getFamiliar());
+        familiarOutfit.setResourceId(currentOutfit.getFamiliarResourceId());
         familiarOutfit.setCategory(ThingCategoryCreature);
     }
 

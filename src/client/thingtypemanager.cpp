@@ -46,8 +46,6 @@ ThingTypeManager g_things;
 void ThingTypeManager::init()
 {
     m_nullThingType = std::make_shared<ThingType>();
-    for (auto& m_thingType : m_thingTypes)
-        m_thingType.resize(1, m_nullThingType);
 #ifdef FRAMEWORK_EDITOR
     m_nullItemType = std::make_shared<ItemType>();
     m_itemTypes.resize(1, m_nullItemType);
@@ -56,8 +54,12 @@ void ThingTypeManager::init()
 
 void ThingTypeManager::terminate()
 {
-    for (auto& m_thingType : m_thingTypes)
-        m_thingType.clear();
+    for (const auto& resource : m_assetResources) {
+        if (!resource)
+            continue;
+
+        resource->terminate();
+    }
 
     m_nullThingType = nullptr;
 
@@ -70,7 +72,8 @@ void ThingTypeManager::terminate()
 
 bool ThingTypeManager::loadDat(const std::string& file, const uint16_t resourceId)
 {
-    auto resource = std::make_shared<AssetResource>(resourceId);
+    auto resource = std::make_shared<AssetResource>();
+    resource->init(resourceId);
 
     if (!resource->loadDat(file))
         return false;
@@ -127,13 +130,18 @@ bool ThingTypeManager::loadOtml(std::string file, uint16_t resourceId)
 
 bool ThingTypeManager::loadAppearances(const std::string& file, uint16_t resourceId)
 {
-    auto resource = getResourceById(resourceId);
-    if (!resource) {
-        g_logger.error("Invalid resourceId {} in loadAppearances", resourceId);
-        return false;
-    }
+    auto resource = std::make_shared<AssetResource>();
+    resource->init(resourceId);
+    bool ret = resource->loadAppearances(file);
 
-    return resource->loadAppearances(file);
+    // resize vector before inserting if necessary
+    if (resourceId >= m_assetResources.size())
+        m_assetResources.resize(static_cast<uint16_t>(resourceId) + 1);
+
+    // insert into resource list
+    m_assetResources[resourceId] = std::move(resource);
+
+    return ret;
 }
 
 namespace {
@@ -240,6 +248,15 @@ uint16_t ThingTypeManager::getContentRevision(const uint16_t resourceId) const
 {
     auto res = getResourceById(resourceId);
     return res ? res->getContentRevision() : 0;
+}
+
+ImagePtr ThingTypeManager::getSpriteImage(int id, uint16_t resourceId, bool& isLoading)
+{
+    auto res = getResourceById(resourceId);
+    if (!res)
+        return nullptr;
+
+    return res->getSpriteImage(id, isLoading);
 }
 
 bool ThingTypeManager::isValidDatId(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const
@@ -587,13 +604,14 @@ bool AssetResource::loadDat(const std::string& file)
 
             for (uint16_t id = firstId; id < thingList.size(); ++id) {
                 auto type = std::make_shared<ThingType>();
-                type->unserialize(id, static_cast<ThingCategory>(category), fin);
+                type->unserialize(id, m_resourceId, static_cast<ThingCategory>(category), fin);
                 thingList[id] = std::move(type);
             }
         }
 
         // allocate sprite manager for managing spr/dat assets
         spriteManager = std::make_unique<LegacySpriteManager>();
+        spriteManager->init();
 
         m_datLoaded = true;
         return true;
@@ -624,6 +642,7 @@ bool AssetResource::loadAppearances(const std::string& file)
         );
 
         auto protoSprites = std::make_unique<ProtobufSpriteManager>();
+        protoSprites->init();
 
         for (const auto& obj : document) {
             const auto& type = obj["type"];
@@ -666,6 +685,7 @@ bool AssetResource::loadAppearances(const std::string& file)
         if (!appearancesLib.ParseFromIstream(&fin))
             throw stdext::exception("Couldn't parse appearances lib.");
 
+        auto resource = shared_from_this();
         auto& nullThing = g_things.getNullThingType();
         for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
             const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
@@ -688,7 +708,7 @@ bool AssetResource::loadAppearances(const std::string& file)
             for (const auto& appearance : *appearances) {
                 const auto& type = std::make_shared<ThingType>();
                 const uint16_t id = appearance.id();
-                type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
+                type->unserializeAppearance(id, resource, static_cast<ThingCategory>(category), appearance);
                 m_thingTypes[category][id] = type;
             }
         }
@@ -699,6 +719,39 @@ bool AssetResource::loadAppearances(const std::string& file)
         g_logger.error("Failed to load appearances '{}': {}", file, e.what());
         return false;
     }
+}
+
+SpriteSheetPtr AssetResource::getSheetBySpriteId(int id, bool load)
+{
+    if (auto* protoSprMgr = dynamic_cast<ProtobufSpriteManager*>(spriteManager.get())) {
+        bool isLoading = false;
+        return protoSprMgr->getSheetBySpriteId(id, isLoading, load);
+    }
+
+    return nullptr;
+}
+
+ImagePtr AssetResource::getSpriteImage(int id, bool& isLoading)
+{
+    if (spriteManager)
+        spriteManager->getSpriteImage(id, isLoading);
+
+    return nullptr;
+}
+
+void AssetResource::init(uint16_t resourceId)
+{
+    m_resourceId = resourceId;
+}
+
+void AssetResource::terminate()
+{
+    for (auto& m_thingType : m_thingTypes)
+        m_thingType.clear();
+
+    if (spriteManager)
+        spriteManager->terminate();
+
 }
 
 const ThingTypeList& AssetResource::getThingTypes(const ThingCategory category)

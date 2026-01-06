@@ -44,6 +44,10 @@ public:
     void setEffect(const uint16_t Effect) { m_effect = Effect; }
     void setShader(const std::string& shader) { m_shader = shader; }
 
+    void setResourceId(const uint16_t resourceId) { m_outfitResourceId = resourceId; }
+    void setMountResourceId(const uint16_t resourceId) { m_mountResourceId = resourceId; }
+    void setFamiliarResourceId(const uint16_t resourceId) { m_familiarResourceId = resourceId; }
+
     void setHead(uint8_t head);
     void setBody(uint8_t body);
     void setLegs(uint8_t legs);
@@ -63,6 +67,10 @@ public:
     uint16_t getAura() const { return m_aura; }
     uint16_t getEffect() const { return m_effect; }
     std::string getShader() const { return m_shader; }
+
+    uint16_t getResourceId() const { return m_outfitResourceId; }
+    uint16_t getMountResourceId() const { return m_mountResourceId; }
+    uint16_t getFamiliarResourceId() const { return m_familiarResourceId; }
 
     uint8_t getHead() const { return m_head; }
     uint8_t getBody() const { return m_body; }
@@ -99,7 +107,10 @@ public:
             m_wing == other.m_wing &&
             m_aura == other.m_aura &&
             m_effect == other.m_effect &&
-            m_shader == other.m_shader;
+            m_shader == other.m_shader &&
+            m_outfitResourceId == other.m_outfitResourceId &&
+            m_mountResourceId == other.m_mountResourceId &&
+            m_familiarResourceId == other.m_familiarResourceId;
     }
     bool operator!=(const Outfit& other) const { return !(*this == other); }
 
@@ -116,6 +127,10 @@ private:
     uint16_t m_aura{ 0 };
     uint16_t m_effect{ 0 };
     std::string m_shader;
+
+    uint16_t m_outfitResourceId{ 0 };
+    uint16_t m_mountResourceId{ 0 };
+    uint16_t m_familiarResourceId{ 0 };
 
     uint8_t m_head{ 0 };
     uint8_t m_body{ 0 };

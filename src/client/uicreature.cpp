@@ -91,6 +91,8 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
             outfit.setCategory(ThingCategoryCreature);
             outfit.setId(node->value<int>());
             setOutfit(outfit);
+        } else if (node->tag() == "outfit-resource-id") {
+            getOutfit().setResourceId(node->value<int>());
         } else if (node->tag() == "outfit-head") {
             getOutfit().setHead(node->value<int>());
         } else if (node->tag() == "outfit-body") {
