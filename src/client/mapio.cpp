@@ -785,13 +785,7 @@ void Map::drawMap(std::string fileName, int sx, int sy, int16_t sz, int size, ui
 void Map::saveImage(const std::string& fileName, int minX, int minY, int maxX, int maxY, short z, bool drawLowerFloors)
 {
     try {
-        // Maximum number of lower floors to render for depth visualization
-        // Set to 7 to match the standard Tibia client's Z-axis view range,
-        // which shows up to 7 floors below the current floor for underground areas
-        constexpr int MAX_LOWER_FLOORS = 7;
-
         // Maximum dimension to prevent integer overflow in memory calculations
-        // This allows maps up to 10000x10000 tiles, which is sufficient for most use cases
         constexpr int MAX_DIMENSION = 10000;
 
         const int width = maxX - minX + 1;
@@ -817,43 +811,62 @@ void Map::saveImage(const std::string& fileName, int minX, int minY, int maxX, i
         }
 
         // Add margin of 1 tile on each side for large sprites (64x64) that extend beyond tile bounds
-        // This prevents clipping of isometric walls and other multi-tile sprites
         const int margin = 1;
         ImagePtr image = std::make_shared<Image>(Size((width + margin * 2) * squareSize, (height + margin * 2) * squareSize));
 
         int tilesFound = 0;
         int tilesWithItems = 0;
+        Position position;
 
-        for (int x = 0; x < width; ++x) {
-            for (int y = 0; y < height; ++y) {
-                Position tilePos(minX + x, minY + y, z);
-                // Add margin offset to drawing position
-                const Point dest((x + margin) * squareSize, (y + margin) * squareSize);
+        // Draw lower floors first (if enabled)
+        if (drawLowerFloors) {
+            // Determine the lowest floor to draw based on target floor
+            // For surface (z <= 7): lowestFloor = 7, which means NO lower floors are drawn (loop won't execute)
+            // For underground (z > 7): lowestFloor = 15, draw from floor 15 down to current floor+1
+            short lowestFloor = (z <= 7) ? 7 : 15;
 
-                if (drawLowerFloors && z > 0) {
-                    // Draw lower floors with shadow
-                    for (int floorOffset = MAX_LOWER_FLOORS; floorOffset >= 1; --floorOffset) {
-                        if (z - floorOffset < 0)
-                            continue;
-
-                        Position lowerPos(tilePos.x, tilePos.y, z - floorOffset);
-                        const auto& lowerTile = getTile(lowerPos);
-                        if (lowerTile) {
-                            lowerTile->drawToImage(dest, image);
-                            if (m_lowerFloorsShadowPercent > 0) {
-                                image->addShadowToSquare(dest, squareSize, m_lowerFloorsShadowPercent);
+            // Draw lower floors (floors below current, which have higher Z values in underground)
+            for (short floor = lowestFloor; floor > z; floor--) {
+                position.z = floor;
+                int offset = floor - z;
+                
+                for (int x = -offset; x <= width; x++) {
+                    for (int y = -offset; y <= height; y++) {
+                        position.x = minX + x;
+                        position.y = minY + y;
+                        
+                        if (const TilePtr& tile = getTile(position)) {
+                            int offX = x + margin + offset;
+                            int offY = y + margin + offset;
+                            if (offX >= 0 && offX < width + margin * 2 && offY >= 0 && offY < height + margin * 2) {
+                                Point dest(offX * squareSize, offY * squareSize);
+                                tile->drawToImage(dest, image);
                             }
                         }
                     }
                 }
+            }
 
-                // Draw current floor
-                const auto& tile = getTile(tilePos);
+            // Apply shadow to all lower floors
+            if (m_lowerFloorsShadowPercent > 0) {
+                image->addShadow(static_cast<uint8_t>(100 - m_lowerFloorsShadowPercent));
+            }
+        }
+
+        // Draw current floor on top (no shadow)
+        position.z = z;
+        for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y) {
+                position.x = minX + x;
+                position.y = minY + y;
+                
+                const auto& tile = getTile(position);
                 if (tile) {
                     tilesFound++;
                     if (!tile->isEmpty()) {
                         tilesWithItems++;
                     }
+                    Point dest((x + margin) * squareSize, (y + margin) * squareSize);
                     tile->drawToImage(dest, image);
                 }
             }
