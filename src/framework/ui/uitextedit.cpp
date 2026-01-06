@@ -219,19 +219,25 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
             }
 
             const int visLen = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
+            const Point* glyphsOffset = m_font->getGlyphsOffset();
+            const int lineH = m_font->getGlyphHeight();
+
             for (auto& li : lines) {
                 for (int v = li.visStart; v < li.visEnd && v < visLen; ++v) {
                     const Rect& r = m_glyphsCoords[v].first;
                     if (!r.isValid()) continue;
                     li.hasGlyphs = true;
-                    li.top = (li.top == std::numeric_limits<int>::min()) ? r.top() : std::min(li.top, r.top());
-                    li.bottom = (li.bottom == std::numeric_limits<int>::min()) ? r.bottom() : std::max(li.bottom, r.bottom());
+
+                    uint8_t g = static_cast<uint8_t>(m_displayedText[v]);
+                    int calculatedTop = r.top() - glyphsOffset[g].y;
+
+                    li.top = (li.top == std::numeric_limits<int>::min()) ? calculatedTop : std::min(li.top, calculatedTop);
+                    li.bottom = (li.bottom == std::numeric_limits<int>::min()) ? (calculatedTop + lineH) : std::max(li.bottom, calculatedTop + lineH);
                     li.left = std::min(li.left, r.left());
                     li.right = std::max(li.right, r.right());
                 }
             }
 
-            const int lineH = m_font->getGlyphHeight();
             const int lineDy = m_font->getGlyphSpacing().height();
             int yCursor = m_drawArea.top();
             for (size_t i = 0; i < lines.size(); ++i) {
