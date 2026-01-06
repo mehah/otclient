@@ -1,4 +1,4 @@
-Helpers = {}
+local Helpers = {}
 
 function Helpers.cloneValue(value)
     if type(value) == 'table' then
@@ -56,37 +56,11 @@ function Helpers.normalizeClassPriceEntries(entries)
 end
 
 function Helpers.formatHistoryDate(timestamp)
-    if not timestamp then
+    if not timestamp or timestamp == 0 then
         return 'Unknown'
     end
-    
-    -- If already a formatted string (contains "-" or ":"), return it as-is
-    if type(timestamp) == 'string' then
-        if string.find(timestamp, '-') or string.find(timestamp, ':') then
-            return timestamp
-        end
-        -- Try to convert string to number (in case it's a numeric string)
-        timestamp = tonumber(timestamp)
-        if not timestamp then
-            return 'Unknown'
-        end
-    end
-    
-    -- If it's a number (unix timestamp), format it
-    if type(timestamp) == 'number' then
-        if timestamp == 0 then
-            return 'Unknown'
-        end
-        -- Protect os.date call with pcall in case of invalid timestamp
-        local success, result = pcall(os.date, '%Y-%m-%d, %H:%M:%S', timestamp)
-        if success then
-            return result
-        else
-            return 'Unknown'
-        end
-    end
-    
-    return 'Unknown'
+
+    return os.date('%Y-%m-%d, %H:%M:%S', timestamp)
 end
 
 Helpers.rightArrow = "/modules/game_forge/images/arrows/icon-arrow-rightlarge.png"
@@ -191,7 +165,7 @@ function Helpers.handleDescription(data, currentType)
             "You can transfer the tier of a classification 4 item to another item of the same classification. To do this, you must have at least one tier 1 item that will be consumed during the transfer and additional resources. The other item will receive the tier of the consumed item."
         else
             data.description =
-            "You can transfer the tier of an item to another item of the same classification. To do so, you need at least a tier 2 item that will be consumed during the transfer and additional resources. The other item will received the consumed item's tier reduced by one."
+            "You can transfer the tier of an item to another item of the samr classification. To do so, you need at least a tier 2 item that will be consumed during the transfer and additional resources. The other item will received the consumed item's tier reduced by one."
         end
         return
     end
@@ -353,3 +327,5 @@ function Helpers.handleDescription(data, currentType)
         return
     end
 end
+
+return Helpers

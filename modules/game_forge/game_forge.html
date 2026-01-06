@@ -46,7 +46,7 @@
               >
                 <div
                   *for="local item in (self.fusion.currentList or {})"
-                  onclick="self.fusion.handleSelect(item)"
+                  onclick="self.fusion:handleSelect(item)"
                   onhover="self:handleDescription('fusion-select-item')"
                 >
                   <div
@@ -104,7 +104,7 @@
                     id="fusion_convergence"
                     type="checkbox"
                     *checked="self.fusion.isConvergence"
-                    onchange="self:toggleConvergence(false)"
+                    onchange="self:toggleConvergence()"
                   /><label style="margin-left: 2px" for="fusion_convergence"
                     >Convergence</label
                   >
@@ -236,8 +236,8 @@
                   <p *color="self:getColor('fusion-dust')">
                     {{self.fusion.dustLabel}}
                   </p>
-                  <img placement="center-right"
-                    style="margin-right: 12px"
+                  <img
+                    style="margin-left: 2px"
                     src="/modules/game_forge/images/icon-currency-dust.png"
                     width="9"
                     height="6"
@@ -264,16 +264,16 @@
                   <div class="fusion-buttons-text-container">
                     <button
                       class="fusion-buttons-improve"
-                      *image-clip="self.fusion.chanceImprovedChecked and {x=0, y=46, width=61, height=23} or {x=0, y=0, width=61, height=23}"
-                      onclick="self.fusion.exaltedCoreImprovements('improve-chance')"
+                      *image-clip="self.fusion.chanceImprovedButtonClip"
+                      onclick="self.fusion:exaltedCoreImprovements('improve-chance')"
                       *disabled="self.currentExaltedCores <= 0 or self.fusion.reduceTierLossChecked and self.currentExaltedCores == 1"
                     >
                       Improve to 65%
                     </button>
                     <div class="fusion-text-chance-cost">
-                      <p *color="self:getColor('improve-chance-cost')" style="padding-left: -10px;">1</p>
-                      <img placement="center-right"
-                        style="margin-right: 4px"
+                      <p *color="self:getColor('improve-chance-cost')">1</p>
+                      <img
+                        style="margin-left: 2px"
                         src="/modules/game_forge/images/icon-currency-exaltedcore.png"
                         width="9"
                         height="9"
@@ -298,17 +298,17 @@
                   <div class="fusion-buttons-text-container">
                     <button
                       class="fusion-buttons-improve"
-                      *image-clip="self.fusion.reduceTierLossChecked and {x=0, y=46, width=61, height=23} or {x=0, y=0, width=61, height=23}"
-                      onclick="self.fusion.exaltedCoreImprovements('reduce-loss')"
+                      *image-clip="self.fusion.reduceTierLossButtonClip"
+                      onclick="self.fusion:exaltedCoreImprovements('reduce-loss')"
                       style="width: 98px"
                       *disabled="self.currentExaltedCores <= 0 or self.fusion.chanceImprovedChecked and self.currentExaltedCores == 1"
                     >
                       Reduce to 50%
                     </button>
                     <div class="fusion-text-chance-cost">
-                      <p *color="self:getColor('reduce-loss-cost')" style="padding-left: -10px;">1</p>
-                      <img placement="center-right"
-                        style="margin-right: 4px"
+                      <p *color="self:getColor('reduce-loss-cost')">1</p>
+                      <img
+                        style="margin-left: 2px"
                         src="/modules/game_forge/images/icon-currency-exaltedcore.png"
                         width="9"
                         height="9"
@@ -417,8 +417,7 @@
                 </div>
                 <div class="base-gold-bg" style="margin-top: 2px; width: 128px">
                   <p *color="self:getColor('price')">{{self.formattedPrice}}</p>
-                  <img placement="center-right"
-                    style="margin-right: 12px"
+                  <img
                     src="/images/game/prey/prey_gold.png"
                     width="10"
                     height="10"
@@ -440,7 +439,7 @@
               >
                 <div
                   *for="local item in (self.transfer.currentList.donors or {})"
-                  onclick="self.transfer.handleSelect(item)"
+                  onclick="self.transfer:handleSelect(item)"
                 >
                   <div
                     class="item-to-select"
@@ -605,8 +604,8 @@
                   <p *color="self:getColor('transfer-dust')">
                     {{self.transfer.dustLabel}}
                   </p>
-                  <img placement="center-right"
-                    style="margin-right: 12px"
+                  <img
+                    style="margin-left: 2px"
                     src="/modules/game_forge/images/icon-currency-dust.png"
                     width="9"
                     height="6"
@@ -625,8 +624,8 @@
                   <p *color="self:getColor('transfer-exalted')">
                     {{self.transfer.exaltedCoresLabel }}
                   </p>
-                  <img placement="center-right"
-                    style="margin-right: 12px"
+                  <img
+                    style="margin-left: 2px"
                     src="/modules/game_forge/images/icon-currency-exaltedcore.png"
                     width="9"
                     height="9"
@@ -726,8 +725,7 @@
                 </div>
                 <div class="base-gold-bg" style="margin-top: 2px; width: 128px">
                   <p *color="self:getColor('price')">{{self.formattedPrice}}</p>
-                  <img placement="center-right"
-                    style="margin-right: 12px"
+                  <img
                     src="/images/game/prey/prey_gold.png"
                     width="10"
                     height="10"
@@ -757,11 +755,11 @@
                   <p *color="self:getColor('dustToSilver')">
                     {{self.conversion.necessaryDustToSliver}}
                   </p>
-                  <img placement="center-right"
+                  <img
                     src="/modules/game_forge/images/icon-currency-dust.png"
                     width="9"
                     height="6"
-                    style="margin-right: 12px"
+                    style="margin-left: 3px"
                   />
                 </div>
                 <div>
@@ -775,7 +773,7 @@
                 <div
                   class="conversion-column-item-conversion-button"
                   *disabled="self.conversion.disableDustConversion"
-                  onclick="self.conversion.toggle(2)"
+                  onclick="self.conversion:toggle(2)"
                   onhover="self:handleDescription('convert-dust-cost')"
                 >
                   <UIItem style="item-id: 37109" />
@@ -801,8 +799,8 @@
                   <p *color="self:getColor('sliverToCore')">
                     {{self.conversion.sliverToCore}}
                   </p>
-                  <img placement="center-right"
-                    style="margin-right: 12px"
+                  <img
+                    style="margin-left: 3px"
                     src="/modules/game_forge/images/icon-currency-sliver.png"
                     width="9"
                     height="9"
@@ -820,7 +818,7 @@
                   class="conversion-column-item-conversion-button"
                   *disabled="self.conversion.disableSliverConversion"
                   onhover="self:handleDescription('convert-sliver-cost')"
-                  onclick="self.conversion.toggle(3)"
+                  onclick="self.conversion:toggle(3)"
                 >
                   <UIItem
                     style="item-id: 37110"
@@ -850,8 +848,8 @@
                   <p *color="self:getColor('increaseDustLimit')">
                     {{self.conversion.dustMaxIncreaseCost}}
                   </p>
-                  <img placement="center-right"
-                    style="margin-right: 12px"
+                  <img
+                    style="margin-left: 3px"
                     src="/modules/game_forge/images/icon-currency-dust.png"
                     width="9"
                     height="6"
@@ -868,15 +866,13 @@
                 <div
                   class="conversion-column-item-increase-button"
                   *disabled="self.conversion.disableIncreaseDustLimit"
-                  onclick="self.conversion.toggle(4)"
+                  onclick="self.conversion:toggle(4)"
                   onhover="self:handleDescription('increase-dust-limit-cost')"
-                  style="position: relative; height: 80px;"
                 >
-                  <UIItem style="item-id: 37160; height: 65px; width: 65px; position: absolute; left: 8px; bottom: 10px;" />
-                  <UIItem style="item-id: 37160; height: 65px; width: 65px; position: absolute; left: 63px; top: -5px;" />
+                  <UIItem style="item-id: 37160" />
                 </div>
-                <div style="margin-top: -7px">
-                  <p style="width: 150px">{{self.conversion.dustMaxLabel}}</p>
+                <div style="margin-top: 8px">
+                  <p style="width: 100px">{{self.conversion.dustMaxLabel}}</p>
                 </div>
               </div>
             </div>
@@ -912,7 +908,7 @@
                 *visible="self.history.showPreviousButton"
                 *disabled="not self.history.showPreviousButton"
                 class="history-footer-previous"
-                onclick="self.history.onHistoryPreviousPage()"
+                onclick="self.history:onHistoryPreviousPage()"
               >
                 Previous Page
               </button>
@@ -925,7 +921,7 @@
                 *visible="self.history.showNextButton"
                 *disabled="not self.history.showNextButton"
                 class="history-footer-next"
-                onclick="self.history.onHistoryNextPage()"
+                onclick="self.history:onHistoryNextPage()"
               >
                 Next Page
               </button>
@@ -940,36 +936,33 @@
         <div class="footer-content">
           <div class="base-gold-bg">
             <p>{{self.currentGold}}</p>
-            <img placement="center-right" style="margin-right: 12px" src="/images/game/prey/prey_gold.png" width="10" height="10" />
+            <img src="/images/game/prey/prey_gold.png" width="10" height="10" />
           </div>
           <div
             class="base-resource-bg base-dust-resource-bg"
             style="margin-left: 8px"
           >
-            <p style="padding-left: -15px;">{{self.currentDustAndMaxLabel}}</p>
-            <img placement="center-right"
+            <p>{{self.currentDustAndMaxLabel}}</p>
+            <img
               src="/modules/game_forge/images/icon-currency-dust.png"
               width="9"
               height="6"
-              style="margin-right: 12px"
             />
           </div>
           <div class="base-resource-bg" style="margin-left: 8px">
-            <p style="padding-left: -10px;">{{self.currentSlivers}}</p>
-            <img placement="center-right"
+            <p>{{self.currentSlivers}}</p>
+            <img
               src="/modules/game_forge/images/icon-currency-sliver.png"
               width="9"
               height="9"
-              style="margin-right: 12px"
             />
           </div>
           <div class="base-resource-bg" style="margin-left: 8px">
-            <p style="padding-left: -10px;">{{self.currentExaltedCores}}</p>
-            <img placement="center-right"
+            <p>{{self.currentExaltedCores}}</p>
+            <img
               src="/modules/game_forge/images/icon-currency-exaltedcore.png"
               width="9"
               height="9"
-              style="margin-right: 12px"
             />
           </div>
         </div>
@@ -981,28 +974,29 @@
       class="result-window"
       onescape="self:closeResult()"
       *if="self.showResult or self.showBonus"
-      image-source="/modules/game_forge/images/boxdragon"
     >
+      <div class="result-dragon" placement="top-center"></div>
       <p class="result-title">{{self.result.title}}</p>
 
       <div
         class="result-content"
+        placement="top-center"
         *if="self.showResult and not self.showBonus"
       >
         <UIItem
           *item-id="self.result.leftItemId"
-          style="height: 64px; width: 64px; position: relative; margin-left: 60px; margin-right: 40px;"
+          style="height: 64px; width: 64px; position: relative"
+          placement="top-left"
           *shader="self.result.leftShader"
         >
           <img
             *if="self.result.leftTier > 0 and self.result.label ~= ''"
             class="item-tier-strip"
             src="/images/inventory/tiers-strip.png"
-            style="position: relative; float: left;"
             *image-clip="self.result.leftClip"
           />
         </UIItem>
-        <div class="result-center" style="margin-left: 10px; margin-right: 10px;">
+        <div class="result-center">
           <div class="result-arrows">
             <img
               *for="local value in self.result.arrows"
@@ -1011,10 +1005,18 @@
               height="25"
             />
           </div>
+          <div class="result-text" *if="self.result.label ~= ''">
+            <span>{{self.result.label}} </span
+            ><span style="margin-left: 3px" *color="self.result.color"
+              >{{self.result.labelResult}}</span
+            >
+          </div>
         </div>
+
         <UIItem
           *item-id="self.result.rightItemId"
-          style="height: 64px; width: 64px; position: relative; margin-left:110px;"
+          style="height: 64px; width: 64px; position: relative"
+          placement="top-right"
           *shader="self.result.rightShader"
         >
           <img
@@ -1026,16 +1028,10 @@
         </UIItem>
       </div>
 
-      <div class="result-text" *if="self.result.label ~= '' and self.showResult and not self.showBonus">
-        <span>{{self.result.label}} </span
-        ><span style="margin-left: 3px" *color="self.result.color"
-          >{{self.result.labelResult}}</span
-        >
-      </div>
-
       <div class="result-content" *if="self.showBonus and not self.showResult">
         <div
           style="width: 400px; text-align: center; top: 0"
+          placement="center"
         >
           <UIItem
             *item-id="self.result and self.result.bonusItem"
@@ -1056,12 +1052,15 @@
           </p>
         </div>
       </div>
-
-      <hr id="resultSeparator" class="result-separator HorizontalSeparator" *if="self.result.label ~= ''" />
-
-      <button class="close-btn" *if="self.result.label ~= ''" style="position: absolute; bottom: 10px; right: 15px; padding: 3px 10px; min-width: 60px; min-height: 20px" onclick="self.result.bonusAction()">
-        {{self.result.buttonLabel}}
-      </button>
+      <hr
+        class="separator HorizontalSeparator"
+        style="margin: 0 10; width: 380px"
+      />
+      <div class="result-footer" *if="self.result.label ~= ''">
+        <button style="float: right" onclick="self.result.bonusAction()">
+          {{self.result.buttonLabel}}
+        </button>
+      </div>
     </window>
   </div>
 </html>

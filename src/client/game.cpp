@@ -1760,7 +1760,7 @@ void Game::leaveMarket()
 {
     if (!canPerformGameAction())
         return;
-
+        
     m_protocolGame->sendMarketLeave();
 
     g_lua.callGlobalField("g_game", "onMarketLeave");
