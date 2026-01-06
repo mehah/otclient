@@ -21,14 +21,16 @@
  */
 
 #include "texture.h"
-
-#include "drawpoolmanager.h"
+#include "framebuffer.h"
 #include "graphics.h"
 #include "image.h"
-#include "textureatlas.h"
 #include "texturemanager.h"
-#include "framework/core/eventdispatcher.h"
+#include "textureatlas.h"
+
+#include <framework/core/application.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include "drawpoolmanager.h"
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);

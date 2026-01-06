@@ -21,11 +21,7 @@
  */
 
 #include "uieffect.h"
-
-#include "effect.h"
-#include "framework/graphics/drawpoolmanager.h"
-#include "framework/otml/otmlnode.h"
-#include "gameconfig.h"
+#include "lightview.h"
 
 UIEffect::UIEffect() { setProp(PropDraggable, true, false); }
 
@@ -89,8 +85,6 @@ void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
 
     UIWidget::onStyleApply(styleName, styleNode);
 }
-
-int UIEffect::getEffectId() { return m_effect ? m_effect->getId() : 0; }
 
 void UIEffect::setShader(std::string_view name) {
     m_shaderName = name;

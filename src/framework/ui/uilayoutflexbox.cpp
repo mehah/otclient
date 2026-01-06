@@ -1,7 +1,5 @@
 #include "uilayoutflexbox.h"
 
-#include "uiwidget.h"
-
 namespace {
     enum class Axis { Horizontal, Vertical };
 

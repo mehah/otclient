@@ -21,9 +21,9 @@
  */
 
 #include "particle.h"
-
-#include "animatedtexture.h"
 #include "drawpoolmanager.h"
+
+#include <framework/graphics/animatedtexture.h>
 
 void Particle::render() const
 {

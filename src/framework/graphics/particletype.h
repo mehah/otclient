@@ -23,7 +23,9 @@
 #pragma once
 
 #include "declarations.h"
-#include "framework/otml/declarations.h"
+#include <framework/graphics/animatedtexture.h>
+#include <framework/graphics/painter.h>
+#include <framework/otml/otml.h>
 
 class ParticleType
 {

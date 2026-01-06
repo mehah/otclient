@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "bitmapfontwrapoptions.h"
 #include "declarations.h"
+#include "bitmapfontwrapoptions.h"
 #include <framework/otml/declarations.h>
 
 class BitmapFont

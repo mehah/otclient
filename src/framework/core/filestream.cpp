@@ -21,14 +21,11 @@
  */
 
 #include "filestream.h"
-
-#include <physfs.h>
-
 #include "binarytree.h"
 #include "graphicalapplication.h"
-#if ENABLE_ENCRYPTION == 1
-#include "resourcemanager.h"
-#endif
+#include <framework/core/application.h>
+
+#include <physfs.h>
 
 inline void grow(std::vector<uint8_t>& data, const size_t size) {
     if (size > data.size())

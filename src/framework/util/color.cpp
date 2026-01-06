@@ -21,6 +21,8 @@
  */
 
 #include "color.h"
+#include <framework/stdext/hash.h>
+#include <iomanip>
 
 #include "framework/stdext/string.h"
 
@@ -131,17 +133,14 @@ namespace {
         {"yellow",rgb_to_abgr(0xFFFF00)}, {"yellowgreen",rgb_to_abgr(0x9ACD32)},
     };
 
-    inline std::string to_lower_ascii(std::string_view s) {
-        std::string out(s);
-        for (char &c : out)
-            if (c >= 'A' && c <= 'Z')
-                c |= 0x20;
+    inline std::string to_lower(std::string_view s) {
+        std::string out; out.reserve(s.size());
+        for (unsigned char c : s) out.push_back(std::tolower(c));
         return out;
     }
 
-
     inline bool css_lookup(std::string_view name, uint32_t& abgrOut) {
-        const auto key = to_lower_ascii(name);
+        const auto key = to_lower(name);
 
         if (key == "transparent") { abgrOut = 0x00000000u; return true; }
 
@@ -166,7 +165,7 @@ namespace {
 
     static inline int parse_byte_or_percent(const std::string& s) {
         if (!s.empty() && s.back() == '%') {
-            const double p = std::strtod(s.data(), nullptr);
+            const double p = std::strtod(s.c_str(), nullptr);
             return clamp255(static_cast<int>(std::lround(p * 255.0 / 100.0)));
         }
         return clamp255(std::stoi(s));
@@ -174,11 +173,11 @@ namespace {
 
     static inline int parse_alpha_any(const std::string& s) {
         if (!s.empty() && s.back() == '%') {
-            const double p = std::strtod(s.data(), nullptr);
+            const double p = std::strtod(s.c_str(), nullptr);
             return clamp255(static_cast<int>(std::lround(p * 255.0 / 100.0)));
         }
         if (s.find_first_of(".eE") != std::string::npos) {
-            double f = std::strtod(s.data(), nullptr);
+            double f = std::strtod(s.c_str(), nullptr);
             if (f < 0) f = 0; if (f > 1) f = 1;
             return clamp255(static_cast<int>(std::lround(f * 255.0)));
         }
@@ -225,7 +224,7 @@ namespace {
 
 Color::Color(const std::string_view coltext)
 {
-    std::stringstream ss((std::string(coltext)));
+    std::stringstream ss(coltext.data());
     ss >> *this;
     update();
 }
@@ -266,7 +265,7 @@ std::istream& operator>>(std::istream& in, Color& color)
 
     auto parse_byte_or_percent = [&](const std::string& s) {
         if (!s.empty() && s.back() == '%') {
-            const double p = std::strtod(s.data(), nullptr);
+            const double p = std::strtod(s.c_str(), nullptr);
             return clamp255(static_cast<int>(std::lround(p * 255.0 / 100.0)));
         }
         return clamp255(std::stoi(s));
@@ -274,11 +273,11 @@ std::istream& operator>>(std::istream& in, Color& color)
 
     auto parse_alpha_any = [&](const std::string& s) {
         if (!s.empty() && s.back() == '%') {
-            const double p = std::strtod(s.data(), nullptr);
+            const double p = std::strtod(s.c_str(), nullptr);
             return clamp255(static_cast<int>(std::lround(p * 255.0 / 100.0)));
         }
         if (s.find_first_of(".eE") != std::string::npos) {
-            double f = std::strtod(s.data(), nullptr);
+            double f = std::strtod(s.c_str(), nullptr);
             if (f < 0) f = 0; if (f > 1) f = 1;
             return clamp255(static_cast<int>(std::lround(f * 255.0)));
         }
@@ -375,9 +374,9 @@ std::istream& operator>>(std::istream& in, Color& color)
             if (o != std::string::npos && c != std::string::npos && c > o + 1) {
                 auto parts = split_commas(t.substr(o + 1, c - o - 1));
                 if ((!hasA && parts.size() == 3) || (hasA && parts.size() == 4)) {
-                    const double h = std::strtod(parts[0].data(), nullptr);
+                    const double h = std::strtod(parts[0].c_str(), nullptr);
                     auto pct = [](const std::string& s) {
-                        const double v = std::strtod(s.data(), nullptr);
+                        const double v = std::strtod(s.c_str(), nullptr);
                         return (!s.empty() && s.back() == '%') ? std::clamp(v / 100.0, 0.0, 1.0)
                             : std::clamp(v, 0.0, 1.0);
                     };

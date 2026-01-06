@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "particle.h"
 #include "particleaffector.h"
+#include "particle.h"
 
 void ParticleAffector::update(const float elapsedTime)
 {

@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include "../stdext/cast.h"
+#include "../stdext/types.h"
+
 class Color
 {
 public:

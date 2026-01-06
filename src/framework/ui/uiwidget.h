@@ -23,13 +23,17 @@
 #pragma once
 
 #include "declarations.h"
+#include "uilayout.h"
 
 #include <framework/core/timer.h>
+#include <framework/graphics/bitmapfont.h>
 #include <framework/graphics/declarations.h>
-#include <framework/html/declarations.h>
 #include <framework/luaengine/luaobject.h>
+#include <framework/otml/otmlnode.h>
+#include <framework/html/declarations.h>
 
-#include "framework/graphics/bitmapfontwrapoptions.h"
+#include "framework/graphics/drawpool.h"
+#include "framework/graphics/texture.h"
 
 template<typename T = int>
 struct EdgeGroup
@@ -182,7 +186,7 @@ enum class AlignSelf : uint8_t
     Baseline
 };
 
-enum class Unit : uint8_t { Auto, FitContent, Px, Em, Percent, Invalid };
+enum class Unit { Auto, FitContent, Px, Em, Percent, Invalid };
 
 enum class OverflowType : uint8_t
 {
@@ -682,7 +686,6 @@ public:
     UIWidgetPtr getFocusedChild() { return m_focusedChild; }
     UIWidgetPtr getHoveredChild();
     UIWidgetList getChildren() { return m_children; }
-    UIWidgetList getReverseChildren() { return UIWidgetList(m_children.rbegin(), m_children.rend()); }
     UIWidgetPtr getFirstChild() { return getChildByIndex(1); }
     UIWidgetPtr getLastChild() { return getChildByIndex(-1); }
     UILayoutPtr getLayout() { return m_layout; }
@@ -692,7 +695,7 @@ public:
     Fw::AutoFocusPolicy getAutoFocusPolicy() { return m_autoFocusPolicy; }
     int getAutoRepeatDelay() { return m_autoRepeatDelay; }
     Point getVirtualOffset() { return m_virtualOffset; }
-    std::string getStyleName();
+    std::string getStyleName() { return m_style->tag(); }
     Point getLastClickPosition() { return m_lastClickPosition; }
 
     // base style
@@ -922,8 +925,8 @@ public:
     int getImageBorderRight() { return m_imageBorder.right; }
     int getImageBorderBottom() { return m_imageBorder.bottom; }
     int getImageBorderLeft() { return m_imageBorder.left; }
-    int getImageTextureWidth();
-    int getImageTextureHeight();
+    int getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
+    int getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
 
     // text related
 private:
@@ -1030,7 +1033,7 @@ public:
     Fw::AlignmentFlag getTextAlign() { return m_textAlign; }
     Point getTextOffset() { return m_textOffset; }
     bool isTextWrap() { return hasProp(PropTextWrap); }
-    std::string getFont();
+    std::string getFont() { return m_font->getName(); }
     Size getTextSize() { return m_textSize; }
 
     // custom style

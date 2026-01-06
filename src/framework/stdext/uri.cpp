@@ -1,3 +1,6 @@
+#include <locale>
+#include <regex>
+
 #include "uri.h"
 
 ParsedURI parseURI(const std::string& url) {

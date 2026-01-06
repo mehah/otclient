@@ -21,6 +21,7 @@
  */
 #include "cssparser.h"
 #include "htmlnode.h"
+#include "queryselector.h"
 
 namespace css {
     namespace detail {

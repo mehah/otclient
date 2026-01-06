@@ -21,11 +21,10 @@
  */
 
 #include "drawpoolmanager.h"
-
+#include "declarations.h"
+#include "drawpool.h"
 #include "graphics.h"
-#include "painter.h"
 #include "textureatlas.h"
-#include <framework/core/configmanager.h>
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 
@@ -40,17 +39,8 @@ void DrawPoolManager::init(const uint16_t spriteSize)
     if (spriteSize != 0)
         m_spriteSize = spriteSize;
 
-    auto mapAtlasSize = g_configs.getPublicConfig().graphics.mapAtlasSize;
-    auto foregroundAtlasSize = g_configs.getPublicConfig().graphics.foregroundAtlasSize;
-
-    if (mapAtlasSize == 0)
-        mapAtlasSize = g_graphics.getMaxTextureSize();
-
-    if (foregroundAtlasSize == 0)
-        foregroundAtlasSize = g_graphics.getMaxTextureSize();
-
-    auto atlasMap = mapAtlasSize > 0 ? std::make_shared<TextureAtlas>(Fw::TextureAtlasType::MAP, mapAtlasSize) : nullptr;
-    auto atlasForeground = foregroundAtlasSize > 0 ? std::make_shared<TextureAtlas>(Fw::TextureAtlasType::FOREGROUND, foregroundAtlasSize, true) : nullptr;
+    auto atlasMap = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::MAP, g_graphics.getMaxTextureSize());
+    auto atlasForeground = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::FOREGROUND, 2048/*, true*/);
 
     // Create Pools
     for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
@@ -61,13 +51,13 @@ void DrawPoolManager::init(const uint16_t spriteSize)
                 pool->m_atlas = atlasMap;
                 break;
 
-            case DrawPoolType::FOREGROUND:
+                // for now atlas in the UI will be disabled,
+                // there are some rendering bugs.
+                // case DrawPoolType::FOREGROUND:
             case DrawPoolType::FOREGROUND_MAP:
             case DrawPoolType::CREATURE_INFORMATION:
                 pool->m_atlas = atlasForeground;
                 break;
-
-            default: break;
         }
     }
 }
@@ -85,7 +75,6 @@ bool DrawPoolManager::isValid() const { return CURRENT_POOL < static_cast<uint8_
 DrawPool* DrawPoolManager::getCurrentPool() const { return m_pools[CURRENT_POOL]; }
 void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uint8_t>(type); }
 bool DrawPoolManager::isPreDrawing() const { return CURRENT_POOL != static_cast<uint8_t>(DrawPoolType::LAST); }
-bool DrawPoolManager::shaderNeedFramebuffer() const { return getCurrentPool()->getCurrentState().shaderProgram && getCurrentPool()->getCurrentState().shaderProgram->useFramebuffer(); }
 
 void DrawPoolManager::draw()
 {
@@ -193,7 +182,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, cons
     });
 }
 
-void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear)
+void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear, const bool alwaysDraw)
 {
     select(type);
     const auto pool = getCurrentPool();
@@ -201,6 +190,9 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     pool->resetState();
 
     if (f) f();
+
+    if (alwaysDraw)
+        pool->repaint();
 
     if (beforeRelease)
         beforeRelease();
@@ -227,6 +219,7 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         pool->m_framebuffer->bind();
 
     if (shouldRepaint) {
+        SpinLock::Guard guard(pool->m_threadLock);
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
         pool->m_shouldRepaint.store(false, std::memory_order_release);
     }

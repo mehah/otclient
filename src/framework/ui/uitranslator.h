@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../const.h"
+#include <string>
 
 namespace Fw
 {

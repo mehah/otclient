@@ -20,20 +20,22 @@
  * THE SOFTWARE.
  */
 
-#include "resourcemanager.h"
-
-#include <physfs.h>
+#include <algorithm>
+#include <filesystem>
+#include <ranges>
 
 #include "filestream.h"
-#include "graphicalapplication.h"
-#include "framework/graphics/drawpoolmanager.h"
-#include "framework/net/protocolhttp.h"
-#include "framework/platform/platform.h"
-#include "framework/util/crypt.h"
+#include "resourcemanager.h"
+#include <client/game.h>
 
-#if ENABLE_ENCRYPTION == 1
-#include "client/game.h"
-#endif
+#include <framework/core/application.h>
+#include <framework/graphics/drawpoolmanager.h>
+#include <framework/luaengine/luainterface.h>
+#include <framework/net/protocolhttp.h>
+#include <framework/platform/platform.h>
+#include <framework/util/crypt.h>
+
+#include <physfs.h>
 
 ResourceManager g_resources;
 
@@ -549,21 +551,24 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, const int32_t size)
     const auto& password = std::string(ENCRYPTION_PASSWORD);
     const int plen = password.length();
 
+    auto* const new_Data = new uint8_t[size];
+
     int j = 0;
     for (int i = -1; ++i < size;) {
         const int ct = data[i];
         if (i % 2) {
-            data[i] = ct + password[j] - i;
+            new_Data[i] = ct + password[j] - i;
         } else {
-            data[i] = ct - password[j] + i;
+            new_Data[i] = ct - password[j] + i;
         }
+        data[i] = new_Data[i];
         ++j;
 
         if (j >= plen)
             j = 0;
     }
 
-    return data;
+    return nullptr;
 }
 
 void ResourceManager::runEncryption(const std::string& password)

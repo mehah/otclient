@@ -33,10 +33,6 @@ local executeConfig = function(attachedEffect, config)
         })
     end
 
-    if config.followOwner then
-        attachedEffect:setFollowOwner(config.followOwner)
-    end
-
     if config.drawOrder then
         attachedEffect:setDrawOrder(config.drawOrder)
     end

@@ -34,7 +34,6 @@ class ScheduledEvent;
 class FileStream;
 class BinaryTree;
 class OutputBinaryTree;
-class ApplicationDrawEvents;
 
 using ModulePtr = std::shared_ptr<Module>;
 using ConfigPtr = std::shared_ptr<Config>;

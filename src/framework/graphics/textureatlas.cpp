@@ -1,22 +1,13 @@
-#include "framebuffer.h"
 #include "textureatlas.h"
+#include "texturemanager.h"
+#include "graphics.h"
+#include "framebuffer.h"
 
-#include "painter.h"
-#include <framework/core/configmanager.h>
-
-// Extra padding around smooth textures to avoid sampling artifacts (in pixels)
-static constexpr uint8_t SMOOTH_PADDING = 2;
-
-// Limit texture size based on atlas size (Default: 35%)
-static constexpr float MAX_ATLAS_TEXTURE_COVERAGE = 0.35f;
-
-// Minimum texture size (including padding) to be cached in the atlas
-// With SMOOTH_PADDING = 2 this results in 8 (4 + 2*2)
-static constexpr int MIN_PADDED_ATLAS_TEXTURE_SIZE = 4 + SMOOTH_PADDING * 2;
+constexpr uint8_t SMOOTH_PADDING = 2;
 
 TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :
     m_type(type),
-    m_size({ std::min<int>(size, g_configs.getPublicConfig().graphics.maxAtlasSize) }) {
+    m_size({ std::min<int>(size, 8192) }) {
     createNewLayer(false);
     if (smoothSupport)
         createNewLayer(true);
@@ -36,86 +27,63 @@ void TextureAtlas::removeTexture(uint32_t id, bool smooth) {
     m_texturesCached.erase(it);
 }
 
-bool TextureAtlas::canAdd(const TexturePtr& texture) const {
-    const auto textureWidth = texture->getWidth();
-    const auto textureHeight = texture->getHeight();
-
-    const int padding = texture->isSmooth() ? SMOOTH_PADDING : 0;
-    const int paddedWidth = textureWidth + padding * 2;
-    const int paddedHeight = textureHeight + padding * 2;
-
-    if (paddedWidth <= 0 || paddedHeight <= 0 ||
-        paddedWidth > m_size.width() || paddedHeight > m_size.height()) {
-        return false; // don't cache
-    }
-
-    if (paddedWidth < MIN_PADDED_ATLAS_TEXTURE_SIZE ||
-        paddedHeight < MIN_PADDED_ATLAS_TEXTURE_SIZE) {
-        return false; // too small for atlas
-    }
-
-    const int64_t atlasPixelArea = static_cast<int64_t>(m_size.width()) * m_size.height();
-    const int64_t maxTextureArea = static_cast<int64_t>(atlasPixelArea * MAX_ATLAS_TEXTURE_COVERAGE);
-
-    // Maximum texture area relative to the atlas
-    return static_cast<int64_t>(paddedWidth) * paddedHeight <= maxTextureArea;
-}
-
 void TextureAtlas::addTexture(const TexturePtr& texture) {
-    if (!canAdd(texture))
-        return;
+    const auto textureID = texture->getId();
+    const auto width = texture->getWidth();
+    const auto height = texture->getHeight();
 
-    const auto textureId = texture->getId();
-    const auto textureWidth = texture->getWidth();
-    const auto textureHeight = texture->getHeight();
+    if (width <= 0 || height <= 0 || width >= m_size.width() || height >= m_size.height()) {
+        return; // don't cache
+    }
 
     auto& filterGroup = m_filterGroups[texture->isSmooth()];
 
-    const auto sizeKey = std::make_pair(textureWidth, textureHeight);
-    if (auto it = filterGroup.inactiveTextures.find(sizeKey);
-        it != filterGroup.inactiveTextures.end()) {
-        auto& pool = it->second;
-        if (!pool.empty()) {
-            auto regionInfo = std::move(pool.back());
-            pool.pop_back();
+    auto sizeKey = std::make_pair(width, height);
+    auto it = filterGroup.inactiveTextures.find(sizeKey);
+    if (it != filterGroup.inactiveTextures.end()) {
+        auto& texList = it->second;
+        if (!texList.empty()) {
+            auto tex = std::move(texList.back());
+            texList.pop_back();
 
-            regionInfo->textureID = textureId;
-            regionInfo->transformMatrixId = texture->getTransformMatrixId();
-            texture->m_atlas[m_type] = regionInfo.get();
+            tex->textureID = texture->getId();
+            tex->transformMatrixId = texture->getTransformMatrixId();
+            texture->m_atlas[m_type] = tex.get();
 
-            filterGroup.layers[regionInfo->layer].textures.emplace_back(regionInfo.get());
-            m_texturesCached.emplace(textureId, std::move(regionInfo));
+            filterGroup.layers[tex->layer].textures.emplace_back(tex.get());
+            m_texturesCached.emplace(textureID, std::move(tex));
+
             return;
         }
     }
 
-    const int padding = texture->isSmooth() ? SMOOTH_PADDING : 0;
-    const int paddedWidth = textureWidth + padding * 2;
-    const int paddedHeight = textureHeight + padding * 2;
+    const int pad = texture->isSmooth() ? SMOOTH_PADDING : 0;
+    const int allocW = width + (pad * 2);
+    const int allocH = height + (pad * 2);
 
-    auto bestRegion = findBestRegion(paddedWidth, paddedHeight, texture->isSmooth());
-    if (!bestRegion) {
+    auto bestRegionOpt = findBestRegion(allocW, allocH, texture->isSmooth());
+    if (!bestRegionOpt.has_value()) {
         createNewLayer(texture->isSmooth());
         return addTexture(texture);
     }
 
-    FreeRegion region = *bestRegion;
-    splitRegion(region, paddedWidth, paddedHeight, texture->isSmooth());
+    FreeRegion region = bestRegionOpt.value();
+    splitRegion(region, allocW, allocH, texture->isSmooth());
 
-    auto regionInfo = std::make_unique<AtlasRegion>(
-        textureId,
-        region.x + padding,
-        region.y + padding,
+    auto info = std::make_unique<AtlasRegion>(
+        textureID,
+        region.x + pad,
+        region.y + pad,
         region.layer,
-        static_cast<int16_t>(textureWidth),
-        static_cast<int16_t>(textureHeight),
+        static_cast<int16_t>(width),
+        static_cast<int16_t>(height),
         texture->getTransformMatrixId(),
         m_filterGroups[texture->isSmooth()].layers[region.layer].framebuffer->getTexture().get()
     );
 
-    texture->m_atlas[m_type] = regionInfo.get();
-    filterGroup.layers[region.layer].textures.emplace_back(regionInfo.get());
-    m_texturesCached.emplace(textureId, std::move(regionInfo));
+    texture->m_atlas[m_type] = info.get();
+    filterGroup.layers[region.layer].textures.emplace_back(info.get());
+    m_texturesCached.emplace(textureID, std::move(info));
 }
 
 void TextureAtlas::createNewLayer(bool smooth) {
@@ -165,7 +133,7 @@ void TextureAtlas::flush() {
                     g_painter->setTexture(texture->textureID, texture->transformMatrixId);
                     g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
 
-                    texture->enabled.store(true, std::memory_order_relaxed);
+                    texture->enabled.store(true, std::memory_order_release);
                 }
                 glEnable(GL_BLEND);
                 layer.textures.clear();

@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "declarations.h"
+
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
 

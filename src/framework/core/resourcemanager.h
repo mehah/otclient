@@ -23,6 +23,8 @@
 #pragma once
 
 #include "declarations.h"
+#include <filesystem>
+#include <set>
 
  // @bindsingleton g_resources
 class ResourceManager

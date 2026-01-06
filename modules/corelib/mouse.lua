@@ -1,7 +1,6 @@
 -- @docclass
-function g_mouse.bindAutoPress(widget, callback, delay, button, interval)
+function g_mouse.bindAutoPress(widget, callback, delay, button)
     local button = button or MouseLeftButton
-    local interval = interval or 30
     connect(widget, {
         onMousePress = function(widget, mousePos, mouseButton)
             if mouseButton ~= button then
@@ -13,7 +12,7 @@ function g_mouse.bindAutoPress(widget, callback, delay, button, interval)
                 callback(widget, g_window.getMousePosition(), mouseButton, g_clock.millis() - startTime)
             end, function()
                 return g_mouse.isPressed(mouseButton)
-            end, interval, delay)
+            end, 30, delay)
             return true
         end
     })

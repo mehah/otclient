@@ -1,5 +1,16 @@
 #pragma once
 
+#include <unordered_map>
+#include <vector>
+#include <chrono>
+#include <set>
+#include <optional>
+#include <functional>
+#include <stdexcept>
+#include <iostream>
+#include <map>
+#include <algorithm>
+
 #include "declarations.h"
 
 class AtlasRegion
@@ -16,7 +27,7 @@ public:
     std::atomic_bool enabled;
 
     bool isEnabled() const {
-        return enabled.load(std::memory_order_relaxed);
+        return enabled.load(std::memory_order_acquire);
     }
 
     AtlasRegion(uint32_t tid, int16_t x, int16_t y, int8_t layer,
@@ -66,7 +77,6 @@ public:
 
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id, bool smooth);
-    bool canAdd(const TexturePtr& texture) const;
 
     Size getSize() const { return m_size; }
 

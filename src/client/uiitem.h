@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include "item.h"
 #include <framework/ui/uiwidget.h>
 
 class UIItem final : public UIWidget
@@ -40,10 +41,10 @@ public:
     void setVirtual(const bool virt) { m_virtual = virt; }
     void clearItem() { setItemId(0); }
 
-    int getItemId();
-    int getItemCount();
-    int getItemSubType();
-    int getItemCountOrSubType();
+    int getItemId() { return m_item ? m_item->getId() : 0; }
+    int getItemCount() { return m_item ? m_item->getCount() : 0; }
+    int getItemSubType() { return m_item ? m_item->getSubType() : 0; }
+    int getItemCountOrSubType() { return m_item ? m_item->getCountOrSubType() : 0; }
     ItemPtr getItem() { return m_item; }
     bool isVirtual() { return m_virtual; }
     bool isItemVisible() { return m_itemVisible; }
@@ -60,5 +61,5 @@ protected:
     bool m_virtual{ false };
     bool m_showId{ false };
     bool m_itemVisible{ true };
-    bool m_alwaysShowCount{ true };
+    bool m_alwaysShowCount{ false };
 };

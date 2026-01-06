@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "htmlnode.h"
 #include "queryselector.h"
+#include "htmlnode.h"
 
 struct Selector;
 struct AttrTest

@@ -21,18 +21,14 @@
  */
 
 #include "attachedeffect.h"
-
-#include "animator.h"
 #include "gameconfig.h"
 #include "lightview.h"
-#include "thingtype.h"
 #include "thingtypemanager.h"
-#include "framework/core/clock.h"
-#include "framework/graphics/animatedtexture.h"
-#include "framework/graphics/drawpoolmanager.h"
-#include "framework/graphics/shadermanager.h"
-#include "framework/graphics/texture.h"
-#include "framework/graphics/texturemanager.h"
+
+#include <framework/core/clock.h>
+#include <framework/graphics/animatedtexture.h>
+#include <framework/graphics/shadermanager.h>
+#include <framework/graphics/texturemanager.h>
 
 AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
@@ -70,13 +66,13 @@ AttachedEffectPtr AttachedEffect::clone()
     return obj;
 }
 
-int getBounce(const Bounce& bounce) {
+int getBounce(const AttachedEffect::Bounce bounce, const ticks_t ticks) {
     const auto minHeight = bounce.minHeight * g_drawPool.getScaleFactor();
     const auto height = bounce.height * g_drawPool.getScaleFactor();
-    return minHeight + (height - std::abs(height - static_cast<int>(bounce.timer.ticksElapsed() / (bounce.speed / 100.f)) % static_cast<int>(height * 2)));
+    return minHeight + (height - std::abs(height - static_cast<int>(ticks / (bounce.speed / 100.f)) % static_cast<int>(height * 2)));
 }
 
-void AttachedEffect::draw(const Point& dest, const bool isOnTop, LightView* lightView, const bool drawThing) {
+void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightViewPtr& lightView, const bool drawThing) {
     if (m_transform)
         return;
 
@@ -101,11 +97,11 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, LightView* ligh
         const auto scaleFactor = g_drawPool.getScaleFactor();
 
         if (m_pulse.height > 0 && m_pulse.speed > 0) {
-            g_drawPool.setScaleFactor(scaleFactor + getBounce(m_pulse) / 100.f);
+            g_drawPool.setScaleFactor(scaleFactor + getBounce(m_pulse, m_pulse.timer.ticksElapsed()) / 100.f);
         }
 
         if (m_fade.height > 0 && m_fade.speed > 0) {
-            g_drawPool.setOpacity(std::clamp<float>(getBounce(m_fade) / 100.f, 0, 1.f));
+            g_drawPool.setOpacity(std::clamp<float>(getBounce(m_fade, m_fade.timer.ticksElapsed()) / 100.f, 0, 1.f));
         }
 
         auto point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
@@ -115,7 +111,7 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, LightView* ligh
         }
 
         if (m_bounce.height > 0 && m_bounce.speed > 0) {
-            point -= getBounce(m_bounce);
+            point -= getBounce(m_bounce, m_bounce.timer.ticksElapsed());
         }
 
         if (lightView && m_light.intensity > 0)
@@ -154,7 +150,7 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, LightView* ligh
     }
 }
 
-void AttachedEffect::drawLight(const Point& dest, LightView* lightView) {
+void AttachedEffect::drawLight(const Point& dest, const LightViewPtr& lightView) {
     if (!lightView) return;
 
     const auto& dirControl = m_offsetDirections[m_direction];

@@ -20,15 +20,13 @@
  * THE SOFTWARE.
  */
 
-#include "uiwidget.h"
 #include "framework/graphics/drawpoolmanager.h"
-
+#include "uiwidget.h"
 #include <framework/graphics/animatedtexture.h>
-#include <framework/graphics/textureatlas.h>
+#include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/graphics/textureatlas.h>
 #include <framework/util/crypt.h>
-
-#include "framework/otml/otmlnode.h"
 
 void UIWidget::initImage() {
     m_imageCoordsCache = std::make_shared<CoordsBuffer>();

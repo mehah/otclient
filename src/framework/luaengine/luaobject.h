@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include <unordered_map>
 
  /// LuaObject, all script-able classes have it as base
  // @bindclass
@@ -45,8 +46,6 @@ public:
     R callLuaField(std::string_view field, const T&... args);
     template<typename... T>
     void callLuaField(std::string_view field, const T&... args);
-    template<typename... T>
-    void callLuaFieldUnchecked(std::string_view field, const T&... args);
 
     /// Returns true if the lua field exists
     bool hasLuaField(std::string_view field) const;
@@ -225,14 +224,6 @@ void LuaObject::callLuaField(const std::string_view field, const T&... args)
 
     if (it == m_events.end())
         m_events[fieldStr] = rets > -1;
-}
-
-template<typename... T>
-void LuaObject::callLuaFieldUnchecked(const std::string_view field, const T&... args)
-{
-    const int rets = luaCallLuaField(field, args...);
-    if (rets > 0)
-        g_lua.pop(rets);
 }
 
 template<typename T>

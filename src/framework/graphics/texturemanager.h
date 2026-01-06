@@ -22,9 +22,8 @@
 
 #pragma once
 
+#include "texture.h"
 #include <framework/core/declarations.h>
-
-#include "declarations.h"
 
 class TextureManager
 {

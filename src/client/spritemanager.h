@@ -22,14 +22,21 @@
 
 #pragma once
 
+#include "gameconfig.h"
 #include <framework/core/declarations.h>
+#include <framework/core/filestream.h>
 #include <framework/graphics/declarations.h>
 
 class FileMetadata
 {
 public:
     FileMetadata() = default;
-    FileMetadata(const FileStreamPtr& file);
+    FileMetadata(const FileStreamPtr& file) {
+        offset = file->getU32();
+        fileSize = file->getU32();
+        fileName = file->getString();
+        spriteId = std::stoi(fileName);
+    }
 
     uint32_t getSpriteId() const { return spriteId; }
     const std::string& getFileName() const { return fileName; }

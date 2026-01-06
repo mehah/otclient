@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <atomic>
+
 namespace stdext
 {
     inline int16_t getThreadId() {

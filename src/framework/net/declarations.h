@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include <asio/ip/tcp.hpp>
+#include <asio/write.hpp>
+
 class InputMessage;
 class OutputMessage;
 #ifdef __EMSCRIPTEN__

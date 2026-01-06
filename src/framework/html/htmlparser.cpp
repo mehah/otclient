@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "htmlnode.h"
 #include "htmlparser.h"
+#include "htmlnode.h"
 #include <stack>
 
 static inline bool is_space(unsigned char c) { return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f'; }

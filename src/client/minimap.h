@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include "gameconfig.h"
 #include <framework/graphics/declarations.h>
 #include <framework/util/spinlock.h>
 

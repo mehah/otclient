@@ -22,6 +22,7 @@
 
 #pragma once
 
-struct DataRoot;
+#include <framework/global.h>
+
 class HtmlNode;
 using HtmlNodePtr = std::shared_ptr<HtmlNode>;

@@ -92,23 +92,19 @@ public:
     template<class C, class B = LuaObject>
     void registerClass()
     {
-        const std::string className = stdext::demangle_class<C>();
-        const std::string baseClassName = stdext::demangle_class<B>();
-        registerClass(className, baseClassName);
+        registerClass(stdext::demangle_class<C>(), stdext::demangle_class<B>());
     }
 
     template<class C>
     void registerClassStaticFunction(const std::string_view functionName, const LuaCppFunction& function)
     {
-        const std::string className = stdext::demangle_class<C>();
-        registerClassStaticFunction(className, functionName, function);
+        registerClassStaticFunction(stdext::demangle_class<C>(), functionName, function);
     }
 
     template<class C>
     void registerClassMemberFunction(const std::string_view functionName, const LuaCppFunction& function)
     {
-        const std::string className = stdext::demangle_class<C>();
-        registerClassMemberFunction(className, functionName, function);
+        registerClassMemberFunction(stdext::demangle_class<C>(), functionName, function);
     }
 
     template<class C>
@@ -116,8 +112,7 @@ public:
                                   const LuaCppFunction& getFunction,
                                   const LuaCppFunction& setFunction)
     {
-        const std::string className = stdext::demangle_class<C>();
-        registerClassMemberField(className, field, getFunction, setFunction);
+        registerClassMemberField(stdext::demangle_class<C>(), field, getFunction, setFunction);
     }
 
     // methods for binding functions

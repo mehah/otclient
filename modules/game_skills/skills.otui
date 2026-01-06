@@ -590,7 +590,6 @@ MiniWindow
       id: HorizontalSeparator
       margin-top: 5
       margin-bottom: 15
-      visible: false
 
   UIWidget
     id: miniborder

@@ -19,18 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "uimanager.h"
-#include <framework/graphics/drawpoolmanager.h>
 
-#include "uiwidget.h"
-#include "framework/core/eventdispatcher.h"
-#include "framework/core/modulemanager.h"
-#include "framework/core/resourcemanager.h"
-#include "framework/graphics/graphics.h"
-#include "framework/otml/otmldocument.h"
-#include "framework/otml/otmlexception.h"
-#include "framework/otml/otmlnode.h"
+#include "uimanager.h"
+#include "ui.h"
+
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/modulemanager.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/graphics/drawpoolmanager.h>
+#include <framework/otml/otml.h>
 #include <framework/platform/platformwindow.h>
+
+#include "framework/graphics/graphics.h"
+#include <framework/html/htmlmanager.h>
 
 UIManager g_ui;
 
@@ -554,7 +555,7 @@ OTMLNodePtr UIManager::findMainWidgetNode(const OTMLDocumentPtr& doc)
     return mainNode;
 }
 
-OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const OperatingSystem os)
+OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::OperatingSystem os)
 {
     const auto rawName = file.substr(0, file.find("."));
     const auto osName = g_platform.getOsShortName(os);
@@ -568,7 +569,7 @@ OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const OperatingSyst
     return nullptr;
 }
 
-OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const DeviceType deviceType)
+OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::DeviceType deviceType)
 {
     const auto rawName = file.substr(0, file.find("."));
     const auto deviceName = g_platform.getDeviceShortName(deviceType);

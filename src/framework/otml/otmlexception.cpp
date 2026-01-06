@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "otmldocument.h"
 #include "otmlexception.h"
+#include "otmldocument.h"
 
 OTMLException::OTMLException(const OTMLNodePtr& node, const std::string_view error)
 {

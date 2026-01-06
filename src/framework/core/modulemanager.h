@@ -21,7 +21,8 @@
  */
 
 #pragma once
-#include "declarations.h"
+
+#include "module.h"
 
  // @bindsingleton g_modules
 class ModuleManager

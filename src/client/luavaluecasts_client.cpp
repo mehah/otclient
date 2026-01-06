@@ -21,10 +21,7 @@
  */
 
 #include "luavaluecasts_client.h"
-
-#include "game.h"
-#include "item.h"
-#include "framework/luaengine/luainterface.h"
+#include <framework/luaengine/luainterface.h>
 
 int push_luavalue(const Outfit& outfit)
 {
@@ -485,6 +482,7 @@ int push_luavalue(const SubOffer& subOffer) {
         g_lua.setField("basePrice");
     }
     if (g_game.getClientVersion() < 1310) {
+
         g_lua.pushString(subOffer.name);
         g_lua.setField("name");
         g_lua.pushString(subOffer.description);
@@ -534,7 +532,7 @@ int push_luavalue(const StoreOffer& offer) {
             g_lua.pushString(offer.reasonIdDisable);
             g_lua.setField("reasonIdDisable");
         }
-    } else {
+    } else{
         g_lua.pushBoolean(offer.configurable);
         g_lua.setField("configurable");
     }
@@ -835,11 +833,11 @@ int push_luavalue(const CharmData& charm) {
     g_lua.pushInteger(charm.removeRuneCost);
     g_lua.setField("removeRuneCost");
     //if (g_game.getClientVersion() >= 1410) {
-    g_lua.pushInteger(charm.availableCharmSlots);
-    g_lua.setField("availableCharmSlots");
-    g_lua.pushInteger(charm.tier);
-    g_lua.setField("tier");
-    // }
+        g_lua.pushInteger(charm.availableCharmSlots);
+        g_lua.setField("availableCharmSlots");
+        g_lua.pushInteger(charm.tier);
+        g_lua.setField("tier");
+   // }
 
     return 1;
 }
@@ -1299,13 +1297,13 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
 {
     g_lua.createTable(0, 30);
 
-    g_lua.pushNumber(data.critChanceTotal);
+    g_lua.pushNumber(data.critChance);
     g_lua.setField("critChance");
 
-    g_lua.pushNumber(data.critDamageTotal);
+    g_lua.pushNumber(data.critDamage);
     g_lua.setField("critDamage");
 
-    g_lua.pushNumber(data.critDamageEquipament);
+    g_lua.pushNumber(data.critDamageBase);
     g_lua.setField("critDamageBase");
 
     g_lua.pushNumber(data.critDamageImbuement);
@@ -1314,10 +1312,10 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     g_lua.pushNumber(data.critDamageWheel);
     g_lua.setField("critDamageWheel");
 
-    g_lua.pushNumber(data.lifeLeechTotal);
+    g_lua.pushNumber(data.lifeLeech);
     g_lua.setField("lifeLeech");
 
-    g_lua.pushNumber(data.lifeLeechEquipament);
+    g_lua.pushNumber(data.lifeLeechBase);
     g_lua.setField("lifeLeechBase");
 
     g_lua.pushNumber(data.lifeLeechImbuement);
@@ -1326,10 +1324,10 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     g_lua.pushNumber(data.lifeLeechWheel);
     g_lua.setField("lifeLeechWheel");
 
-    g_lua.pushNumber(data.manaLeechTotal);
+    g_lua.pushNumber(data.manaLeech);
     g_lua.setField("manaLeech");
 
-    g_lua.pushNumber(data.manaLeechEquipament);
+    g_lua.pushNumber(data.manaLeechBase);
     g_lua.setField("manaLeechBase");
 
     g_lua.pushNumber(data.manaLeechImbuement);

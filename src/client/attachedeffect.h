@@ -21,18 +21,17 @@
  */
 
 #pragma once
-#include "framework/core/timer.h"
-#include "framework/graphics/declarations.h"
-#include "framework/luaengine/luaobject.h"
-#include "staticdata.h"
+
+#include "outfit.h"
+#include "thingtype.h"
 
 class AttachedEffect final : public LuaObject
 {
 public:
     static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
 
-    void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr, bool drawThing = true);
-    void drawLight(const Point& /*dest*/, LightView*);
+    void draw(const Point& /*dest*/, bool /*isOnTop*/, const LightViewPtr & = nullptr, bool drawThing = true);
+    void drawLight(const Point& /*dest*/, const LightViewPtr&);
 
     uint16_t getId() { return m_id; }
 
@@ -59,9 +58,6 @@ public:
     bool isPermanent() { return m_permanent; }
     void setPermanent(const bool permanent) { m_permanent = permanent; }
 
-    bool isFollowingOwner() { return m_followOwner; }
-    void setFollowOwner(const bool v) { m_followOwner = v; }
-
     uint16_t getDuration() { return m_duration; }
     void setDuration(const uint16_t v) { m_duration = v; }
 
@@ -75,13 +71,22 @@ public:
     void setDirection(const Otc::Direction dir) { m_direction = std::min<Otc::Direction>(dir, Otc::NorthWest); }
 
     void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) {
-        m_bounce = { .minHeight = minHeight,.height = height, .speed = speed };
+        m_bounce = { .minHeight =
+minHeight,
+.height = height, .speed = speed
+        };
     }
     void setPulse(const uint8_t minHeight, const uint8_t height, const uint16_t speed) {
-        m_pulse = { .minHeight = minHeight,.height = height, .speed = speed };
+        m_pulse = { .minHeight =
+minHeight,
+.height = height, .speed = speed
+        };
     }
     void setFade(const uint8_t start, const uint8_t end, const uint16_t speed) {
-        m_fade = { .minHeight = start, .height = end,.speed = speed };
+        m_fade = { .minHeight = start, .height =
+end,
+.speed = speed
+        };
     }
 
     void setOnTop(const bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
@@ -89,7 +94,10 @@ public:
     void setOnTopByDir(const Otc::Direction direction, const bool onTop) { m_offsetDirections[direction].onTop = onTop; }
 
     void setDirOffset(const Otc::Direction direction, int8_t x, int8_t y, const bool onTop = false) {
-        m_offsetDirections[direction] = { .onTop = onTop,.offset = {x, y} };
+        m_offsetDirections[direction] = { .onTop =
+onTop,
+.offset = {x, y}
+        };
     }
     void setShader(std::string_view name);
     void setCanDrawOnUI(const bool canDraw) { m_canDrawOnUI = canDraw; }
@@ -105,6 +113,14 @@ public:
     void setLight(const Light& light) { m_light = light; }
 
     ThingType* getThingType() const;
+
+    struct Bounce
+    {
+        uint8_t minHeight{ 0 };
+        uint8_t height{ 0 };
+        uint16_t speed{ 0 };
+        Timer timer{};
+    };
 
 private:
     int getCurrentAnimationPhase();
@@ -133,7 +149,6 @@ private:
     bool m_disableWalkAnimation{ false };
     bool m_permanent{ false };
     bool m_smooth = { true };
-    bool m_followOwner{ false };
 
     Outfit m_outfitOwner;
     Light m_light;

@@ -21,9 +21,10 @@
 */
 
 #include "animator.h"
+#include "declarations.h"
 
-#include "framework/core/clock.h"
-#include "framework/core/filestream.h"
+#include <framework/core/clock.h>
+#include <framework/core/filestream.h>
 
 void Animator::unserializeAppearance(const appearances::SpriteAnimation& animation)
 {

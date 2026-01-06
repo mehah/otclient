@@ -21,23 +21,26 @@
  */
 
 #include "thingtypemanager.h"
-
-#include <nlohmann/json.hpp>
-#include <nlohmann/json_fwd.hpp>
-
+#include "creature.h"
 #include "game.h"
-#include "spriteappearances.h"
 #include "thingtype.h"
-#include "framework/core/filestream.h"
-#include "framework/core/resourcemanager.h"
-#include "framework/otml/otmldocument.h"
-#include <staticdata.pb.h>
 
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"
 #include "creatures.h"
 #include <framework/core/binarytree.h>
 #endif
+
+#include <framework/core/filestream.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/otml/otml.h>
+
+#include <client/spriteappearances.h>
+
+#include <appearances.pb.h>
+#include <staticdata.pb.h>
+
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -156,15 +159,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
                     appearancesFile = obj["file"];
                 } else if (type == "sprite") {
                     int lastSpriteId = obj["lastspriteid"].get<int>();
-                    const auto& sheet = std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>());
-                    const int spritesPerSheet = sheet->getSpritesPerSheet();
-                    const int maxSpriteId = sheet->firstId + spritesPerSheet - 1;
-                    if (lastSpriteId > maxSpriteId) {
-                        g_logger.debug("Sprite sheet '{}' lastspriteid {} exceeds capacity {}, clamping to {}", sheet->file, lastSpriteId, maxSpriteId, maxSpriteId);
-                        lastSpriteId = maxSpriteId;
-                        sheet->lastId = maxSpriteId;
-                    }
-                    g_spriteAppearances.addSpriteSheet(sheet);
+                    g_spriteAppearances.addSpriteSheet(std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>()));
                     spritesCount = std::max<int>(spritesCount, lastSpriteId);
                 }
             }

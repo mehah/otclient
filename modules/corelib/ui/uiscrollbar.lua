@@ -8,40 +8,33 @@ local function calcValues(self)
     local incrementButton = self:getChildById('incrementButton')
 
     local pxrange, center
-
     if self.orientation == 'vertical' then
-        pxrange = self:getHeight() - decrementButton:getHeight() - decrementButton:getMarginTop() -
-                      decrementButton:getMarginBottom() - incrementButton:getHeight() - incrementButton:getMarginTop() -
-                      incrementButton:getMarginBottom()
+        pxrange = (self:getHeight() - decrementButton:getHeight() - decrementButton:getMarginTop() -
+            decrementButton:getMarginBottom() - incrementButton:getHeight() - incrementButton:getMarginTop() -
+            incrementButton:getMarginBottom())
         center = self:getY() + math.floor(self:getHeight() / 2)
-    else
-        pxrange = self:getWidth() - decrementButton:getWidth() - decrementButton:getMarginLeft() -
-                      decrementButton:getMarginRight() - incrementButton:getWidth() - incrementButton:getMarginLeft() -
-                      incrementButton:getMarginRight()
+    else -- horizontal
+        pxrange = (self:getWidth() - decrementButton:getWidth() - decrementButton:getMarginLeft() -
+            decrementButton:getMarginRight() - incrementButton:getWidth() - incrementButton:getMarginLeft() -
+            incrementButton:getMarginRight())
         center = self:getX() + math.floor(self:getWidth() / 2)
     end
 
     local range = self.maximum - self.minimum + 1
 
     local proportion
-    if self.virtualChilds > 0 and self.visibleItems then
-        proportion = math.min(1.0, self.visibleItems / self.virtualChilds)
+
+    if self.pixelsScroll then
+        proportion = pxrange / (range + pxrange)
     else
-        if self.pixelsScroll then
-            proportion = pxrange / (range + pxrange)
-        else
-            proportion = math.min(math.max(self.step, 1), range) / range
-        end
+        proportion = math.min(math.max(self.step, 1), range) / range
     end
 
-    -- For horizontal scrollbars, use a larger minimum size for better usability
-    local minSize = (self.orientation == 'horizontal') and 40 or 12
-    local px = math.max(proportion * pxrange, minSize)
+    local px = math.max(proportion * pxrange, 6)
+    px = px - px % 2 + 1
 
-    px = px - (px % 2) + 1
-
-    if self.defaultSlider then
-        px = 13
+    if self.scrollSize and self:getParent() and self:getParent().scrollSize then
+        px = math.max(self:getParent().scrollSize, 14)
     end
 
     local offset = 0
@@ -90,7 +83,7 @@ local function updateSlider(self)
     end
     updateValueDisplay(self)
 
-    local status = true
+    local status = (self.maximum ~= self.minimum)
 
     self:setOn(status)
     for _i, child in pairs(self:getChildren()) do
@@ -98,10 +91,7 @@ local function updateSlider(self)
     end
 end
 
-local function parseSliderPos(self, slider, pos, move, useStep)
-    if useStep == nil then
-        useStep = true
-    end
+local function parseSliderPos(self, slider, pos, move)
     local delta, hotDistance
     if self.orientation == 'vertical' then
         delta = move.y
@@ -114,19 +104,6 @@ local function parseSliderPos(self, slider, pos, move, useStep)
     if (delta > 0 and hotDistance + delta > self.hotDistance) or (delta < 0 and hotDistance + delta < self.hotDistance) then
         local range, pxrange, px, offset, center = calcValues(self)
         local newvalue = self.value + delta * (range / (pxrange - px))
-
-        if useStep and self.step > 1 then
-            local step = self.step
-            local remainder = newvalue % step
-            if remainder ~= 0 then
-                if delta > 0 then
-                    newvalue = newvalue + (step - remainder)
-                else
-                    newvalue = newvalue - remainder
-                end
-            end
-        end
-
         self:setValue(newvalue)
     end
 end
@@ -147,19 +124,12 @@ function UIScrollBar.create()
     scrollbar.minimum = -999999
     scrollbar.maximum = 999999
     scrollbar.step = 1
-    scrollbar.visibleItems = 0
-    scrollbar.virtualChilds = 0
-    scrollbar.incrementValue = 1
     scrollbar.orientation = 'vertical'
     scrollbar.pixelsScroll = false
     scrollbar.showValue = false
     scrollbar.symbol = nil
     scrollbar.mouseScroll = true
-    scrollbar.defaultSlider = false
-    scrollbar.invertedView = true
-    scrollbar.shiftIncrement = 10
-    scrollbar.ctrlIncrement = 100
-    scrollbar.autoPressDelay = 30
+    scrollbar.scrollSize = nil
     return scrollbar
 end
 
@@ -168,59 +138,27 @@ function UIScrollBar:onSetup()
     local sliderButton = self:getChildById('sliderButton')
     g_mouse.bindAutoPress(self:getChildById('decrementButton'), function()
         self:onDecrement()
-    end, 250, nil, self.autoPressDelay)
-
+    end, 300)
     g_mouse.bindAutoPress(self:getChildById('incrementButton'), function()
         self:onIncrement()
-    end, 250, nil, self.autoPressDelay)
-
+    end, 300)
     g_mouse.bindPressMove(sliderButton, function(mousePos, mouseMoved)
-        if self.canChangeValue and not signalcall(self.canChangeValue, self) then
-            return
-        end
-        parseSliderPos(self, sliderButton, mousePos, mouseMoved, false)
+        parseSliderPos(self, sliderButton, mousePos, mouseMoved)
     end)
-
     g_mouse.bindPress(sliderButton, function(mousePos, mouseButton)
-        if self.canChangeValue and not signalcall(self.canChangeValue, self) then
-            return
-        end
         parseSliderPress(self, sliderButton, mousePos, mouseButton)
     end)
 
-    self.onClick = function()
-        self:onClickSlider()
-    end
     updateSlider(self)
-end
 
-function UIScrollBar:onClickSlider(slider)
-    local mousePos = g_window.getMousePosition()
-    local slider = self:getChildById('sliderButton')
-    self:setSliderClick(slider, slider:getPosition())
-    if self.orientation == 'vertical' then
-        self:setSliderPos(slider, slider:getPosition(), {
-            y = mousePos.y - slider:getPosition().y,
-            x = 0
-        })
-    else
-        self:setSliderPos(slider, slider:getPosition(), {
-            x = mousePos.x - slider:getPosition().x,
-            y = 0
-        })
+    if self:getParent() then
+        if self:getParent().minimumScrollValue then
+            self:setMinimum(self:getParent().minimumScrollValue)
+        end
+        if self:getParent().maximumScrollValue then
+            self:setMaximum(self:getParent().maximumScrollValue)
+        end
     end
-end
-
-function UIScrollBar:setSliderClick(slider, pos)
-    if self.orientation == 'vertical' then
-        self.hotDistance = pos.y - slider:getY()
-    else
-        self.hotDistance = pos.x - slider:getX()
-    end
-end
-
-function UIScrollBar:setSliderPos(slider, pos, move)
-    parseSliderPos(self, slider, pos, move)
 end
 
 function UIScrollBar:onStyleApply(styleName, styleNode)
@@ -243,61 +181,38 @@ function UIScrollBar:onStyleApply(styleName, styleNode)
             self.symbol = value
         elseif name == 'mouse-scroll' then
             self.mouseScroll = value
-        elseif name == 'default-scroll' then
-            self.defaultSlider = value
-        elseif name == 'increment' then
-            self.incrementValue = value
-        elseif name == 'inverted-view' then
-            self.invertedView = value
-        elseif name == 'ctrl-increment' then
-            self.ctrlIncrement = value
-        elseif name == 'shift-increment' then
-            self.shiftIncrement = value
-        elseif name == 'auto-press-delay' then
-            self.autoPressDelay = value
+        elseif name == 'parent-scroll' then
+            self.scrollSize = value
         end
     end
 end
 
 function UIScrollBar:onDecrement()
-    local count = self.incrementValue
-    if g_keyboard.isShiftPressed() and g_keyboard.isCtrlPressed() then
-        count = 1000
-    elseif g_keyboard.isCtrlPressed() then
-        count = self.ctrlIncrement
+    if g_keyboard.isCtrlPressed() then
+        self:decrement(self.value)
     elseif g_keyboard.isShiftPressed() then
-        count = self.shiftIncrement
+        self:decrement(10)
+    else
+        self:decrement()
     end
-
-    self:decrement(count)
 end
 
 function UIScrollBar:onIncrement()
-    local count = self.incrementValue
-    if g_keyboard.isShiftPressed() and g_keyboard.isCtrlPressed() then
-        count = 1000
-    elseif g_keyboard.isCtrlPressed() then
-        count = self.ctrlIncrement
+    if g_keyboard.isCtrlPressed() then
+        self:increment(self.maximum)
     elseif g_keyboard.isShiftPressed() then
-        count = self.shiftIncrement
+        self:increment(10)
+    else
+        self:increment()
     end
-    self:increment(count)
 end
 
 function UIScrollBar:decrement(count)
-    if self.canChangeValue and not signalcall(self.canChangeValue, self) then
-        return
-    end
-
     count = count or self.step
     self:setValue(self.value - count)
 end
 
 function UIScrollBar:increment(count)
-    if self.canChangeValue and not signalcall(self.canChangeValue, self) then
-        return
-    end
-
     count = count or self.step
     self:setValue(self.value + count)
 end
@@ -358,6 +273,10 @@ function UIScrollBar:setStep(step)
     self.step = step
 end
 
+function UIScrollBar:setPixelsScroll(v)
+    self.pixelsScroll = v
+end
+
 function UIScrollBar:setOrientation(orientation)
     self.orientation = orientation
 end
@@ -374,14 +293,9 @@ function UIScrollBar:onGeometryChange()
 end
 
 function UIScrollBar:onMouseWheel(mousePos, mouseWheel)
-    if not self.mouseScroll or not self:isOn() or self.disableScroll then
+    if not self.mouseScroll or not self:isOn() then
         return false
     end
-
-    if self.canChangeValue and not signalcall(self.canChangeValue, self) then
-        return
-    end
-
     if mouseWheel == MouseWheelUp then
         if self.orientation == 'vertical' then
             if self.value <= self.minimum then
@@ -389,17 +303,10 @@ function UIScrollBar:onMouseWheel(mousePos, mouseWheel)
             end
             self:decrement()
         else
-            if self.invertedView then
-                if self.value <= self.minimum then
-                    return false
-                end
-                self:decrement()
-            else
-                if self.value >= self.maximum then
-                    return false
-                end
-                self:increment()
+            if self.value >= self.maximum then
+                return false
             end
+            self:increment()
         end
     else
         if self.orientation == 'vertical' then
@@ -408,59 +315,43 @@ function UIScrollBar:onMouseWheel(mousePos, mouseWheel)
             end
             self:increment()
         else
-            if self.invertedView then
-                if self.value >= self.maximum then
-                    return false
-                end
-                self:increment()
-            else
-                if self.value <= self.minimum then
-                    return false
-                end
-                self:decrement()
+            if self.value <= self.minimum then
+                return false
             end
+            self:decrement()
         end
     end
     return true
 end
 
-function UIScrollBar:getIncrementValue()
-    return self.incrementValue
-end
-function UIScrollBar:setIncrementStep(value)
-    self.incrementValue = value
-end
-function UIScrollBar:setDefaultScroll()
-    self.defaultSlider = true
-end
 function UIScrollBar:getMaximum()
     return self.maximum
 end
+
 function UIScrollBar:getMinimum()
     return self.minimum
 end
+
 function UIScrollBar:getValue()
     return math.round(self.value)
 end
+
 function UIScrollBar:getStep()
     return self.step
 end
+
 function UIScrollBar:getOrientation()
     return self.orientation
 end
+
 function UIScrollBar:getShowValue()
     return self.showValue
 end
+
 function UIScrollBar:getSymbol()
     return self.symbol
 end
+
 function UIScrollBar:getMouseScroll()
     return self.mouseScroll
 end
-function UIScrollBar:setVirtualChilds(value)
-    self.virtualChilds = value
-    updateSlider(self)
-end
-function UIScrollBar:setVisibleItems(value)
-    self.visibleItems = value
-end -- mest be called before setVirtualChilds 

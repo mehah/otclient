@@ -22,9 +22,11 @@
 
 #include "image.h"
 
-#include "apngloader.h"
-#include "framework/core/filestream.h"
-#include "framework/core/resourcemanager.h"
+#include <framework/core/filestream.h>
+#include <framework/core/resourcemanager.h>
+#include <framework/graphics/apngloader.h>
+
+#include "framework/stdext/qrcodegen.h"
 
 using namespace qrcodegen;
 

@@ -34,6 +34,8 @@
 
 #include <emscripten/threading.h>
 
+
+
 std::list<std::shared_ptr<asio::streambuf>> WebConnection::m_outputStreams;
 WebConnection::WebConnection()
 {
@@ -49,6 +51,7 @@ WebConnection::~WebConnection()
 
 void WebConnection::poll()
 {
+
 }
 
 void WebConnection::terminate()
@@ -80,6 +83,7 @@ void WebConnection::close()
         g_game.forceLogout();
     });
 }
+
 
 void WebConnection::connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback, bool gameWorld)
 {

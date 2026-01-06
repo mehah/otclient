@@ -21,14 +21,10 @@
  */
 
 #include "localplayer.h"
-
-#include "container.h"
 #include "game.h"
-#include "item.h"
 #include "map.h"
 #include "tile.h"
-#include "framework/core/clock.h"
-#include "framework/core/eventdispatcher.h"
+#include <framework/core/eventdispatcher.h>
 
 void LocalPlayer::lockWalk(const uint16_t millis)
 {
@@ -84,7 +80,6 @@ void LocalPlayer::preWalk(Otc::Direction direction)
 
     const auto& oldPos = getPosition();
     Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
-    Creature::onPositionChange(getLastStepToPosition(), getLastStepFromPosition());
     registerAdjustInvalidPosEvent();
 }
 
@@ -93,7 +88,7 @@ void LocalPlayer::onWalking() {
         if (const auto& tile = g_map.getTile(getPosition())) {
             for (const auto& creature : tile->getWalkingCreatures()) {
                 // Cancel pre-walk movement if the local player tries to walk on an unwalkable tile.
-                if (creature.get() != this && creature->getPosition() == getPosition() && !creature->isPassable()) {
+                if (creature.get() != this && creature->getPosition() == getPosition()) {
                     cancelWalk();
                     g_map.notificateTileUpdate(getPosition(), asLocalPlayer(), Otc::OPERATION_CLEAN);
                     break;
@@ -218,8 +213,6 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
     return true;
 }
 
-bool LocalPlayer::isWalkLocked() { return m_walkLockExpiration != 0 && g_clock.millis() < m_walkLockExpiration; }
-
 void LocalPlayer::stopAutoWalk()
 {
     m_autoWalkDestination = {};
@@ -239,9 +232,6 @@ void LocalPlayer::terminateWalk()
 
 void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPos)
 {
-    if (isPreWalking())
-        return;
-
     Creature::onPositionChange(newPos, oldPos);
 
     if (newPos == m_autoWalkDestination)
@@ -455,69 +445,6 @@ void LocalPlayer::setInventoryItem(const Otc::InventorySlot inventory, const Ite
     m_inventoryItems[inventory] = item;
 
     callLuaField("onInventoryChange", inventory, item, oldItem);
-}
-
-void LocalPlayer::setInventoryCountCache(std::map<std::pair<uint16_t, uint8_t>, uint32_t> counts)
-{
-    m_inventoryCountCache = std::move(counts);
-}
-
-bool LocalPlayer::hasEquippedItemId(const uint16_t itemId, const uint8_t tier)
-{
-    if (itemId == 0)
-        return false;
-
-    for (const auto& item : m_inventoryItems) {
-        if (!item)
-            continue;
-
-        if (item->getId() != itemId)
-            continue;
-
-        if (item->getTier() != tier)
-            continue;
-
-        return true;
-    }
-
-    return false;
-}
-
-uint32_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tier)
-{
-    if (std::cmp_equal(itemId, 0))
-        return 0;
-
-    const auto key = std::make_pair(itemId, tier);
-    const auto it = m_inventoryCountCache.find(key);
-    if (it != m_inventoryCountCache.end()) {
-        return it->second;
-    }
-
-    uint32_t total = 0;
-
-    const auto accumulate = [&](const ItemPtr& item) {
-        if (item && std::cmp_equal(item->getId(), itemId) && item->getTier() == tier) {
-            total += item->getCount();
-        }
-    };
-
-    for (const auto& item : m_inventoryItems)
-        accumulate(item);
-
-    for (const auto& [containerId, container] : g_game.getContainers()) {
-        if (!container)
-            continue;
-
-        for (const auto& item : container->getItems())
-            accumulate(item);
-    }
-
-    if (const uint64_t maxUint32 = std::numeric_limits<uint32_t>::max(); total > maxUint32) {
-        total = maxUint32;
-    }
-
-    return total;
 }
 
 void LocalPlayer::setPremium(const bool premium)

@@ -20,6 +20,10 @@
  * THE SOFTWARE.
  */
 
+#include <chrono>
+#include <ctime>
+#include <thread>
+
 #include "types.h"
 
 namespace stdext

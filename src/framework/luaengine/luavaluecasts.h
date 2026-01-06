@@ -26,8 +26,10 @@
 
 #include "declarations.h"
 #include <framework/otml/declarations.h>
+#include <framework/platform/platform.h>
 
-#include "framework/platform/staticdata.h"
+#include <set>
+#include <type_traits>
 
 template<typename T>
 int push_internal_luavalue(T v);
@@ -95,7 +97,7 @@ inline bool luavalue_cast(const int index, int64_t& v)
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 
-using lua_u64 = std::conditional_t<sizeof(unsigned long) == 8, unsigned long, std::uint64_t>;
+using lua_u64 = std::conditional_t<sizeof(unsigned long)==8, unsigned long, std::uint64_t>;
 using lua_unsigned_long = lua_u64;
 
 static_assert(sizeof(lua_u64) == 8, "lua_u64 must be 64-bit");
@@ -166,8 +168,8 @@ int push_luavalue(const Size& size);
 bool luavalue_cast(int index, Size& size);
 
 // device
-int push_luavalue(const Device& device);
-bool luavalue_cast(int index, Device& device);
+int push_luavalue(const Platform::Device& device);
+bool luavalue_cast(int index, Platform::Device& device);
 
 // otml nodes
 int push_luavalue(const OTMLNodePtr& node);

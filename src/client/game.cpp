@@ -21,24 +21,21 @@
  */
 
 #include "game.h"
-
-#include "attachedeffect.h"
 #include "container.h"
-#include "gameconfig.h"
-#include "item.h"
+#include "creature.h"
 #include "localplayer.h"
-#include "map.h"
-#include "protocolgame.h"
-#include "protocolcodes.h"
-#include "thingtype.h"
-#include "thingtypemanager.h"
-#include "tile.h"
-#include "framework/core/eventdispatcher.h"
-#include "framework/core/graphicalapplication.h"
-#include "framework/luaengine/luainterface.h"
-#include "framework/net/packet_player.h"
-#include "framework/net/packet_recorder.h"
 #include "luavaluecasts_client.h"
+#include "map.h"
+#include "protocolcodes.h"
+#include "protocolgame.h"
+#include <framework/core/application.h>
+#include <framework/core/eventdispatcher.h>
+
+#include "framework/core/graphicalapplication.h"
+#include "tile.h"
+
+#include <framework/net/packet_player.h>
+#include <framework/net/packet_recorder.h>
 
 Game g_game;
 
@@ -56,6 +53,7 @@ void Game::terminate()
 void Game::resetGameStates()
 {
     m_online = false;
+    enableBotCall();
     m_dead = false;
     m_serverBeat = 50;
     m_seq = 0;
@@ -172,6 +170,11 @@ void Game::processGameStart()
     // synchronize fight modes with the server
     m_protocolGame->sendChangeFightModes(m_fightMode, m_chaseMode, m_safeFight, m_pvpMode);
 
+    // NOTE: the entire map description and local player information is not known yet (bot call is allowed here)
+    enableBotCall();
+    g_lua.callGlobalField("g_game", "onGameStart");
+    disableBotCall();
+
     if (g_game.getFeature(Otc::GameClientPing) || g_game.getFeature(Otc::GameExtendedClientPing)) {
         m_pingEvent = g_dispatcher.scheduleEvent([] { g_game.ping(); }, m_pingDelay);
     }
@@ -185,8 +188,6 @@ void Game::processGameStart()
             m_connectionFailWarned = false;
         }
     }, 1000);
-
-    g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onGameStart"); });
 }
 
 void Game::processGameEnd()
@@ -247,7 +248,9 @@ void Game::processPlayerModes(const Otc::FightModes fightMode, const Otc::ChaseM
 void Game::processPing()
 {
     g_lua.callGlobalField("g_game", "onPing");
+    enableBotCall();
     m_protocolGame->sendPingBack();
+    disableBotCall();
 }
 
 void Game::processPingBack()
@@ -286,7 +289,9 @@ void Game::processOpenContainer(const uint8_t containerId, const ItemPtr& contai
     container->onAddItems(items);
 
     // we might want to close a container here
+    enableBotCall();
     container->onOpen(previousContainer);
+    disableBotCall();
 
     if (previousContainer)
         previousContainer->onClose();
@@ -633,11 +638,13 @@ void Game::playRecord(const std::string_view& file)
 
 void Game::cancelLogin()
 {
+    enableBotCall();
     // send logout even if the game has not started yet, to make sure that the player doesn't stay logged there
     if (m_protocolGame)
         m_protocolGame->sendLogout();
 
     processDisconnect();
+    disableBotCall();
 }
 
 void Game::forceLogout()
@@ -1479,21 +1486,6 @@ void Game::equipItem(const ItemPtr& item)
     }
 }
 
-void Game::equipItemId(const uint16_t itemId, const uint8_t tier)
-{
-    if (!canPerformGameAction())
-        return;
-
-    if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
-        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
-        if (thing && thing->getClassification() > 0) {
-            m_protocolGame->sendEquipItemWithTier(itemId, tier);
-            return;
-        }
-    }
-    m_protocolGame->sendEquipItemWithCountOrSubType(itemId, tier);
-}
-
 void Game::mount(const bool mount)
 {
     if (!canPerformGameAction())
@@ -1539,7 +1531,7 @@ void Game::buyStoreOffer(const uint32_t offerId, const uint8_t action, const std
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendBuyStoreOffer(offerId, action, name, type, location);
+    m_protocolGame->sendBuyStoreOffer(offerId, action, name, type,location);
 }
 
 void Game::requestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage)
@@ -1587,7 +1579,7 @@ void Game::sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortO
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendRequestStoreOfferById(offerId, sortOrder, serviceType);
+    m_protocolGame->sendRequestStoreOfferById(offerId, sortOrder , serviceType);
 }
 
 void Game::sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType)
@@ -1630,7 +1622,9 @@ void Game::ping()
     if (m_pingReceived != m_pingSent)
         return;
 
+    enableBotCall();
     m_protocolGame->sendPing();
+    disableBotCall();
     ++m_pingSent;
     m_pingTimer.restart();
 }
@@ -1642,10 +1636,6 @@ void Game::changeMapAwareRange(const uint8_t xrange, const uint8_t yrange)
 
     m_protocolGame->sendChangeMapAwareRange(xrange, yrange);
 }
-
-bool Game::isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
-bool Game::isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
-bool Game::isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
 
 bool Game::canPerformGameAction() const
 {
@@ -1758,21 +1748,19 @@ Otc::OperatingSystem_t Game::getOs()
 
 void Game::leaveMarket()
 {
-    if (!canPerformGameAction())
-        return;
-        
+    enableBotCall();
     m_protocolGame->sendMarketLeave();
+    disableBotCall();
 
     g_lua.callGlobalField("g_game", "onMarketLeave");
 }
 
-void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
+void Game::browseMarket(const uint8_t browseId, const uint8_t browseType)
 {
-    if (!canPerformGameAction()) {
+    if (!canPerformGameAction())
         return;
-    }
 
-    m_protocolGame->sendMarketBrowse(browseId, browseType, tier);
+    m_protocolGame->sendMarketBrowse(browseId, browseType);
 }
 
 void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
@@ -1876,14 +1864,6 @@ void Game::stashWithdraw(const uint16_t itemId, const uint32_t count, const uint
     m_protocolGame->sendStashWithdraw(itemId, count, stackpos);
 }
 
-void Game::stashStowItem(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action)
-{
-    if (!canPerformGameAction())
-        return;
-
-    m_protocolGame->sendStashStow(position, itemId, count, stackpos, action);
-}
-
 void Game::requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
 {
     if (!canPerformGameAction())
@@ -1967,12 +1947,12 @@ void Game::requestBestiary()
     m_protocolGame->sendRequestBestiary();
 }
 
-void Game::requestBestiaryOverview(const std::string_view catName, bool search, std::vector<uint16_t> raceIds)
+void Game::requestBestiaryOverview(const std::string_view catName)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendRequestBestiaryOverview(catName, search, raceIds);
+    m_protocolGame->sendRequestBestiaryOverview(catName);
 }
 
 void Game::requestBestiarySearch(const uint16_t raceId)
@@ -2085,3 +2065,4 @@ void Game::processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStat
 {
     g_lua.callGlobalField("g_game", "onCyclopediaCharacterMiscStats", data);
 }
+

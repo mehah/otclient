@@ -25,6 +25,10 @@
 #include "demangle.h"
 #include "exception.h"
 
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
+
 namespace stdext
 {
     // cast a type to another type

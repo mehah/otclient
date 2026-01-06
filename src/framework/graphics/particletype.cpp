@@ -21,11 +21,7 @@
  */
 
 #include "particletype.h"
-
-#include "animatedtexture.h"
-#include "texture.h"
-#include "texturemanager.h"
-#include "framework/otml/otmlnode.h"
+#include <framework/graphics/texturemanager.h>
 
 void ParticleType::load(const OTMLNodePtr& node)
 {

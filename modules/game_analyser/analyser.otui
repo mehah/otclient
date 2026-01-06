@@ -3,7 +3,6 @@ MiniWindow
   &type: 'analyticsSelector'
   !text: tr('Analytics Selector')
   height: 237
-  max-height: 237
   @onClose: modules.game_analyser.hide();
   @onOpen: modules.game_analyser.onOpen();
   &save: true
@@ -39,7 +38,7 @@ MiniWindow
 
     Button
       id: huntingButton
-      size: 148 20
+      size: 158 20
       anchors.top: parent.top
       anchors.left: parent.left
       image-source: /images/game/analyzer/huntingButton
@@ -54,7 +53,7 @@ MiniWindow
 
     Button
       id: lootButton
-      size: 148 20
+      size: 158 20
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 3
@@ -70,7 +69,7 @@ MiniWindow
 
     Button
       id: supplyButton
-      size: 148 20
+      size: 158 20
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 3
@@ -86,7 +85,7 @@ MiniWindow
 
     Button
       id: impactButton
-      size: 148 20
+      size: 158 20
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 3
@@ -102,7 +101,7 @@ MiniWindow
 
     Button
       id: damageButton
-      size: 148 20
+      size: 158 20
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 3
@@ -118,7 +117,7 @@ MiniWindow
 
     Button
       id: xpButton
-      size: 148 20
+      size: 158 20
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 3
@@ -134,7 +133,7 @@ MiniWindow
 
     Button
       id: dropButton
-      size: 148 20
+      size: 158 20
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 3
@@ -150,7 +149,7 @@ MiniWindow
 
     Button
       id: partyButton
-      size: 148 20
+      size: 158 20
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 3
@@ -166,7 +165,7 @@ MiniWindow
 
     Button
       id: bossButton
-      size: 148 20
+      size: 158 20
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-top: 3

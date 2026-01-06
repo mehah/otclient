@@ -233,10 +233,4 @@ MainInventoryItem < UIWidget
       focusable: false
       visible: false
       image-smooth: true
-
-UIDragIcon < UIItem
-  size: 34 34
-  border-color: alpha
-  virtual: true
-  focusable: false
-  phantom: true
+      

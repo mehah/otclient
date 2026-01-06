@@ -25,7 +25,6 @@ static/
 cmake-build-*/
 vcpkg_installed/
 vc17/
-/build-emscripten-web/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -220,7 +219,6 @@ tags
 *.dat
 *.pic
 config.otml
-*.patch
 
 ## Cmake cache
 CMakeLists.txt.user

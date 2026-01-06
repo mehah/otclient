@@ -592,7 +592,7 @@ BossSlotProgress < UIWidget
     text-auto-resize: true
     !text: tr('0')
 ProgressBackground < UIWidget
-  image-source: /images/ui/1pixel_down_frame
+  image-source: /images/game/actionbar/1pixel-down-frame
   image-border: 5
   padding: 1
   UIWidget
@@ -780,7 +780,7 @@ MarkListItem < ButtonBox
   icon-offset: 3 3
 CharacterCategoryItem < UIWidget
   size: 150 22
-  image-source: /images/ui/1pixel_down_frame
+  image-source: /images/game/actionbar/1pixel-down-frame
   image-border: 5
   UIWidget
     id: Button
@@ -1183,7 +1183,16 @@ RuneSlot < InventoryItemCyclopedia
   id: slot18
 
   &position: {x=65535, y=18, z=0}
+
+RoundCheckBox < CheckBox
+  image-source: /images/ui/outfits/checkbox_round
   
+  $first:
+    margin-top: 2
+
+  $!first:
+    margin-top: 5
+
 TrackerButton < Panel
   height: 34
   margin-bottom: 5
