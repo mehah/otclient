@@ -174,6 +174,14 @@ bool run(const Request& request)
     if (request.clientVersion > 0)
         g_game.setClientVersion(static_cast<uint16_t>(request.clientVersion));
 
+    const int version = request.clientVersion;
+    if (version >= 960)
+        g_game.enableFeature(Otc::GameSpritesU32);
+    if (version >= 1050)
+        g_game.enableFeature(Otc::GameEnhancedAnimations);
+    if (version >= 1057)
+        g_game.enableFeature(Otc::GameIdleAnimations);
+
     if (!g_things.loadDat(request.datPath)) {
         throw std::runtime_error("unable to load DAT file: " + request.datPath);
     }
