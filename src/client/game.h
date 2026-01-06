@@ -368,7 +368,7 @@ public:
 
     // market related
     void leaveMarket();
-    void browseMarket(uint8_t browseId, uint8_t browseType);
+    void browseMarket(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
     void createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void cancelMarketOffer(uint32_t timestamp, uint16_t counter);
     void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
@@ -411,7 +411,7 @@ public:
     void inspectionNormalObject(const Position& position);
     void inspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
     void requestBestiary();
-    void requestBestiaryOverview(std::string_view catName);
+    void requestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
     void requestBestiarySearch(uint16_t raceId);
     void requestSendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void requestSendCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage = 0, uint16_t page = 0);

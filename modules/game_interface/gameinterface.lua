@@ -106,7 +106,8 @@ function init()
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)
     else
-        leftDecreaseSidePanels:setEnabled(true)
+        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or modules.client_options.getOption('showLeftExtraPanel')
+        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
@@ -252,7 +253,8 @@ function onGameStart()
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)
     else
-        leftDecreaseSidePanels:setEnabled(true)
+        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or modules.client_options.getOption('showLeftExtraPanel')
+        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
@@ -1616,7 +1618,8 @@ function setupViewMode(mode)
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)
     else
-        leftDecreaseSidePanels:setEnabled(true)
+        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or modules.client_options.getOption('showLeftExtraPanel')
+        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))

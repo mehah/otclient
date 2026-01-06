@@ -130,7 +130,7 @@ public:
     void sendTransferCoins(std::string_view recipient, uint16_t amount);
     void sendOpenTransactionHistory(uint8_t entriesPerPage);
     void sendMarketLeave();
-    void sendMarketBrowse(uint8_t browseId, uint16_t browseType);
+    void sendMarketBrowse(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
     void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
@@ -147,7 +147,7 @@ public:
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
     void sendRequestBestiary();
-    void sendRequestBestiaryOverview(std::string_view catName);
+    void sendRequestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
     void sendRequestBestiarySearch(uint16_t raceId);
     void sendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void sendCyclopediaRequestCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage, uint16_t page);
