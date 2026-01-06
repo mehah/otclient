@@ -266,5 +266,8 @@ controller:registerEvents(g_game, {
             g_game.disableFeature(GameForgeSkillStats)
             g_game.enableFeature(GameCharacterSkillStats)
         end
+        if version >= 1510 then
+            g_game.enableFeature(GameProficiency)
+        end
     end
 })

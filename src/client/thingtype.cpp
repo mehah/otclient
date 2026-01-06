@@ -369,6 +369,14 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
     if (flags.has_deco_kit() && flags.deco_kit()) {
         m_flags |= ThingFlagAttrExpireStop;
     }
+
+    // proficiency flag
+    if (flags.has_proficiency()) {
+        if (g_game.getFeature(Otc::GameProficiency)) {
+            m_proficiencyId = flags.proficiency().id();
+            m_flags |= ThingFlagAttrProficiency;
+        }
+    }
 }
 
 void ThingType::unserialize(const uint16_t clientId, const ThingCategory category, const FileStreamPtr& fin)
