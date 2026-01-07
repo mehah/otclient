@@ -81,6 +81,7 @@ void GarbageCollection::thingType() {
             resourceId = 0;
             category = ThingCategoryItem;
             thingId = 0;
+            break;
         }
 
         auto res = g_things.getResourceById(resourceId);

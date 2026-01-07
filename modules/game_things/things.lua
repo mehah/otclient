@@ -107,7 +107,7 @@ local function loadResource(path, version, resourceId, errorList)
 
 	-- assets
 	if g_resources.fileExists(resolvepath(path .. 'catalog-content.json')) then
-		if not g_things.loadAppearances(resolvepath(path .. 'appearances'), resourceId) then
+		if not g_things.loadAppearances(resolvepath(path), resourceId) then
             addError(errorList, "Couldn't load assets", resourceId)
         end
         if not g_things.loadStaticData(path) then
