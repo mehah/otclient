@@ -813,7 +813,6 @@ void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
             value = msg->getU64();
             break;
     }
-
     m_localPlayer->setResourceBalance(type, value);
 }
 
@@ -1904,7 +1903,6 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
 
 void ProtocolGame::parseForgeResult(const InputMessagePtr& msg)
 {
-
     ForgeResultData forgeResult;
     forgeResult.actionType = msg->getU8();
     forgeResult.convergence = msg->getU8() == 1;
