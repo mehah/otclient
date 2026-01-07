@@ -763,7 +763,7 @@ SpriteSheetPtr AssetResource::getSheetBySpriteId(int id, bool load)
 ImagePtr AssetResource::getSpriteImage(int id, bool& isLoading)
 {
     if (spriteManager)
-        spriteManager->getSpriteImage(id, isLoading);
+        return spriteManager->getSpriteImage(id, isLoading);
 
     return nullptr;
 }
