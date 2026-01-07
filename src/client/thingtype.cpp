@@ -792,6 +792,10 @@ void ThingType::loadTexture(const int animationPhase)
                                 for (int w = 0; w < m_size.width(); ++w) {
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     auto spriteId = m_spritesIndex[spriteIndex];
+
+                                    if (spriteId == 0)
+                                        continue;
+
                                     bool isLoading = false;
                                     const auto& spriteImage = g_sprites.getSpriteImage(spriteId, isLoading);
 
