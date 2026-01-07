@@ -1032,17 +1032,30 @@ local letterWidth = { -- New line (10) and Space (32) have width 1 because they 
 }
 
 -- Return information about start, end in the string and the highlighted words
-function getHighlightedText(text)
-    local tmpData = {}
-
-    repeat
-        local tmp = {string.find(text, '{([^}]+)}', tmpData[#tmpData - 1])}
-        for _, v in pairs(tmp) do
-            table.insert(tmpData, v)
+function getHighlightedText(text, color, highlightColor)
+    color = color or "white"
+    highlightColor = highlightColor or "#1f9ffe"
+    local firstBrace = text:find("{", 1, true)
+    if not firstBrace then
+        return string.format("{%s, %s}", text, color)
+    end
+    local parts = {}
+    local lastPos = 1
+    if firstBrace > 1 then
+        parts[#parts + 1] = string.format("{%s, %s}", text:sub(1, firstBrace - 1), color)
+    end
+    for startPos, content, endPos in text:gmatch("()%{([^}]*)%}()") do
+        local textPart = content:match("([^,]+)") or content
+        local highlighted = string.format("[text-event]%s[/text-event]", textPart:match("^%s*(.-)%s*$"))
+        parts[#parts + 1] = string.format("{%s, %s}", highlighted, highlightColor)
+        local nextBrace = text:find("{", endPos, true)
+        local afterText = text:sub(endPos, (nextBrace or 0) - 1)
+        if afterText ~= "" then
+            parts[#parts + 1] = string.format("{%s, %s}", afterText, color)
         end
-    until not (string.find(text, '{([^}]+)}', tmpData[#tmpData - 1]))
-
-    return tmpData
+        lastPos = endPos
+    end
+    return table.concat(parts)
 end
 
 local function changeNewNessageColor(tab)
@@ -1056,6 +1069,21 @@ local function changeNewNessageColor(tab)
         tab.isOnRedMessage = true
         tab.newMessageEvent = nil
     end, 1000)
+end
+
+function onConsoleTextClicked(widget, text)
+    local npcTab = consoleTabBar:getTab("NPCs")
+    if npcTab then
+        sendMessage(text, npcTab)
+    end
+end
+
+function onConsoleTextHovered(widget, text, hovered)
+    if hovered then
+        g_mouse.pushCursor("pointer")
+    else
+       g_mouse.popCursor("pointer")
+    end
 end
 
 function addTabText(text, speaktype, tab, creatureName)
@@ -1072,76 +1100,24 @@ function addTabText(text, speaktype, tab, creatureName)
     local label = g_ui.createWidget('ConsoleLabel', consoleBuffer)
     label:setId('consoleLabel' .. consoleBuffer:getChildCount())
 
-    label.highlightInfo = {}
-
     -- Overlay for consoleBuffer which shows highlighted words only
-    local processedText = text
-    if speaktype.npcChat and
-        (g_game.getCharacterName() ~= creatureName or g_game.getCharacterName() == 'Account Manager') then
-        local highlightData = getHighlightedText(text)
-        if #highlightData > 0 then
-            local labelHighlight = g_ui.createWidget('ConsolePhantomLabel', label)
-            labelHighlight:fill('parent')
-
-            labelHighlight:setId('consoleLabelHighlight' .. consoleBuffer:getChildCount())
-            labelHighlight:setColor('#1f9ffe')
-
-            -- Remove the curly braces
-            for i = 1, #highlightData / 3 do
-                local dataBlock = {
-                    _start = highlightData[(i - 1) * 3 + 1],
-                    _end = highlightData[(i - 1) * 3 + 2],
-                    words = highlightData[(i - 1) * 3 + 3]
-                }
-                processedText = processedText:gsub('%{(.-)%}', dataBlock.words, 1)
-
-                -- Recalculate positions as braces are removed
-                highlightData[(i - 1) * 3 + 1] = dataBlock._start - ((i - 1) * 2)
-                highlightData[(i - 1) * 3 + 2] = dataBlock._end - (1 + (i - 1) * 2)
-            end
-
-
-            -- Calculate the positions of the highlighted text and fill with string.char(127) [Width: 1]
-            local drawText = processedText
-            local tmpText = ''
-            for i = 1, #highlightData / 3 do
-                local dataBlock = {
-                    _start = highlightData[(i - 1) * 3 + 1],
-                    _end = highlightData[(i - 1) * 3 + 2],
-                    words = highlightData[(i - 1) * 3 + 3]
-                }
-                local lastBlockEnd = (highlightData[(i - 2) * 3 + 2] or 1)
-
-                for i = dataBlock._start, dataBlock._end do
-                    label.highlightInfo[i] = dataBlock.words
-                end
-
-                for letter = lastBlockEnd, dataBlock._start - 1 do
-                    local tmpChar = string.byte(drawText:sub(letter, letter))
-                    local fillChar = (tmpChar == 10 or tmpChar == 32) and string.char(tmpChar) or string.char(127)
-
-                    tmpText = tmpText .. string.rep(fillChar, letterWidth[tmpChar])
-                end
-                tmpText = tmpText .. dataBlock.words
-            end
-
-            -- Fill the highlight label to the same size as default label
-            local finalBlockEnd = (highlightData[(#highlightData / 3 - 1) * 3 + 2] or 1)
-            for letter = finalBlockEnd, drawText:len() do
-                local tmpChar = string.byte(drawText:sub(letter, letter))
-                local fillChar = (tmpChar == 10 or tmpChar == 32) and string.char(tmpChar) or string.char(127)
-
-                tmpText = tmpText .. string.rep(fillChar, letterWidth[tmpChar])
-            end
-
-            labelHighlight:setText(tmpText)
+    if speaktype.npcChat and (g_game.getCharacterName() ~= creatureName or g_game.getCharacterName() == 'Account Manager') then
+        local highlightData = getHighlightedText(text, speaktype.color, "#1f9ffe")
+        label:setColoredText(highlightData)
+        if not label:hasEventListener(EVENT_TEXT_CLICK) and not label:hasEventListener(EVENT_TEXT_HOVER) then
+            label:setEventListener(EVENT_TEXT_CLICK)
+            label:setEventListener(EVENT_TEXT_HOVER)
+            connect(label, {
+                onTextClick = onConsoleTextClicked,
+                onTextHoverChange = onConsoleTextHovered
+            })
         end
-    end
-
-    if speaktype.colored then
-        label:setColoredText(processedText)
     else
-        label:setText(processedText)
+        if speaktype.colored then
+            label:setColoredText(text)
+        else
+            label:setText(text)
+        end
     end
     label:setColor(speaktype.color)
     if readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText() then
@@ -1149,9 +1125,9 @@ function addTabText(text, speaktype, tab, creatureName)
         local readOnlyLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
         readOnlyLabel:setId('consoleLabel' .. readOnlyBuffer:getChildCount())
         if speaktype.colored then
-            readOnlyLabel:setColoredText(processedText)
+            readOnlyLabel:setColoredText(text)
         else
-            readOnlyLabel:setText(processedText)
+            readOnlyLabel:setText(text)
         end
         readOnlyLabel:setColor(speaktype.color)
     end
@@ -1160,18 +1136,13 @@ function addTabText(text, speaktype, tab, creatureName)
             changeNewNessageColor(tab)
         end
     end
-
     label.name = creatureName
     consoleBuffer.onMouseRelease = function(self, mousePos, mouseButton)
         processMessageMenu(mousePos, mouseButton, nil, nil, nil, tab)
     end
+
     label.onMouseRelease = function(self, mousePos, mouseButton)
-        if mouseButton == MouseLeftButton then
-            local position = label:getTextPos(mousePos)
-            if position and label.highlightInfo[position] then
-                sendMessage(label.highlightInfo[position], npcTab)
-            end
-        elseif mouseButton == MouseRightButton then
+        if mouseButton == MouseRightButton then
             processMessageMenu(mousePos, mouseButton, creatureName, text, self, tab)
         end
     end
@@ -1650,25 +1621,22 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
         channelId = violationsChannelId
     end
 
-    if (mode == MessageModes.Say or mode == MessageModes.Whisper or mode == MessageModes.Yell or mode ==
-        MessageModes.Spell or mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or mode ==
-        MessageModes.NpcFrom or mode == MessageModes.BarkLow or mode == MessageModes.BarkLoud or mode ==
-        MessageModes.NpcFromStartBlock) and creaturePos then
+    if (mode == MessageModes.Say or mode == MessageModes.Whisper or mode == MessageModes.Yell or mode == MessageModes.Spell or
+        mode == MessageModes.MonsterSay or mode == MessageModes.MonsterYell or mode == MessageModes.NpcFrom or mode ==
+        MessageModes.BarkLow or mode == MessageModes.BarkLoud or mode == MessageModes.NpcFromStartBlock) and creaturePos then
         local staticText = StaticText.create()
-        -- Remove curly braces from screen message
         local staticMessage = message
         if isNpcMode then
-            local highlightData = getHighlightedText(staticMessage)
-            if #highlightData > 0 then
-                for i = 1, #highlightData / 3 do
-                    local dataBlock = {
-                        _start = highlightData[(i - 1) * 3 + 1],
-                        _end = highlightData[(i - 1) * 3 + 2],
-                        words = highlightData[(i - 1) * 3 + 3]
-                    }
-                    staticMessage = staticMessage:gsub('{' .. dataBlock.words .. '}', dataBlock.words)
-                end
+            local highlightedText = getHighlightedText(staticMessage, speaktype.color, "#1f9ffe")
+
+            local processedText = staticMessage
+            local colorPattern = "{([^,]+),[ ]*[^}]+}"
+            for textContent in highlightedText:gmatch(colorPattern) do
+                local plainText = textContent:gsub("%[text%-event%](.-)%[/text%-event%]", "%1")
+                processedText = processedText:gsub("{" .. textContent .. "}", plainText)
             end
+            processedText = processedText:gsub("{([^}]+)}", "%1")
+            staticMessage = processedText
             staticText:setColor(speaktype.color)
         end
 
