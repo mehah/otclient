@@ -1,0 +1,8 @@
+UIWidget  
+  id: fragContainer  
+    
+  Label  
+    anchors.centerIn: parent  
+    !text: tr('Fragment Workshop')  
+    text-align: center  
+    font: verdana-11px-antialised
