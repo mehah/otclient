@@ -138,3 +138,4 @@ using UIMinimapPtr = std::shared_ptr<UIMinimap>;
 using UIProgressRectPtr = std::shared_ptr<UIProgressRect>;
 using UIMapAnchorLayoutPtr = std::shared_ptr<UIMapAnchorLayout>;
 using UIPositionAnchorPtr = std::shared_ptr<UIPositionAnchor>;
+struct GemData;

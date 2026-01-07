@@ -110,3 +110,7 @@ int push_luavalue(const ForgeItemInfo& data);
 int push_luavalue(const BossCooldownData& data);
 int push_luavalue(const PartyMemberData& data);
 int push_luavalue(const PartyMemberName& data);
+
+// whell gem atelier  
+int push_luavalue(const GemData& gem);  
+bool luavalue_cast(int index, GemData& gem);
