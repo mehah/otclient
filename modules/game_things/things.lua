@@ -221,11 +221,14 @@ local function load(version)
 	end
 
     loaded = #errorList == 0
-    if loaded and version > 1300 then
+    if loaded then
         -- loading client files was successful, try to load sounds now
         -- sound files are optional, this means that failing to load them
         -- will not block logging into game
-        g_sounds.loadClientFiles(resolvepath(string.format('/sounds/%d/', version)))
+		if version > 1300 then
+			g_sounds.loadClientFiles(resolvepath(string.format('/sounds/%d/', version)))
+		end
+
 		g_logger.info("Assets loading complete.")
         return
     end
