@@ -1632,8 +1632,8 @@ function setupViewMode(mode)
     if currentViewMode == 2 then
         gameMapPanel:addAnchor(AnchorLeft, 'gameLeftPanel', AnchorRight)
         gameMapPanel:addAnchor(AnchorRight, 'gameRightPanel', AnchorLeft)
-        gameMapPanel:addAnchor(AnchorRight, 'gameRightExtraPanel', AnchorLeft)
-        gameMapPanel:addAnchor(AnchorBottom, 'gameBottomPanel', AnchorTop)
+        gameMapPanel:addAnchor(AnchorBottom, 'bottomSplitter', AnchorTop)
+        gameMapPanel:addAnchor(AnchorTop, 'gameTopPanel', AnchorBottom)
         gameRootPanel:addAnchor(AnchorTop, 'parent', AnchorTop)
         gameLeftPanel:setOn(modules.client_options.getOption('showLeftPanel'))
         gameRightExtraPanel:setOn(modules.client_options.getOption('showRightExtraPanel'))
@@ -1867,12 +1867,19 @@ function testExtendedView(mode)
         gameMainRightPanel:setImageColor('alpha')
         gameBottomPanel:addAnchor(AnchorTop, 'gameBottomActionPanel', AnchorBottom)
         gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        gameLeftActionPanel:setImageSource(nil)
+        gameRightActionPanel:setImageSource(nil)
+        gameLeftActionPanel:setBorderWidthRight(0)
+        gameRightActionPanel:setBorderWidthLeft(0)
     else
         -- Reset to normal view
         gameMainRightPanel:setHeight(200)
         gameMainRightPanel:setMarginTop(0)
         gameMainRightPanel:setImageColor('white')
-
+        gameLeftActionPanel:setImageSource('/images/ui/actionbar/actionbar_background-light')
+        gameRightActionPanel:setImageSource('/images/ui/actionbar/actionbar_background-light')
+        gameLeftActionPanel:setBorderWidthRight(1)
+        gameRightActionPanel:setBorderWidthLeft(1)
         local buttons = { leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
             leftDecreaseSidePanels }
 

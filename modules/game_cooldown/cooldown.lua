@@ -95,14 +95,6 @@ function loadIcon(iconId)
     return icon, spellName
 end
 
-function onMiniWindowOpen()
-    modules.client_options.setOption('showSpellGroupCooldowns', true)
-end
-
-function onMiniWindowClose()
-    modules.client_options.setOption('showSpellGroupCooldowns', false)
-end
-
 function online()
     local console = modules.game_console.consolePanel
     if console then
@@ -111,6 +103,15 @@ function online()
     if not g_game.getFeature(GameSpellList) then
         modules.client_options.setOption('showSpellGroupCooldowns', false)
         return
+    end
+    local children = contentsPanel:getChildren()
+    local version = g_game.getClientVersion() >= 1100
+    for i = 9, #children - 2 do -- Groups Crippling to virtue
+        local widget = children[i]
+        if widget then
+            widget:setVisible(version)
+            widget:setWidth(version and 22 or 0)
+        end
     end
 
     if not lastPlayer or lastPlayer ~= g_game.getCharacterName() then

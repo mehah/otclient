@@ -224,7 +224,7 @@ EnterGameWindow
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 2
+    margin-top: 10
 
   QtCheckBox
     id: httpLoginBox
