@@ -1,6 +1,5 @@
 -- to-do
 -- change to ItemsDatabase.setTier(UIitem) to UIitem:setTier()
--- move this to "\modules\gamelib\ui\uiitem.lua" or "\modules\game_interface\widgets\uiitem.lua" why are 2 ?
 ItemsDatabase = {}
 
 ItemsDatabase.rarityColors = {
@@ -55,7 +54,7 @@ function ItemsDatabase.getClipAndImagePath(item)
     local clip = nil
 
     if type(item) == "number" then
-        item = Item.create(item, 1)
+        item = g_things.getThingType(item, ThingCategoryItem)
     end
 
     if not item then
