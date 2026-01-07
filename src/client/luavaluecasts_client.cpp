@@ -33,6 +33,10 @@ int push_luavalue(const Outfit& outfit)
     g_lua.setField("type");
     g_lua.pushInteger(outfit.getAuxId());
     g_lua.setField("auxType");
+
+    g_lua.pushInteger(outfit.getResourceId());
+    g_lua.setField("resourceId");
+
     if (g_game.getFeature(Otc::GamePlayerAddons)) {
         g_lua.pushInteger(outfit.getAddons());
         g_lua.setField("addons");
@@ -48,12 +52,19 @@ int push_luavalue(const Outfit& outfit)
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
         g_lua.pushInteger(outfit.getMount());
         g_lua.setField("mount");
+
+        g_lua.pushInteger(outfit.getMountResourceId());
+        g_lua.setField("mountResourceId");
     }
     if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
         g_lua.pushInteger(outfit.getFamiliar());
         g_lua.setField("familiar");
+
+        g_lua.pushInteger(outfit.getFamiliarResourceId());
+        g_lua.setField("familiarResourceId");
     }
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
+        // to do: resource ids?
         g_lua.pushInteger(outfit.getWing());
         g_lua.setField("wings");
         g_lua.pushInteger(outfit.getEffect());
@@ -75,6 +86,10 @@ bool luavalue_cast(const int index, Outfit& outfit)
     outfit.setId(g_lua.popInteger());
     g_lua.getField("auxType", index);
     outfit.setAuxId(g_lua.popInteger());
+
+    g_lua.getField("resourceId", index);
+    outfit.setResourceId(g_lua.popInteger());
+
     if (g_game.getFeature(Otc::GamePlayerAddons)) {
         g_lua.getField("addons", index);
         outfit.setAddons(g_lua.popInteger());
@@ -90,12 +105,19 @@ bool luavalue_cast(const int index, Outfit& outfit)
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
         g_lua.getField("mount", index);
         outfit.setMount(g_lua.popInteger());
+
+        g_lua.getField("mountResourceId", index);
+        outfit.setMountResourceId(g_lua.popInteger());
     }
     if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
         g_lua.getField("familiar", index);
         outfit.setFamiliar(g_lua.popInteger());
+
+        g_lua.getField("familiarResourceId", index);
+        outfit.setFamiliarResourceId(g_lua.popInteger());
     }
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
+        // to do: resource ids?
         g_lua.getField("wings", index);
         outfit.setWing(g_lua.popInteger());
         g_lua.getField("effects", index);
