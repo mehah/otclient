@@ -91,22 +91,70 @@ json thingTypeToJson(const ThingTypePtr& type, const ThingCategory category, con
         { "z", type->getNumPatternZ() },
     };
     entry["animationPhases"] = type->getAnimationPhases();
-    entry["groundSpeed"] = type->getGroundSpeed();
-    entry["elevation"] = type->getElevation();
+    entry["displacement"] = type->hasDisplacement()
+            ? json{{ "x", type->getDisplacementX() }, { "y", type->getDisplacementY() }}
+            : json("none");
+    if (category == ThingCategoryItem) {
+        entry["groundSpeed"] = type->hasAttr(ThingAttrGround) ? json(type->getGroundSpeed()) : json("none");
+        entry["elevation"] = type->hasAttr(ThingAttrElevation) ? json(type->getElevation()) : json("none");
 
-    auto& flags = entry["flags"];
-    flags["floorChange"] = type->hasAttr(ThingAttrFloorChange);
-    flags["ground"] = type->isGround();
-    flags["groundBorder"] = type->isGroundBorder();
-    flags["onTop"] = type->isOnTop();
-    flags["onBottom"] = type->isOnBottom();
-    flags["fullGround"] = type->isFullGround();
-    flags["notWalkable"] = type->isNotWalkable();
-    flags["notPathable"] = type->isNotPathable();
-    flags["blockProjectile"] = type->blockProjectile();
-    flags["hasElevation"] = type->hasAttr(ThingAttrElevation);
-    flags["hasDisplacement"] = type->hasAttr(ThingAttrDisplacement);
-    flags["hasLight"] = type->hasAttr(ThingAttrLight);
+
+        entry["light"] = type->hasLight()
+            ? json{{ "intensity", type->getLight().intensity }, { "color", type->getLight().color } }
+            : json("none");
+        entry["minimapColor"] = type->hasMiniMapColor() ? json(type->getMinimapColor()) : json("none");
+        entry["lensHelp"] = type->hasLensHelp() ? json(type->getLensHelp()) : json("none");
+
+        auto setFlag = [&](const std::string& key, const ThingAttr attr, const bool value) {
+            entry["flags"][key] = type->hasAttr(attr) ? json(value) : json("none");
+        };
+
+        setFlag("floorChange", ThingAttrFloorChange, type->hasAttr(ThingAttrFloorChange));
+        setFlag("ground", ThingAttrGround, type->isGround());
+        setFlag("groundBorder", ThingAttrGroundBorder, type->isGroundBorder());
+        setFlag("onTop", ThingAttrOnTop, type->isOnTop());
+        setFlag("onBottom", ThingAttrOnBottom, type->isOnBottom());
+        setFlag("fullGround", ThingAttrFullGround, type->isFullGround());
+        setFlag("notWalkable", ThingAttrNotWalkable, type->isNotWalkable());
+        setFlag("notPathable", ThingAttrNotPathable, type->isNotPathable());
+        setFlag("blockProjectile", ThingAttrBlockProjectile, type->blockProjectile());
+        setFlag("container", ThingAttrContainer, type->isContainer());
+        setFlag("stackable", ThingAttrStackable, type->isStackable());
+        setFlag("forceUse", ThingAttrForceUse, type->isForceUse());
+        setFlag("multiUse", ThingAttrMultiUse, type->isMultiUse());
+        setFlag("writable", ThingAttrWritable, type->isWritable());
+        setFlag("writableOnce", ThingAttrWritableOnce, type->isWritableOnce());
+        setFlag("chargeable", ThingAttrChargeable, type->isChargeable());
+        setFlag("fluidContainer", ThingAttrFluidContainer, type->isFluidContainer());
+        setFlag("splash", ThingAttrSplash, type->isSplash());
+        setFlag("hasElevation", ThingAttrElevation, type->hasAttr(ThingAttrElevation));
+        setFlag("hasDisplacement", ThingAttrDisplacement, type->hasAttr(ThingAttrDisplacement));
+        setFlag("hasLight", ThingAttrLight, type->hasAttr(ThingAttrLight));
+        setFlag("notMoveable", ThingAttrNotMoveable, type->isNotMoveable());
+        setFlag("pickupable", ThingAttrPickupable, type->isPickupable());
+        setFlag("hangable", ThingAttrHangable, type->isHangable());
+        setFlag("hookSouth", ThingAttrHookSouth, type->isHookSouth());
+        setFlag("hookEast", ThingAttrHookEast, type->isHookEast());
+        setFlag("rotateable", ThingAttrRotateable, type->isRotateable());
+        setFlag("dontHide", ThingAttrDontHide, type->isDontHide());
+        setFlag("translucent", ThingAttrTranslucent, type->isTranslucent());
+        setFlag("lyingCorpse", ThingAttrLyingCorpse, type->isLyingCorpse());
+        setFlag("animateAlways", ThingAttrAnimateAlways, type->isAnimateAlways());
+        setFlag("ignoreLook", ThingAttrLook, type->isIgnoreLook());
+        setFlag("cloth", ThingAttrCloth, type->isCloth());
+        setFlag("market", ThingAttrMarket, type->isMarketable());
+        setFlag("usable", ThingAttrUsable, type->isUsable());
+        setFlag("wrapable", ThingAttrWrapable, type->isWrapable());
+        setFlag("unwrapable", ThingAttrUnwrapable, type->isUnwrapable());
+        setFlag("wearOut", ThingAttrWearOut, type->hasWearOut());
+        setFlag("clockExpire", ThingAttrClockExpire, type->hasClockExpire());
+        setFlag("expire", ThingAttrExpire, type->hasExpire());
+        setFlag("expireStop", ThingAttrExpireStop, type->hasExpireStop());
+        setFlag("podium", ThingAttrPodium, type->isPodium());
+        setFlag("topEffect", ThingAttrTopEffect, type->isTopEffect());
+        setFlag("defaultAction", ThingAttrDefaultAction, type->hasAction());
+        setFlag("decoKit", ThingAttrDecoKit, type->isDecoKit());
+    }
 
     return entry;
 }
@@ -121,9 +169,10 @@ std::optional<Request> parseRequest(std::vector<std::string>& args)
 
         Request request;
         if (auto datValue = readFlagValue(args, i, "--dump-dat-to-json"); datValue) {
-            request.datPath = *datValue;
+                request.datPath = "data/things/" + *datValue + "/Tibia.dat";
+                request.clientVersion = std::stoi(*datValue);
         } else {
-            throw std::runtime_error("--dump-dat-to-json requires an argument (e.g. --dump-dat-to-json=data/Tibia.dat)");
+            throw std::runtime_error("--dump-dat-to-json requires an argument (e.g. --dump-dat-to-json=version)");
         }
 
         args.erase(args.begin() + static_cast<long>(i));
@@ -134,19 +183,6 @@ std::optional<Request> parseRequest(std::vector<std::string>& args)
                 args.erase(args.begin() + static_cast<long>(j));
                 continue;
             }
-
-            if (auto value = readFlagValue(args, j, "--dump-dat-client-version"); value) {
-                try {
-                    request.clientVersion = std::stoi(*value);
-                } catch (const std::exception&) {
-                    std::throw_with_nested(
-                        std::invalid_argument("invalid --dump-dat-client-version value")
-                    );
-                }
-                args.erase(args.begin() + static_cast<long>(j));
-                continue;
-            }
-
             if (args[j] == "--dump-dat-compact") {
                 request.compactOutput = true;
                 args.erase(args.begin() + static_cast<long>(j));
@@ -170,9 +206,16 @@ bool run(const Request& request)
 
     g_lua.init();
     g_things.init();
-
     if (request.clientVersion > 0)
         g_game.setClientVersion(static_cast<uint16_t>(request.clientVersion));
+
+    const int version = request.clientVersion;
+    if (version >= 960)
+        g_game.enableFeature(Otc::GameSpritesU32);
+    if (version >= 1050)
+        g_game.enableFeature(Otc::GameEnhancedAnimations);
+    if (version >= 1057)
+        g_game.enableFeature(Otc::GameIdleAnimations);
 
     if (!g_things.loadDat(request.datPath)) {
         throw std::runtime_error("unable to load DAT file: " + request.datPath);
