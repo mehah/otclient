@@ -19,16 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <algorithm>
-#include <cmath>
-#include <functional>
-#include <vector>
+#include "uilayoutflexbox.h"
+#include "uimanager.h"
+#include "uiwidget.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/html/htmlmanager.h>
 #include <framework/html/htmlnode.h>
-#include "uimanager.h"
-#include "uiwidget.h"
-#include "uilayoutflexbox.h"
 
 namespace {
     inline uint32_t SIZE_VERSION_COUNTER = 1;

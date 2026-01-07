@@ -21,10 +21,17 @@
  */
 
 #include "configmanager.h"
+#include <INIReader.h>
+#include "resourcemanager.h"
 
 ConfigManager g_configs;
 
-void ConfigManager::init() { m_settings = std::make_shared<Config>(); }
+void ConfigManager::init() {
+    m_settings = std::make_shared<Config>();
+
+    // Comment out or remove this line to skip loading config.ini.
+    loadPublicConfig("config.ini");
+}
 
 void ConfigManager::terminate()
 {
@@ -117,3 +124,21 @@ bool ConfigManager::unload(const std::string& file)
 }
 
 void ConfigManager::remove(const ConfigPtr& config) { m_configs.remove(config); }
+
+void ConfigManager::loadPublicConfig(const std::string& fileName) {
+    try {
+        auto content = g_resources.readFileContents(fileName);
+        INIReader reader(content.c_str(), content.size());
+
+        if (reader.ParseError() < 0) {
+            g_logger.error("Failed to read config otml '{}''", fileName);
+            return;
+        }
+
+        m_publicConfig.graphics.maxAtlasSize = std::max<int>(2048, reader.GetInteger("graphics", "maxAtlasSize", m_publicConfig.graphics.maxAtlasSize));
+        m_publicConfig.graphics.mapAtlasSize = reader.GetInteger("graphics", "mapAtlasSize", m_publicConfig.graphics.mapAtlasSize);
+        m_publicConfig.graphics.foregroundAtlasSize = reader.GetInteger("graphics", "foregroundAtlasSize", m_publicConfig.graphics.foregroundAtlasSize);
+    } catch (const std::exception& e) {
+        g_logger.error("Failed to parse public config '{}': {}", fileName, e.what());
+    }
+}

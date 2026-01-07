@@ -21,18 +21,24 @@
  */
 
 #include "client.h"
+
 #include "game.h"
 #include "gameconfig.h"
 #include "map.h"
+#include "mapview.h"
 #include "minimap.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
+#include "thingtypemanager.h"
 #include "uimap.h"
-
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/graphics/shadermanager.h>
-#include <framework/ui/ui.h>
+#include "framework/core/eventdispatcher.h"
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/graphics/shadermanager.h"
+#include "framework/ui/uimanager.h"
+#ifdef FRAMEWORK_EDITOR
+#include "creatures.h"
+#endif
+#include "paperdollmanager.h"
 
 Client g_client;
 
@@ -65,6 +71,7 @@ void Client::terminate()
     g_sprites.terminate();
     g_spriteAppearances.terminate();
     g_shaders.terminate();
+    g_paperdolls.clear();
     g_gameConfig.terminate();
 }
 

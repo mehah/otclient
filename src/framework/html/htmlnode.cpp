@@ -21,10 +21,9 @@
  */
 
 #include "htmlnode.h"
-#include <framework/otml/otml.h>
-#include <framework/ui/uiwidget.h>
-#include <framework/html/queryselector.h>
 #include "htmlparser.h"
+#include "queryselector.h"
+#include "framework/ui/uiwidget.h"
 
 std::string HtmlNode::getAttr(const std::string& name) const {
     auto key = ascii_tolower_copy(name);

@@ -13,22 +13,15 @@ BattleListInstance = nil
 BattleButtonPool = nil
 
 -- Utility functions
-function table.copy(t)
+function tableCopy(t)
     if type(t) ~= "table" then return t end
     local meta = getmetatable(t)
     local target = {}
     for k, v in pairs(t) do
-        target[k] = type(v) == "table" and table.copy(v) or v
+        target[k] = type(v) == "table" and tableCopy(v) or v
     end
     setmetatable(target, meta)
     return target
-end
-
-function table.size(t)
-    if type(t) ~= "table" then return 0 end
-    local count = 0
-    for _ in pairs(t) do count = count + 1 end
-    return count
 end
 
 -- Default filter settings
@@ -127,7 +120,7 @@ function BattleListManager:restoreInstancesState()
                 if instance and instance.window then
                     if shouldRestoreSettings and oldSettings then
                         local newSettingsKey = instance:getSettingsKey()
-                        local settingsToRestore = table.copy(oldSettings)
+                        local settingsToRestore = tableCopy(oldSettings)
                         settingsToRestore.customName = data.name
                         
                         g_settings.mergeNode(newSettingsKey, settingsToRestore)
@@ -456,7 +449,7 @@ function BattleListInstance:new(id, customName)
     instance.lastAge = 0
     instance.name = customName or tr('Battle List')
     instance.settings = {
-        filters = table.copy(BATTLE_FILTERS),
+        filters = tableCopy(BATTLE_FILTERS),
         sortType = 'name',
         sortOrder = 'A',
         hidingFilters = false,
@@ -473,7 +466,7 @@ end
 function BattleListInstance:loadFilters()
     local settings = g_settings.getNode(self:getSettingsKey())
     if not settings or not settings['filters'] then
-        return table.copy(BATTLE_FILTERS)
+        return tableCopy(BATTLE_FILTERS)
     end
     return settings['filters']
 end
@@ -682,7 +675,7 @@ function BattleListInstance:clearAllConfigurations()
     end
     
     self.settings = {
-        filters = table.copy(BATTLE_FILTERS),
+        filters = tableCopy(BATTLE_FILTERS),
         sortType = 'name',
         sortOrder = 'A',
         hidingFilters = false,
@@ -2327,54 +2320,56 @@ function onCreatureHealthPercentChange(creature, healthPercent, oldHealthPercent
             if battleButton.data then
                 battleButton.data.healthpercent = healthPercent
             end
+            local skipInstance = false
             if sortType == 'health' then
                 if healthPercent == oldHealthPercent then
-                    goto continue -- Skip this instance
+                    skipInstance = true -- Skip this instance
                 end
-                if healthPercent == 0 then
-                    goto continue -- Let onCreatureDisappear handle this
+                if not skipInstance and healthPercent == 0 then
+                    skipInstance = true -- Let onCreatureDisappear handle this
                 end
 
-                local index = binarySearch(instance.binaryTree, {
-                    healthpercent = oldHealthPercent,
-                    id = creatureId
-                }, BSComparatorSortType, 'health', true)
-                if index ~= nil and creatureId == instance.binaryTree[index].id then
-                    instance.binaryTree[index].healthpercent = healthPercent
-                    battleButton.data.healthpercent = healthPercent
-                    if healthPercent > oldHealthPercent then
-                        if index < #instance.binaryTree then
-                            for i = index, #instance.binaryTree - 1 do
-                                local a = instance.binaryTree[i]
-                                local b = instance.binaryTree[i + 1]
-                                if a.healthpercent > b.healthpercent or (a.healthpercent == b.healthpercent and a.id > b.id) then
-                                    local tmp = instance.binaryTree[i]
-                                    instance.binaryTree[i] = instance.binaryTree[i + 1]
-                                    instance.binaryTree[i + 1] = tmp
+                if not skipInstance then
+                    local index = binarySearch(instance.binaryTree, {
+                        healthpercent = oldHealthPercent,
+                        id = creatureId
+                    }, BSComparatorSortType, 'health', true)
+                    if index ~= nil and creatureId == instance.binaryTree[index].id then
+                        instance.binaryTree[index].healthpercent = healthPercent
+                        battleButton.data.healthpercent = healthPercent
+                        if healthPercent > oldHealthPercent then
+                            if index < #instance.binaryTree then
+                                for i = index, #instance.binaryTree - 1 do
+                                    local a = instance.binaryTree[i]
+                                    local b = instance.binaryTree[i + 1]
+                                    if a.healthpercent > b.healthpercent or (a.healthpercent == b.healthpercent and a.id > b.id) then
+                                        local tmp = instance.binaryTree[i]
+                                        instance.binaryTree[i] = instance.binaryTree[i + 1]
+                                        instance.binaryTree[i + 1] = tmp
+                                    end
+                                end
+                            end
+                        else
+                            if index > 1 then
+                                for i = index, 2, -1 do
+                                    local a = instance.binaryTree[i - 1]
+                                    local b = instance.binaryTree[i]
+                                    if a.healthpercent > b.healthpercent or (a.healthpercent == b.healthpercent and a.id > b.id) then
+                                        local tmp = instance.binaryTree[i - 1]
+                                        instance.binaryTree[i - 1] = instance.binaryTree[i]
+                                        instance.binaryTree[i] = tmp
+                                    end
                                 end
                             end
                         end
-                    else
-                        if index > 1 then
-                            for i = index, 2, -1 do
-                                local a = instance.binaryTree[i - 1]
-                                local b = instance.binaryTree[i]
-                                if a.healthpercent > b.healthpercent or (a.healthpercent == b.healthpercent and a.id > b.id) then
-                                    local tmp = instance.binaryTree[i - 1]
-                                    instance.binaryTree[i - 1] = instance.binaryTree[i]
-                                    instance.binaryTree[i] = tmp
-                                end
-                            end
-                        end
+                        instance:correctBattleButtons()
                     end
-                    instance:correctBattleButtons()
                 end
             end
-            if battleButton.creature then
+            if not skipInstance and battleButton.creature then
                 battleButton:update()
             end
         end
-        ::continue::
     end
 end
 

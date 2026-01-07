@@ -22,7 +22,7 @@
 
 #pragma once
 
-#if defined(OPENGL_ES) || defined(__EMSCRIPTEN__)
+#if defined(OPENGL_ES) || defined(__EMSCRIPTEN__) || defined(__ANDROID__)
  // for static linking
 #define GL_APICALL
 #define EGLAPI

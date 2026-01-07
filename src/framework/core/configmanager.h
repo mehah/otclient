@@ -24,7 +24,19 @@
 
 #include "config.h"
 
- // @bindsingleton g_configs
+struct GraphicsConfig
+{
+    uint16_t maxAtlasSize = 8192;
+    int16_t  mapAtlasSize = 0;
+    int16_t foregroundAtlasSize = 2048;
+};
+
+struct PublicConfig
+{
+    GraphicsConfig graphics;
+};
+
+// @bindsingleton g_configs
 class ConfigManager
 {
 public:
@@ -41,11 +53,15 @@ public:
     bool unload(const std::string& file);
     void remove(const ConfigPtr& config);
 
+    const PublicConfig& getPublicConfig() const { return m_publicConfig; }
+    void loadPublicConfig(const std::string& file);
+
 protected:
     ConfigPtr m_settings;
 
 private:
     std::list<ConfigPtr> m_configs;
+    PublicConfig m_publicConfig;
 };
 
 extern ConfigManager g_configs;

@@ -4,6 +4,7 @@ controller:registerEvents(g_game, {
         -- g_game.enableFeature(GameKeepUnawareTiles)
         -- g_game.enableFeature(GameNegativeOffset)
         -- g_game.enableFeature(GameWingsAurasEffectsShader)
+        -- g_game.enableFeature(GameCreaturePaperdoll)
         -- g_game.enableFeature(GameAllowCustomBotScripts)
 
         g_game.enableFeature(GameFormatCreatureName)
@@ -49,6 +50,7 @@ controller:registerEvents(g_game, {
         if version >= 841 then
             g_game.enableFeature(GameChallengeOnLogin)
             g_game.enableFeature(GameMessageSizeCheck)
+            g_game.enableFeature(GameTileAddThingWithStackpos)
         end
 
         if version >= 854 then
@@ -95,6 +97,10 @@ controller:registerEvents(g_game, {
 
         if version >= 963 then
             g_game.enableFeature(GameAdditionalVipInfo)
+        end
+
+        if version >= 972 then
+            g_game.enableFeature(GameDoublePlayerGoodsMoney)
         end
 
         if version >= 980 then

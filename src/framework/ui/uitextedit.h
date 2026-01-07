@@ -108,6 +108,7 @@ protected:
     bool onMouseRelease(const Point& mousePos, Fw::MouseButton button) override;
     bool onMouseMove(const Point& mousePos, const Point& mouseMoved) override;
     bool onDoubleClick(const Point& mousePos) override;
+    void onTextChange(std::string_view text, std::string_view oldText) override;
     virtual void onTextAreaUpdate(const Point& vitualOffset, const Size& visibleSize, const Size& totalSize);
 
 private:

@@ -22,37 +22,11 @@
 
 #pragma once
 
-#include <utility>
-
 #include "declarations.h"
 #include "framebuffer.h"
 #include "framework/core/timer.h"
-#include <framework/core/graphicalapplication.h>
-#include <framework/platform/platformwindow.h>
-#include <framework/util/spinlock.h>
 
 #include "../stdext/storage.h"
-#include <unordered_set>
-
-enum class DrawPoolType : uint8_t
-{
-    MAP,
-    CREATURE_INFORMATION,
-    LIGHT,
-    FOREGROUND_MAP,
-    FOREGROUND,
-    LAST
-};
-
-enum DrawOrder : uint8_t
-{
-    FIRST,  // GROUND
-    SECOND, // BORDER
-    THIRD,  // BOTTOM & TOP
-    FOURTH, // TOP ~ TOP
-    FIFTH,  // ABOVE ALL - MISSILE
-    LAST
-};
 
 struct DrawHashController
 {
@@ -81,8 +55,10 @@ struct DrawHashController
     }
 
     void reset() {
+        if (m_currentHash != 1)
+            m_lastHash = m_currentHash;
+
         m_hashs.clear();
-        m_lastHash = m_currentHash;
         m_currentHash = 0;
         m_lastObjectHash = 0;
     }
@@ -100,6 +76,7 @@ class DrawPool
 {
 public:
     static constexpr uint16_t
+        FPS1 = 1000 / 1,
         FPS10 = 1000 / 10,
         FPS20 = 1000 / 20,
         FPS60 = 1000 / 60;
@@ -118,7 +95,7 @@ public:
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
     bool canRepaint();
-    void repaint() { if (hasFrameBuffer()) m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
+    void repaint() { m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
@@ -126,7 +103,7 @@ public:
 
     void setScaleFactor(const float scale) { m_scaleFactor = scale; }
     float getScaleFactor() const { return m_scaleFactor; }
-    bool isScaled() const { return m_scaleFactor != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
+    bool isScaled() const { return m_scaleFactor != DEFAULT_DISPLAY_DENSITY; }
 
     void setFramebuffer(const Size& size);
     void removeFramebuffer();
@@ -146,62 +123,7 @@ public:
         return m_shouldRepaint.load(std::memory_order_acquire);
     }
 
-    void release() {
-        SpinLock::Guard guard(m_threadLock);
-
-        if (!canRepaint()) {
-            for (auto& objs : m_objects)
-                objs.clear();
-            m_objectsFlushed.clear();
-            return;
-        }
-
-        m_shouldRepaint.store(true, std::memory_order_release);
-
-        m_refreshTimer.restart();
-
-        m_objectsDraw[0].clear();
-
-        if (!m_objectsFlushed.empty()) {
-            if (m_objectsDraw[0].size() < m_objectsFlushed.size())
-                m_objectsDraw[0].swap(m_objectsFlushed);
-
-            if (!m_objectsFlushed.empty()) {
-                m_objectsDraw[0].insert(
-                    m_objectsDraw[0].end(),
-                    std::make_move_iterator(m_objectsFlushed.begin()),
-                    std::make_move_iterator(m_objectsFlushed.end()));
-            }
-            m_objectsFlushed.clear();
-        }
-
-        for (auto& objs : m_objects) {
-            if (m_objectsDraw[0].size() < objs.size())
-                m_objectsDraw[0].swap(objs);
-
-            bool addFirst = true;
-
-            if (!m_objectsDraw[0].empty() && !objs.empty()) {
-                auto& last = m_objectsDraw[0].back();
-                auto& first = objs.front();
-
-                if (last.state == first.state && last.coords && first.coords) {
-                    last.coords->append(first.coords.get());
-                    addFirst = false;
-                }
-            }
-
-            if (!objs.empty()) {
-                m_objectsDraw[0].insert(
-                    m_objectsDraw[0].end(),
-                    std::make_move_iterator(objs.begin() + (addFirst ? 0 : 1)),
-                    std::make_move_iterator(objs.end()));
-                objs.clear();
-            }
-        }
-    }
-
-    auto& getThreadLock() { return m_threadLock; }
+    void release();
 
 protected:
 
@@ -276,11 +198,20 @@ private:
 
     void add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer = nullptr);
 
-    void addAction(const std::function<void()>& action);
+    void addAction(const std::function<void()>& action, size_t hash = 0);
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
     void releaseFrameBuffer(const Rect& dest);
 
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
+
+    bool canRefresh() const
+    {
+        uint16_t refreshDelay = m_refreshDelay;
+        if (m_shaderRefreshDelay > 0 && (refreshDelay == 0 || m_shaderRefreshDelay < refreshDelay))
+            refreshDelay = m_shaderRefreshDelay;
+
+        return refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay;
+    }
 
     bool updateHash(const DrawMethod& method, const Texture* texture, const Color& color, bool hasCoord);
     PoolState getState(const TexturePtr& texture, Texture* textureAtlas, const Color& color);
@@ -339,30 +270,7 @@ private:
             m_parameters.erase(it);
     }
 
-    void flush()
-    {
-        m_coords.clear();
-
-        for (auto& objs : m_objects) {
-            bool addFirst = true;
-            if (!objs.empty() && !m_objectsFlushed.empty()) {
-                auto& last = m_objectsFlushed.back();
-                auto& first = objs.front();
-
-                if (last.state == first.state && last.coords && first.coords) {
-                    last.coords->append(first.coords.get());
-                    addFirst = false;
-                }
-            }
-
-            m_objectsFlushed.insert(
-                m_objectsFlushed.end(),
-                std::make_move_iterator(objs.begin() + (addFirst ? 0 : 1)),
-                std::make_move_iterator(objs.end())
-            );
-            objs.clear();
-        }
-    }
+    void flush();
 
     void resetOnlyOnceParameters() {
         if (m_onlyOnceStateFlag > 0) { // Only Once State
@@ -426,17 +334,15 @@ private:
     stdext::map<std::string_view, std::any> m_parameters;
 
     float m_scaleFactor{ 1.f };
-    float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
+    float m_scale{ DEFAULT_DISPLAY_DENSITY };
 
     FrameBufferPtr m_framebuffer;
 
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    SpinLock m_threadLock;
-
     TextureAtlasPtr m_atlas;
-    std::atomic_bool m_shouldRepaint;
+    std::atomic_bool m_shouldRepaint{ false };
 
     friend class DrawPoolManager;
 };

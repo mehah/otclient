@@ -21,8 +21,11 @@
  */
 
 #include "uiitem.h"
-#include "lightview.h"
-#include <framework/graphics/fontmanager.h>
+
+#include "framework/graphics/drawpoolmanager.h"
+#include "framework/otml/otmlnode.h"
+#include "gameconfig.h"
+#include "item.h"
 
 UIItem::UIItem() { setProp(PropDraggable, true, false); }
 
@@ -52,7 +55,7 @@ void UIItem::drawSelf(const DrawPoolType drawPane)
         m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement());
         g_drawPool.releaseFrameBuffer(getPaddingRect());
 
-        if (m_font && (m_alwaysShowCount || m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
+        if (m_font && (m_alwaysShowCount && (m_item->isStackable() || m_item->isChargeable())) && m_item->getCountOrSubType() > 1) {
             static constexpr Color STACK_COLOR(231, 231, 231);
             const auto& count = m_item->getCountOrSubType();
             const auto& countText = count < 1000 ? std::to_string(count) : fmt::format("{}k", count / 1000.f);
@@ -129,6 +132,11 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
 
     UIWidget::onStyleApply(styleName, styleNode);
 }
+
+int UIItem::getItemId() { return m_item ? m_item->getId() : 0; }
+int UIItem::getItemCount() { return m_item ? m_item->getCount() : 0; }
+int UIItem::getItemSubType() { return m_item ? m_item->getSubType() : 0; }
+int UIItem::getItemCountOrSubType() { return m_item ? m_item->getCountOrSubType() : 0; }
 
 void UIItem::setShader(std::string_view name) {
     m_shaderName = name;

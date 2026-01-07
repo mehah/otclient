@@ -23,7 +23,6 @@
 #pragma once
 
 #include "declarations.h"
-#include <framework/graphics/paintershaderprogram.h>
 
  //@bindsingleton g_shaders
 class ShaderManager

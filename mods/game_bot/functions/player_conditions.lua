@@ -4,7 +4,7 @@ for i, state in ipairs(PlayerStates) do
   context[state] = state
 end
 
-context.hasCondition = function(condition) return bit.band(context.player:getStates(), condition) > 0 end
+context.hasCondition = function(condition) return Bit.band(context.player:getStates(), condition) > 0 end
 
 context.isPoisioned = function() return context.hasCondition(PlayerStates.Poison) end
 context.isBurning = function() return context.hasCondition(PlayerStates.Burn) end

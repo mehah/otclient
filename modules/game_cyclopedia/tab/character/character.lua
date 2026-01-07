@@ -1331,13 +1331,13 @@ local  function getWeaponSkillName(skillType)
             {name = getWeaponSkillName(data.weaponSkillType), value = data.weaponSkillLevel or 0, align = "center", icon = false},
             {name = "From Combat Tactics", value = data.weaponDamage or 0, align = "center", icon = false},
     
-            {name = "Life Leech", value = data.lifeLeech or 0, icon = false, percent = true},
-            {name = "From Base", value = data.lifeLeechBase or 0, align = "center", percent = true, icon = false},
+            {name = "Life Leech", value = data.lifeLeechTotal or 0, icon = false, percent = true},
+            {name = "From Base", value = data.lifeLeechEquipament or 0, align = "center", percent = true, icon = false},
             {name = "From Equipment", value = data.lifeLeechImbuement or 0, align = "center", percent = true, icon = false},
             {name = "From Wheel", value = data.lifeLeechWheel or 0, align = "center", percent = true, icon = false},
     
-            {name = "Mana Leech", value = data.manaLeech or 0, icon = false, percent = true},
-            {name = "From Base", value = data.manaLeechBase or 0, align = "center", percent = true, icon = false},
+            {name = "Mana Leech", value = data.manaLeechTotal or 0, icon = false, percent = true},
+            {name = "From Base", value = data.manaLeechEquipament or 0, align = "center", percent = true, icon = false},
             {name = "From Equipment", value = data.manaLeechImbuement or 0, align = "center", percent = true, icon = false},
             {name = "From Wheel", value = data.manaLeechWheel or 0, align = "center", percent = true, icon = false},
     
@@ -1346,9 +1346,9 @@ local  function getWeaponSkillName(skillType)
             {name = "From Amplification", value = data.onslaughtBonus or 0, align = "center", percent = true, icon = false},
     
             {name = "Critical Hit", parent = "right", value = "", icon = false},
-            {name = "     Chance", parent = "right", value = data.critChance or 0, percent = true, icon = false},
-            {name = "     Extra Damage", parent = "right", value = data.critDamage or 0, percent = true, icon = false},
-            {name = "From Base", parent = "right", value = data.critDamageBase or 0, align = "center", percent = true, icon = false},
+            {name = "     Chance", parent = "right", value = data.critChanceTotal or 0, percent = true, icon = false},
+            {name = "     Extra Damage", parent = "right", value = data.critChanceFlat or 0, percent = true, icon = false},
+            {name = "From Base", parent = "right", value = data.critChanceEquipament or 0, align = "center", percent = true, icon = false},
             {name = "From Equipment", parent = "right", value = data.critDamageImbuement or 0, align = "center", percent = true, icon = false},
             {name = "From Wheel", parent = "right", value = data.critDamageWheel or 0, align = "center", percent = true, icon = false}
         }

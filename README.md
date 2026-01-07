@@ -11,7 +11,7 @@
 
 ---
 
-## 📋 Table of Contents
+## <a id="table-of-contents"></a>📋 Table of Contents
 1. ![Logo](https://raw.githubusercontent.com/mehah/otclient/main/src/otcicon.ico)  [What is OTClient?](#what-is-otclient)
 2. 🚀 [Features](#features)
 3. <img height="16" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png"/> [The Mobile Project](#the-mobile-project)
@@ -26,7 +26,7 @@
 
 ---
 
-## ![Logo](https://raw.githubusercontent.com/mehah/otclient/main/src/otcicon.ico) What is OTClient?
+## <a id="what-is-otclient"></a>![Logo](https://raw.githubusercontent.com/mehah/otclient/main/src/otcicon.ico) What is OTClient?
 OTClient is an alternative Tibia client for usage with OTServ. It aims to be **complete** and **flexible**:
 
 - **LUA scripting** for all game interface functionality
@@ -42,7 +42,7 @@ For a server to connect to, you can build your own with **theforgottenserver** o
 
 ---
 
-## 🚀 Features
+## <a id="features"></a>🚀 Features
 
 Beyond its flexibility with scripts, OTClient comes with many features that enable client-side innovation in OTServ: **sound system**, **graphics effects with shaders**, **modules/addons**, **animated textures**, **styleable UI**, **transparency**, **multi-language**, **in-game LUA terminal**, and an **OpenGL 2.0 ES engine** that allows porting to mobile platforms. It is also flexible enough to create Tibia tools like map editors using scripts—OTClient is a **framework + Tibia APIs**.
 
@@ -252,7 +252,7 @@ https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e
 ---
 
 ### 🔗 Compatibility & Protocols
-- Client **12.85 ~ 12.92**, **13.00 ~ 13.40** support *(protobuf)*  
+- Client **12.85 ~ 12.92**, **13.00 ~ 15.11** support *(protobuf)*  
 - Market rewritten (compatible with TFS and Canary)  
 - Async Texture Loading *(engine-level feature)*  
 - Supports sequenced packages and compression  
@@ -499,7 +499,7 @@ If it doesn't work, enable **curl**:
 
 ---
 
-## <img height="20" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png"/> The Mobile Project
+## <a id="the-mobile-project"></a><img height="20" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png"/> The Mobile Project
 This is a fork of edubart's OTClient. The objective of this fork is to develop a runnable OTClient on mobile devices.
 
 **Tasks**
@@ -512,12 +512,12 @@ This is a fork of edubart's OTClient. The objective of this fork is to develop a
 
 ---
 
-## 🔨 Compiling
+## <a id="compiling"></a>🔨 Compiling
 If you are interested in compiling this project, visit the **[Wiki](https://github.com/mehah/otclient/wiki)**.
 
 ---
 
-## 🐳 Docker
+## <a id="docker"></a>🐳 Docker
 
 In order to build the app for production, run the following commands:
 
@@ -544,12 +544,12 @@ xhost -
 
 ---
 
-## 🩺 Need Help?
+## <a id="need-help"></a>🩺 Need Help?
 Ask questions on **Discord**: https://discord.gg/tUjTBZzMCy
 
 ---
 
-## 📑 Bugs
+## <a id="bugs"></a>📑 Bugs
 Found a bug? Please create an issue in our **[bug tracker](https://github.com/mehah/otclient/issues)**.
 
 > [!TIP]
@@ -558,9 +558,11 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 > In old protocols, if item speed feels too fast, adjust  
 > [`item-ticks-per-frame: 75`](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32) in `data/setup.otml`.
 
+> if you use TVP or Nostalrius 7.72 activate the feature `g_game.enableFeature(GameTileAddThingWithStackpos)` in game_feature .
+
 ---
 
-## ❤️ Roadmap
+## <a id="roadmap"></a>❤️ Roadmap
 | TO-DO list | Status | PR |
 |---|---|---|
 | wheel of destiny | ![](https://geps.dev/progress/10) | [#1311](https://github.com/mehah/otclient/pull/1311) |
@@ -572,7 +574,7 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 
 ---
 
-## 💯 Support Protocol
+## <a id="support-protocol"></a>💯 Support Protocol
 
 | Protocol / version | Description | Required Feature | Compatibility |
 |---|---|---|---|
@@ -583,16 +585,16 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 | TFS 1.6 (13.10) | Main repo otland (2024) | [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) | ✅ |
 | Canary (13.21 / 13.32 / 13.40) | OpenTibiaBr | [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption) | ✅ |
 | Canary (14.00 ~ 14.12) | OpenTibiaBr | [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption) | ✅ |
-| Canary (15.00 ~ 15.10) | OpenTibiaBr | [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption) | ❌ |
+| Canary (15.00 ~ 15.11) | OpenTibiaBr | [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption) | ❌ |
 
 ---
 
-## ©️ License
+## <a id="license"></a>©️ License
 OTClient is made available under the **MIT License** — you are free to use it for commercial, non-commercial, closed or open projects.  
 See: [MIT License](http://opensource.org/licenses/MIT)
 
 ---
 
-## ❤️ Contributors
+## <a id="contributors"></a>❤️ Contributors
 If you are interested in supporting the project, donate here:  
 **[PayPal](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL)**

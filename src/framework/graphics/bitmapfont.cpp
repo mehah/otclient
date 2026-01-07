@@ -21,13 +21,14 @@
  */
 
 #include "bitmapfont.h"
-#include "graphics.h"
-#include "image.h"
-#include "texturemanager.h"
-#include "textureatlas.h"
 
-#include <framework/otml/otml.h>
 #include "drawpoolmanager.h"
+#include "image.h"
+#include "painter.h"
+#include "texture.h"
+#include "textureatlas.h"
+#include "texturemanager.h"
+#include "framework/otml/otmlnode.h"
 
 static thread_local std::vector<Point> s_glyphsPositions(1);
 static thread_local std::vector<int>   s_lineWidths(1);
@@ -148,8 +149,6 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
         dx = (screenCoords.width() - textBoxSize.width()) / 2;
     }
 
-    const AtlasRegion* region = m_texture->getAtlasRegion();
-
     for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
         if (glyph < 32) continue;
@@ -159,9 +158,6 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
 
         if (!clipAndTranslateGlyph(glyphScreenCoords, glyphTextureCoords, screenCoords))
             continue;
-
-        if (region)
-            glyphTextureCoords.translate(region->x, region->y);
 
         list.emplace_back(glyphScreenCoords, glyphTextureCoords);
     }

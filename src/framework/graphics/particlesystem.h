@@ -23,7 +23,7 @@
 #pragma once
 
 #include "declarations.h"
-#include "particleemitter.h"
+#include "framework/otml/declarations.h"
 
 class ParticleSystem : public std::enable_shared_from_this<ParticleSystem>
 {

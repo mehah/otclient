@@ -28,6 +28,7 @@ class ApplicationContext
 {
 public:
     ApplicationContext() = default;
+    virtual ~ApplicationContext() = default;
 };
 
 //@bindsingleton g_app
