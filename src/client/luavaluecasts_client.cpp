@@ -1639,3 +1639,15 @@ int push_luavalue(const PartyMemberName& data) {
     g_lua.setField("memberName");
     return 1;
 }
+
+int push_luavalue(const AssetResourceInfo& data)
+{
+    g_lua.createTable(0, 3);
+    g_lua.pushInteger(data.resourceId);
+    g_lua.setField("id");
+    g_lua.pushInteger(data.clientVersionId);
+    g_lua.setField("version");
+    g_lua.pushString(data.dir);
+    g_lua.setField("dir");
+    return 1;
+}

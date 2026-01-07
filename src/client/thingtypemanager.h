@@ -28,6 +28,13 @@
 using RaceList = std::vector<RaceType>;
 static const RaceType emptyRaceType{};
 
+struct AssetResourceInfo
+{
+    uint16_t resourceId = 0;
+    int clientVersionId = 0;
+    std::string dir;
+};
+
 class ThingTypeManager
 {
 public:
@@ -38,6 +45,7 @@ public:
     bool loadOtml(std::string file, uint16_t resourceId);
     bool loadAppearances(const std::string& file, const uint16_t resourceId);
     bool loadStaticData(const std::string& file);
+    PackInfoResourceList decodePackInfo(const std::string& file);
 
 #ifdef FRAMEWORK_EDITOR
     void parseItemType(uint16_t id, pugi::xml_node node);

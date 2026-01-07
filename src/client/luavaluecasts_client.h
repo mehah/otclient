@@ -23,6 +23,7 @@
 #pragma once
 
 #include "staticdata.h"
+#include "thingtypemanager.h"
 
  // outfit
 int push_luavalue(const Outfit& outfit);
@@ -110,3 +111,6 @@ int push_luavalue(const ForgeItemInfo& data);
 int push_luavalue(const BossCooldownData& data);
 int push_luavalue(const PartyMemberData& data);
 int push_luavalue(const PartyMemberName& data);
+
+// packinfo.xml
+int push_luavalue(const AssetResourceInfo& data);

@@ -107,6 +107,7 @@ local function loadResource(path, version, resourceId, errorList)
 
 	-- assets
 	if g_resources.fileExists(resolvepath(path .. 'catalog-content.json')) then
+		g_logger.info(string.format("Loading resource %d (assets) ...", resourceId))
 		if not g_things.loadAppearances(resolvepath(path), resourceId) then
             addError(errorList, "Couldn't load assets", resourceId)
         end
@@ -116,6 +117,8 @@ local function loadResource(path, version, resourceId, errorList)
 
 		return
 	end
+
+	g_logger.info(string.format("Loading resource %d (spr/dat) from %s ...", resourceId, path))
 
 	-- otfi-defined spr/dat
 	local otfiPath = findFileByExtension(path, ".otfi")
@@ -182,33 +185,21 @@ local function loadResource(path, version, resourceId, errorList)
 	end
 end
 
-local function resourcesFromXML(filePath)
-    local file = io.open(filePath, "r")
-    if not file then
-        return nil
-    end
+local function loadPackInfo(packPath, errorList)
+	g_logger.info("Found packinfo.xml")
+	local packInfo = g_things.decodePackInfo(resolvepath(packPath))
+	if #packInfo == 0 then
+		addError(errorList, "Failed to decode packinfo.xml", 0)
+		return
+	end
 
-    local content = file:read("*a")
-    file:close()
+	for _, resInfo in pairs(packInfo) do
+		loadResource(string.format("%s%s/", packPath, resInfo.dir), resInfo.version, resInfo.id, errorList)
 
-    if not content then
-        return nil
-    end
-
-	-- note: dat file may have different client version than protocol version
-	-- this is why it has to be defined in packinfo.xml
-	-- this ensures that dat flags will be read properly
-	local resources = {}
-    for id, version, dir in content:gmatch('<resource id="(%d+)" version="(%d+)" dir="(%s+)"') do
-        id = tonumber(id)
-        version = tonumber(version)
-
-		if id and version then
-			resources[id] = {version = version, dir = dir}
-        end
-    end
-
-    return resources
+		if #errorList > 0 then
+			break
+		end
+	end
 end
 
 local function load(version)
@@ -220,21 +211,11 @@ local function load(version)
     local errorList = {}
 	local path = string.format('/data/things/%s/', version)
 
+	g_logger.info("Loading game assets from " .. path)
+
 	local packPath = resolvepath(path .. 'packinfo.xml')
 	if g_resources.fileExists(packPath) then
-		local packInfo = resourcesFromXML(packPath)
-		if not packInfo then
-			addError(errorList, "Failed to decode packinfo.xml", 0)
-			return
-		end
-
-		for resourceId, resInfo in pairs(packInfo) do
-			loadResource(path .. resInfo.dir, resInfo.version, resourceId, errorList)
-
-			if #errorList > 0 then
-				break
-			end
-		end
+		loadPackInfo(path, errorList)
 	else
 		loadResource(path, version, 0, errorList)
 	end
@@ -245,10 +226,12 @@ local function load(version)
         -- sound files are optional, this means that failing to load them
         -- will not block logging into game
         g_sounds.loadClientFiles(resolvepath(string.format('/sounds/%d/', version)))
+		g_logger.info("Assets loading complete.")
         return
     end
 
-    local messageBox = displayErrorBox(tr('Error'), table.concat(errorList, "\n"))
+	local errors = table.concat(errorList, "\n")
+    local messageBox = displayErrorBox(tr('Error'), errors)
     addEvent(function()
         messageBox:raise()
         messageBox:focus()
@@ -256,6 +239,7 @@ local function load(version)
 
     g_game.setClientVersion(0)
     g_game.setProtocolVersion(0)
+	g_logger.error(errors)
 end
 
 function ThingsLoaderController:onInit()

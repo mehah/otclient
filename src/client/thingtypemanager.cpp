@@ -220,6 +220,42 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
     return false;
 }
 
+PackInfoResourceList ThingTypeManager::decodePackInfo(const std::string& file)
+{
+    PackInfoResourceList resourceList;
+
+    try {
+        pugi::xml_document doc;
+        pugi::xml_parse_result result = doc.load_string(g_resources.readFileContents(g_resources.resolvePath(
+            g_resources.guessFilePath(file + "packinfo", "xml")
+        )).c_str());
+        if (!result)
+            throw Exception("cannot load '{}: '{}'", file, result.description());
+
+        pugi::xml_node root = doc.child("resources");
+        if (root.empty())
+            throw Exception("malformed packinfo file");
+
+        for (pugi::xml_node node = root.first_child(); node; node = node.next_sibling()) {
+            if (node.name() != std::string("resource"))
+                throw Exception("invalid resource node");
+
+            AssetResourceInfo res = {};
+            res.resourceId = node.attribute("id").as_int();
+            res.clientVersionId = node.attribute("version").as_int();
+            res.dir = node.attribute("dir").as_string();
+
+            resourceList.push_back(res);
+        }
+
+        g_logger.debug("Packinfo read successfully.");
+    } catch (const std::exception& e) {
+        g_logger.error("Failed to load '{}': {}", file, e.what());
+    }
+
+    return resourceList;
+}
+
 const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category, uint16_t resourceId)
 {
     auto res = getResourceById(resourceId);

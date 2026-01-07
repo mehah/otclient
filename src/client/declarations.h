@@ -60,6 +60,7 @@ class AttachedEffect;
 class AttachableObject;
 class Paperdoll;
 class AssetResource;
+struct AssetResourceInfo;
 
 #ifdef FRAMEWORK_EDITOR
 class House;
@@ -106,6 +107,7 @@ using ThingList = std::vector<ThingPtr>;
 using ThingTypeList = std::vector<ThingTypePtr>;
 using ItemTypeList = std::vector<ItemTypePtr>;
 using AssetResourceList = std::vector<AssetResourcePtr>;
+using PackInfoResourceList = std::vector<AssetResourceInfo>;
 
 using TileList = std::list<TilePtr>;
 using ItemVector = std::vector<ItemPtr>;
