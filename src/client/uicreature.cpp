@@ -81,30 +81,33 @@ Outfit UICreature::getOutfit() { if (!m_creature) setOutfit({}); return m_creatu
 
 void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
+    auto outfit = getOutfit();
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "creature-center") {
+        const std::string tag = node->tag();
+        if (tag == "creature-center") {
             m_center = node->value<bool>();
-        } else if (node->tag() == "creature-size") {
+        } else if (tag == "creature-size") {
             setCreatureSize(node->value<int>());
-        } else if (node->tag() == "outfit-id") {
-            auto outfit = getOutfit();
+        } else if (tag == "outfit-id") {
             outfit.setCategory(ThingCategoryCreature);
             outfit.setId(node->value<int>());
-            setOutfit(outfit);
-        } else if (node->tag() == "outfit-resource-id") {
-            getOutfit().setResourceId(node->value<int>());
-        } else if (node->tag() == "outfit-head") {
-            getOutfit().setHead(node->value<int>());
-        } else if (node->tag() == "outfit-body") {
-            getOutfit().setBody(node->value<int>());
-        } else if (node->tag() == "outfit-legs") {
-            getOutfit().setLegs(node->value<int>());
-        } else if (node->tag() == "outfit-feet") {
-            getOutfit().setFeet(node->value<int>());
-        } else if (node->tag() == "outfit-direction") {
+        } else if (tag == "outfit-resource-id") {
+            outfit.setResourceId(node->value<int>());
+        } else if (tag == "outfit-head") {
+            outfit.setHead(node->value<int>());
+        } else if (tag == "outfit-body") {
+            outfit.setBody(node->value<int>());
+        } else if (tag == "outfit-legs") {
+            outfit.setLegs(node->value<int>());
+        } else if (tag == "outfit-feet") {
+            outfit.setFeet(node->value<int>());
+        } else if (tag == "outfit-direction") {
             m_direction = static_cast<Otc::Direction>(node->value<int>());
         }
     }
+
+    setOutfit(outfit);
+
     UIWidget::onStyleApply(styleName, styleNode);
 }
 

@@ -71,14 +71,20 @@ void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
+    uint16_t spriteId = 0;
+    uint16_t spriteResourceId = 0;
+
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "sprite-id")
-            setSpriteId(node->value<int>(), m_resourceId);
-        else if (node->tag() == "sprite-resource-id")
-            setSpriteId(m_spriteId, node->value<int>());
-        else if (node->tag() == "sprite-visible")
+        const std::string tag = node->tag();
+        if (tag == "sprite-id")
+            spriteId = node->value<int>();
+        else if (tag == "sprite-resource-id")
+            spriteResourceId = node->value<int>();
+        else if (tag == "sprite-visible")
             setSpriteVisible(node->value<bool>());
-        else if (node->tag() == "sprite-color")
+        else if (tag == "sprite-color")
             setSpriteColor(node->value<Color>());
     }
+
+    setSpriteId(spriteId, spriteResourceId);
 }
