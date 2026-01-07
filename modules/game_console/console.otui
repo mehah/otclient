@@ -1,6 +1,5 @@
 ConsoleLabel < UITextEdit
-  ttf-font: arialb
-  ttf-font-size: 12
+  font: verdana-11px-antialised
   height: 14
   color: yellow
   margin-left: 2
@@ -16,12 +15,13 @@ ConsoleLabel < UITextEdit
   focusable: false
 
 ConsolePhantomLabel < UILabel
-  ttf-font: arialb
-  ttf-font-size: 12
+  font: verdana-11px-antialised
   height: 14
   color: yellow
   text-wrap: true
   text-auto-resize: true
+  selection-color: #111416
+  selection-background-color: #999999
 
 ConsoleTabBar < MoveableTabBar
   height: 28
@@ -58,15 +58,15 @@ ConsoleTabBarPanel < MoveableTabBarPanel
     margin-bottom: 4
 
 ConsoleTabBarButton < UIButton
-  size: 0 18
+  size: 96 18
   image-source: /images/ui/console_button
   image-clip: 0 18 96 18
   color: #7f7f7fff
   font: verdana-11px-rounded
-  &ignoreTextResize: false
+  &ignoreTextResize: true
   anchors.top: parent.top
   anchors.left: parent.left
-  padding: 8
+  padding: 5
   tab-spacing: 0
 
   $checked:
