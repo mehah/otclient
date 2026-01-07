@@ -77,13 +77,13 @@ void GarbageCollection::thingType() {
     size_t scanned = 0;
 
     while (scanned < AMOUNT_PER_CHECK) {
-        if (resourceId >= g_things.m_assetResources.size()) {
+        if (resourceId >= g_things.getResourcesCount()) {
             resourceId = 0;
             category = ThingCategoryItem;
             thingId = 0;
         }
 
-        auto& res = g_things.m_assetResources[resourceId];
+        auto res = g_things.getResourceById(resourceId);
         if (!res) {
             ++resourceId;
             category = ThingCategoryItem;

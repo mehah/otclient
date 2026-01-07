@@ -74,6 +74,7 @@ public:
     const ThingTypeList& getThingTypes(ThingCategory category, uint16_t resourceId = 0);
 
     AssetResourcePtr getResourceById(const uint16_t resourceId) const;
+    size_t getResourcesCount() const { return m_assetResources.size(); }
     uint32_t getDatSignature(const uint16_t resourceId = 0) const;
     uint16_t getContentRevision(const uint16_t resourceId = 0) const;
 
@@ -105,8 +106,6 @@ private:
     bool m_xmlLoaded{ false };
     bool m_otbLoaded{ false };
 #endif
-
-    friend class GarbageCollection;
 };
 
 extern ThingTypeManager g_things;
