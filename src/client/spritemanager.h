@@ -25,97 +25,11 @@
 #include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
 
-class ISpriteManager {
-public:
-    virtual ~ISpriteManager() = default;
-
-    virtual ImagePtr getSpriteImage(int id, bool& isLoading) = 0;
-    virtual int getSpritesCount() const = 0;
-    virtual void unload() = 0;
-    virtual void reload() = 0;
-
-    virtual void init() = 0;
-    virtual void terminate() = 0;
-};
-
-class FileMetadata
+enum class SpriteLoadState
 {
-public:
-    FileMetadata() = default;
-    FileMetadata(const FileStreamPtr& file);
-
-    uint32_t getSpriteId() const { return spriteId; }
-    const std::string& getFileName() const { return fileName; }
-    uint32_t getOffset() const { return offset; }
-    uint32_t getFileSize() const { return fileSize; }
-private:
-    std::string fileName;
-    uint32_t offset = 0;
-    uint32_t fileSize = 0;
-    uint32_t spriteId = 0;
-};
-
-class LegacySpriteManager : public ISpriteManager
-{
-public:
-    void init() override;
-    void terminate() override;
-
-    bool loadSpr(std::string file);
-    bool loadRegularSpr(std::string file);
-    bool loadCwmSpr(std::string file);
-    void reload() override;
-    void unload();
-
-#ifdef FRAMEWORK_EDITOR
-    void saveSpr(const std::string& fileName);
-#endif
-
-    uint32_t getSignature() { return m_signature; }
-    int getSpritesCount() { return m_spritesCount; }
-
-    ImagePtr getSpriteImage(int id) {
-        bool isLoading = false;
-        return getSpriteImage(id, isLoading);
-    }
-
-    ImagePtr getSpriteImage(int id, bool& isLoading);
-    bool isLoaded() { return m_loaded; }
-
-private:
-    enum class SpriteLoadState
-    {
-        NONE,
-        LOADING,
-        LOADED
-    };
-
-    struct FileStream_m
-    {
-        FileStreamPtr file;
-        std::atomic<SpriteLoadState> m_loadingState = SpriteLoadState::NONE;
-
-        FileStream_m(FileStreamPtr f) : file(std::move(f)) {}
-    };
-
-    void load();
-    FileStreamPtr getSpriteFile() const {
-        return m_spritesFiles[0]->file;
-    }
-
-    ImagePtr getSpriteImageHd(int id, const FileStreamPtr& file);
-    ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
-
-    std::string m_lastFileName;
-
-    bool m_spritesHd{ false };
-    bool m_loaded{ false };
-    uint32_t m_signature{ 0 };
-    uint32_t m_spritesCount{ 0 };
-    uint32_t m_spritesOffset{ 0 };
-
-    std::vector<std::unique_ptr<FileStream_m>> m_spritesFiles;
-    std::unordered_map<uint32_t, FileMetadata> m_cwmSpritesMetadata;
+    NONE,
+    LOADING,
+    LOADED
 };
 
 enum class SpriteLayout
@@ -161,11 +75,93 @@ enum class SpriteLayout
     SIZE_384_384 = 35
 };
 
-enum class SpriteLoadState
+class ISpriteManager {
+public:
+    virtual ~ISpriteManager() = default;
+
+    virtual ImagePtr getSpriteImage(int id, bool& isLoading) = 0;
+    ImagePtr getSpriteImage(int id)
+    {
+        bool isLoading = false;
+        return getSpriteImage(id, isLoading);
+    }
+
+    virtual int getSpritesCount() const = 0;
+    virtual void unload() = 0;
+    virtual void reload() = 0;
+
+    virtual void init() = 0;
+    virtual void terminate() = 0;
+    virtual bool isLoaded() const { return false; }
+};
+
+class FileMetadata
 {
-    NONE,
-    LOADING,
-    LOADED
+public:
+    FileMetadata() = default;
+    FileMetadata(const FileStreamPtr& file);
+
+    uint32_t getSpriteId() const { return spriteId; }
+    const std::string& getFileName() const { return fileName; }
+    uint32_t getOffset() const { return offset; }
+    uint32_t getFileSize() const { return fileSize; }
+private:
+    std::string fileName;
+    uint32_t offset = 0;
+    uint32_t fileSize = 0;
+    uint32_t spriteId = 0;
+};
+
+class LegacySpriteManager : public ISpriteManager
+{
+public:
+    void init() override;
+    void terminate() override;
+
+    bool loadSpr(std::string file);
+    bool loadRegularSpr(std::string file);
+    bool loadCwmSpr(std::string file);
+    void reload() override;
+    void unload() override;
+
+#ifdef FRAMEWORK_EDITOR
+    void saveSpr(const std::string& fileName);
+#endif
+
+    uint32_t getSignature() const { return m_signature; }
+    int getSpritesCount() const override { return m_spritesCount; }
+
+    ImagePtr getSpriteImage(int id, bool& isLoading) override;
+    bool isLoaded() const override { return m_loaded; }
+
+private:
+
+    struct FileStream_m
+    {
+        FileStreamPtr file;
+        std::atomic<SpriteLoadState> m_loadingState = SpriteLoadState::NONE;
+
+        FileStream_m(FileStreamPtr f) : file(std::move(f)) {}
+    };
+
+    void load();
+    FileStreamPtr getSpriteFile() const {
+        return m_spritesFiles[0]->file;
+    }
+
+    ImagePtr getSpriteImageHd(int id, const FileStreamPtr& file);
+    ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
+
+    std::string m_lastFileName;
+
+    bool m_spritesHd{ false };
+    bool m_loaded{ false };
+    uint32_t m_signature{ 0 };
+    uint32_t m_spritesCount{ 0 };
+    uint32_t m_spritesOffset{ 0 };
+
+    std::vector<std::unique_ptr<FileStream_m>> m_spritesFiles;
+    std::unordered_map<uint32_t, FileMetadata> m_cwmSpritesMetadata;
 };
 
 class SpriteSheet
@@ -200,10 +196,11 @@ public:
     void init() override;
     void terminate() override;
 
-    void unload();
+    void reload() override {};
+    void unload() override;
 
     void setSpritesCount(const int count) { m_spritesCount = count; }
-    int getSpritesCount() const { return m_spritesCount; }
+    int getSpritesCount() const override { return m_spritesCount; }
 
     void setPath(const std::string& path) { m_path = path; }
     std::string getPath() const { return m_path; }
@@ -219,12 +216,10 @@ public:
 
     void addSpriteSheet(const SpriteSheetPtr& sheet) { m_sheets.emplace_back(sheet); }
 
-    ImagePtr getSpriteImage(int id) {
-        bool isLoading = false;
-        return getSpriteImage(id, isLoading);
-    }
-    ImagePtr getSpriteImage(int id, bool& isLoading);
+    ImagePtr getSpriteImage(int id, bool& isLoading) override;
     void saveSpriteToFile(int id, const std::string& file);
+
+    bool isLoaded() const override { return true; }
 
 private:
     uint32_t m_spritesCount{ 0 };

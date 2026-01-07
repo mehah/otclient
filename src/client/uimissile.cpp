@@ -57,14 +57,14 @@ void UIMissile::drawSelf(const DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIMissile::setMissileId(const int id)
+void UIMissile::setMissileId(const int id, uint16_t resourceId)
 {
     if (id == 0)
         m_missile = nullptr;
     else {
         if (!m_missile)
             m_missile = std::make_shared<Missile>();
-        m_missile->setId(id);
+        m_missile->setId(id, resourceId);
         m_missile->setDirection(Otc::South);
 
         if (m_missile)
@@ -85,7 +85,9 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
 {
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "missile-id")
-            setMissileId(node->value<int>());
+            setMissileId(node->value<int>(), m_missile->getResourceId());
+        else if (node->tag() == "missile-resource-id")
+            setMissileId(m_missile->getId(), node->value<int>());
         else if (node->tag() == "missile-visible")
             setMissileVisible(node->value<bool>());
         else if (node->tag() == "virtual")

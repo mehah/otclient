@@ -635,7 +635,7 @@ ImagePtr ProtobufSpriteManager::getSpriteImage(const int id, bool& isLoading)
 
 void ProtobufSpriteManager::saveSpriteToFile(const int id, const std::string& file)
 {
-    if (const auto& sprite = getSpriteImage(id)) {
+    if (const auto& sprite = ISpriteManager::getSpriteImage(id)) {
         sprite->savePNG(file);
     }
 }

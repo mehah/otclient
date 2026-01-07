@@ -56,14 +56,14 @@ void UIEffect::drawSelf(const DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIEffect::setEffectId(const int id)
+void UIEffect::setEffectId(const int id, uint16_t resourceId)
 {
     if (id == 0)
         m_effect = nullptr;
     else {
         if (!m_effect)
             m_effect = std::make_shared<Effect>();
-        m_effect->setId(id);
+        m_effect->setId(id, resourceId);
         if (m_effect)
             m_effect->setShader(m_shaderName);
     }
@@ -78,7 +78,9 @@ void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
 {
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "effect-id")
-            setEffectId(node->value<int>());
+            setEffectId(node->value<int>(), m_effect->getResourceId());
+        else if (node->tag() == "effect-resource-id")
+            setEffectId(m_effect->getId(), node->value<int>());
         else if (node->tag() == "effect-visible")
             setEffectVisible(node->value<bool>());
         else if (node->tag() == "virtual")

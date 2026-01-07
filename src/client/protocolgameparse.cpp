@@ -1668,9 +1668,10 @@ void ProtocolGame::parseOpenNpcTrade(const InputMessagePtr& msg)
 
     for (auto i = 0; i < listCount; ++i) {
         const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const uint8_t itemCount = msg->getU8();
 
-        const auto item = Item::create(itemId);
+        const auto item = Item::create(itemId, resourceId);
         item->setCountOrSubType(itemCount);
 
         const auto& itemName = msg->getString();
@@ -1703,9 +1704,10 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
 
     for (auto i = 0; i < itemsListSize; ++i) {
         const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const uint16_t itemAmount = g_game.getFeature(Otc::GameDoubleShopSellAmount) ? msg->getU16() : msg->getU8();
 
-        goods.emplace_back(Item::create(itemId), itemAmount);
+        goods.emplace_back(Item::create(itemId, resourceId), itemAmount);
     }
 
     g_game.processPlayerGoods(money, goods);
@@ -1761,6 +1763,8 @@ void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 {
+    uint16_t resourceId = 0;
+
     const auto& pos = getPosition(msg);
     if (g_game.getProtocolVersion() >= 1203) {
         uint8_t effectType = msg->getU8();
@@ -1775,15 +1779,18 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
                     const uint16_t shotId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
+                    if (g_game.getFeature(Otc::GameMultiSpr)) {
+                        resourceId = msg->getU16();
+                    }
                     const auto offsetX = static_cast<int8_t>(msg->getU8());
                     const auto offsetY = static_cast<int8_t>(msg->getU8());
-                    if (!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
+                    if (!g_things.isValidDatId(shotId, ThingCategoryMissile, resourceId)) {
                         g_logger.traceError("invalid missile id {}", shotId);
                         return;
                     }
 
                     const auto& missile = std::make_shared<Missile>();
-                    missile->setId(shotId);
+                    missile->setId(shotId, resourceId);
 
                     if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
                         missile->setPath(pos, Position(pos.x + offsetX, pos.y + offsetY, pos.z));
@@ -1797,13 +1804,17 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 
                 case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
                     const uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-                    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
+                    if (g_game.getFeature(Otc::GameMultiSpr)) {
+                        resourceId = msg->getU16();
+                    }
+
+                    if (!g_things.isValidDatId(effectId, ThingCategoryEffect, resourceId)) {
                         g_logger.traceError("invalid effect id {}", effectId);
                         continue;
                     }
 
                     const auto& effect = std::make_shared<Effect>();
-                    effect->setId(effectId);
+                    effect->setId(effectId, resourceId);
                     g_map.addThing(effect, pos);
                     break;
                 }
@@ -1831,18 +1842,21 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
     }
 
     uint16_t effectId = g_game.getFeature(Otc::GameMagicEffectU16) ? msg->getU16() : msg->getU8();
+    if (g_game.getFeature(Otc::GameMultiSpr)) {
+        resourceId = msg->getU16();
+    }
 
     if (g_game.getClientVersion() <= 750) {
         effectId += 1; //hack to fix effects in earlier clients
     }
 
-    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
+    if (!g_things.isValidDatId(effectId, ThingCategoryEffect, resourceId)) {
         g_logger.traceError("invalid effect id {}", effectId);
         return;
     }
 
     const auto& effect = std::make_shared<Effect>();
-    effect->setId(effectId);
+    effect->setId(effectId, resourceId);
 
     g_map.addThing(effect, pos);
 }
@@ -1851,7 +1865,12 @@ void ProtocolGame::parseRemoveMagicEffect(const InputMessagePtr& msg)
 {
     getPosition(msg);
     uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
+    uint16_t resourceId = 0;
+    if (g_game.getFeature(Otc::GameMultiSpr)) {
+        resourceId = msg->getU16();
+    }
+
+    if (!g_things.isValidDatId(effectId, ThingCategoryEffect, resourceId)) {
         g_logger.warning("[ProtocolGame::parseRemoveMagicEffect] - Invalid effectId type {}", effectId);
         return;
     }
@@ -1881,13 +1900,18 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
     const auto& toPos = getPosition(msg);
 
     const uint16_t shotId = g_game.getFeature(Otc::GameDistanceEffectU16) ? msg->getU16() : msg->getU8();
-    if (!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
+    uint16_t resourceId = 0;
+    if (g_game.getFeature(Otc::GameMultiSpr)) {
+        resourceId = msg->getU16();
+    }
+
+    if (!g_things.isValidDatId(shotId, ThingCategoryMissile, resourceId)) {
         g_logger.traceError("invalid missile id {}", shotId);
         return;
     }
 
     const auto& missile = std::make_shared<Missile>();
-    missile->setId(shotId);
+    missile->setId(shotId, resourceId);
     missile->setPath(fromPos, toPos);
 
     g_map.addThing(missile, fromPos);
@@ -3391,7 +3415,10 @@ void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
 
     for (auto i = 0; i < listCount; ++i) {
         const auto& item = std::make_shared<Item>();
-        item->setId(msg->getU16());
+        const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+
+        item->setId(itemId, resourceId);
         item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
         const auto& desc = msg->getString();
         itemList.emplace_back(item, desc);
@@ -3429,12 +3456,13 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 
     for (uint16_t i = 0; std::cmp_less(i, size); ++i) {
         const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const uint8_t attribute = msg->getU8();
 
         const uint32_t amount = g_game.getProtocolVersion() < 1500 ? msg->getU16() : readPackedCount1500(msg);
 
         uint8_t tier = 0;
-        if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem)) {
+        if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem, resourceId)) {
             if (std::cmp_greater(thingType->getClassification(), 0)) {
                 tier = attribute;
             }
@@ -3633,6 +3661,8 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
     Outfit outfit;
 
     uint16_t lookType = g_game.getFeature(Otc::GameLooktypeU16) ? msg->getU16() : msg->getU8();
+    const uint16_t outfitResourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+    outfit.setResourceId(outfitResourceId);
 
     if (lookType != 0) {
         outfit.setCategory(ThingCategoryCreature);
@@ -3642,7 +3672,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
         const uint8_t feet = msg->getU8();
         const uint8_t addons = g_game.getFeature(Otc::GamePlayerAddons) ? msg->getU8() : 0;
 
-        if (!g_things.isValidDatId(lookType, ThingCategoryCreature)) {
+        if (!g_things.isValidDatId(lookType, ThingCategoryCreature, outfitResourceId)) {
             g_logger.traceError("invalid outfit looktype {}", lookType);
             lookType = 0;
         }
@@ -3655,11 +3685,12 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
         outfit.setAddons(addons);
     } else {
         uint16_t lookTypeEx = msg->getU16();
+        
         if (lookTypeEx == 0) {
             outfit.setCategory(ThingCategoryEffect);
             outfit.setAuxId(13); // invisible effect id
         } else {
-            if (!g_things.isValidDatId(lookTypeEx, ThingCategoryItem)) {
+            if (!g_things.isValidDatId(lookTypeEx, ThingCategoryItem, outfitResourceId)) {
                 g_logger.traceError("invalid outfit looktypeex {}", lookTypeEx);
                 lookTypeEx = 0;
             }
@@ -3670,6 +3701,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
 
     if (g_game.getFeature(Otc::GamePlayerMounts) && parseMount) {
         const uint16_t mount = msg->getU16();
+        const uint16_t mountResourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         if (g_game.getClientVersion() >= 1281 && mount != 0) {
             msg->getU8(); //head
             msg->getU8(); //body
@@ -3677,9 +3709,12 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
             msg->getU8(); //feet
         }
         outfit.setMount(mount);
+        outfit.setMountResourceId(mountResourceId);
     }
 
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader) && parseMount) {
+        // to do: support resource ids
+
         const uint16_t wings = msg->getU16();
         outfit.setWing(wings);
 
@@ -3994,7 +4029,9 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         id = msg->getU16();
     }
 
-    const auto& item = Item::create(id);
+    const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+
+    const auto& item = Item::create(id, resourceId);
 
     if (!item) {
         throw Exception("ProtocolGame::getItem: unable to create item with invalid id {}", id);
@@ -4626,8 +4663,9 @@ void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
 
     for (auto i = 0; i < priceCount; ++i) {
         const uint16_t itemId = msg->getU16(); // item client id
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         if (g_game.getClientVersion() >= 1281) {
-            const auto& item = Item::create(itemId);
+            const auto& item = Item::create(itemId, resourceId);
 
             // note: vanilla client allows made-up client ids
             // their classification is assumed as 0
@@ -4876,7 +4914,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < inventoryItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& itemCreated = Item::create(itemId, resourceId);
                 const uint16_t classification = itemCreated->getClassification();
 
                 uint8_t itemTier = 0;
@@ -4894,7 +4933,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < storeItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& itemCreated = Item::create(itemId, resourceId);
                 const uint16_t classification = itemCreated->getClassification();
 
                 uint8_t itemTier = 0;
@@ -4912,7 +4952,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < stashItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
                 if (!thing) {
                     continue;
                 }
@@ -4933,7 +4974,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < depotItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& itemCreated = Item::create(itemId, resourceId);
                 const uint16_t classification = itemCreated->getClassification();
 
                 uint8_t itemTier = 0;
@@ -4951,7 +4993,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < inboxItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& itemCreated = Item::create(itemId, resourceId);
                 const uint16_t classification = itemCreated->getClassification();
 
                 uint8_t itemTier = 0;
@@ -5637,9 +5680,10 @@ Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
     const uint8_t itemsSize = msg->getU8();
     for (auto i = 0; std::cmp_less(i, itemsSize); ++i) {
         const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const auto& itemName = msg->getString();
         const uint16_t itemCount = msg->getU16();
-        const auto& item = Item::create(itemId);
+        const auto& item = Item::create(itemId, resourceId);
         item->setCount(itemCount);
         imbuement.sources.emplace_back(item, itemName);
     }
@@ -5672,7 +5716,8 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         g_lua.callGlobalField("g_game", "onOpenImbuementWindow", itemId, unknown);
     } else if (windowType == Otc::IMBUEMENT_WINDOW_SELECT_ITEM) {
         const uint16_t itemId = msg->getU16();
-        const auto& item = Item::create(itemId);
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+        const auto& item = Item::create(itemId, resourceId);
         if (!item) {
             throw Exception("ProtocolGame::parseImbuementWindow: unable to create item with invalid id {}", itemId);
         }
@@ -5710,8 +5755,9 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
 
         for (uint32_t i = 0; i < neededItemsListCount; ++i) {
             const uint16_t needItemId = msg->getU16();
+            const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
             const uint16_t count = msg->getU16();
-            const auto& needItem = Item::create(needItemId);
+            const auto& needItem = Item::create(needItemId, resourceId);
             needItem->setCount(count);
             neededItemsList.push_back(needItem);
         }
@@ -5733,8 +5779,9 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
 
         for (uint32_t i = 0; i < neededItemsListCount; ++i) {
             const uint16_t needItemId = msg->getU16();
+            const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
             const uint16_t count = msg->getU16();
-            const auto& needItem = Item::create(needItemId);
+            const auto& needItem = Item::create(needItemId, resourceId);
             needItem->setCount(count);
             neededItemsList.push_back(needItem);
         }
@@ -5755,13 +5802,13 @@ void ProtocolGame::parseError(const InputMessagePtr& msg)
     g_lua.callGlobalField("g_game", "onServerError", code, error);
 }
 
-static uint8_t readMarketItemTier(const InputMessagePtr& msg, uint16_t itemId, int clientVersion)
+static uint8_t readMarketItemTier(const InputMessagePtr& msg, uint16_t itemId, uint16_t resourceId, int clientVersion)
 {
     if (clientVersion < 1281) {
         return 0;
     }
 
-    const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+    const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
     if (!thing) {
         return 0;
     }
@@ -5782,7 +5829,8 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
 
     for (auto i = 0; i < itemsSentCount; ++i) {
         const uint16_t itemId = msg->getU16();
-        const uint8_t itemTier = readMarketItemTier(msg, itemId, g_game.getClientVersion());
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+        const uint8_t itemTier = readMarketItemTier(msg, itemId, resourceId, g_game.getClientVersion());
         const uint16_t count = msg->getU16();
         depotItems.push_back({ itemId, count, itemTier });
     }
@@ -5908,11 +5956,12 @@ static std::vector<std::vector<uint64_t>> readMarketStatsList(
 void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
 {
     const uint16_t itemId = msg->getU16();
+    const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
 
     const int clientVersion = g_game.getClientVersion();
     const bool pricesAreU64 = (clientVersion >= 1281);
 
-    const uint8_t itemTier = readMarketItemTier(msg, itemId, clientVersion);
+    const uint8_t itemTier = readMarketItemTier(msg, itemId, resourceId, clientVersion);
     auto descriptions = readMarketDescriptions(msg, clientVersion);
 
     const uint32_t timeThing = (time(nullptr) / 1000) * 86400;
@@ -5928,12 +5977,16 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
     const uint32_t timestamp = msg->getU32();
     const uint16_t counter = msg->getU16();
     uint16_t itemId = 0;
+    uint16_t resourceId = 0;
     uint8_t itemTier = 0;
 
     const int clientVersion = g_game.getClientVersion();
     if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS || var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         itemId = msg->getU16();
-        itemTier = readMarketItemTier(msg, itemId, clientVersion);
+        if (g_game.getFeature(Otc::GameMultiSpr)) {
+            resourceId = msg->getU16();
+        }
+        itemTier = readMarketItemTier(msg, itemId, resourceId, clientVersion);
     } else {
         itemId = var;
     }
@@ -5963,7 +6016,8 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
         var = msg->getU8();
         if (var == 3) {
             var = msg->getU16(); // itemId
-            const auto& thing = g_things.getThingType(var, ThingCategoryItem);
+            const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+            const auto& thing = g_things.getThingType(var, ThingCategoryItem, resourceId);
             if (thing) {
                 const uint16_t classification = thing->getClassification();
                 if (classification > 0) {

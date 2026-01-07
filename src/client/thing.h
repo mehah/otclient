@@ -36,10 +36,11 @@ public:
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
     bool isThing() override { return true; }
 
-    virtual void setId(uint32_t /*id*/) {}
+    virtual void setId(uint32_t /*id*/, uint16_t /*resourceId*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0);
 
     virtual uint32_t getId() { return m_clientId; }
+    virtual uint16_t getResourceId() { return m_resourceId; }
     uint16_t getClientId() const { return m_clientId; }
 
     virtual Position getPosition() { return m_position; }

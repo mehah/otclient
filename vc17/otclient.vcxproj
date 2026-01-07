@@ -347,7 +347,6 @@
     <ClCompile Include="..\src\client\gameconfig.cpp" />
     <ClCompile Include="..\src\client\luavaluecasts_client.cpp" />
     <ClCompile Include="..\src\client\position.cpp" />
-    <ClCompile Include="..\src\client\spriteappearances.cpp" />
     <ClCompile Include="..\src\client\container.cpp" />
     <ClCompile Include="..\src\client\creature.cpp" />
     <ClCompile Include="..\src\client\creatures.cpp" />
@@ -515,7 +514,6 @@
     <ClInclude Include="..\src\client\luavaluecasts_client.h" />
     <ClInclude Include="..\src\client\paperdoll.h" />
     <ClInclude Include="..\src\client\paperdollmanager.h" />
-    <ClInclude Include="..\src\client\spriteappearances.h" />
     <ClInclude Include="..\src\client\client.h" />
     <ClInclude Include="..\src\client\const.h" />
     <ClInclude Include="..\src\client\container.h" />

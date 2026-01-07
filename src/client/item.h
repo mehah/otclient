@@ -73,7 +73,7 @@ enum ItemAttr : uint8_t
 class Item final : public Thing
 {
 public:
-    static ItemPtr create(int id);
+    static ItemPtr create(int id, uint16_t resourceId);
 
     void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
     void drawLight(const Point& dest, LightView* lightView) override;

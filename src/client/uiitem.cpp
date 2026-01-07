@@ -44,8 +44,8 @@ void UIItem::drawSelf(const DrawPoolType drawPane)
     drawImage(m_rect);
 
     if (m_itemVisible && m_item) {
-        if (m_item->getClientId() != m_itemId) {
-            m_item->setId(m_itemId);
+        if (m_item->getClientId() != m_itemId || m_item->getResourceId() != m_resourceId) {
+            m_item->setId(m_itemId, m_resourceId);
         }
 
         const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_item->getExactSize());
@@ -73,16 +73,17 @@ void UIItem::drawSelf(const DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIItem::setItemId(const int id)
+void UIItem::setItemId(const int id, uint16_t resourceId)
 {
     m_itemId = id;
+    m_resourceId = resourceId;
 
     if (id == 0)
         m_item = nullptr;
     else if (m_item)
-        m_item->setId(id);
+        m_item->setId(id, resourceId);
     else
-        m_item = Item::create(id);
+        m_item = Item::create(id, resourceId);
 
     if (m_item)
         m_item->setShader(m_shaderName);

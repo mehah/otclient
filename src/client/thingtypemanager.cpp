@@ -259,10 +259,39 @@ ImagePtr ThingTypeManager::getSpriteImage(int id, uint16_t resourceId, bool& isL
     return res->getSpriteImage(id, isLoading);
 }
 
+bool ThingTypeManager::isDatLoaded()
+{
+    // return the state of the first resource encountered
+    for (const auto& resource : m_assetResources) {
+        if (resource) {
+            return m_assetResources.front()->isDatLoaded();
+        }
+    }
+
+    // no resources allocated
+    return false;
+}
+
 bool ThingTypeManager::isValidDatId(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const
 {
     auto res = getResourceById(resourceId);
     return res ? res->isValidDatId(id, category) : false;
+}
+
+void ThingTypeManager::reloadSprites()
+{
+    for (const auto& resource : m_assetResources)
+        if (resource)
+            resource->reloadSprites();
+}
+
+bool ThingTypeManager::isSprLoaded(uint16_t resourceId)
+{
+    auto res = getResourceById(resourceId);
+    if (!res)
+        return false;
+
+    return res->isSprLoaded();
 }
 
 const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const

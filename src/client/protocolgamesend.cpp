@@ -1336,13 +1336,13 @@ void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t brows
     send(msg);
 }
 
-void ProtocolGame::sendMarketCreateOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
+void ProtocolGame::sendMarketCreateOffer(const uint8_t type, const uint16_t itemId, const uint16_t resourceId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketCreate);
     msg->addU8(type);
     msg->addU16(itemId);
-    if (const auto& item = Item::create(itemId)) {
+    if (const auto& item = Item::create(itemId, resourceId)) {
         if (item->getClassification() > 0) {
             msg->addU8(itemTier);
         }

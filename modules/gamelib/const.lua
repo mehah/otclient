@@ -222,6 +222,7 @@ GameMapCache = 125
 GameForgeSkillStats = 126
 GameCharacterSkillStats = 127
 GameCreaturePaperdoll = 128
+GameMultiSpr = 129
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'

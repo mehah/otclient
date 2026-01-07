@@ -369,7 +369,7 @@ public:
     // market related
     void leaveMarket();
     void browseMarket(uint8_t browseId, uint8_t browseType);
-    void createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
+    void createMarketOffer(uint8_t type, uint16_t itemId, uint16_t resourceId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void cancelMarketOffer(uint32_t timestamp, uint16_t counter);
     void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
 

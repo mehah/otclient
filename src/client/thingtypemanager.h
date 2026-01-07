@@ -79,24 +79,11 @@ public:
 
     ImagePtr getSpriteImage(int id, uint16_t resourceId, bool& isLoading);
 
-    bool isDatLoaded() {
-        // return the state of the first resource encountered
-        for (const auto& resource : m_assetResources) {
-            if (resource) {
-                return m_assetResources.front()->isDatLoaded();
-            }
-        }
-
-        // no resources allocated
-        return false;
-    }
+    bool isDatLoaded();
     bool isValidDatId(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const;
 
-    void reloadSprites() {
-        for (const auto& resource : m_assetResources)
-            if (resource)
-                resource->reloadSprites();
-    }
+    void reloadSprites();
+    bool isSprLoaded(uint16_t resourceId);
 
 private:
 
@@ -157,6 +144,10 @@ public:
     void reloadSprites() {
         if (spriteManager)
             spriteManager->reload();
+    }
+
+    bool isSprLoaded() {
+        return spriteManager ? spriteManager->isLoaded() : false;
     }
 
 private:

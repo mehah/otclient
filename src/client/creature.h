@@ -54,7 +54,10 @@ public:
     void internalDraw(Point dest, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags);
 
-    void setId(const uint32_t id) override { m_id = id; }
+    // note: unlike other classes that derive from Thing, this one sets creatureId
+    // rather than clientId. The resourceId is managed in creature outfit.
+    void setId(const uint32_t id, const uint16_t /* resourceId */ = 0) override { m_id = id; }
+
     void setMasterId(const uint32_t id) { m_masterId = id; }
     void setName(std::string_view name);
     void setHealthPercent(uint8_t healthPercent);

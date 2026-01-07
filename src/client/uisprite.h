@@ -29,7 +29,7 @@ class UISprite final : public UIWidget
 public:
     void drawSelf(DrawPoolType drawPane) override;
 
-    void setSpriteId(int id, uint16_t resourceId);
+    void setSpriteId(int id, uint16_t resourceId = 0);
     int getSpriteId() { return m_spriteId; }
     void clearSprite() { setSpriteId(0); }
 

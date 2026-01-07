@@ -1773,12 +1773,12 @@ void Game::browseMarket(const uint8_t browseId, const uint8_t browseType)
     m_protocolGame->sendMarketBrowse(browseId, browseType);
 }
 
-void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
+void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint16_t resourceId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendMarketCreateOffer(type, itemId, itemTier, amount, price, anonymous);
+    m_protocolGame->sendMarketCreateOffer(type, itemId, resourceId, itemTier, amount, price, anonymous);
 }
 
 void Game::cancelMarketOffer(const uint32_t timestamp, const uint16_t counter)

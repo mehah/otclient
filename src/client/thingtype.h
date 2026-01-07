@@ -52,6 +52,7 @@ public:
     void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color);
 
     uint16_t getId() { return m_id; }
+    uint16_t getResourceId() { return m_resourceId; }
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }
     bool hasAttr(const ThingAttr attr) { return (m_flags & thingAttrToThingFlagAttr(attr)); }

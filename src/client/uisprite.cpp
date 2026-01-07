@@ -50,7 +50,7 @@ void UISprite::drawSelf(const DrawPoolType drawPane)
 
 void UISprite::setSpriteId(const int id, const uint16_t resourceId)
 {
-    if (!g_sprites.isLoaded())
+    if (!g_things.isSprLoaded(resourceId))
         return;
 
     m_spriteId = id;

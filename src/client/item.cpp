@@ -39,10 +39,10 @@
 #include "itemtype.h"
 #endif
 
-ItemPtr Item::create(const int id)
+ItemPtr Item::create(const int id, uint16_t resourceId)
 {
     const auto& item = std::make_shared<Item>();
-    item->setId(id);
+    item->setId(id, resourceId);
 
     return item;
 }
