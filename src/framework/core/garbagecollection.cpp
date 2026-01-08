@@ -103,7 +103,7 @@ void GarbageCollection::thingType() {
             continue;
         }
 
-        const size_t limit = std::min(thingId + (AMOUNT_PER_CHECK - scanned), things.size());
+        const size_t limit = std::min(thingId + (AMOUNT_PER_CHECK - scanned), things.size() - 1);
 
         for (; thingId < limit; ++thingId, ++scanned) {
             auto& thing = things[thingId];

@@ -33,8 +33,8 @@
 #include <nlohmann/json_fwd.hpp>
 #include "lzma.h"
 
- // warnings related to protobuf
-    // https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
+// warnings related to protobuf
+// https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
 
 FileMetadata::FileMetadata(const FileStreamPtr& file) {
     offset = file->getU32();

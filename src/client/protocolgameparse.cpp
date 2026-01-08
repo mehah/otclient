@@ -3645,7 +3645,12 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
             g_logger.traceError("ProtocolGame::setTileDescription: too many things, pos={}, stackpos={}", position, stackPos);
         }
 
-        const auto& thing = getThing(msg);
+        const auto thing = getThing(msg);
+        if (!thing) {
+            g_logger.traceError("ProtocolGame::setTileDescription: failed to get thing at pos={}, stackpos={}", position, stackPos);
+            continue;
+        }
+
         if (thing->isLocalPlayer()) {
             thing->static_self_cast<LocalPlayer>()->resetPreWalk();
         }
@@ -3870,7 +3875,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
 
         const uint16_t speed = msg->getU16();
 
-        if (g_game.getClientVersion() >= 1281) {
+        if (creature && g_game.getClientVersion() >= 1281) {
             addCreatureIcon(msg, creature->getId());
         }
 
@@ -3900,7 +3905,9 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                 }
             } else if (creatureType == Proto::CreatureTypePlayer) {
                 uint8_t vocationId = msg->getU8();
-                creature->setVocation(vocationId);
+                if (creature) {
+                    creature->setVocation(vocationId);
+                }
             }
         }
 

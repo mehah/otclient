@@ -134,12 +134,12 @@ bool Client::canDraw(const DrawPoolType type) const
 
 bool Client::isLoadingAsyncTexture()
 {
-    return g_game.isUsingProtobuf();
+    return true; // deprecated / to be discussed
 }
 
 bool Client::isUsingProtobuf()
 {
-    return g_game.isUsingProtobuf();
+    return true; // deprecated / to be discussed
 }
 
 void Client::onLoadingAsyncTextureChanged(bool /*loadingAsync*/)

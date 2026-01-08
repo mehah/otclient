@@ -698,7 +698,7 @@ const TexturePtr& ThingType::getTexture(const int animationPhase)
     bool expected = false;
     if (m_loading.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
         bool async = g_app.isLoadingAsyncTexture();
-        if (g_game.isUsingProtobuf() && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
+        if (g_things.isUsingProtobuf(m_resourceId) && g_drawPool.getCurrentType() == DrawPoolType::FOREGROUND)
             async = false;
 
         if (!async) {
@@ -738,7 +738,7 @@ void ThingType::loadTexture(const int animationPhase)
     const int indexSize = textureLayers * m_numPatternX * m_numPatternY * m_numPatternZ;
     const auto& textureSize = getBestTextureDimension(m_size.width(), m_size.height(), indexSize);
     const auto& fullImage = useCustomImage ? Image::load(m_customImage) : std::make_shared<Image>(textureSize * g_gameConfig.getSpriteSize());
-    const bool protobufSupported = g_game.isUsingProtobuf();
+    const bool protobufSupported = g_things.isUsingProtobuf(m_resourceId);
 
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
 

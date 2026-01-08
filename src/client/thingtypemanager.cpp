@@ -89,6 +89,17 @@ bool ThingTypeManager::loadDat(const std::string& file, const uint16_t resourceI
     return true;
 }
 
+bool ThingTypeManager::loadSpr(const std::string& file, const uint16_t resourceId)
+{
+    auto sprManager = dynamic_pointer_cast<LegacySpriteManager>(getSpriteManagerById(resourceId));
+    if (!sprManager) {
+        g_logger.error("Failed to read '{}': Sprite manager not initialized!'", file);
+        return false;
+    }
+
+    sprManager->loadSpr(file);
+}
+
 bool ThingTypeManager::loadOtml(std::string file, uint16_t resourceId)
 {
     try {
@@ -338,6 +349,15 @@ bool ThingTypeManager::isSprLoaded(uint16_t resourceId)
         return false;
 
     return res->isLoaded();
+}
+
+bool ThingTypeManager::isUsingProtobuf(uint16_t resourceId)
+{
+    auto res = getSpriteManagerById(resourceId);
+    if (!res)
+        return false;
+
+    return res->isProtobuf();
 }
 
 const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const
@@ -673,7 +693,7 @@ bool AssetResource::loadDat(const std::string& file)
             thingTypeList.resize(count);
         }
 
-        for (int category = -1; category < ThingLastCategory; ++category) {
+        for (int category = 0; category < ThingLastCategory; ++category) {
             const uint16_t firstId = (category == ThingCategoryItem ? 100 : 1);
             auto& thingList = m_thingTypes[category];
 
@@ -753,10 +773,6 @@ SpriteManagerPtr AssetResource::loadAppearances(const std::string& file)
         if (!appearancesLib.ParseFromIstream(&fin))
             throw stdext::exception("Couldn't parse appearances lib.");
 
-        auto spriteManager = std::dynamic_pointer_cast<ProtobufSpriteManager>(g_things.getSpriteManagerById(m_resourceId));
-        if (!spriteManager)
-            throw stdext::exception("Sprite manager not loaded!");
-
         auto& nullThing = g_things.getNullThingType();
         for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
             const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
@@ -779,7 +795,7 @@ SpriteManagerPtr AssetResource::loadAppearances(const std::string& file)
             for (const auto& appearance : *appearances) {
                 const auto& type = std::make_shared<ThingType>();
                 const uint16_t id = appearance.id();
-                type->unserializeAppearance(id, m_resourceId, spriteManager, static_cast<ThingCategory>(category), appearance);
+                type->unserializeAppearance(id, m_resourceId, protoSprites, static_cast<ThingCategory>(category), appearance);
                 m_thingTypes[category][id] = type;
             }
         }

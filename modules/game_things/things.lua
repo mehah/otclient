@@ -170,16 +170,43 @@ local function loadResource(path, version, resourceId, errorList)
 			addError(errorList, string.format("Failed to read %s: file structure does not match the defined version or OTFI specification", datName), resourceId)
 			return
 		end
+
+		-- check if otfi-specified spr file exists
+		local sprPath = resolvepath(path .. sprName)
+		if not g_resources.fileExists(sprPath) then
+			addError(errorList, string.format("Unable to load %s: file not found", datName), resourceId)
+			return
+		end
+
+		-- try to load spr file
+		if not g_things.loadSpr(sprPath, resourceId) then
+			addError(errorList, string.format("Failed to read %s: file structure does not match the defined version or OTFI specification", datName), resourceId)
+			return
+		end
 	else
-		-- normal spr/dat
+		-- normal dat file
 		local datPath = findFileByExtension(path, ".dat")
 		if not datPath then
 			addError(errorList, "DAT file not found", resourceId)
 			return
 		end
 
+		-- try to load dat
 		local datResult = tryLoadDatWithFallbacks(datPath, resourceId)
 		if not datResult then
+			addError(errorList, "Failed to read dat file: file structure does not match the defined version", resourceId)
+		end
+
+		-- normal spr file
+		local sprPath = findFileByExtension(path, ".spr")
+		if not sprPath then
+			addError(errorList, "SPR file not found", resourceId)
+			return
+		end
+
+		-- try to load spr
+		local sprResult = loadSpr(sprPath, resourceId)
+		if not sprResult then
 			addError(errorList, "Failed to read dat file: file structure does not match the defined version", resourceId)
 		end
 	end

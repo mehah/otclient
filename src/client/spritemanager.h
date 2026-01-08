@@ -24,6 +24,7 @@
 
 #include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
+#include "thingtype.h"
 
 enum class SpriteLoadState
 {
@@ -90,6 +91,7 @@ public:
 
     virtual void reload() = 0;
     virtual bool isLoaded() const { return false; }
+    virtual bool isProtobuf() const { return false; }
 };
 
 class FileMetadata
@@ -133,6 +135,7 @@ public:
 
     ImagePtr getSpriteImage(int id, bool& isLoading) override;
     bool isLoaded() const override { return m_loaded; }
+    bool isProtobuf() const override { return false; }
 
 private:
 
@@ -225,7 +228,7 @@ public:
     void saveSpriteToFile(int id, const std::string& file);
 
     bool isLoaded() const override { return true; }
-
+    bool isProtobuf() const override { return true; }
 private:
     uint32_t m_spritesCount{ 0 };
     std::vector<SpriteSheetPtr> m_sheets;

@@ -42,6 +42,7 @@ public:
     void terminate();
 
     bool loadDat(const std::string& file, const uint16_t resourceId);
+    bool loadSpr(const std::string& file, const uint16_t resourceId);
     bool loadOtml(std::string file, uint16_t resourceId);
     bool loadAppearances(const std::string& file, const uint16_t resourceId);
     bool loadStaticData(const std::string& file);
@@ -94,6 +95,7 @@ public:
 
     void reloadSprites();
     bool isSprLoaded(uint16_t resourceId);
+    bool isUsingProtobuf(uint16_t resourceId);
 
 private:
 
