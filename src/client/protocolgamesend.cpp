@@ -1408,6 +1408,36 @@ void ProtocolGame::sendPreyRequest()
     send(msg);
 }
 
+void ProtocolGame::sendOpenPortableForge() {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientPreyRequest);
+    send(msg);
+}
+
+void ProtocolGame::sendForgeRequest(Otc::ForgeAction_t actionType, bool convergence, uint16_t firstItemid, uint8_t firstItemTier, uint16_t secondItemId, bool improveChance, bool tierLoss) {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeEnter);
+    msg->addU8(static_cast<uint8_t>(actionType));
+
+    if (actionType == Otc::ForgeAction_t::FUSION || actionType == Otc::ForgeAction_t::TRANSFER) {
+        msg->addU8(static_cast<uint8_t>(convergence));
+        msg->addU16(firstItemid);
+        msg->addU8(firstItemTier);
+        msg->addU16(secondItemId);
+        msg->addU8(static_cast<uint8_t>(improveChance));
+        msg->addU8(static_cast<uint8_t>(tierLoss));
+    }
+
+    send(msg);
+}
+
+void ProtocolGame::sendForgeBrowseHistoryRequest(uint16_t page) {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeBrowseHistory);
+    msg->addU8(page);
+    send(msg);
+}
+
 void ProtocolGame::sendApplyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm)
 {
     const auto& msg = std::make_shared<OutputMessage>();
