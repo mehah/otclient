@@ -171,20 +171,20 @@ local function setupComboBox()
         setOption('framesRarity', comboBox:getCurrentOption().data)
     end
 
-    if widgetFontCombobox then
-        widgetFontCombobox:addOption('Default', 'default')
-        local fontFiles = g_resources.listDirectoryFiles('/data/fonts', false, false)
-        for _, file in pairs(fontFiles) do
-            if file:lower():find('.otfont') then
-                 local fontName = file:sub(1, #file - 4)
-                 widgetFontCombobox:addOption(fontName, fontName)
-            end
-        end
+    -- if widgetFontCombobox then
+    --     widgetFontCombobox:addOption('Default', 'default')
+    --     local fontFiles = g_resources.listDirectoryFiles('/data/fonts', false, false)
+    --     for _, file in pairs(fontFiles) do
+    --         if file:lower():find('.otfont') then
+    --              local fontName = file:sub(1, #file - 4)
+    --              widgetFontCombobox:addOption(fontName, fontName)
+    --         end
+    --     end
 
-        widgetFontCombobox.onOptionChange = function(comboBox, option)
-            setOption('widgetFont', comboBox:getCurrentOption().data)
-        end
-    end
+    --     widgetFontCombobox.onOptionChange = function(comboBox, option)
+    --         setOption('widgetFont', comboBox:getCurrentOption().data)
+    --     end
+    -- end
 
     local profileCombobox = panels.misc:recursiveGetChildById('profile')
 
