@@ -182,7 +182,7 @@
       <WarningLevel>Level4</WarningLevel>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <IncludeInUnityFile>false</IncludeInUnityFile>
+      <IncludeInUnityFile>true</IncludeInUnityFile>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -207,7 +207,7 @@
       <CombineFilesOnlyFromTheSameFolder>true</CombineFilesOnlyFromTheSameFolder>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
-      <IncludeInUnityFile>false</IncludeInUnityFile>
+      <IncludeInUnityFile>true</IncludeInUnityFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
