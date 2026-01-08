@@ -539,7 +539,7 @@ namespace Otc
         GameDoublePlayerGoodsMoney = 98,
 
         //  others
-        GameLoadSprInsteadProtobuf = 100,
+        GameLoadSprInsteadProtobuf = 100, // deprecated
         GameItemShader = 101,
         GameCreatureShader = 102,
         GameCreatureAttachedEffect = 103,

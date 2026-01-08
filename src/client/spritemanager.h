@@ -87,11 +87,8 @@ public:
     }
 
     virtual int getSpritesCount() const = 0;
-    virtual void unload() = 0;
-    virtual void reload() = 0;
 
-    virtual void init() = 0;
-    virtual void terminate() = 0;
+    virtual void reload() = 0;
     virtual bool isLoaded() const { return false; }
 };
 
@@ -115,14 +112,17 @@ private:
 class LegacySpriteManager : public ISpriteManager
 {
 public:
-    void init() override;
-    void terminate() override;
+    LegacySpriteManager() {}
+    ~LegacySpriteManager() override {
+        m_spritesCount = 0;
+        m_signature = 0;
+        m_spritesFiles.clear();
+    }
 
     bool loadSpr(std::string file);
     bool loadRegularSpr(std::string file);
     bool loadCwmSpr(std::string file);
     void reload() override;
-    void unload() override;
 
 #ifdef FRAMEWORK_EDITOR
     void saveSpr(const std::string& fileName);
@@ -193,11 +193,16 @@ public:
 class ProtobufSpriteManager : public ISpriteManager
 {
 public:
-    void init() override;
-    void terminate() override;
+    ProtobufSpriteManager() {
+        // in tibia 12.81 there is currently 3482 sheets
+        m_sheets.reserve(4000);
+    }
+    ~ProtobufSpriteManager() override {
+        m_spritesCount = 0;
+        m_sheets.clear();
+    }
 
     void reload() override {};
-    void unload() override;
 
     void setSpritesCount(const int count) { m_spritesCount = count; }
     int getSpritesCount() const override { return m_spritesCount; }

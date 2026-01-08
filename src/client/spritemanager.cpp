@@ -43,9 +43,6 @@ FileMetadata::FileMetadata(const FileStreamPtr& file) {
     spriteId = std::stoi(fileName);
 }
 
-void LegacySpriteManager::init() {}
-void LegacySpriteManager::terminate() { unload(); }
-
 void LegacySpriteManager::reload() {
     if (g_app.isEncrypted())
         return;
@@ -209,13 +206,6 @@ void LegacySpriteManager::saveSpr(const std::string& fileName)
 }
 #endif
 
-void LegacySpriteManager::unload()
-{
-    m_spritesCount = 0;
-    m_signature = 0;
-    m_spritesFiles.clear();
-}
-
 ImagePtr LegacySpriteManager::getSpriteImage(const int id, bool& isLoading)
 {
     const auto threadId = g_app.isLoadingAsyncTexture() ? stdext::getThreadId() : 0;
@@ -355,17 +345,6 @@ ImagePtr LegacySpriteManager::getSpriteImage(const int id, const FileStreamPtr& 
 }
 
 using json = nlohmann::json;
-
-void ProtobufSpriteManager::init()
-{
-    // in tibia 12.81 there is currently 3482 sheets
-    m_sheets.reserve(4000);
-}
-
-void ProtobufSpriteManager::terminate()
-{
-    unload();
-}
 
 Size SpriteSheet::getSpriteSize() const
 {    
@@ -552,12 +531,6 @@ bool ProtobufSpriteManager::loadSpriteSheet(const SpriteSheetPtr& sheet) const
         g_logger.error("Failed to load single sprite sheet '{}': {}", sheet->file, e.what());
         return false;
     }
-}
-
-void ProtobufSpriteManager::unload()
-{
-    m_spritesCount = 0;
-    m_sheets.clear();
 }
 
 SpriteSheetPtr ProtobufSpriteManager::getSheetBySpriteId(const int id, bool& isLoading, const bool load /* = true */)

@@ -82,6 +82,7 @@ public:
     const ThingTypeList& getThingTypes(ThingCategory category, uint16_t resourceId = 0);
 
     AssetResourcePtr getResourceById(const uint16_t resourceId) const;
+    SpriteManagerPtr getSpriteManagerById(const uint16_t resourceId) const;
     size_t getResourcesCount() const { return m_assetResources.size(); }
     uint32_t getDatSignature(const uint16_t resourceId = 0) const;
     uint16_t getContentRevision(const uint16_t resourceId = 0) const;
@@ -99,6 +100,12 @@ private:
     // loaded spr/dat/assets storage
     // resources 0 .. n
     AssetResourceList m_assetResources;
+
+    // loaded sprite managers
+    // contains dedicated sprite manager for each loaded resource
+    // if assets: uses ProtobufSpriteManager object
+    // if spr/dat: uses LegacySpriteManager object
+    SpriteManagerList m_spriteManagers;
 
     ThingTypePtr m_nullThingType;
 
@@ -121,8 +128,17 @@ extern ThingTypeManager g_things;
 class AssetResource : public std::enable_shared_from_this<AssetResource>
 {
 public:
-    void init(uint16_t resourceId);
-    void terminate();
+    // AssetResource::Create(resourceId)
+    static std::shared_ptr<AssetResource> Create(uint16_t resourceId) {
+        return std::shared_ptr<AssetResource>(
+            new AssetResource(resourceId)
+        );
+    }
+
+    ~AssetResource() {
+        for (auto& m_thingType : m_thingTypes)
+            m_thingType.clear();
+    }
 
     uint16_t getId() const { return m_resourceId; }
     
@@ -142,28 +158,12 @@ public:
     bool isValidDatId(const uint16_t id, const ThingCategory category) const { return category < ThingLastCategory && id >= 1 && id < m_thingTypes[category].size(); }
 
     // protobuf assets
-    bool loadAppearances(const std::string& file);
-    SpriteSheetPtr getSheetBySpriteId(int id, bool load = true);
-
-    // common
-    ImagePtr getSpriteImage(int id, bool& isLoading);
-
-    void reloadSprites() {
-        if (spriteManager)
-            spriteManager->reload();
-    }
-
-    bool isSprLoaded() {
-        return spriteManager ? spriteManager->isLoaded() : false;
-    }
+    SpriteManagerPtr loadAppearances(const std::string& file);
 
 private:
-    ThingTypeList m_thingTypes[ThingLastCategory];
+    explicit AssetResource(uint16_t resourceId) : m_resourceId(resourceId) {}
 
-    // sprite manager for current resource
-    // if assets: points to ProtobufSpriteManager object
-    // if spr/dat: points to LegacySpriteManager object
-    std::unique_ptr<ISpriteManager> spriteManager;
+    ThingTypeList m_thingTypes[ThingLastCategory];
 
     uint32_t m_datSignature{ 0 };
     uint16_t m_contentRevision{ 0 };

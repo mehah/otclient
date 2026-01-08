@@ -46,6 +46,7 @@ ThingTypeManager g_things;
 void ThingTypeManager::init()
 {
     m_nullThingType = std::make_shared<ThingType>();
+
 #ifdef FRAMEWORK_EDITOR
     m_nullItemType = std::make_shared<ItemType>();
     m_itemTypes.resize(1, m_nullItemType);
@@ -54,13 +55,6 @@ void ThingTypeManager::init()
 
 void ThingTypeManager::terminate()
 {
-    for (const auto& resource : m_assetResources) {
-        if (!resource)
-            continue;
-
-        resource->terminate();
-    }
-
     m_nullThingType = nullptr;
 
 #ifdef FRAMEWORK_EDITOR
@@ -72,18 +66,20 @@ void ThingTypeManager::terminate()
 
 bool ThingTypeManager::loadDat(const std::string& file, const uint16_t resourceId)
 {
-    auto resource = std::make_shared<AssetResource>();
-    resource->init(resourceId);
-
+    auto resource = AssetResource::Create(resourceId);
     if (!resource->loadDat(file))
         return false;
 
     // resize vector before inserting if necessary
-    if (resourceId >= m_assetResources.size())
-        m_assetResources.resize(static_cast<uint16_t>(resourceId) + 1);
+    if (resourceId >= m_assetResources.size()) {
+        const auto newSize = static_cast<size_t>(resourceId) + 1;
+        m_assetResources.resize(newSize);
+        m_spriteManagers.resize(newSize);
+    }
 
     // insert into resource list
     m_assetResources[resourceId] = std::move(resource);
+    m_spriteManagers[resourceId] = std::make_shared<LegacySpriteManager>();
 
     // notify Lua
     // IMPORTANT: this may require moving so it's called only once
@@ -130,18 +126,24 @@ bool ThingTypeManager::loadOtml(std::string file, uint16_t resourceId)
 
 bool ThingTypeManager::loadAppearances(const std::string& file, uint16_t resourceId)
 {
-    auto resource = std::make_shared<AssetResource>();
-    resource->init(resourceId);
-    bool ret = resource->loadAppearances(file);
+    auto resource = AssetResource::Create(resourceId);
+    auto sprManager = resource->loadAppearances(file);
+    if (!sprManager) {
+        return false;
+    }
 
     // resize vector before inserting if necessary
-    if (resourceId >= m_assetResources.size())
-        m_assetResources.resize(static_cast<uint16_t>(resourceId) + 1);
+    if (resourceId >= m_assetResources.size()) {
+        const auto newSize = static_cast<size_t>(resourceId) + 1;
+        m_assetResources.resize(newSize);
+        m_spriteManagers.resize(newSize);
+    }
 
     // insert into resource list
     m_assetResources[resourceId] = std::move(resource);
+    m_spriteManagers[resourceId] = std::move(sprManager);
 
-    return ret;
+    return true;
 }
 
 namespace {
@@ -274,6 +276,14 @@ AssetResourcePtr ThingTypeManager::getResourceById(const uint16_t resourceId) co
     return m_assetResources[resourceId];
 }
 
+SpriteManagerPtr ThingTypeManager::getSpriteManagerById(const uint16_t resourceId) const
+{
+    if (resourceId >= m_spriteManagers.size())
+        return nullptr;
+
+    return m_spriteManagers[resourceId];
+}
+
 uint32_t ThingTypeManager::getDatSignature(const uint16_t resourceId) const
 {
     auto res = getResourceById(resourceId);
@@ -288,7 +298,7 @@ uint16_t ThingTypeManager::getContentRevision(const uint16_t resourceId) const
 
 ImagePtr ThingTypeManager::getSpriteImage(int id, uint16_t resourceId, bool& isLoading)
 {
-    auto res = getResourceById(resourceId);
+    auto res = getSpriteManagerById(resourceId);
     if (!res)
         return nullptr;
 
@@ -316,18 +326,18 @@ bool ThingTypeManager::isValidDatId(const uint16_t id, const ThingCategory categ
 
 void ThingTypeManager::reloadSprites()
 {
-    for (const auto& resource : m_assetResources)
-        if (resource)
-            resource->reloadSprites();
+    for (const auto& sprManager : m_spriteManagers)
+        if (sprManager)
+            sprManager->reload();
 }
 
 bool ThingTypeManager::isSprLoaded(uint16_t resourceId)
 {
-    auto res = getResourceById(resourceId);
+    auto res = getSpriteManagerById(resourceId);
     if (!res)
         return false;
 
-    return res->isSprLoaded();
+    return res->isLoaded();
 }
 
 const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const
@@ -674,10 +684,6 @@ bool AssetResource::loadDat(const std::string& file)
             }
         }
 
-        // allocate sprite manager for managing spr/dat assets
-        spriteManager = std::make_unique<LegacySpriteManager>();
-        spriteManager->init();
-
         m_datLoaded = true;
         return true;
 
@@ -687,11 +693,11 @@ bool AssetResource::loadDat(const std::string& file)
     }
 }
 
-bool AssetResource::loadAppearances(const std::string& file)
+SpriteManagerPtr AssetResource::loadAppearances(const std::string& file)
 {
     if (m_datLoaded) {
         g_logger.error("Failed to read '{}': Resource already loaded!", file);
-        return false;
+        return nullptr;
     }
 
     try {
@@ -706,8 +712,7 @@ bool AssetResource::loadAppearances(const std::string& file)
             )
         );
 
-        auto protoSprites = std::make_unique<ProtobufSpriteManager>();
-        protoSprites->init();
+        auto protoSprites = std::make_shared<ProtobufSpriteManager>();
 
         for (const auto& obj : document) {
             const auto& type = obj["type"];
@@ -737,8 +742,6 @@ bool AssetResource::loadAppearances(const std::string& file)
         protoSprites->setSpritesCount(spritesCount + 1);
         protoSprites->setPath(file);
 
-        spriteManager = std::move(protoSprites);
-
         // load appearances.dat
         std::stringstream fin;
         g_resources.readFileStream(
@@ -750,7 +753,10 @@ bool AssetResource::loadAppearances(const std::string& file)
         if (!appearancesLib.ParseFromIstream(&fin))
             throw stdext::exception("Couldn't parse appearances lib.");
 
-        auto resource = shared_from_this();
+        auto spriteManager = std::dynamic_pointer_cast<ProtobufSpriteManager>(g_things.getSpriteManagerById(m_resourceId));
+        if (!spriteManager)
+            throw stdext::exception("Sprite manager not loaded!");
+
         auto& nullThing = g_things.getNullThingType();
         for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
             const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
@@ -759,7 +765,7 @@ bool AssetResource::loadAppearances(const std::string& file)
                 case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
                 case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
                 case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
-                default: return false;
+                default: return nullptr;
             }
             // fix for custom assets, in which the ids are not sorted.
             uint32_t lastAppearanceId = 0;
@@ -773,50 +779,17 @@ bool AssetResource::loadAppearances(const std::string& file)
             for (const auto& appearance : *appearances) {
                 const auto& type = std::make_shared<ThingType>();
                 const uint16_t id = appearance.id();
-                type->unserializeAppearance(id, resource, static_cast<ThingCategory>(category), appearance);
+                type->unserializeAppearance(id, m_resourceId, spriteManager, static_cast<ThingCategory>(category), appearance);
                 m_thingTypes[category][id] = type;
             }
         }
 
         m_datLoaded = true;
-        return true;
+        return protoSprites;
     } catch (const std::exception& e) {
         g_logger.error("Failed to load appearances '{}': {}", file, e.what());
-        return false;
+        return nullptr;
     }
-}
-
-SpriteSheetPtr AssetResource::getSheetBySpriteId(int id, bool load)
-{
-    if (auto* protoSprMgr = dynamic_cast<ProtobufSpriteManager*>(spriteManager.get())) {
-        bool isLoading = false;
-        return protoSprMgr->getSheetBySpriteId(id, isLoading, load);
-    }
-
-    return nullptr;
-}
-
-ImagePtr AssetResource::getSpriteImage(int id, bool& isLoading)
-{
-    if (spriteManager)
-        return spriteManager->getSpriteImage(id, isLoading);
-
-    return nullptr;
-}
-
-void AssetResource::init(uint16_t resourceId)
-{
-    m_resourceId = resourceId;
-}
-
-void AssetResource::terminate()
-{
-    for (auto& m_thingType : m_thingTypes)
-        m_thingType.clear();
-
-    if (spriteManager)
-        spriteManager->terminate();
-
 }
 
 const ThingTypeList& AssetResource::getThingTypes(const ThingCategory category)

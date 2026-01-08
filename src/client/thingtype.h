@@ -37,7 +37,7 @@ using namespace otclient::protobuf;
 class ThingType final : public LuaObject
 {
 public:
-    void unserializeAppearance(uint16_t clientId, AssetResourcePtr resource, ThingCategory category, const appearances::Appearance& appearance);
+    void unserializeAppearance(uint16_t clientId, uint16_t resourceId, ProtobufSpriteManagerPtr spriteManager, ThingCategory category, const appearances::Appearance& appearance);
     void unserialize(uint16_t clientId, uint16_t resourceId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
     void applyAppearanceFlags(const appearances::AppearanceFlags& flags);

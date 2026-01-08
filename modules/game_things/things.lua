@@ -200,6 +200,9 @@ local function loadPackInfo(packPath, errorList)
 			break
 		end
 	end
+
+	-- enable resource ids in packets
+	-- g_game.enableFeature(GameMultiSpr)
 end
 
 local function load(version)
