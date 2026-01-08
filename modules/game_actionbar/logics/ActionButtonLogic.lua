@@ -682,7 +682,7 @@ function updateButton(button)
 
     button.cache = getButtonCache(button)
     if button.item.getItemId and not button.cache.actionType then
-        button.item:setItemId(0, true)
+        button.item:setItemId(0)
         button.item:setOn(false)
     end
 
@@ -704,7 +704,7 @@ function updateButton(button)
     local passiveAbility = buttonData["actionsetting"]["passiveAbility"]
 
     if useAction then
-        button.item:setItemId(useAction, true)
+        button.item:setItemId(useAction, 0) -- to do: resourceId
         button.item:setOn(true)
         local cached = cachedItemWidget[useAction]
         if cached then
