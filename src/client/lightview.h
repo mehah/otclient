@@ -26,7 +26,6 @@
 #include "framework/luaengine/luaobject.h"
 #include "staticdata.h"
 #include <framework/graphics/declarations.h>
-#include <framework/util/spinlock.h>
 
 class LightView final : public LuaObject
 {
@@ -71,8 +70,6 @@ private:
 
     void updateCoords(const Rect& dest, const Rect& src);
     void updatePixels();
-
-    SpinLock m_lock;
 
     bool m_isDark{ false };
 
