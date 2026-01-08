@@ -770,30 +770,32 @@ void ThingType::loadTexture(const int animationPhase)
                                 return;
 
                             if (!spriteImage) {
-                                if (spriteId != 0) {
-                                    g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, animationPhase);
-                                    return;
-                                }
-                            } else {
-                                // verifies that the first block in the lower right corner is transparent.
-                                if (spriteImage->hasTransparentPixel()) {
-                                    fullImage->setTransparentPixel(true);
-                                }
-
-                                if (spriteMask) {
-                                    spriteImage->overwriteMask(maskColors[(l - 1)]);
-                                }
-
-                                auto spriteSize = spriteImage->getSize() / g_gameConfig.getSpriteSize();
-
-                                const Point& spritePos = Point(m_size.width() - spriteSize.width(), m_size.height() - spriteSize.height()) * g_gameConfig.getSpriteSize();
-                                fullImage->blit(framePos + spritePos, spriteImage);
+                                g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, animationPhase);
+                                return;
                             }
+
+                            // verifies that the first block in the lower right corner is transparent.
+                            if (!spriteImage || spriteImage->hasTransparentPixel()) {
+                                fullImage->setTransparentPixel(true);
+                            }
+
+                            if (spriteMask) {
+                                spriteImage->overwriteMask(maskColors[(l - 1)]);
+                            }
+
+                            auto spriteSize = spriteImage->getSize() / g_gameConfig.getSpriteSize();
+
+                            const Point& spritePos = Point(m_size.width() - spriteSize.width(), m_size.height() - spriteSize.height()) * g_gameConfig.getSpriteSize();
+                            fullImage->blit(framePos + spritePos, spriteImage);
                         } else {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     auto spriteId = m_spritesIndex[spriteIndex];
+
+                                    if (spriteId == 0)
+                                        continue;
+
                                     bool isLoading = false;
                                     const auto& spriteImage = g_sprites.getSpriteImage(spriteId, isLoading);
 
@@ -801,23 +803,21 @@ void ThingType::loadTexture(const int animationPhase)
                                         return;
 
                                     if (!spriteImage) {
-                                        if (spriteId != 0) {
-                                            g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
-                                            return;
-                                        }
-                                    } else {
-                                        // verifies that the first block in the lower right corner is transparent.
-                                        if (h == 0 && w == 0 && spriteImage->hasTransparentPixel()) {
-                                            fullImage->setTransparentPixel(true);
-                                        }
-
-                                        if (spriteMask) {
-                                            spriteImage->overwriteMask(maskColors[(l - 1)]);
-                                        }
-
-                                        const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * g_gameConfig.getSpriteSize();
-                                        fullImage->blit(framePos + spritePos, spriteImage);
+                                        g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
+                                        return;
                                     }
+
+                                    // verifies that the first block in the lower right corner is transparent.
+                                    if (h == 0 && w == 0 && (!spriteImage || spriteImage->hasTransparentPixel())) {
+                                        fullImage->setTransparentPixel(true);
+                                    }
+
+                                    if (spriteMask) {
+                                        spriteImage->overwriteMask(maskColors[(l - 1)]);
+                                    }
+
+                                    const Point& spritePos = Point(m_size.width() - w - 1, m_size.height() - h - 1) * g_gameConfig.getSpriteSize();
+                                    fullImage->blit(framePos + spritePos, spriteImage);
                                 }
                             }
                         }
