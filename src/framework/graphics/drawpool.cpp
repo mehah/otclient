@@ -268,6 +268,8 @@ void DrawPool::release() {
 
     m_refreshTimer.restart();
 
+    SpinLock::Guard guard(m_threadLock);
+
     m_objectsDraw[0].clear();
 
     if (!m_objectsFlushed.empty()) {
@@ -308,7 +310,7 @@ void DrawPool::release() {
         }
     }
 
-    m_shouldRepaint.store(true, std::memory_order_release);
+    m_shouldRepaint.store(true, std::memory_order_relaxed);
 }
 
 void DrawPool::flush()
