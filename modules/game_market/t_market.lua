@@ -127,8 +127,10 @@ function toggle()
     if marketWindow:isVisible() then
         sendMarketLeave()
         marketWindow:hide()
+        marketWindow:unlock()
     else
         marketWindow:show(true)
+        marketWindow:lock()
         marketWindow.contentPanel.searchText:focus()
     end
 end
@@ -137,7 +139,6 @@ function hide()
     if not marketWindow then
         return
     end
-
     local benchmark = g_clock.millis()
     local mainMarket = marketWindow.contentPanel:getChildById('mainMarket')
     local detailsMarket = marketWindow.contentPanel:getChildById('detailsMarket')
@@ -150,12 +151,14 @@ function hide()
 
     onClearMainMarket(true)
     marketWindow:hide()
+    marketWindow:unlock()
     onClearSearch()
 
     lastSelectedItem = {}
 end
 
 function show()
+    marketWindow:lock()
     marketWindow:show(true)
     marketWindow.contentPanel.searchText:focus()
     sortButtons["classFilter"] = -1
@@ -210,6 +213,7 @@ function closeMarket()
 
     marketWindow:setText(tr('Market'))
     marketWindow:hide()
+    marketWindow:unlock()
 
     onClearMainMarket(true)
     onClearSearch()
