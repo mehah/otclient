@@ -260,7 +260,17 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     g_drawPool.setDrawOrder(DrawOrder::SECOND);
 
     if (drawFlags & Otc::DrawNames) {
+        PainterShaderProgramPtr nameProgram;
+        if (!m_nameShader.empty())
+            nameProgram = g_shaders.getShader(m_nameShader);
+
+        if (nameProgram)
+            g_drawPool.setShaderProgram(nameProgram);
+
         m_name.draw(textRect, fillColor);
+
+        if (nameProgram)
+            g_drawPool.resetShaderProgram();
 
         if (m_text) {
             auto extraTextSize = m_text->getTextSize();
@@ -305,20 +315,6 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     }
 
     g_drawPool.resetDrawOrder();
-
-        // draw name with optional shader
-        auto nameShader = m_nameShader;
-        if (!nameShader.empty()) {
-            // try to get a shader program and set it on painter before drawing name
-            auto program = g_shaders.getShader(nameShader);
-            if (program) g_drawPool.setShaderProgram(program);
-        }
-
-        m_name.draw(textRect, fillColor);
-
-        if (!nameShader.empty()) {
-            g_drawPool.resetShaderProgram();
-        }
 }
 
 void Creature::internalDraw(Point dest, const Color& color)
