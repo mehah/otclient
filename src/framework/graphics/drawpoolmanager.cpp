@@ -227,8 +227,9 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         pool->m_framebuffer->bind();
 
     if (shouldRepaint) {
+        SpinLock::Guard guard(pool->m_threadLock);
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
-        pool->m_shouldRepaint.store(false, std::memory_order_release);
+        pool->m_shouldRepaint.store(false, std::memory_order_relaxed);
     }
 
     for (auto& obj : pool->m_objectsDraw[1]) {
