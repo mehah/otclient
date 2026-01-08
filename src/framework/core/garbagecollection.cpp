@@ -113,7 +113,7 @@ void GarbageCollection::thingType() {
                 thing->unload();
         }
 
-        if (thingId == things.size()) {
+        if (thingId == things.size() - 1) {
             thingId = 0;
             ++category;
             if (category == ThingLastCategory) {
