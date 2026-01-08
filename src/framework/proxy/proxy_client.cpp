@@ -56,7 +56,7 @@ void Proxy::terminate()
         g_proxies.erase(self);
         disconnect();
         std::error_code ec;
-        m_timer.cancel(ec);
+        m_timer.cancel();
     });
 }
 
@@ -94,7 +94,7 @@ void Proxy::check(const std::error_code& ec)
             ping();
         }
     }
-    m_timer.expires_from_now(std::chrono::milliseconds(CHECK_INTERVAL));
+    m_timer.expires_after(std::chrono::milliseconds(CHECK_INTERVAL));
     m_timer.async_wait([capture0 = shared_from_this()](auto&& PH1) {
         capture0->check(std::forward<decltype(PH1)>(PH1));
     });
@@ -127,7 +127,7 @@ void Proxy::connect()
             }
             endpoint = asio::ip::tcp::endpoint(address, self->m_port);
         } else {
-            endpoint = asio::ip::tcp::endpoint(*results);
+            if (!results.empty()) endpoint = results.begin()->endpoint();
             endpoint.port(self->m_port);
         }
         self->m_resolvedIp = endpoint.address().to_string();
@@ -353,7 +353,7 @@ void Session::terminate(std::error_code ec)
             std::error_code ecc;
             m_socket.shutdown(asio::ip::tcp::socket::shutdown_both, ecc);
             m_socket.close(ecc);
-            m_timer.cancel(ecc);
+            m_timer.cancel();
         } else if (m_disconnectCallback) {
             m_disconnectCallback(ec);
         }
@@ -379,7 +379,7 @@ void Session::check(const std::error_code& ec)
 
     selectProxies();
 
-    m_timer.expires_from_now(std::chrono::milliseconds(CHECK_INTERVAL));
+    m_timer.expires_after(std::chrono::milliseconds(CHECK_INTERVAL));
     m_timer.async_wait([capture0 = shared_from_this()](auto&& PH1) {
         capture0->check(std::forward<decltype(PH1)>(PH1));
     });

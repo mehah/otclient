@@ -235,7 +235,6 @@ bool Http::cancel(int id)
 void HttpSession::start()
 {
     instance_uri = parseURI(m_url);
-    const asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
     m_timer.expires_after(std::chrono::seconds(m_timeout));
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) { sft->onTimeout(ec); });
@@ -275,51 +274,48 @@ void HttpSession::start()
         m_request.append(m_result->postData);
     }
 
-    m_resolver.async_resolve(instance_uri.domain, instance_uri.port, [sft = shared_from_this()](
-        const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator) {
-        sft->on_resolve(ec, std::move(iterator));
-    });
+    m_resolver.async_resolve(
+        instance_uri.domain,
+        instance_uri.port,
+        [sft = shared_from_this()](
+            const std::error_code& ec,
+            asio::ip::tcp::resolver::results_type results
+        ) {
+            sft->on_resolve(ec, std::move(results));
+        }
+    );
 }
 
-void HttpSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator)
+void HttpSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::results_type results)
 {
     if (ec) {
         onError("HttpSession unable to resolve " + m_url + ": " + ec.message());
         return;
     }
 
-    std::error_code _ec;
-
     // Try to find IPv4 addresses first
-    asio::ip::tcp::resolver::iterator end;
-    asio::ip::tcp::resolver::iterator ipv4_it = end;
-    auto current = iterator;
-
-    while (current != end) {
-        if (!current->endpoint().address().is_v6()) {
-            ipv4_it = current;
+    auto endpoint_it = results.begin();
+    for (auto it = results.begin(); it != results.end(); ++it) {
+        if (it->endpoint().address().is_v4()) {
+            endpoint_it = it;
             break;
         }
-        ++current;
     }
-
-    // If no IPv4 found, use the original iterator (IPv6)
-    const auto& endpoint_to_use = (ipv4_it != end) ? ipv4_it : iterator;
 
     g_logger.debug("Attempting connection to: {}:{}", instance_uri.domain, instance_uri.port);
 
     if (instance_uri.port == "443") {
-        // For HTTPS, use the SSL stream's underlying socket
-        m_ssl.lowest_layer().async_connect(*endpoint_to_use, [sft = shared_from_this()](
-            const std::error_code& ec) {
-            sft->on_connect(ec);
-        });
+        m_ssl.lowest_layer().async_connect(
+            endpoint_it->endpoint(),
+            [sft = shared_from_this()](const std::error_code& ec) {
+                sft->on_connect(ec);
+            });
     } else {
-        // For HTTP, use the regular socket
-        m_socket.async_connect(*endpoint_to_use, [sft = shared_from_this()](
-            const std::error_code& ec) {
-            sft->on_connect(ec);
-        });
+        m_socket.async_connect(
+            endpoint_it->endpoint(),
+            [sft = shared_from_this()](const std::error_code& ec) {
+                sft->on_connect(ec);
+            });
     }
 }
 
@@ -587,7 +583,6 @@ void HttpSession::onError(const std::string& ec, const std::string& /*details*/)
 void WebsocketSession::start()
 {
     instance_uri = parseURI(m_url);
-    const asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
     m_request.append("GET " + instance_uri.query + " HTTP/1.1\r\n");
     m_request.append("Host: " + instance_uri.domain + ":" + instance_uri.port + "\r\n");
@@ -598,14 +593,18 @@ void WebsocketSession::start()
     m_request.append("\r\n");
 
     m_resolver.async_resolve(
-        query_resolver,
+        instance_uri.domain,
+        instance_uri.port,
         [sft = shared_from_this()](
-        const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator) {
-        sft->on_resolve(ec, std::move(iterator));
-    });
+            const std::error_code& ec,
+            asio::ip::tcp::resolver::results_type results
+        ) {
+            sft->on_resolve(ec, std::move(results));
+        }
+    );
 }
 
-void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator)
+void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::results_type results)
 {
     if (ec) {
         onError("WebsocketSession unable to resolve " + m_url + ": " + ec.message());
@@ -614,9 +613,9 @@ void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::reso
 
     std::error_code _ec;
     if (instance_uri.port == "443") {
-        while (iterator != asio::ip::tcp::resolver::iterator()) {
+        for (auto it = results.begin(); it != results.end(); ++it) {
             m_ssl.lowest_layer().close();
-            m_ssl.lowest_layer().connect(*iterator++, _ec);
+            m_ssl.lowest_layer().connect(*it, _ec);
             if (!_ec) {
                 const std::error_code __ec;
                 on_connect(__ec);
@@ -624,9 +623,9 @@ void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::reso
             }
         }
     } else {
-        while (iterator != asio::ip::tcp::resolver::iterator()) {
+        for (auto it = results.begin(); it != results.end(); ++it) {
             m_socket.close();
-            m_socket.connect(*iterator++, _ec);
+            m_socket.connect(*it, _ec);
             if (!_ec) {
                 const std::error_code __ec;
                 on_connect(__ec);

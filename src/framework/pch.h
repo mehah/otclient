@@ -83,7 +83,7 @@
 #include <fmt/ranges.h>
 
 // Asio (standalone)
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 #include <asio/read.hpp>
 #include <asio/read_until.hpp>
