@@ -608,6 +608,39 @@ return {
             end, 100)
         end
     },
+
+    -- widgetFont                        = {
+    --     value = 'default',
+    --     action = function(value, options, controller, panels, extraWidgets)
+    --         local function recursiveSetFont(widget, fontName)
+    --             if not widget then return end
+                
+    --             if fontName and fontName ~= 'default' then
+    --               --  widget:setFont(fontName)
+    --               --  widget:setTTFFont(fontName, 10)
+    --               -- widget:setStroke(1, "black")
+    --             end
+                
+    --             local children = widget:getChildren()
+    --             if children then
+    --                 for _, child in pairs(children) do
+    --                     recursiveSetFont(child, fontName)
+    --                 end
+    --             end
+    --         end
+            
+    --         if value and value ~= 'default' then
+    --              recursiveSetFont(g_ui.getRootWidget(), value)
+    --         end
+            
+    --         local combo = panels.interface:recursiveGetChildById('widgetFont')
+    --         if combo then
+    --             combo:setCurrentOptionByData(value, true)
+    --         end
+    --     end
+    -- },
+
+
     autoSwitchPreset                  = false,
     listKeybindsPanel                 = {
         action = function(value, options, controller, panels, extraWidgets)
