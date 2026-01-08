@@ -26,7 +26,6 @@
 #include "painter.h"
 #include "textureatlas.h"
 #include <framework/core/configmanager.h>
-#include <sstream>
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 

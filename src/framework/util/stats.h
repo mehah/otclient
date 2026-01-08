@@ -13,7 +13,8 @@
 
 // NOT THREAD SAFE
 
-enum StatsTypes {
+enum StatsTypes
+{
     STATS_FIRST = 0,
     STATS_GENERAL = STATS_FIRST,
     STATS_MAIN,
@@ -25,7 +26,8 @@ enum StatsTypes {
     STATS_LAST = STATS_PACKETS
 };
 
-struct Stat {
+struct Stat
+{
     Stat(uint64_t _executionTime, const std::string& _description, const std::string& _extraDescription) :
         executionTime(_executionTime), description(_description), extraDescription(_extraDescription) {}
     uint64_t executionTime = 0;
@@ -33,7 +35,8 @@ struct Stat {
     std::string extraDescription;
 };
 
-struct StatsData {
+struct StatsData
+{
     StatsData(uint32_t _calls, uint64_t _executionTime, const std::string& _extraInfo) :
         calls(_calls), executionTime(_executionTime), extraInfo(_extraInfo) {}
     uint32_t calls = 0;
@@ -46,7 +49,8 @@ using StatsList = std::list<Stat*>;
 
 class UIWidget;
 
-class Stats {
+class Stats
+{
 public:
     void add(int type, Stat* stats);
 
@@ -83,7 +87,8 @@ public:
     inline void removeCreature() { destroyedCreatures += 1; }
 
 private:
-    struct {
+    struct
+    {
         StatsMap data;
         StatsList slow;
         int64_t start = 0;
@@ -103,7 +108,8 @@ private:
 
 extern Stats g_stats;
 
-class AutoStat {
+class AutoStat
+{
 public:
     AutoStat(int type, const std::string& description, const std::string& extraDescription = "") :
         m_type(type), m_stat(new Stat(0, description, extraDescription)), m_timePoint(std::chrono::high_resolution_clock::now()) {}

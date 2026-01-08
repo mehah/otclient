@@ -23,7 +23,6 @@
 #pragma once
 
 #include <framework/luaengine/luaobject.h>
-#include <string>
 
  // @bindclass
 class Event : public LuaObject

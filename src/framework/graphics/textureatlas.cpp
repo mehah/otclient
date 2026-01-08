@@ -3,7 +3,6 @@
 
 #include "painter.h"
 #include <framework/core/configmanager.h>
-#include <sstream>
 
 // Extra padding around smooth textures to avoid sampling artifacts (in pixels)
 static constexpr uint8_t SMOOTH_PADDING = 2;
@@ -180,7 +179,7 @@ std::string TextureAtlas::getStats() const
 {
     std::stringstream ss;
     ss << "size=" << m_size.width() << "x" << m_size.height()
-       << " cached=" << m_texturesCached.size();
+        << " cached=" << m_texturesCached.size();
 
     for (int i = 0; i < ATLAS_FILTER_COUNT; ++i) {
         const auto& group = m_filterGroups[i];
@@ -189,10 +188,10 @@ std::string TextureAtlas::getStats() const
             textures += layer.textures.size();
         }
         ss << " | " << (i == ATLAS_FILTER_LINEAR ? "linear" : "nearest")
-           << ":layers=" << group.layers.size()
-           << " textures=" << textures
-           << " free=" << group.freeRegions.size()
-           << " inactive=" << group.inactiveTextures.size();
+            << ":layers=" << group.layers.size()
+            << " textures=" << textures
+            << " free=" << group.freeRegions.size()
+            << " inactive=" << group.inactiveTextures.size();
     }
 
     return ss.str();
