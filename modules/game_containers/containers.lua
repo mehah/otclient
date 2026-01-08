@@ -1078,6 +1078,25 @@ function onContainerOpen(container, previousContainer)
     -- Set maximum height based on whether pages are active
     local maxHeightOffset = container:hasPages() and 65 or 30
     containerWindow:setContentMaximumHeight(cellSize.height * layout:getNumLines() + maxHeightOffset)
+    -- Enables dragging only when mouse press occurs within window bounds (with tolerance margins)
+    -- and not over the containerPanel child widget
+    -- https://github.com/mehah/otclient/issues/1562
+    local TOLERANCE_HORIZONTAL = 5
+    local TOLERANCE_VERTICAL = 2
+    containerWindow.onMousePress = function(widget, mousePos, mouseButton)
+        local x, y = containerWindow:getX(), containerWindow:getY()
+        local width, height = containerWindow:getWidth(), containerWindow:getHeight()
+        local inBounds = mousePos.x >= x + TOLERANCE_HORIZONTAL and 
+                        mousePos.x <= x + width - TOLERANCE_HORIZONTAL and
+                        mousePos.y >= y + TOLERANCE_VERTICAL and 
+                        mousePos.y <= y + height - TOLERANCE_VERTICAL
+        local notOnPanel = containerWindow:getChildByPos(mousePos) ~= containerPanel
+        containerWindow:setDraggable(inBounds and notOnPanel)
+        return inBounds
+    end
+    containerWindow.onMouseRelease = function(widget, mousePos, mouseButton)
+        containerWindow:setDraggable(true)
+    end
 
     -- Define resize restriction function
     local function restrictResize()
