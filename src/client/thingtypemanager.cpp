@@ -97,7 +97,7 @@ bool ThingTypeManager::loadSpr(const std::string& file, const uint16_t resourceI
         return false;
     }
 
-    sprManager->loadSpr(file);
+    return sprManager->loadSpr(file);
 }
 
 bool ThingTypeManager::loadOtml(std::string file, uint16_t resourceId)
