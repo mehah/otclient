@@ -205,7 +205,7 @@ local function loadResource(path, version, resourceId, errorList)
 		end
 
 		-- try to load spr
-		local sprResult = loadSpr(sprPath, resourceId)
+		local sprResult = g_things.loadSpr(sprPath, resourceId)
 		if not sprResult then
 			addError(errorList, "Failed to read dat file: file structure does not match the defined version", resourceId)
 		end
