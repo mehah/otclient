@@ -1,5 +1,4 @@
 ConsoleLabel < UITextEdit
-  font: verdana-11px-antialised
   height: 14
   color: yellow
   margin-left: 2
@@ -15,7 +14,6 @@ ConsoleLabel < UITextEdit
   focusable: false
 
 ConsolePhantomLabel < UILabel
-  font: verdana-11px-antialised
   height: 14
   color: yellow
   text-wrap: true
