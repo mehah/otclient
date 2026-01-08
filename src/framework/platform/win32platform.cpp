@@ -26,7 +26,11 @@
 
 #include <framework/core/eventdispatcher.h>
 
+#include <psapi.h>
+#include <windows.h>
 #include <shellapi.h>
+
+#pragma comment(lib, "psapi.lib")
 
 void Platform::init(std::vector<std::string>& args)
 {
@@ -196,6 +200,13 @@ double Platform::getTotalSystemMemory()
     status.dwLength = sizeof(status);
     GlobalMemoryStatusEx(&status);
     return status.ullTotalPhys;
+}
+
+double Platform::getMemoryUsage()
+{
+    PROCESS_MEMORY_COUNTERS pmc;
+    GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
+    return static_cast<double>(pmc.WorkingSetSize);
 }
 
 #ifndef PRODUCT_PROFESSIONAL

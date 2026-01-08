@@ -29,7 +29,7 @@
 class ScheduledEvent final : public Event
 {
 public:
-    ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles = 0);
+    ScheduledEvent(const std::string& function, const std::function<void()>& callback, int delay, int maxCycles = 0);
     void execute() override;
     void postpone();
     bool nextCycle();

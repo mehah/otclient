@@ -25,6 +25,7 @@
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/drawpool.h>
 #include <framework/graphics/framebuffer.h>
+#include <string>
 
 class DrawPoolManager
 {
@@ -113,6 +114,7 @@ public:
     bool isPreDrawing() const;
 
     void removeTextureFromAtlas(uint32_t id, bool smooth);
+    std::string getAtlasStats() const;
 
 private:
     DrawPool* getCurrentPool() const;

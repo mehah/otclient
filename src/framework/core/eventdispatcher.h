@@ -84,9 +84,13 @@ public:
     void poll();
 
     EventPtr addEvent(const std::function<void()>& callback);
+    EventPtr addEventEx(const std::string& function, const std::function<void()>& callback);
     void deferEvent(const std::function<void()>& callback);
+    void deferEventEx(const std::string& function, const std::function<void()>& callback);
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
+    ScheduledEventPtr scheduleEventEx(const std::string& function, const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
+    ScheduledEventPtr cycleEventEx(const std::string& function, const std::function<void()>& callback, int delay);
 
     const auto& context() const {
         return dispacherContext;

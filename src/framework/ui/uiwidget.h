@@ -695,6 +695,10 @@ public:
     std::string getStyleName();
     Point getLastClickPosition() { return m_lastClickPosition; }
 
+    // for stats only
+    bool isRootChild() const { return m_isRootChild; }
+    void setRootChild(const bool v) { m_isRootChild = v; }
+
     // base style
 private:
     void initBaseStyle();
@@ -723,6 +727,7 @@ protected:
     float m_rotation{ 0.f };
     uint16_t m_autoRepeatDelay{ 500 };
     Point m_lastClickPosition;
+    bool m_isRootChild{ false }; // for stats
 
     DrawOrder m_textDrawOrder{ DrawOrder::FIRST };
 

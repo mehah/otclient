@@ -80,6 +80,8 @@ public:
     void setTargetFps(const uint16_t targetFps) { m_graphicFrameCounter.setTargetFps(targetFps); }
 
     uint16_t getFps() { return m_graphicFrameCounter.getFps(); }
+    uint16_t getGraphicsFps() { return m_graphicFrameCounter.getFps(); }
+    uint16_t getProcessingFps() { return m_mapProcessFrameCounter.getFps(); }
     uint8_t getMaxFps() { return m_graphicFrameCounter.getMaxFps(); }
     uint8_t getTargetFps() { return m_graphicFrameCounter.getTargetFps(); }
 

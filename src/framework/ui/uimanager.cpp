@@ -31,6 +31,7 @@
 #include "framework/otml/otmlexception.h"
 #include "framework/otml/otmlnode.h"
 #include <framework/platform/platformwindow.h>
+#include <framework/util/stats.h>
 
 UIManager g_ui;
 
@@ -348,6 +349,11 @@ void UIManager::onWidgetDisappear(const UIWidgetPtr& widget)
 
 void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
 {
+    std::string extra = widget->getId();
+    if (widget->getParent())
+        extra += " (" + widget->getParent()->getId() + ")";
+    AutoStat s(STATS_MAIN, "UIManager::onWidgetDestroy", extra);
+
     // release input grabs
     if (m_keyboardReceiver == widget)
         resetKeyboardReceiver();

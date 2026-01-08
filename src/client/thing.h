@@ -30,6 +30,9 @@
 class Thing : public AttachableObject
 {
 public:
+    Thing();
+    ~Thing() override;
+
     virtual void draw(const Point& /*dest*/, bool /*drawThings*/ = true, LightView* = nullptr) {}
     virtual void drawLight(const Point& /*dest*/, LightView*) {}
 

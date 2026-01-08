@@ -69,6 +69,7 @@ public:
     bool canAdd(const TexturePtr& texture) const;
 
     Size getSize() const { return m_size; }
+    std::string getStats() const;
 
     void flush();
 

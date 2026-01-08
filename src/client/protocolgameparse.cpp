@@ -40,6 +40,8 @@
 #include "framework/net/inputmessage.h"
 #include "paperdollmanager.h"
 #include "paperdoll.h"
+#include <fmt/format.h>
+#include <framework/util/stats.h>
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {
@@ -49,6 +51,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
     try {
         while (!msg->eof()) {
             opcode = msg->getU8();
+            AutoStat s(STATS_PACKETS, fmt::format("{} (0x{:02X})", opcode, opcode));
 
             // must be > so extended will be enabled before GameStart.
             if (!g_game.getFeature(Otc::GameLoginPending)) {
