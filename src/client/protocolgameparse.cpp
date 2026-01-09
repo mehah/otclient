@@ -5590,9 +5590,10 @@ Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
 
 void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
 {
-    uint8_t windowType = 1;
+    uint8_t windowType = Otc::IMBUEMENT_WINDOW_SELECT_ITEM;
     if (g_game.getClientVersion() >= 1510) {
-        windowType = msg->getU8(); // 0 = Choice, 1 = Select Item, 2 = Scroll
+        // 0 = Choice, 1 = Select Item, 2 = Scroll
+        windowType = static_cast<Otc::Imbuement_Window_t>(msg->getU8());
         msg->getU8(); // unknown byte
     }
 
@@ -5601,7 +5602,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         return;
     } else if (windowType == Otc::IMBUEMENT_WINDOW_CHOICE) {
         const uint16_t itemId = msg->getU16();
-        const uint32_t unknown = msg->getU32();
+        const uint32_t unknown = msg->getU32(); // new imbuement duration?
 
         g_lua.callGlobalField("g_game", "onOpenImbuementWindow", itemId, unknown);
         return;
@@ -5611,8 +5612,12 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
     std::vector<ItemPtr> neededItemsList;
 
     if (windowType == Otc::IMBUEMENT_WINDOW_SCROLL) {
-        msg->getU8(); // unknown byte
-        msg->getU8(); // unknown byte
+        // both ITEM and SCROLL window use the same packet structure
+        // these fields are not forwarded to the ui in the "scroll" mode
+        // we trust that the server will send 0 for both values here
+        msg->getU16(); // item clientId
+        msg->getU8(); // imbuing slots count
+
         getImbuingIngredients(msg, imbuements, neededItemsList);
         g_lua.callGlobalField("g_game", "onImbuementScroll", imbuements, neededItemsList);
         return;
@@ -5632,10 +5637,11 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         msg->getU8(); // tier
     }
 
-    const uint8_t slot = msg->getU8();
+    // imbuing slots
+    const uint8_t imbuingSlotCount = msg->getU8();
     std::unordered_map<int, std::tuple<Imbuement, uint32_t, uint32_t>> activeSlots;
 
-    for (auto i = 0; std::cmp_less(i, slot); i++) {
+    for (auto i = 0; std::cmp_less(i, imbuingSlotCount); i++) {
         const uint8_t firstByte = msg->getU8();
         if (firstByte == 0x01) {
             Imbuement imbuement = getImbuementInfo(msg);
@@ -5647,7 +5653,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
 
     getImbuingIngredients(msg, imbuements, neededItemsList);
 
-    g_lua.callGlobalField("g_game", "onImbuementItem", itemId, slot, activeSlots, imbuements, neededItemsList);
+    g_lua.callGlobalField("g_game", "onImbuementItem", itemId, imbuingSlotCount, activeSlots, imbuements, neededItemsList);
 }
 
 void ProtocolGame::parseCloseImbuementWindow(const InputMessagePtr& /*msg*/)
