@@ -22,6 +22,7 @@
 
 #include "tools/datdump.h"
 
+#ifdef FRAMEWORK_EDITOR
 #include "client/game.h"
 #include "client/thingtype.h"
 #include "client/thingtypemanager.h"
@@ -260,3 +261,4 @@ namespace datdump {
         return success;
     }
 } // namespace datdump
+#endif
