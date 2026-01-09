@@ -619,8 +619,7 @@ void ThingType::loadTexture(const int animationPhase)
                     posData.rects = { framePos + Point(m_size.width(), m_size.height()) * g_gameConfig.getSpriteSize() - Point(1), framePos };
                     for (int fx = framePos.x; fx < framePos.x + m_size.width() * g_gameConfig.getSpriteSize(); ++fx) {
                         for (int fy = framePos.y; fy < framePos.y + m_size.height() * g_gameConfig.getSpriteSize(); ++fy) {
-                            const uint8_t* p = fullImage->getPixel(fx, fy);
-                            if (p[3] == 0x00)
+                            if (const uint8_t* p = fullImage->getPixel(fx, fy); p[3] == 0x00)
                                 continue;
 
                             posData.rects.setTop(std::min<int>(fy, posData.rects.top()));

@@ -6375,7 +6375,7 @@ void ProtocolGame::creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& c
             (creatureType == Proto::CreatureTypePlayer && !m_localPlayer->getId() && name == m_localPlayer->getName())) {
             creature = m_localPlayer;
         } else {
-            makeCreature(creature, creatureId, creatureType, name);
+            makeCreature(creature, creatureId, creatureType);
         }
     }
 
@@ -6388,7 +6388,7 @@ void ProtocolGame::creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& c
     }   
 }
 
-void ProtocolGame::makeCreature(CreaturePtr& creature, const uint32_t id, uint8_t creatureType, const std::string& creatureName) const
+void ProtocolGame::makeCreature(CreaturePtr& creature, const uint32_t id, uint8_t creatureType) const
 {
     switch (creatureType) {
         case Proto::CreatureTypePlayer:

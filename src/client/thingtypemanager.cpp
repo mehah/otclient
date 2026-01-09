@@ -239,11 +239,15 @@ PackInfoResourceList ThingTypeManager::decodePackInfo(const std::string& file)
 
     try {
         pugi::xml_document doc;
-        pugi::xml_parse_result result = doc.load_string(g_resources.readFileContents(g_resources.resolvePath(
+        if (pugi::xml_parse_result result = doc.load_string(
+            g_resources.readFileContents(
+            g_resources.resolvePath(
             g_resources.guessFilePath(file + "packinfo", "xml")
-        )).c_str());
-        if (!result)
+            )
+            ).c_str()
+            ); !result) {
             throw Exception("cannot load '{}: '{}'", file, result.description());
+        }
 
         pugi::xml_node root = doc.child("resources");
         if (root.empty())

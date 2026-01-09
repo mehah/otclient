@@ -130,7 +130,7 @@ void GarbageCollection::processThingsInCategory(ThingTypeList& things, size_t& t
 
     const size_t limit = std::min(thingId + (maxAmount - scanned), things.size() - 1);
     for (; thingId < limit; ++thingId, ++scanned) {
-        auto& thing = things[thingId];
+        const auto& thing = things[thingId];
         if (!thing) continue;
 
         if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME)

@@ -161,8 +161,8 @@ private:
 
     ImagePtr getSpriteImageHd(int id, const FileStreamPtr& file);
     ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
-    void setPixelsRGB(uint8_t* pixels, uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize);
-    void setPixelsRGBA(uint8_t* pixels, uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize, bool& hasAlpha, int& transparentCount);
+    void setPixelsRGB(uint8_t* pixels, const uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize);
+    void setPixelsRGBA(uint8_t* pixels, const uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize, bool& hasAlpha, int& transparentCount);
 
 
     std::string m_lastFileName;
@@ -227,7 +227,7 @@ public:
     void setSpritesCount(const int count) { m_spritesCount = count; }
     int getSpritesCount() const override { return m_spritesCount; }
 
-    void setPath(const std::string& path) { m_path = path; }
+    void setPath(const std::string_view path) { m_path = path; }
     std::string getPath() const { return m_path; }
 
     bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;

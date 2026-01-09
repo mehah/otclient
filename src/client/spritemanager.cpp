@@ -327,7 +327,7 @@ ImagePtr LegacySpriteManager::getSpriteImage(const int id, const FileStreamPtr& 
     }
 }
 
-void LegacySpriteManager::setPixelsRGB(uint8_t* pixels, uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize)
+void LegacySpriteManager::setPixelsRGB(uint8_t* pixels, const uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize)
 {
     for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 3) {
         pixels[writePos + 0] = tempBuffer[src + 0];
@@ -338,7 +338,7 @@ void LegacySpriteManager::setPixelsRGB(uint8_t* pixels, uint8_t* tempBuffer, int
     }
 }
 
-void LegacySpriteManager::setPixelsRGBA(uint8_t* pixels, uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize, bool& hasAlpha, int& transparentCount)
+void LegacySpriteManager::setPixelsRGBA(uint8_t* pixels, const uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize, bool& hasAlpha, int& transparentCount)
 {
     for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 4) {
         pixels[writePos + 0] = tempBuffer[src + 0];
@@ -402,8 +402,7 @@ Size SpriteSheet::getSpriteSize() const
         Size(384,384)  // 35
     };
 
-    const size_t idx = static_cast<size_t>(spriteLayout);
-    if (idx < sizes.size())
+    if (const size_t idx = static_cast<size_t>(spriteLayout); idx < sizes.size())
         return sizes[idx];
 
     return sizes[0];
@@ -476,8 +475,7 @@ bool ProtobufSpriteManager::loadSpriteSheet(const SpriteSheetPtr& sheet) const
             lzma_filter{LZMA_VLI_UNKNOWN, nullptr}
         };
 
-        lzma_ret ret = lzma_raw_decoder(&stream, filters);
-        if (ret != LZMA_OK) {
+        if (lzma_ret ret = lzma_raw_decoder(&stream, filters); ret != LZMA_OK) {
             throw stdext::exception(fmt::format("failed to initialize lzma raw decoder result: {}", ret));
         }
 
@@ -582,9 +580,10 @@ ImagePtr ProtobufSpriteManager::getSpriteImage(const int id, bool& isLoading)
 
         const int spriteOffset = id - sheet->firstId;
         const int allColumns = sheet->getColumns();
-        const int spritesPerSheet = sheet->getSpritesPerSheet();
-
-        if (spriteOffset < 0 || spriteOffset >= spritesPerSheet) {
+        if (
+            const int spritesPerSheet = sheet->getSpritesPerSheet();
+            spriteOffset < 0 || spriteOffset >= spritesPerSheet
+        ) {
             g_logger.error("Sprite id {} is out of bounds for sheet {} (offset {}, max {})", id, sheet->file, spriteOffset, spritesPerSheet);
             return nullptr;
         }
