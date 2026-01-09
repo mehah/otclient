@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ void UIMap::draw(const DrawPoolType drawPane) {
             m_mapView->m_lightView->clear();
             m_mapView->drawLights();
             m_mapView->m_lightView->draw(m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect);
-        }, true);
+        });
     } else if (drawPane == DrawPoolType::CREATURE_INFORMATION) {
         g_drawPool.preDraw(drawPane, [this] {
             m_mapView->drawCreatureInformation();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 #include "outfit.h"
 #include "thing.h"
 #include <framework/core/declarations.h>
-#include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
 
 #include "staticdata.h"
@@ -313,12 +312,7 @@ private:
     Color m_staticSquareColor{ Color::white };
     Color m_informationColor{ Color::white };
 
-    struct
-    {
-        uint8_t minHeight{ 0 };
-        uint8_t height{ 0 };
-        uint16_t speed{ 0 };
-    } m_bounce;
+    Bounce m_bounce;
 
     // jump related
     Timer m_jumpTimer;

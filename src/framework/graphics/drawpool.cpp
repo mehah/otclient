@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,10 +61,12 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
 
         if (m_atlas) {
             if (const auto region = texture->getAtlasRegion(m_atlas->getType())) {
-                textureAtlas = region->atlas;
+                if (region->isEnabled()) {
+                    textureAtlas = region->atlas;
 
-                if (method.src.isValid())
-                    method.src.translate(region->x, region->y);
+                    if (method.src.isValid())
+                        method.src.translate(region->x, region->y);
+                }
             }
         }
     }
@@ -75,7 +77,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
     auto& list = m_objects[m_currentDrawOrder];
     auto& state = getCurrentState();
 
-    if (!list.empty() && list.back().state == state) {
+    if (!list.empty() && list.back().coords && list.back().state == state) {
         auto& last = list.back();
         coordsBuffer ? last.coords->append(coordsBuffer.get()) : addCoords(*last.coords, method);
     } else if (m_alwaysGroupDrawings) {
@@ -112,7 +114,7 @@ bool DrawPool::updateHash(const DrawMethod& method, const Texture* texture, cons
     state.hash = 0;
 
     { // State Hash
-        if (m_bindedFramebuffers)
+        if (m_bindedFramebuffers > -1)
             stdext::hash_combine(state.hash, m_lastFramebufferId);
 
         if (state.blendEquation != BlendEquation::ADD)
@@ -250,19 +252,14 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint()
 {
-    uint16_t refreshDelay = m_refreshDelay;
-    if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
-        refreshDelay = m_shaderRefreshDelay;
+    if (!m_enabled || shouldRepaint())
+        return false;
 
-    const bool canRepaint = m_hashCtrl.wasModified() || (refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay);
-
-    return canRepaint;
+    return canRefresh();
 }
 
 void DrawPool::release() {
-    SpinLock::Guard guard(m_threadLock);
-
-    if (!canRepaint()) {
+    if (hasFrameBuffer() && !m_hashCtrl.wasModified() && !canRefresh()) {
         for (auto& objs : m_objects)
             objs.clear();
         m_objectsFlushed.clear();
@@ -270,6 +267,8 @@ void DrawPool::release() {
     }
 
     m_refreshTimer.restart();
+
+    SpinLock::Guard guard(m_threadLock);
 
     m_objectsDraw[0].clear();
 
@@ -311,7 +310,7 @@ void DrawPool::release() {
         }
     }
 
-    m_shouldRepaint.store(true, std::memory_order_release);
+    m_shouldRepaint.store(true, std::memory_order_relaxed);
 }
 
 void DrawPool::flush()

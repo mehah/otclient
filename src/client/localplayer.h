@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -122,6 +122,11 @@ public:
     bool isServerWalking() { return m_serverWalk; }
     bool isPreWalking() { return !m_preWalks.empty(); }
 
+    bool isSupplyStashAvailable() const { return m_isSupplyStashAvailable; }
+    void setSupplyStashAvailable(bool available) {
+        m_isSupplyStashAvailable = available;
+    }
+
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }
@@ -170,6 +175,8 @@ private:
     bool m_known{ false };
     bool m_pending{ false };
     bool m_serverWalk{ false };
+
+    bool m_isSupplyStashAvailable{ false };
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 

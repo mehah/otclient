@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +74,7 @@ void Item::internalDraw(const int animationPhase, const Point& dest, const Color
             m_shader->setUniformValue(ShaderManager::ITEM_ID_UNIFORM, static_cast<int>(getId()));
         };*/
 
-        drawAttachedEffect(dest, lightView, false); // On Bottom
+        drawAttachedEffect(dest, dest, lightView, false); // On Bottom
         if (hasShader())
             g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
     }
@@ -83,7 +83,7 @@ void Item::internalDraw(const int animationPhase, const Point& dest, const Color
     g_drawPool.resetShaderProgram();
 
     if (!replaceColorShader) {
-        drawAttachedEffect(dest, lightView, true); // On Top
+        drawAttachedEffect(dest, dest, lightView, true); // On Top
         drawAttachedParticlesEffect(dest);
     }
 }

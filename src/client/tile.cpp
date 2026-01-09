@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,7 @@ void Tile::draw(const Point& dest, const int flags, LightView* lightView)
         drawThing(thing, dest, flags, drawElevation);
     }
 
-    drawAttachedEffect(dest, lightView, false);
+    drawAttachedEffect(dest, dest, lightView, false);
 
     if (hasCommonItem()) {
         for (auto& item : std::ranges::reverse_view(m_things)) {
@@ -103,7 +103,7 @@ void Tile::draw(const Point& dest, const int flags, LightView* lightView)
 
     drawCreature(dest, flags, false, drawElevation);
     drawTop(dest, flags, false, drawElevation);
-    drawAttachedEffect(dest, lightView, true);
+    drawAttachedEffect(dest, dest, lightView, true);
     drawAttachedParticlesEffect(dest);
 }
 

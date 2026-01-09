@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -113,15 +113,27 @@ void UIWidget::initText()
     m_font = g_fonts.getDefaultWidgetFont();
     m_textAlign = Fw::AlignCenter;
     m_coordsBuffer = std::make_shared<CoordsBuffer>();
+    m_textOverflowLength = 0;
+    m_textOverflowCharacter = "...";
+    m_baseTextColor = m_color;
 }
 
 void UIWidget::updateText()
 {
+    if ((hasEventListener(EVENT_TEXT_CLICK) || hasEventListener(EVENT_TEXT_HOVER)) && m_textEvents.empty())
+        processCodeTags();
+
     if (isTextWrap() && m_rect.isValid()) {
         m_drawTextColors = m_textColors;
-        m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x, getTextWrapOptions());
+        if (m_textOverflowLength > 0 && m_text.length() > m_textOverflowLength)
+            m_drawText = m_font->wrapText(m_text.substr(0, m_textOverflowLength - m_textOverflowCharacter.length()) + m_textOverflowCharacter, getWidth() - m_textOffset.x, &m_drawTextColors);
+        else
+            m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x, &m_drawTextColors);
     } else {
-        m_drawText = m_text;
+        if (m_textOverflowLength > 0 && m_text.length() > m_textOverflowLength)
+            m_drawText = m_text.substr(0, m_textOverflowLength - m_textOverflowCharacter.length()) + m_textOverflowCharacter;
+        else
+            m_drawText = m_text;
         m_drawTextColors = m_textColors;
     }
 
@@ -190,6 +202,10 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
             m_textWrapOptions.hyphenationMode = parseHyphenationMode(node->value());
         else if (tag == "text-lang")
             m_textWrapOptions.language = node->value();
+        else if (node->tag() == "text-overflow-length")
+            setTextOverflowLength(node->value<uint16_t>());
+        else if (node->tag() == "text-overflow-character")
+            setTextOverflowCharacter(node->value<>());
     }
 }
 
@@ -213,6 +229,9 @@ void UIWidget::drawText(const Rect& screenCoords)
         auto coords = Rect(screenCoords.topLeft().scale(m_fontScale), screenCoords.bottomRight().scale(m_fontScale));
         coords.translate(textOffset);
 
+        if (hasEventListener(EVENT_TEXT_CLICK) || hasEventListener(EVENT_TEXT_HOVER))
+            cacheRectToWord();
+
         if (m_drawTextColors.empty())
             m_font->fillTextCoords(m_coordsBuffer, m_drawText, m_textSize, m_textAlign, coords, m_glyphsPositionsCache);
         else
@@ -231,6 +250,8 @@ void UIWidget::drawText(const Rect& screenCoords)
     }
     g_drawPool.resetDrawOrder();
     g_drawPool.scale(1.f); // reset scale
+    if (m_textUnderline->getVertexCount() > 0)
+        g_drawPool.addTexturedCoordsBuffer(nullptr, m_textUnderline, m_color);
 }
 
 void UIWidget::onTextChange(const std::string_view text, const std::string_view oldText)
@@ -252,6 +273,7 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
     m_textColors.clear();
     m_drawTextColors.clear();
     m_colorCoordsBuffer.clear();
+    m_textEvents.clear();
 
     const std::string oldText = m_text;
     m_text = _text;
@@ -275,40 +297,118 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     m_drawTextColors.clear();
     m_colorCoordsBuffer.clear();
     m_coordsBuffer->clear();
+    m_textEvents.clear();
 
-    std::regex exp(R"(\{([^\}]+),[ ]*([^\}]+)\})");
+    static const std::regex expColor(R"(\{([^\}]+),[ ]*([^\}]+)\})");
+    static const std::regex expEvent(R"(\[text-event\](.*?)\[/text-event\])");
 
     std::string _text{ coloredText.data() };
+    std::string text;
+    text.reserve(coloredText.size());
 
-    Color baseColor = Color::white;
+    Color baseColor = m_color;
+    m_baseTextColor = baseColor;
     std::smatch res;
-    std::string text = "";
-    while (std::regex_search(_text, res, exp)) {
+    text.clear();
+    auto processTextEvents = [&](const std::string& fragment, size_t basePosition) -> std::string {
+        if (fragment.find("[text-event]") == std::string::npos) {
+            return fragment;
+        }
+
+        std::string tempText = fragment;
+        std::vector<std::tuple<size_t, size_t, std::string, bool>> foundEvents;
+
+        foundEvents.reserve(5);
+
+        std::smatch eventMatch;
+        size_t eventAdjustment = 0;
+
+        while (std::regex_search(tempText, eventMatch, expEvent)) {
+            std::string fullMatch = eventMatch[0].str();
+            std::string eventContent = eventMatch[1].str();
+
+            // detect special marker prefix (\x01) which indicates "no underline"
+            bool noUnderline = false;
+            if (!eventContent.empty() && eventContent[0] == '\x01') {
+                noUnderline = true;
+                eventContent = eventContent.substr(1);
+            }
+
+            size_t pos = eventMatch.position(0);
+            size_t realPos = pos + basePosition - eventAdjustment;
+
+            foundEvents.emplace_back(
+                realPos,
+                realPos + eventContent.length(),
+                eventContent,
+                noUnderline
+            );
+
+            tempText = eventMatch.suffix().str();
+            eventAdjustment += fullMatch.length() - (eventContent.length() + (noUnderline ? 1u : 0u));
+        }
+
+        m_textEvents.reserve(m_textEvents.size() + foundEvents.size());
+
+        for (const auto& [startPos, endPos, word, noUnderline] : foundEvents) {
+            TextEvent event;
+            event.word = word;
+            event.startPos = startPos;
+            event.endPos = endPos;
+            event.noUnderline = noUnderline;
+            m_textEvents.push_back(event);
+        }
+        std::string result = fragment;
+        size_t pos = 0;
+
+        while ((pos = result.find("[text-event]", pos)) != std::string::npos) {
+            size_t endPos = result.find("[/text-event]", pos);
+            if (endPos != std::string::npos) {
+                size_t contentLength = endPos - pos - 12;
+                std::string eventContent = result.substr(pos + 12, contentLength);
+                if (!eventContent.empty() && eventContent[0] == '\x01')
+                    eventContent = eventContent.substr(1);
+                result.replace(pos, contentLength + 25, eventContent);
+            } else {
+                break;
+            }
+        }
+
+        return result;
+    };
+
+    m_textColors.reserve(coloredText.size() / 20 + 5);
+
+    while (std::regex_search(_text, res, expColor)) {
         std::string prefix = res.prefix().str();
-        if (prefix.size() > 0) {
+        if (!prefix.empty()) {
+            std::string processedPrefix = processTextEvents(prefix, text.size());
             m_textColors.emplace_back(text.size(), baseColor);
-            text = text + prefix;
+            text.append(processedPrefix);
         }
         auto color = Color(res[2].str());
+        std::string colorContent = res[1].str();
+        std::string processedColorContent = processTextEvents(colorContent, text.size());
         m_textColors.emplace_back(text.size(), color);
-        text = text + res[1].str();
-        _text = res.suffix();
+        text.append(processedColorContent);
+        _text = res.suffix().str();
     }
 
-    if (_text.size() > 0) {
+    if (!_text.empty()) {
+        std::string processedRemaining = processTextEvents(_text, text.size());
         m_textColors.emplace_back(text.size(), baseColor);
-        text = text + _text;
+        text.append(processedRemaining);
     }
 
     if (hasProp(PropTextOnlyUpperCase))
         stdext::toupper(text);
 
     std::string oldText = m_text;
-    m_text = text;
+    m_text = std::move(text);
     updateText();
 
     if (!dontFireLuaCall) {
-        onTextChange(text, oldText);
+        onTextChange(m_text, oldText);
     }
 }
 
@@ -370,4 +470,92 @@ void UIWidget::applyWhiteSpace() {
         normalizeWhiteSpace(m_text, true, false);
     }
     computeHtmlTextIntrinsicSize();
+}
+
+void UIWidget::processCodeTags() {
+    std::string tempText = m_text;
+    m_text.clear();
+    m_textEvents.clear();
+
+    std::regex regex(R"(\[text-event\](.*?)\[/text-event\])");
+    std::smatch match;
+
+        while (std::regex_search(tempText, match, regex)) {
+            m_text += tempText.substr(0, match.position());
+
+            std::string word = match[1];
+            size_t startPos = m_text.length();
+            size_t endPos = startPos + word.length();
+
+            // detect special marker prefix (\x01) which indicates "no underline"
+            bool noUnderline = false;
+            if (!word.empty() && word[0] == '\x01') {
+                noUnderline = true;
+                word = word.substr(1);
+            }
+
+            m_textEvents.push_back({ word, startPos, endPos, noUnderline });
+            m_text += word;
+            tempText = tempText.substr(match.position() + match.length());
+        }
+
+    m_text += tempText;
+}
+
+static void buildTextUnderline(Rect& wordRect, CoordsBuffer& textUnderlineCoords) {
+    int currentX = wordRect.x();
+    int y = wordRect.y() + wordRect.height() - 2;
+    while (currentX < wordRect.x() + wordRect.width()) {
+        textUnderlineCoords.addRect(Rect(currentX, y, 2, 2));
+        currentX += 4;
+    }
+
+    if (currentX < wordRect.width()) {
+        textUnderlineCoords.addRect(Rect(currentX, y, std::min<int>(2, wordRect.width() - currentX), 2));
+    }
+}
+
+void UIWidget::updateRectToWord(const std::vector<Rect>& glypsCoords)
+{
+    m_rectToWord.clear();
+    m_textUnderline->clear();
+
+    if (glypsCoords.empty() || m_textEvents.empty())
+        return;
+
+    const size_t glyphCount = glypsCoords.size();
+
+    for (const auto& textEvent : m_textEvents) {
+        const size_t start = std::min<int>(textEvent.startPos, glyphCount);
+        const size_t end = std::min<int>(textEvent.endPos, glyphCount);
+        if (start >= end)
+            continue;
+
+        Rect wordRect;
+        bool inNewLine = false;
+
+        for (size_t i = start; i < end; ++i) {
+            if (m_drawText[i] == '\n') {
+                if (wordRect.isValid()) {
+                    m_rectToWord.push_back({ wordRect, textEvent.word });
+                    if (!textEvent.noUnderline)
+                        buildTextUnderline(wordRect, *m_textUnderline);
+                }
+                inNewLine = true;
+                continue;
+            }
+
+            if (i == start || inNewLine) {
+                wordRect = glypsCoords[i];
+                inNewLine = false;
+            } else
+                wordRect.expand(0, glypsCoords[i].width(), 0, 0);
+        }
+
+        if (wordRect.isValid()) {
+            m_rectToWord.push_back({ wordRect, textEvent.word });
+            if (!textEvent.noUnderline)
+                buildTextUnderline(wordRect, *m_textUnderline);
+        }
+    }
 }

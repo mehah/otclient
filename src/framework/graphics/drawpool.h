@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,9 @@
 #include "declarations.h"
 #include "framebuffer.h"
 #include "framework/core/timer.h"
-#include <framework/util/spinlock.h>
 
 #include "../stdext/storage.h"
+#include <framework/util/spinlock.h>
 
 struct DrawHashController
 {
@@ -56,8 +56,10 @@ struct DrawHashController
     }
 
     void reset() {
+        if (m_currentHash != 1)
+            m_lastHash = m_currentHash;
+
         m_hashs.clear();
-        m_lastHash = m_currentHash;
         m_currentHash = 0;
         m_lastObjectHash = 0;
     }
@@ -94,7 +96,7 @@ public:
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
     bool canRepaint();
-    void repaint() { if (hasFrameBuffer()) m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
+    void repaint() { m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
@@ -119,7 +121,7 @@ public:
     }
 
     bool shouldRepaint() const {
-        return m_shouldRepaint.load(std::memory_order_acquire);
+        return m_shouldRepaint.load(std::memory_order_relaxed);
     }
 
     void release();
@@ -204,6 +206,15 @@ private:
     void releaseFrameBuffer(const Rect& dest);
 
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
+
+    bool canRefresh() const
+    {
+        uint16_t refreshDelay = m_refreshDelay;
+        if (m_shaderRefreshDelay > 0 && (refreshDelay == 0 || m_shaderRefreshDelay < refreshDelay))
+            refreshDelay = m_shaderRefreshDelay;
+
+        return refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay;
+    }
 
     bool updateHash(const DrawMethod& method, const Texture* texture, const Color& color, bool hasCoord);
     PoolState getState(const TexturePtr& texture, Texture* textureAtlas, const Color& color);
@@ -333,10 +344,10 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    SpinLock m_threadLock;
-
     TextureAtlasPtr m_atlas;
-    std::atomic_bool m_shouldRepaint;
+    std::atomic_bool m_shouldRepaint{ false };
+
+    SpinLock m_threadLock;
 
     friend class DrawPoolManager;
 };

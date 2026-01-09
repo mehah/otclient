@@ -29,3 +29,8 @@ function formatTimeByMinutes(totalMinutes)
     local minutes = math.floor(remainingSeconds / 60)
     return string.format("%02d:%02d", hours, minutes)
 end
+
+function math.cround(value, rd)
+    local _round = math.floor(value / rd)
+    return _round * rd
+end

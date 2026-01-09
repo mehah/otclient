@@ -262,9 +262,6 @@ local function setup()
             end
         end
     end, 100)
-    
-    -- Ensure settings are saved
-    g_settings.save()
 end
 
 

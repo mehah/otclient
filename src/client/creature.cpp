@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@
 #include "framework/graphics/shadermanager.h"
 #include "framework/ui/uiwidget.h"
 #include <framework/core/graphicalapplication.h>
+#include <framework/util/stats.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -52,6 +53,7 @@ double Creature::speedC = 0;
 
 Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
+    g_stats.addCreature();
     m_name.setFont(g_gameConfig.getCreatureNameFont());
     m_name.setAlign(Fw::AlignTopCenter);
     m_typingIconTexture = g_textures.getTexture(g_gameConfig.getTypingIcon());
@@ -59,6 +61,7 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 
 Creature::~Creature() {
     setWidgetInformation(nullptr);
+    g_stats.removeCreature();
 }
 
 void Creature::onCreate() {
@@ -310,11 +313,22 @@ void Creature::internalDraw(Point dest, const Color& color)
         m_shader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
     };*/
 
+    Point originalDest = dest;
+
+    if (!m_jumpOffset.isNull()) {
+        const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
+        dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
+    } else if (m_bounce.height > 0 && m_bounce.speed > 0) {
+        const auto minHeight = m_bounce.minHeight * g_drawPool.getScaleFactor();
+        const auto height = m_bounce.height * g_drawPool.getScaleFactor();
+        dest -= minHeight + (height - std::abs(height - static_cast<int>(m_bounce.timer.ticksElapsed() / (m_bounce.speed / 100.f)) % static_cast<int>(height * 2)));
+    }
+
     const bool replaceColorShader = color != Color::white;
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
     else
-        drawAttachedEffect(dest, nullptr, false); // On Bottom
+        drawAttachedEffect(originalDest, dest, nullptr, false); // On Bottom
 
     if (!isHided()) {
         const int animationPhase = getCurrentAnimationPhase();
@@ -336,15 +350,6 @@ void Creature::internalDraw(Point dest, const Color& color)
                 getMountThingType()->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), color);
 
                 dest += getDisplacement() * g_drawPool.getScaleFactor();
-            }
-
-            if (!m_jumpOffset.isNull()) {
-                const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
-                dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
-            } else if (m_bounce.height > 0 && m_bounce.speed > 0) {
-                const auto minHeight = m_bounce.minHeight * g_drawPool.getScaleFactor();
-                const auto height = m_bounce.height * g_drawPool.getScaleFactor();
-                dest -= (minHeight * 1.f) + std::abs((m_bounce.speed / 2) - g_clock.millis() % m_bounce.speed) / (m_bounce.speed * 1.f) * height;
             }
 
             const auto& datType = getThingType();
@@ -421,8 +426,8 @@ void Creature::internalDraw(Point dest, const Color& color)
     if (replaceColorShader)
         g_drawPool.resetShaderProgram();
     else {
-        drawAttachedEffect(dest, nullptr, true); // On Top
-        drawAttachedParticlesEffect(dest);
+        drawAttachedEffect(originalDest, dest, nullptr, true); // On Top
+        drawAttachedParticlesEffect(originalDest);
     }
 }
 

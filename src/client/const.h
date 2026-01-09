@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -438,6 +438,14 @@ namespace Otc
         PREY_UNLOCK_STORE = 1,
         PREY_UNLOCK_NONE = 2,
     };
+    enum class ForgeAction_t : uint8_t
+    {
+        FUSION = 0,
+        TRANSFER = 1,
+        DUST2SLIVER = 2,
+        SLIVER2CORE = 3,
+        INCREASELIMIT = 4,
+    };
 
     enum GameFeature : uint8_t
     {
@@ -536,6 +544,7 @@ namespace Otc
         GameAnthem = 95,
         GameVipGroups = 96,
         GameBosstiary = 97,
+        GameDoublePlayerGoodsMoney = 98,
 
         //  others
         GameLoadSprInsteadProtobuf = 100,
