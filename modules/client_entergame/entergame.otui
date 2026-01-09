@@ -2,6 +2,7 @@ EnterGameWindow < MainWindow
   !text: tr('Enter Game')
   size: 236 316
 
+
 EnterGameButton < Button
   width: 64
 
@@ -29,6 +30,8 @@ EnterGameWindow
   size: 280 302
   @onEnter: EnterGame.doLogin()
 
+
+
   Label
     id: emailLabel
     !text: tr('Acc Name:') 
@@ -36,7 +39,8 @@ EnterGameWindow
     anchors.top: parent.top
 
     opacity: 0.8
- 
+
+      
   Label
     id: passwordLabel
     !text: tr('Password:')
@@ -50,8 +54,6 @@ EnterGameWindow
     anchors.right: accountPasswordTextEdit.right
     anchors.verticalCenter: emailLabel.verticalCenter
     anchors.left: accountPasswordTextEdit.left
-    ttf-font: arialb
-    ttf-font-size: 12	
     
   HiddenTextQtEdit
     id: accountPasswordTextEdit
@@ -59,8 +61,6 @@ EnterGameWindow
     anchors.left: passwordLabel.right
     anchors.verticalCenter: passwordLabel.verticalCenter
     margin-left: 5
-    ttf-font: arialb
-    ttf-font-size: 12
 
   QtCheckBox
     id: rememberEmailBox
@@ -224,7 +224,7 @@ EnterGameWindow
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 2
+    margin-top: 10
 
   QtCheckBox
     id: httpLoginBox
@@ -276,3 +276,4 @@ EnterGameWindow
     margin-top: 5
     color: green
     text-auto-resize: true
+

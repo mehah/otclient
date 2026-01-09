@@ -13,9 +13,9 @@ ShowOffWidget < UIWidget
 
   UITextEdit
     id: description
-    size: 480 0
-    ttf-font: arial
-    ttf-font-size: 16
+    size: 472 0
+    ttf-font: verdana-bold
+    ttf-font-size: 10
     anchors.left: image.right
     anchors.top: parent.top
     anchors.bottom: parent.bottom
@@ -41,8 +41,8 @@ Panel
     color: #c0c0c0ff
     margin-bottom: 110
     text: OTClient Redemption
-    ttf-font: 28 Days Later
-    ttf-font-size: 100
+    ttf-font: martel
+    ttf-font-size: 90
     stroke: 2 black
     shader: Map - Party
     
