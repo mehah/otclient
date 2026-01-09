@@ -197,6 +197,17 @@ MessageTypes = {
 messagesPanel = nil
 
 function init()
+    if g_game.getClientVersion() >= 1300 then
+        MessageTypes[MessageModes.Loot] = MessageSettings.loot
+        MessageTypes[MessageModes.ValuableLoot] = MessageSettings.valuableLoot
+        MessageTypes[MessageModes.Guild] = MessageSettings.statusOwn
+        MessageTypes[MessageModes.Party] = MessageSettings.statusOwn
+    else
+        MessageTypes[MessageModes.Loot] = MessageSettings.centerGreen
+        MessageTypes[MessageModes.ValuableLoot] = MessageSettings.centerGreen
+        MessageTypes[MessageModes.Guild] = MessageSettings.centerGreen
+        MessageTypes[MessageModes.Party] = MessageSettings.centerGreen
+    end
     for messageMode, _ in pairs(MessageTypes) do
         registerMessageMode(messageMode, displayMessage)
     end
