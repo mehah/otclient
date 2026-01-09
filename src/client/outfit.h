@@ -24,6 +24,34 @@
 
 #include "declarations.h"
 
+struct SimpleOutfit
+{
+    uint16_t type = 0;
+    uint16_t typeEx = 0;
+    uint16_t resourceId = 0;
+
+    bool operator==(const SimpleOutfit&) const = default;
+};
+
+struct ColorOutfit
+{
+    uint16_t type = 0;
+    uint16_t typeEx = 0;
+    uint16_t resourceId = 0;
+
+    uint8_t head = 0;
+    uint8_t body = 0;
+    uint8_t legs = 0;
+    uint8_t feet = 0;
+
+    Color headColor{ Color::white };
+    Color bodyColor{ Color::white };
+    Color legsColor{ Color::white };
+    Color feetColor{ Color::white };
+
+    bool operator==(const ColorOutfit&) const = default;
+};
+
 class Outfit
 {
     enum
@@ -35,18 +63,18 @@ class Outfit
 public:
     static Color getColor(int color);
 
-    void setId(const uint16_t id) { m_id = id; }
-    void setAuxId(const uint16_t id) { m_auxId = id; }
-    void setMount(const uint16_t mount) { m_mount = mount; }
-    void setFamiliar(const uint16_t familiar) { m_familiar = familiar; }
+    void setId(const uint16_t id) { m_outfit.type = id; }
+    void setAuxId(const uint16_t id) { m_outfit.typeEx = id; }
+    void setMount(const uint16_t mount) { m_mount.type = mount; }
+    void setFamiliar(const uint16_t familiar) { m_familiar.type = familiar; }
     void setWing(const uint16_t Wing) { m_wing = Wing; }
     void setAura(const uint16_t Aura) { m_aura = Aura; }
     void setEffect(const uint16_t Effect) { m_effect = Effect; }
     void setShader(const std::string& shader) { m_shader = shader; }
 
-    void setResourceId(const uint16_t resourceId) { m_outfitResourceId = resourceId; }
-    void setMountResourceId(const uint16_t resourceId) { m_mountResourceId = resourceId; }
-    void setFamiliarResourceId(const uint16_t resourceId) { m_familiarResourceId = resourceId; }
+    void setResourceId(const uint16_t resourceId) { m_outfit.resourceId = resourceId; }
+    void setMountResourceId(const uint16_t resourceId) { m_mount.resourceId = resourceId; }
+    void setFamiliarResourceId(const uint16_t resourceId) { m_familiar.resourceId = resourceId; }
 
     void setHead(uint8_t head);
     void setBody(uint8_t body);
@@ -59,26 +87,26 @@ public:
 
     void resetClothes();
 
-    uint16_t getId() const { return m_id; }
-    uint16_t getAuxId() const { return m_auxId; }
-    uint16_t getMount() const { return m_mount; }
-    uint16_t getFamiliar() const { return m_familiar; }
+    uint16_t getId() const { return m_outfit.type; }
+    uint16_t getAuxId() const { return m_outfit.typeEx; }
+    uint16_t getMount() const { return m_mount.type; }
+    uint16_t getFamiliar() const { return m_familiar.type; }
     uint16_t getWing() const { return m_wing; }
     uint16_t getAura() const { return m_aura; }
     uint16_t getEffect() const { return m_effect; }
     std::string getShader() const { return m_shader; }
 
-    uint16_t getResourceId() const { return m_outfitResourceId; }
-    uint16_t getMountResourceId() const { return m_mountResourceId; }
-    uint16_t getFamiliarResourceId() const { return m_familiarResourceId; }
+    uint16_t getResourceId() const { return m_outfit.resourceId; }
+    uint16_t getMountResourceId() const { return m_mount.resourceId; }
+    uint16_t getFamiliarResourceId() const { return m_familiar.resourceId; }
 
-    uint8_t getHead() const { return m_head; }
-    uint8_t getBody() const { return m_body; }
-    uint8_t getLegs() const { return m_legs; }
-    uint8_t getFeet() const { return m_feet; }
+    uint8_t getHead() const { return m_outfit.head; }
+    uint8_t getBody() const { return m_outfit.body; }
+    uint8_t getLegs() const { return m_outfit.legs; }
+    uint8_t getFeet() const { return m_outfit.feet; }
     uint8_t getAddons() const { return m_addons; }
 
-    bool hasMount() const { return m_mount > 0; }
+    bool hasMount() const { return m_mount.type > 0; }
 
     ThingCategory getCategory() const { return m_category; }
     bool isCreature() const { return m_category == ThingCategoryCreature; }
@@ -87,30 +115,22 @@ public:
     bool isItem() const { return m_category == ThingCategoryItem; }
     bool isTemp() const { return m_temp; }
 
-    Color getHeadColor() const { return m_headColor; }
-    Color getBodyColor() const { return m_bodyColor; }
-    Color getLegsColor() const { return m_legsColor; }
-    Color getFeetColor() const { return m_feetColor; }
+    Color getHeadColor() const { return m_outfit.headColor; }
+    Color getBodyColor() const { return m_outfit.bodyColor; }
+    Color getLegsColor() const { return m_outfit.legsColor; }
+    Color getFeetColor() const { return m_outfit.feetColor; }
 
     bool operator==(const Outfit& other) const
     {
         return m_category == other.m_category &&
-            m_id == other.m_id &&
-            m_auxId == other.m_auxId &&
-            m_head == other.m_head &&
-            m_body == other.m_body &&
-            m_legs == other.m_legs &&
-            m_feet == other.m_feet &&
+            m_outfit == other.m_outfit &&
             m_addons == other.m_addons &&
             m_mount == other.m_mount &&
             m_familiar == other.m_familiar &&
             m_wing == other.m_wing &&
             m_aura == other.m_aura &&
             m_effect == other.m_effect &&
-            m_shader == other.m_shader &&
-            m_outfitResourceId == other.m_outfitResourceId &&
-            m_mountResourceId == other.m_mountResourceId &&
-            m_familiarResourceId == other.m_familiarResourceId;
+            m_shader == other.m_shader;
     }
     bool operator!=(const Outfit& other) const { return !(*this == other); }
 
@@ -118,28 +138,20 @@ private:
     ThingCategory m_category{ ThingInvalidCategory };
 
     bool m_temp{ false };
+    
+    // base outfit fields
+    ColorOutfit m_outfit{};
+    uint8_t m_addons{ 0 };
 
-    uint16_t m_id{ 0 };
-    uint16_t m_auxId{ 0 };
-    uint16_t m_mount{ 0 };
-    uint16_t m_familiar{ 0 };
+    // mount fields
+    ColorOutfit m_mount{};
+
+    // familiar fields
+    SimpleOutfit m_familiar{};
+
+    // custom features (to do)
     uint16_t m_wing{ 0 };
     uint16_t m_aura{ 0 };
     uint16_t m_effect{ 0 };
     std::string m_shader;
-
-    uint16_t m_outfitResourceId{ 0 };
-    uint16_t m_mountResourceId{ 0 };
-    uint16_t m_familiarResourceId{ 0 };
-
-    uint8_t m_head{ 0 };
-    uint8_t m_body{ 0 };
-    uint8_t m_legs{ 0 };
-    uint8_t m_feet{ 0 };
-    uint8_t m_addons{ 0 };
-
-    Color m_headColor{ Color::white };
-    Color m_bodyColor{ Color::white };
-    Color m_legsColor{ Color::white };
-    Color m_feetColor{ Color::white };
 };

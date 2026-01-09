@@ -126,30 +126,30 @@ void Outfit::resetClothes()
 }
 
 void Outfit::setHead(const uint8_t head) {
-    if (m_head == head)
+    if (m_outfit.head == head)
         return;
 
-    m_head = head;
-    m_headColor = getColor(head);
+    m_outfit.head = head;
+    m_outfit.headColor = getColor(head);
 }
 void Outfit::setBody(const uint8_t body) {
-    if (m_body == body)
+    if (m_outfit.body == body)
         return;
 
-    m_body = body;
-    m_bodyColor = getColor(body);
+    m_outfit.body = body;
+    m_outfit.bodyColor = getColor(body);
 }
 void Outfit::setLegs(const uint8_t legs) {
-    if (m_legs == legs)
+    if (m_outfit.legs == legs)
         return;
 
-    m_legs = legs;
-    m_legsColor = getColor(legs);
+    m_outfit.legs = legs;
+    m_outfit.legsColor = getColor(legs);
 }
 void Outfit::setFeet(const uint8_t feet) {
-    if (m_feet == feet)
+    if (m_outfit.feet == feet)
         return;
 
-    m_feet = feet;
-    m_feetColor = getColor(feet);
+    m_outfit.feet = feet;
+    m_outfit.feetColor = getColor(feet);
 }
