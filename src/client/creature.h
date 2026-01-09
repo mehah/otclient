@@ -56,7 +56,7 @@ public:
 
     // note: unlike other classes that derive from Thing, this one sets creatureId
     // rather than clientId. The resourceId is managed in creature outfit.
-    void setId(const uint32_t id, const uint16_t /* resourceId */ = 0) override { m_id = id; }
+    void setId(const uint32_t id) { m_id = id; }
 
     void setMasterId(const uint32_t id) { m_masterId = id; }
     void setName(std::string_view name);
