@@ -1073,11 +1073,32 @@ function onContainerOpen(container, previousContainer)
 
     local layout = containerPanel:getLayout()
     local cellSize = layout:getCellSize()
+    local step = cellSize.height + layout:getCellSpacing()
+    local numLines = layout:getNumLines()
+    local chromeHeight = container:hasPages() and 55 or 31
     containerWindow:setContentMinimumHeight(cellSize.height)
-    
-    -- Set maximum height based on whether pages are active
-    local maxHeightOffset = container:hasPages() and 65 or 30
-    containerWindow:setContentMaximumHeight(cellSize.height * layout:getNumLines() + maxHeightOffset)
+    local function snapToGrid()
+        local currentHeight = containerWindow:getHeight()
+        local rows = math.max(1, math.floor((currentHeight - chromeHeight + step * 0.5) / step))
+        local newHeight = rows * step + chromeHeight
+        
+        if currentHeight ~= newHeight then
+            containerWindow:setHeight(newHeight)
+        end
+    end
+    local resizeBorder = containerWindow:getChildById('bottomResizeBorder')
+    if resizeBorder then
+        resizeBorder:setMinimum(step + chromeHeight)
+        resizeBorder:setMaximum(numLines * step + chromeHeight)
+        
+        local originalMouseRelease = resizeBorder.onMouseRelease
+        resizeBorder.onMouseRelease = function(self, mousePos, mouseButton)
+            if originalMouseRelease then
+                originalMouseRelease(self, mousePos, mouseButton)
+            end
+            snapToGrid()
+        end
+    end
     -- Enables dragging only when mouse press occurs within window bounds (with tolerance margins)
     -- and not over the containerPanel child widget
     -- On Drop: When an item is dropped, it is placed at the nearest valid parent location, such as in a grid.
@@ -1085,14 +1106,13 @@ function onContainerOpen(container, previousContainer)
     local TOLERANCE_HORIZONTAL = 5
     local TOLERANCE_VERTICAL = 2
     containerWindow.onMousePress = function(widget, mousePos, mouseButton)
-        local x, y = containerWindow:getX(), containerWindow:getY()
-        local width, height = containerWindow:getWidth(), containerWindow:getHeight()
-        local inBounds = mousePos.x >= x + TOLERANCE_HORIZONTAL and 
-                        mousePos.x <= x + width - TOLERANCE_HORIZONTAL and
-                        mousePos.y >= y + TOLERANCE_VERTICAL and 
-                        mousePos.y <= y + height - TOLERANCE_VERTICAL
-        local notOnPanel = containerWindow:getChildByPos(mousePos) ~= containerPanel
-        containerWindow:setDraggable(inBounds and notOnPanel)
+        local winX, winY = containerWindow:getX(), containerWindow:getY()
+        local winW, winH = containerWindow:getWidth(), containerWindow:getHeight()
+        local inBounds = mousePos.x >= winX + TOLERANCE_HORIZONTAL and 
+                        mousePos.x <= winX + winW - TOLERANCE_HORIZONTAL and
+                        mousePos.y >= winY + TOLERANCE_VERTICAL and 
+                        mousePos.y <= winY + winH - TOLERANCE_VERTICAL
+        containerWindow:setDraggable(inBounds and containerWindow:getChildByPos(mousePos) ~= containerPanel)
         return inBounds
     end
     containerWindow.onMouseRelease = function(widget, mousePos, mouseButton)
@@ -1107,20 +1127,6 @@ function onContainerOpen(container, previousContainer)
             child:onDrop(widget, mousePos, true)
         end
     end
-    -- Define resize restriction function
-    local function restrictResize()
-        containerWindow.onResize = function()
-            local minHeight = cellSize.height + 30
-            if container:hasPages() then
-                minHeight = minHeight + 35
-            end
-            if containerWindow:getHeight() < minHeight then
-                containerWindow:setHeight(minHeight)
-            end
-        end
-    end
-    restrictResize()
-
     -- Remove resize restriction on minimize, restore on maximize
     containerWindow.onMinimize = function()
         local pagePanel = containerWindow:getChildById('pagePanel')
@@ -1128,7 +1134,6 @@ function onContainerOpen(container, previousContainer)
             pagePanel.wasVisibleBeforeMinimize = true
             pagePanel:setVisible(false)
         end
-        containerWindow.onResize = nil
     end
 
     containerWindow.onMaximize = function()
@@ -1137,7 +1142,7 @@ function onContainerOpen(container, previousContainer)
             pagePanel:setVisible(true)
             pagePanel.wasVisibleBeforeMinimize = nil
         end
-        restrictResize()
+        snapToGrid()
     end
 
     if not previousContainer then
@@ -1149,10 +1154,10 @@ function onContainerOpen(container, previousContainer)
     local minRows = 1
     if modules.client_options.getOption('openMaximized') then
         local numLines = math.max(layout:getNumLines(), minRows)
-        containerWindow:setContentHeight(cellSize.height * numLines)
+        containerWindow:setHeight(numLines * step + chromeHeight)
     else
         local filledLines = math.max(math.ceil(container:getItemsCount() / layout:getNumColumns()), minRows)
-        containerWindow:setContentHeight(filledLines * cellSize.height)
+        containerWindow:setHeight(filledLines * step + chromeHeight)
     end
 
     containerWindow:setup()
@@ -1163,6 +1168,7 @@ function onContainerOpen(container, previousContainer)
     if currentSortMode and currentSortMode ~= 'none' and not isManualSortEnabled then
         sortContainerItems(container, currentSortMode)
     end
+    snapToGrid()
 end
 
 function onContainerClose(container)
