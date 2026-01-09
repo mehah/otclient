@@ -402,7 +402,7 @@ Size SpriteSheet::getSpriteSize() const
         Size(384,384)  // 35
     };
 
-    if (const size_t idx = static_cast<size_t>(spriteLayout); idx < sizes.size())
+    if (const auto idx = static_cast<size_t>(spriteLayout); idx < sizes.size())
         return sizes[idx];
 
     return sizes[0];

@@ -139,9 +139,8 @@ class AssetResource : public std::enable_shared_from_this<AssetResource>
 public:
     // AssetResource::Create(resourceId)
     static std::shared_ptr<AssetResource> Create(uint16_t resourceId) {
-        return std::shared_ptr<AssetResource>(
-            new AssetResource(resourceId)
-        );
+        // Using 'new' here intentionally due to private constructor
+        return std::shared_ptr<AssetResource>(new AssetResource(resourceId));
     }
 
     ~AssetResource() = default;

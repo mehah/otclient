@@ -912,7 +912,8 @@ void ThingType::adjustSpriteSizes(const std::vector<Size>& sizes, const std::vec
         const int totalSprites = total_sprites[frameId];
         if (m_size == sizes[frameId]) {
             for (int j = 0; j < totalSprites; ++j) {
-                m_spritesIndex.push_back(sprites[spriteIndex++]);
+                m_spritesIndex.push_back(sprites[spriteIndex]);
+                ++spriteIndex;
             }
             continue;
         }
@@ -928,7 +929,8 @@ void ThingType::adjustSpriteFrame(const std::vector<Size>& sizes, const std::vec
     for (int x = 0; x < m_size.width(); ++x) {
         for (int y = 0; y < m_size.height(); ++y) {
             if (x < sizes[frameId].width() && y < sizes[frameId].height()) {
-                m_spritesIndex.push_back(sprites[spriteIndex++]);
+                m_spritesIndex.push_back(sprites[spriteIndex]);
+                ++spriteIndex;
                 continue;
             }
             m_spritesIndex.push_back(0);

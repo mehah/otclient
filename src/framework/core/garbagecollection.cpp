@@ -98,7 +98,6 @@ void GarbageCollection::thingType() {
         // but it stops sonar from flagging this function as a "blocker"
         if (category >= res->m_thingTypes->size()) {
             throw std::out_of_range("GarbageCollection: resource category is out of range");
-            break;
         }
 
         auto& things = res->m_thingTypes[category];

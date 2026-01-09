@@ -4837,7 +4837,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             const uint16_t stashItemsCount = msg->getU16();
             for (auto i = 0; i < stashItemsCount; ++i) {
-                ItemSummary item = ItemSummary();
+                ItemSummary item;
                 const uint16_t itemId = msg->getU16();
                 const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
                 const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
@@ -5612,11 +5612,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
     std::vector<ItemPtr> neededItemsList;
 
     if (windowType == Otc::IMBUEMENT_WINDOW_SCROLL) {
-        // both ITEM and SCROLL window use the same packet structure
-        // these fields are not forwarded to the ui in the "scroll" mode
-        // we trust that the server will send 0 for both values here
-        msg->getU16(); // item clientId
-        msg->getU8(); // imbuing slots count
+        msg->getU16(); // scroll clientid?
 
         getImbuingIngredients(msg, imbuements, neededItemsList);
         g_lua.callGlobalField("g_game", "onImbuementScroll", imbuements, neededItemsList);
@@ -6381,7 +6377,7 @@ void ProtocolGame::creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& c
             (creatureType == Proto::CreatureTypePlayer && !m_localPlayer->getId() && name == m_localPlayer->getName())) {
             creature = m_localPlayer;
         } else {
-            makeCreature(creature, creatureId, creatureType);
+            makeCreature(creature, creatureType);
         }
     }
 
@@ -6394,7 +6390,7 @@ void ProtocolGame::creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& c
     }   
 }
 
-void ProtocolGame::makeCreature(CreaturePtr& creature, const uint32_t id, uint8_t creatureType) const
+void ProtocolGame::makeCreature(CreaturePtr& creature, uint8_t creatureType) const
 {
     switch (creatureType) {
         case Proto::CreatureTypePlayer:
