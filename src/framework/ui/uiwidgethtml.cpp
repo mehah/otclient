@@ -832,8 +832,10 @@ void UIWidget::refreshHtml(bool siblingsTo) {
         parent_fitHeight->applyDimension(false, parent_fitHeight->m_height.unit, parent_fitHeight->m_height.value);
 
     if (siblingsTo) {
-        for (const auto& child : m_parent->m_children) {
-            child->scheduleHtmlTask(PropApplyAnchorAlignment);
+        if (m_parent.get() != g_ui.getRootWidget().get()) {
+            for (const auto& child : m_parent->m_children) {
+                child->scheduleHtmlTask(PropApplyAnchorAlignment);
+            }
         }
     }
 }
