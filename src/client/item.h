@@ -78,7 +78,7 @@ public:
     void draw(const Point& dest, bool drawThings = true, LightView* lightView = nullptr) override;
     void drawLight(const Point& dest, LightView* lightView) override;
 
-    void setId(uint32_t id, uint16_t resourceId) override;
+    void setId(uint32_t id, uint16_t resourceId);
 
     void setCountOrSubType(const int value) { m_countOrSubType = value; updatePatterns(); }
     void setCount(const int count) { m_countOrSubType = count; updatePatterns(); }

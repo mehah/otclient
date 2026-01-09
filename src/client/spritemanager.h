@@ -114,7 +114,7 @@ private:
 class LegacySpriteManager : public ISpriteManager
 {
 public:
-    LegacySpriteManager() {}
+    LegacySpriteManager() = default;
     ~LegacySpriteManager() override {
         m_spritesCount = 0;
         m_signature = 0;
@@ -122,7 +122,11 @@ public:
     }
 
     // non-copyable
-	ProtobufSpriteManager& operator=(const ProtobufSpriteManager&) = delete;
+    LegacySpriteManager(const LegacySpriteManager&) = delete;
+    LegacySpriteManager& operator=(const LegacySpriteManager&) = delete;
+
+    LegacySpriteManager(LegacySpriteManager&&) = delete;
+    LegacySpriteManager& operator=(LegacySpriteManager&&) = delete;
 
     bool loadSpr(std::string file);
     bool loadRegularSpr(std::string file);
@@ -209,7 +213,11 @@ public:
     }
 
     // non-copyable
-	ProtobufSpriteManager& operator=(const ProtobufSpriteManager&) = delete;
+    ProtobufSpriteManager(const ProtobufSpriteManager&) = delete;
+    ProtobufSpriteManager& operator=(const ProtobufSpriteManager&) = delete;
+
+    ProtobufSpriteManager(ProtobufSpriteManager&&) = delete;
+    ProtobufSpriteManager& operator=(ProtobufSpriteManager&&) = delete;
 
     void reload() override { /* for protobuf assets this is managed per sheet */ };
 
