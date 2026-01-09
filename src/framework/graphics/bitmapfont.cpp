@@ -69,12 +69,11 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
                                              ((glyph - m_firstGlyph) / numHorizontalGlyphs) * glyphSize.height(),
                                              m_glyphsSize[glyph].width(),
                                              m_glyphHeight);
-        // Inicializar offset e advance para fontes bitmap (não TTF)
+
         m_glyphsOffset[glyph] = Point(0, 0);
         m_glyphsAdvance[glyph] = m_glyphsSize[glyph].width();
     }
     
-    // Inicializar também os glyphs antes de m_firstGlyph
     for (int glyph = 0; glyph < m_firstGlyph; ++glyph) {
         m_glyphsOffset[glyph] = Point(0, 0);
         m_glyphsAdvance[glyph] = 0;
