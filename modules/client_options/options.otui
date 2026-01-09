@@ -1,10 +1,10 @@
 OptionsCategory < UIWidget
-  size: 115 22
+  size: 126 22
   image-source: /images/ui/1pixel_down_frame
   image-border: 5
   UIWidget
     id: Button
-    size: 115 20
+    size: 126 20
     anchors.top: parent.top
     anchors.left: parent.left
     margin-left: 1
@@ -164,7 +164,7 @@ MainWindow
     margin-bottom: 10
     image-border: 3
     image-source: /images/ui/2pixel_up_frame_borderimage_dark
-    size: 128 423
+    size: 131 423
 
   QtPanel
     id: optionsTabContent

@@ -37,8 +37,4 @@ game
     static-duration-per-character: 60
     min-static-text-duration: 3000
 
-font
-  widget: verdana-11px-antialised
-  static-text: verdana-11px-rounded
-  animated-text: verdana-11px-rounded
-  creature-text: verdana-11px-rounded
+

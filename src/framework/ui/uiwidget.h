@@ -967,6 +967,8 @@ protected:
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
+    int m_strokeWidth{ 0 };
+    Color m_strokeColor{ Color::black };	
 
     const AtlasRegion* m_atlasRegion = nullptr;
 
@@ -1026,6 +1028,8 @@ public:
     }
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(std::string_view fontName);
+    void setTTFFont(std::string_view fontName, int fontSize = 12, int strokeWidth = 0, const Color& strokeColor = Color::black);
+    void setStroke(int strokeWidth, const Color& strokeColor = Color::black);
     void setFontScale(const float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }
     void setLineHeight(std::string height);
     const auto& getLineHeight() { return m_lineHeight; }

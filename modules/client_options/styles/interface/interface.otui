@@ -140,3 +140,26 @@ UIWidget
       !text: tr('Show Expiry On Unused Items')
       !tooltip: tr('Check this box to see how much time or how many charges are left\n on items that have not been used yet')
       enabled: false
+
+  //SmallReversedQtPanel
+  //  anchors.left: parent.left
+  //  anchors.right: parent.right
+  //  anchors.top: prev.bottom
+  //  margin-top: 7
+  //  height: 32
+
+  //  Label
+  //    !text: 'Title Font:'
+  //    anchors.left: parent.left
+  //    margin-left: 18
+  //    color: #c0c0c0ff
+  //    anchors.verticalCenter: parent.verticalCenter
+
+  //  QtComboBox
+  //    id: widgetFont
+  //    width: 190
+  //    margin-left: 10
+  //    anchors.verticalCenter: prev.verticalCenter
+  //    anchors.left: prev.right
+  //    mouse-scroll: false
+

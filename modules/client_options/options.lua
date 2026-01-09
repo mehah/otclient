@@ -116,6 +116,7 @@ local function setupComboBox()
     local listKeybindsPanel = panels.keybindsPanel:recursiveGetChildById('list')
     local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
     local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+    -- local widgetFontCombobox = panels.interface:recursiveGetChildById('widgetFont')
 
     for k, v in pairs({ { 'Disabled', 'disabled' }, { 'Default', 'default' }, { 'Full', 'full' } }) do
         crosshairCombo:addOption(v[1], v[2])
@@ -169,6 +170,21 @@ local function setupComboBox()
     framesRarityCombobox.onOptionChange = function(comboBox, option)
         setOption('framesRarity', comboBox:getCurrentOption().data)
     end
+
+    -- if widgetFontCombobox then
+    --     widgetFontCombobox:addOption('Default', 'default')
+    --     local fontFiles = g_resources.listDirectoryFiles('/data/fonts', false, false)
+    --     for _, file in pairs(fontFiles) do
+    --         if file:lower():find('.otfont') then
+    --              local fontName = file:sub(1, #file - 4)
+    --              widgetFontCombobox:addOption(fontName, fontName)
+    --         end
+    --     end
+
+    --     widgetFontCombobox.onOptionChange = function(comboBox, option)
+    --         setOption('widgetFont', comboBox:getCurrentOption().data)
+    --     end
+    -- end
 
     local profileCombobox = panels.misc:recursiveGetChildById('profile')
 
