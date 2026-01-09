@@ -878,7 +878,9 @@ namespace Otc
     {
         IMBUEMENT_WINDOW_CHOICE = 0,
         IMBUEMENT_WINDOW_SELECT_ITEM = 1,
-        IMBUEMENT_WINDOW_SCROLL = 2
+        IMBUEMENT_WINDOW_SCROLL = 2,
+
+        IMBUEMENT_WINDOW_LAST
     };
 
     enum Vocations_t : uint8_t

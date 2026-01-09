@@ -161,6 +161,9 @@ private:
 
     ImagePtr getSpriteImageHd(int id, const FileStreamPtr& file);
     ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
+    void setPixelsRGB(uint8_t* pixels, uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize);
+    void setPixelsRGBA(uint8_t* pixels, uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize, bool& hasAlpha, int& transparentCount);
+
 
     std::string m_lastFileName;
 

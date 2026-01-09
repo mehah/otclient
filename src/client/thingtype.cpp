@@ -681,70 +681,93 @@ Size ThingType::getBestTextureDimension(int w, int h, const int count)
 
 void ThingType::translateFlagId(const int version, int& flagId)
 {
-    if (version >= 1000) {
-        // In 10.10+ all attributes after 16 were incremented by 1
-        // in order to make space for "no movement animation" flag.
-        if (flagId == 16)
-            flagId = ThingAttrNoMoveAnimation;
-        else if (flagId == 254) // Usable
-            flagId = ThingAttrUsable;
-        else if (flagId == 35) // Default Action
-            flagId = ThingAttrDefaultAction;
-        else if (flagId > 16)
-            flagId -= 1;
-    } else if (version >= 860) {
-        // Default attribute values follow the format of 8.6-9.86.
-        // Therefore no changes here.
+    // In 10.10+ all attributes after 16 were incremented by 1
+    // in order to make space for "no movement animation" flag.
+    if (version >= 1000)
+        translateFlagId1000(flagId);
+
+    // Default attribute values follow the format of 8.6-9.86.
+    // Therefore no changes here.
+    else if (version >= 860)
         return;
-    } else if (version >= 780) {
-        // In 7.80-8.54 all attributes after 8 were incremented by 1
-        // in order to make space for rune charges flag
-        if (flagId == 8)
-            flagId = ThingAttrChargeable;        
-        else if (flagId > 8)
-            flagId -= 1;
-    } else if (version >= 755) {
-        // In 7.55-7.72 attributes 23 is "Floor Change".
-        if (flagId == 23)
-            flagId = ThingAttrFloorChange;
-    } else if (version >= 740) {
-        // In 7.4-7.5 attribute "Ground Border" did not exist
-        // attributes 1-15 have to be adjusted.
-        if (flagId > 0 && flagId <= 15)
-            flagId += 1;
 
-        // several other changes in the format
-        else if (flagId == 16)
-            flagId = ThingAttrLight;
-        else if (flagId == 17)
-            flagId = ThingAttrFloorChange;
-        else if (flagId == 18)
-            flagId = ThingAttrFullGround;
-        else if (flagId == 19)
-            flagId = ThingAttrElevation;
-        else if (flagId == 20)
-            flagId = ThingAttrDisplacement;
-        else if (flagId == 22)
-            flagId = ThingAttrMinimapColor;
-        else if (flagId == 23)
-            flagId = ThingAttrRotateable;
-        else if (flagId == 24)
-            flagId = ThingAttrLyingCorpse;
-        else if (flagId == 25)
-            flagId = ThingAttrHangable;
-        else if (flagId == 26)
-            flagId = ThingAttrHookSouth;
-        else if (flagId == 27)
-            flagId = ThingAttrHookEast;
-        else if (flagId == 28)
-            flagId = ThingAttrAnimateAlways;
+    // In 7.80-8.54 all attributes after 8 were incremented by 1
+    // in order to make space for rune charges flag
+    else if (version >= 780)
+        translateFlagId780(flagId);
 
-        // "Multi Use" and "Force Use" are swapped
-        if (flagId == ThingAttrMultiUse)
-            flagId = ThingAttrForceUse;
-        else if (flagId == ThingAttrForceUse)
-            flagId = ThingAttrMultiUse;
-    }
+    // In 7.55-7.72 attributes 23 is "Floor Change".
+    else if (version >= 755)
+        translateFlagId755(flagId);
+
+    // In 7.4-7.5 attribute "Ground Border" did not exist
+    // attributes 1-15 have to be adjusted.
+    else if (version >= 740)
+        translateFlagId740(flagId);
+}
+
+void ThingType::translateFlagId740(int& flagId)
+{
+    if (flagId > 0 && flagId <= 15)
+        flagId += 1;
+
+    // several other changes in the format
+    else if (flagId == 16)
+        flagId = ThingAttrLight;
+    else if (flagId == 17)
+        flagId = ThingAttrFloorChange;
+    else if (flagId == 18)
+        flagId = ThingAttrFullGround;
+    else if (flagId == 19)
+        flagId = ThingAttrElevation;
+    else if (flagId == 20)
+        flagId = ThingAttrDisplacement;
+    else if (flagId == 22)
+        flagId = ThingAttrMinimapColor;
+    else if (flagId == 23)
+        flagId = ThingAttrRotateable;
+    else if (flagId == 24)
+        flagId = ThingAttrLyingCorpse;
+    else if (flagId == 25)
+        flagId = ThingAttrHangable;
+    else if (flagId == 26)
+        flagId = ThingAttrHookSouth;
+    else if (flagId == 27)
+        flagId = ThingAttrHookEast;
+    else if (flagId == 28)
+        flagId = ThingAttrAnimateAlways;
+
+    // "Multi Use" and "Force Use" are swapped
+    if (flagId == ThingAttrMultiUse)
+        flagId = ThingAttrForceUse;
+    else if (flagId == ThingAttrForceUse)
+        flagId = ThingAttrMultiUse;
+}
+
+void ThingType::translateFlagId755(int& flagId)
+{
+    if (flagId == 23)
+        flagId = ThingAttrFloorChange;
+}
+
+void ThingType::translateFlagId780(int& flagId)
+{
+    if (flagId == 8)
+        flagId = ThingAttrChargeable;        
+    else if (flagId > 8)
+        flagId -= 1;
+}
+
+void ThingType::translateFlagId1000(int& flagId)
+{
+    if (flagId == 16)
+        flagId = ThingAttrNoMoveAnimation;
+    else if (flagId == 254) // Usable
+        flagId = ThingAttrUsable;
+    else if (flagId == 35) // Default Action
+        flagId = ThingAttrDefaultAction;
+    else if (flagId > 16)
+        flagId -= 1;
 }
 
 void ThingType::unserializeAttribute(int attr, const FileStreamPtr& fin)
@@ -804,50 +827,9 @@ void ThingType::unserializeSpriteInfo(const FileStreamPtr& fin)
     std::vector<int> total_sprites;
 
     for (int i = 0; i < groupCount; ++i) {
-        uint8_t frameGroupType = FrameGroupDefault;
-        if (hasFrameGroups)
-            frameGroupType = fin->getU8();
-
-        const uint8_t width = fin->getU8();
-        const uint8_t height = fin->getU8();
-        m_size = { width, height };
-        sizes.emplace_back(m_size);
-        if (width > 1 || height > 1) {
-            m_realSize = std::max<int>(m_realSize, fin->getU8());
-        }
-
-        m_layers = fin->getU8();
-        m_numPatternX = fin->getU8();
-        m_numPatternY = fin->getU8();
-        if (g_game.getClientVersion() >= 755)
-            m_numPatternZ = fin->getU8();
-        else
-            m_numPatternZ = 1;
-
-        const int groupAnimationsPhases = fin->getU8();
-        m_animationPhases += groupAnimationsPhases;
-
-        if (groupAnimationsPhases > 1 && g_game.getFeature(Otc::GameEnhancedAnimations)) {
-            auto* animator = new Animator;
-            animator->unserialize(groupAnimationsPhases, fin);
-
-            if (frameGroupType == FrameGroupMoving)
-                m_animator = animator;
-            else if (frameGroupType == FrameGroupIdle)
-                m_idleAnimator = animator;
-        }
-
-        const int totalSprites = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * groupAnimationsPhases;
-        total_sprites.push_back(totalSprites);
-        if (totalSpritesCount + totalSprites > 4096)
-            throw Exception("a thing type has more than 4096 sprites");
-
-        m_spritesIndex.resize(totalSpritesCount + totalSprites);
-        for (int j = totalSpritesCount; j < (totalSpritesCount + totalSprites); ++j)
-            m_spritesIndex[j] = g_game.getFeature(Otc::GameSpritesU32) ? fin->getU32() : fin->getU16();
-
-        totalSpritesCount += totalSprites;
+        unserializeFrameGroup(fin, hasFrameGroups, sizes, total_sprites, totalSpritesCount);
     }
+
     if (sizes.size() > 1) {
         bool hasDifferentSizes = false;
         const Size& firstSize = sizes[0];
@@ -862,6 +844,53 @@ void ThingType::unserializeSpriteInfo(const FileStreamPtr& fin)
         }
     }
     m_textureData.resize(m_animationPhases);
+}
+
+void ThingType::unserializeFrameGroup(const FileStreamPtr& fin, const bool hasFrameGroups, std::vector<Size>& sizes, std::vector<int>& total_sprites, int& totalSpritesCount)
+{
+    uint8_t frameGroupType = FrameGroupDefault;
+    if (hasFrameGroups)
+        frameGroupType = fin->getU8();
+
+    const uint8_t width = fin->getU8();
+    const uint8_t height = fin->getU8();
+    m_size = { width, height };
+    sizes.emplace_back(m_size);
+    if (width > 1 || height > 1) {
+        m_realSize = std::max<int>(m_realSize, fin->getU8());
+    }
+
+    m_layers = fin->getU8();
+    m_numPatternX = fin->getU8();
+    m_numPatternY = fin->getU8();
+    if (g_game.getClientVersion() >= 755)
+        m_numPatternZ = fin->getU8();
+    else
+        m_numPatternZ = 1;
+
+    const int groupAnimationsPhases = fin->getU8();
+    m_animationPhases += groupAnimationsPhases;
+
+    if (groupAnimationsPhases > 1 && g_game.getFeature(Otc::GameEnhancedAnimations)) {
+        auto* animator = new Animator;
+        animator->unserialize(groupAnimationsPhases, fin);
+
+        if (frameGroupType == FrameGroupMoving)
+            m_animator = animator;
+        else if (frameGroupType == FrameGroupIdle)
+            m_idleAnimator = animator;
+    }
+
+    const int totalSprites = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * groupAnimationsPhases;
+    total_sprites.push_back(totalSprites);
+    if (totalSpritesCount + totalSprites > 4096)
+        throw Exception("a thing type has more than 4096 sprites");
+
+    m_spritesIndex.resize(totalSpritesCount + totalSprites);
+    for (int j = totalSpritesCount; j < (totalSpritesCount + totalSprites); ++j)
+        m_spritesIndex[j] = g_game.getFeature(Otc::GameSpritesU32) ? fin->getU32() : fin->getU16();
+
+    totalSpritesCount += totalSprites;
 }
 
 void ThingType::adjustSpriteSizes(const std::vector<Size>& sizes, const std::vector<int>& total_sprites)

@@ -306,26 +306,9 @@ ImagePtr LegacySpriteManager::getSpriteImage(const int id, const FileStreamPtr& 
             offset += bytesToRead;
 
             if (useAlpha) {
-                for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 4) {
-                    pixels[writePos + 0] = tempBuffer[src + 0];
-                    pixels[writePos + 1] = tempBuffer[src + 1];
-                    pixels[writePos + 2] = tempBuffer[src + 2];
-                    const uint8_t alpha = tempBuffer[src + 3];
-                    pixels[writePos + 3] = alpha;
-
-                    if (alpha != 0xFF) hasAlpha = true;
-                    else if (transparentCount <= 4 && alpha == 0x00) ++transparentCount;
-
-                    writePos += 4;
-                }
+                setPixelsRGBA(pixels, tempBuffer, writePos, actualColoredPixels, maxWriteSize, hasAlpha, transparentCount);
             } else {
-                for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 3) {
-                    pixels[writePos + 0] = tempBuffer[src + 0];
-                    pixels[writePos + 1] = tempBuffer[src + 1];
-                    pixels[writePos + 2] = tempBuffer[src + 2];
-                    pixels[writePos + 3] = 0xFF;
-                    writePos += 4;
-                }
+                setPixelsRGB(pixels, tempBuffer, writePos, actualColoredPixels, maxWriteSize);
             }
         }
 
@@ -341,6 +324,33 @@ ImagePtr LegacySpriteManager::getSpriteImage(const int id, const FileStreamPtr& 
     } catch (const stdext::exception& e) {
         g_logger.error("Failed to get sprite id {}: {}", id, e.what());
         return nullptr;
+    }
+}
+
+void LegacySpriteManager::setPixelsRGB(uint8_t* pixels, uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize)
+{
+    for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 3) {
+        pixels[writePos + 0] = tempBuffer[src + 0];
+        pixels[writePos + 1] = tempBuffer[src + 1];
+        pixels[writePos + 2] = tempBuffer[src + 2];
+        pixels[writePos + 3] = 0xFF;
+        writePos += 4;
+    }
+}
+
+void LegacySpriteManager::setPixelsRGBA(uint8_t* pixels, uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize, bool& hasAlpha, int& transparentCount)
+{
+    for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 4) {
+        pixels[writePos + 0] = tempBuffer[src + 0];
+        pixels[writePos + 1] = tempBuffer[src + 1];
+        pixels[writePos + 2] = tempBuffer[src + 2];
+        const uint8_t alpha = tempBuffer[src + 3];
+        pixels[writePos + 3] = alpha;
+
+        if (alpha != 0xFF) hasAlpha = true;
+        else if (transparentCount <= 4 && alpha == 0x00) ++transparentCount;
+
+        writePos += 4;
     }
 }
 

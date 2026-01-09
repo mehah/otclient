@@ -400,7 +400,11 @@ public:
 private:
     PaperdollPtr getPaperdoll(const InputMessagePtr& msg) const;
     void internalGetCreature(const InputMessagePtr& msg, CreaturePtr& creature, bool known) const;
+    void creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& creature, uint32_t& creatureId, const bool known) const;
     void makeCreature(CreaturePtr& creature, const uint32_t id, uint8_t creatureType, const std::string& creatureName) const;
+    void getImbuingIngredients(const InputMessagePtr& msg, std::vector<Imbuement>& imbuements, std::vector<ItemPtr>& neededItemsList);
+    void setExtendedCosmetics(const InputMessagePtr& msg, const CreaturePtr& creature) const;
+    void setCreatureIcons(const InputMessagePtr& msg, const CreaturePtr& creature, const uint32_t creatureId, const bool known) const;
 
     bool m_enableSendExtendedOpcode{ false };
     bool m_gameInitialized{ false };

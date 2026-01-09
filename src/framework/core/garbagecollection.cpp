@@ -23,7 +23,6 @@
 #include "garbagecollection.h"
 
 #include "client/const.h"
-#include "client/thingtype.h"
 #include "client/thingtypemanager.h"
 #include "framework/graphics/declarations.h"
 #include "framework/graphics/texture.h"
@@ -66,9 +65,7 @@ void GarbageCollection::texture() {
 }
 
 void GarbageCollection::thingType() {
-    static constexpr uint16_t
-        IDLE_TIME = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
-        AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
+    static constexpr uint16_t AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
 
     static uint8_t category{ 0 };
 
@@ -115,15 +112,7 @@ void GarbageCollection::thingType() {
             continue;
         }
 
-        const size_t limit = std::min(thingId + (AMOUNT_PER_CHECK - scanned), things.size() - 1);
-
-        for (; thingId < limit; ++thingId, ++scanned) {
-            auto& thing = things[thingId];
-            if (!thing) continue;
-
-            if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME)
-                thing->unload();
-        }
+        processThingsInCategory(things, thingId, scanned, AMOUNT_PER_CHECK);
 
         if (thingId == things.size() - 1) {
             thingId = 0;
@@ -133,5 +122,18 @@ void GarbageCollection::thingType() {
                 ++resourceId;
             }
         }
+    }
+}
+
+void GarbageCollection::processThingsInCategory(ThingTypeList& things, size_t& thingId, size_t& scanned, size_t maxAmount) {
+    static constexpr uint16_t IDLE_TIME = 60 * 1000; // Maximum time it can be idle, default 60 seconds.
+
+    const size_t limit = std::min(thingId + (maxAmount - scanned), things.size() - 1);
+    for (; thingId < limit; ++thingId, ++scanned) {
+        auto& thing = things[thingId];
+        if (!thing) continue;
+
+        if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME)
+            thing->unload();
     }
 }
