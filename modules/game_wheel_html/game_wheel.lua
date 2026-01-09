@@ -592,7 +592,7 @@ function WheelController:onInit()
 
     if not WheelButton then
         -- Use addToggleButton for notification support (20x40 vertical image)
-        WheelButton = modules.game_mainpanel.addToggleButton('WheelButton', tr('Open Wheel of Destiny'),
+        WheelButton = modules.game_mainpanel.addToggleButton('WheelButton', tr('Wheel of Destiny'),
             '/images/options/wheel', function() self:toggle() end, false, nil, true)
     end
 
