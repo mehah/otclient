@@ -1086,7 +1086,6 @@ function onContainerOpen(container, previousContainer)
     -- Enables dragging only when mouse press occurs within window bounds (with tolerance margins)
     -- and not over the containerPanel child widget
     -- On Drop: When an item is dropped, it is placed at the nearest valid parent location, such as in a grid.
-    -- https://github.com/mehah/otclient/issues/1562
     local TOLERANCE_HORIZONTAL = 5
     local TOLERANCE_VERTICAL = 2
     containerWindow.onMousePress = function(widget, mousePos, mouseButton)
