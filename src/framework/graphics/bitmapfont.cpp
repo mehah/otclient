@@ -340,7 +340,7 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
                 continue;
             }
             if (g >= 32) {
-                // Usar advance ao invés de largura para calcular espaçamento correto
+      
                 s_lineWidths[lines] += m_glyphsAdvance[g];
                 if (i + 1 != textLength && p[i + 1] != static_cast<unsigned char>('\n'))
                     s_lineWidths[lines] += m_glyphSpacing.width();
@@ -372,7 +372,7 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
 
         if (g >= 32 && g != static_cast<unsigned char>('\n')) {
             glyphsPositions[i] = vpos;
-            // Usar advance ao invés de largura para avançar a posição
+
             vpos.x += m_glyphsAdvance[g] + m_glyphSpacing.width();
         }
     }
