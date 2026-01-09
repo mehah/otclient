@@ -209,6 +209,7 @@ struct TextEvent
     std::string word;
     size_t startPos;
     size_t endPos;
+    bool noUnderline = false;
 };
 
 struct SizeUnit

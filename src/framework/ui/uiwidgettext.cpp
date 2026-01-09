@@ -316,7 +316,7 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
         }
 
         std::string tempText = fragment;
-        std::vector<std::tuple<size_t, size_t, std::string>> foundEvents;
+        std::vector<std::tuple<size_t, size_t, std::string, bool>> foundEvents;
 
         foundEvents.reserve(5);
 
@@ -327,26 +327,35 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
             std::string fullMatch = eventMatch[0].str();
             std::string eventContent = eventMatch[1].str();
 
+            // detect special marker prefix (\x01) which indicates "no underline"
+            bool noUnderline = false;
+            if (!eventContent.empty() && eventContent[0] == '\x01') {
+                noUnderline = true;
+                eventContent = eventContent.substr(1);
+            }
+
             size_t pos = eventMatch.position(0);
             size_t realPos = pos + basePosition - eventAdjustment;
 
             foundEvents.emplace_back(
                 realPos,
                 realPos + eventContent.length(),
-                eventContent
+                eventContent,
+                noUnderline
             );
 
             tempText = eventMatch.suffix().str();
-            eventAdjustment += fullMatch.length() - eventContent.length();
+            eventAdjustment += fullMatch.length() - (eventContent.length() + (noUnderline ? 1u : 0u));
         }
 
         m_textEvents.reserve(m_textEvents.size() + foundEvents.size());
 
-        for (const auto& [startPos, endPos, word] : foundEvents) {
+        for (const auto& [startPos, endPos, word, noUnderline] : foundEvents) {
             TextEvent event;
             event.word = word;
             event.startPos = startPos;
             event.endPos = endPos;
+            event.noUnderline = noUnderline;
             m_textEvents.push_back(event);
         }
         std::string result = fragment;
@@ -357,6 +366,8 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
             if (endPos != std::string::npos) {
                 size_t contentLength = endPos - pos - 12;
                 std::string eventContent = result.substr(pos + 12, contentLength);
+                if (!eventContent.empty() && eventContent[0] == '\x01')
+                    eventContent = eventContent.substr(1);
                 result.replace(pos, contentLength + 25, eventContent);
             } else {
                 break;
@@ -469,17 +480,24 @@ void UIWidget::processCodeTags() {
     std::regex regex(R"(\[text-event\](.*?)\[/text-event\])");
     std::smatch match;
 
-    while (std::regex_search(tempText, match, regex)) {
-        m_text += tempText.substr(0, match.position());
+        while (std::regex_search(tempText, match, regex)) {
+            m_text += tempText.substr(0, match.position());
 
-        std::string word = match[1];
-        size_t startPos = m_text.length();
-        size_t endPos = startPos + word.length();
+            std::string word = match[1];
+            size_t startPos = m_text.length();
+            size_t endPos = startPos + word.length();
 
-        m_textEvents.push_back({ word, startPos, endPos });
-        m_text += word;
-        tempText = tempText.substr(match.position() + match.length());
-    }
+            // detect special marker prefix (\x01) which indicates "no underline"
+            bool noUnderline = false;
+            if (!word.empty() && word[0] == '\x01') {
+                noUnderline = true;
+                word = word.substr(1);
+            }
+
+            m_textEvents.push_back({ word, startPos, endPos, noUnderline });
+            m_text += word;
+            tempText = tempText.substr(match.position() + match.length());
+        }
 
     m_text += tempText;
 }
@@ -520,7 +538,8 @@ void UIWidget::updateRectToWord(const std::vector<Rect>& glypsCoords)
             if (m_drawText[i] == '\n') {
                 if (wordRect.isValid()) {
                     m_rectToWord.push_back({ wordRect, textEvent.word });
-                    buildTextUnderline(wordRect, *m_textUnderline);
+                    if (!textEvent.noUnderline)
+                        buildTextUnderline(wordRect, *m_textUnderline);
                 }
                 inNewLine = true;
                 continue;
@@ -535,7 +554,8 @@ void UIWidget::updateRectToWord(const std::vector<Rect>& glypsCoords)
 
         if (wordRect.isValid()) {
             m_rectToWord.push_back({ wordRect, textEvent.word });
-            buildTextUnderline(wordRect, *m_textUnderline);
+            if (!textEvent.noUnderline)
+                buildTextUnderline(wordRect, *m_textUnderline);
         }
     }
 }

@@ -164,6 +164,9 @@ local readOnlyPanel = nil
 local activeactiveReadOnlyTabName = ""
 local readOnlyModeEnabled = false
 
+-- Option: show underline/dots for highlighted text in console
+local showHighlightedUnderline = false
+
 local communicationSettings = {
     useIgnoreList = true,
     useWhiteList = true,
@@ -513,6 +516,7 @@ function save()
     local settings = {}
     settings.messageHistory = messageHistory
     settings.wasdMode = consoleToggleChat.isChecked
+    settings.showHighlightedUnderline = showHighlightedUnderline
     g_settings.setNode('game_console', settings)
 end
 
@@ -521,6 +525,7 @@ function load()
     if settings then
         messageHistory = settings.messageHistory or {}
         consoleToggleChat.isChecked = settings.wasdMode or false
+        showHighlightedUnderline = settings.showHighlightedUnderline or false
         if consoleToggleChat.isChecked then
             consoleToggleChat:setText(tr('Chat Off'))
         else
@@ -532,6 +537,10 @@ function load()
         end
     end
     loadCommunicationSettings()
+end
+
+function setShowHighlightedUnderline(value)
+    showHighlightedUnderline = value
 end
 
 function isEnabledWASD()
@@ -1046,7 +1055,15 @@ function getHighlightedText(text, color, highlightColor)
     end
     for startPos, content, endPos in text:gmatch("()%{([^}]*)%}()") do
         local textPart = content:match("([^,]+)") or content
-        local highlighted = string.format("[text-event]%s[/text-event]", textPart:match("^%s*(.-)%s*$"))
+        local trimmed = textPart:match("^%s*(.-)%s*$")
+        local highlighted = trimmed
+        -- always wrap with text-event to preserve click/hover functionality
+        if showHighlightedUnderline then
+            highlighted = string.format("[text-event]%s[/text-event]", trimmed)
+        else
+            -- prefix with marker (0x01) to indicate "no underline" to UI widget
+            highlighted = string.format("[text-event]%s%s[/text-event]", string.char(1), trimmed)
+        end
         parts[#parts + 1] = string.format("{%s, %s}", highlighted, highlightColor)
         local nextBrace = text:find("{", endPos, true)
         local afterText = text:sub(endPos, (nextBrace or 0) - 1)
@@ -1633,6 +1650,10 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
             local colorPattern = "{([^,]+),[ ]*[^}]+}"
             for textContent in highlightedText:gmatch(colorPattern) do
                 local plainText = textContent:gsub("%[text%-event%](.-)%[/text%-event%]", "%1")
+                -- remove possible no-underline marker (0x01) inserted by getHighlightedText
+                if plainText:sub(1,1) == string.char(1) then
+                    plainText = plainText:sub(2)
+                end
                 processedText = processedText:gsub("{" .. textContent .. "}", plainText)
             end
             processedText = processedText:gsub("{([^}]+)}", "%1")

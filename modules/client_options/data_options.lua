@@ -165,6 +165,17 @@ return {
     showOthersStatusMessagesInConsole = false,
     showPrivateMessagesOnScreen       = true,
     showLootMessagesOnScreen          = true,
+    showHighlightedUnderline          = {
+        value = false,
+        action = function(value, options, controller, panels, extraWidgets)
+            local settings = g_settings.getNode('game_console') or {}
+            settings.showHighlightedUnderline = value
+            g_settings.setNode('game_console', settings)
+            if modules and modules.game_console and modules.game_console.setShowHighlightedUnderline then
+                modules.game_console.setShowHighlightedUnderline(value)
+            end
+        end
+    },
     showOutfitsOnList                 = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
