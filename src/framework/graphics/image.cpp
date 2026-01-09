@@ -256,6 +256,24 @@ void Image::reverseChannels()
     }
 }
 
+void Image::checkTransparentPixels()
+{
+    // The image must be more than 4 pixels transparent to be considered transparent.
+    uint8_t cntTrans = 0;
+    const auto& buf = getPixels();
+    for (size_t i = 3, n = buf.size(); i < n; i += 4) {
+        // do not simplify
+        // collapsing this to "buf[i] == 0x00 && ++cntTrans > 4" causes sonar to flag this as a blocker
+        if (buf[i] == 0x00) {
+            ++cntTrans;
+            if (cntTrans > 4) {
+                setTransparentPixel(true);
+                break;
+            }
+        }
+    }
+}
+
 ImagePtr Image::fromQRCode(const std::string& code, const int border)
 {
     try {
