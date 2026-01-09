@@ -1,3 +1,5 @@
 *
 !/README.txt
 !.gitignore
+!game_wheel/
+!game_wheel/**
