@@ -34,3 +34,80 @@ function math.cround(value, rd)
     local _round = math.floor(value / rd)
     return _round * rd
 end
+
+function table.isIn(tbl, val)
+  for _, v in ipairs(tbl) do
+    if v == val then
+      return true
+    end
+  end
+  return false
+end
+
+function table.reserve(count, default)
+  local t = {}
+  for i = 1, count do
+    t[i] = default
+  end
+  return t
+end
+
+function formatMoney(amount, separator)
+  local patternSeparator = string.format("%%1%s%%2", separator)
+  local formatted = amount
+  while true do
+    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", patternSeparator)
+    if (k==0) then
+      break
+    end
+  end
+  return formatted
+end
+
+if not setStringColor then
+  function setStringColor(str, color)
+    return str  -- ignora a cor e retorna o texto puro
+  end
+end
+
+function convertLongGold(amount, shortValue, normalized)
+    local hasBillion = false
+    local hasTrillion = false
+  
+    local fomarType = 0
+    if normalized and amount >= 1000000 then
+      amount = math.floor(amount / 1000000)
+      fomarType = 1
+    elseif normalized and amount >= 10000 then
+      amount = math.floor(amount / 1000)
+      fomarType = 2
+    elseif shortValue and amount > 10000000 then
+        fomarType = 1
+      amount = math.floor(amount / 1000000)
+    elseif shortValue and amount > 1000000 then
+        fomarType = 2
+      amount = math.floor(amount / 1000)
+    elseif amount > 999999999 then
+      fomarType = 1
+      amount = math.floor(amount / 1000000)
+    elseif amount > 99999999 then
+      fomarType = 2
+      amount = math.floor(amount / 1000)
+    end
+  
+    local formatted = amount
+    while true do
+      formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+      if (k==0) then
+        break
+      end
+    end
+  
+    if fomarType == 1 then
+      formatted = formatted .. " kk"
+    elseif fomarType == 2 then
+      formatted = formatted .. " k"
+    end
+  
+    return formatted
+end
