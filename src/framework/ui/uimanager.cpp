@@ -60,6 +60,7 @@ void UIManager::terminate()
     m_checkEvent = nullptr;
     m_hoveredWidgets.clear();
     m_pressedWidgets.clear();
+    m_hoveredText.clear();
 }
 
 void UIManager::render(DrawPoolType drawPane) const
@@ -160,6 +161,7 @@ void UIManager::inputEvent(const InputEvent& event)
 
             // mouse move can change hovered widgets
             updateHoveredWidget(true);
+            updateHoveredText(true);
 
             // first fire dragging move
             if (m_draggingWidget) {
@@ -319,6 +321,10 @@ void UIManager::updateHoveredWidget(const bool now)
             if (oldHovered) {
                 oldHovered->updateState(Fw::HoverState);
                 oldHovered->onHoverChange(false);
+                if (oldHovered->hasEventListener(EVENT_TEXT_HOVER) && m_hoveredText.length() > 0) {
+                    oldHovered->onTextHoverChange(m_hoveredText, false);
+                    m_hoveredText.clear();
+                }
             }
             if (hoveredWidget) {
                 hoveredWidget->updateState(Fw::HoverState);
@@ -337,14 +343,18 @@ void UIManager::updateHoveredWidget(const bool now)
 
 void UIManager::onWidgetAppear(const UIWidgetPtr& widget)
 {
-    if (widget->containsPoint(g_window.getMousePosition()))
+    if (widget->containsPoint(g_window.getMousePosition())) {
         updateHoveredWidget();
+        updateHoveredText();
+    }
 }
 
 void UIManager::onWidgetDisappear(const UIWidgetPtr& widget)
 {
-    if (widget->containsPoint(g_window.getMousePosition()))
+    if (widget->containsPoint(g_window.getMousePosition())) {
         updateHoveredWidget();
+        updateHoveredText();
+    }
 }
 
 void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
@@ -361,8 +371,10 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
     if (m_mouseReceiver == widget)
         resetMouseReceiver();
 
-    if (m_hoveredWidget == widget)
+    if (m_hoveredWidget == widget) {
         updateHoveredWidget();
+        updateHoveredText();
+    }
 
     if (m_pressedWidget == widget) {
         updatePressedWidget(nullptr);
@@ -713,4 +725,39 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
 
     widget->callLuaField("onSetup");
     return widget;
+}
+
+void UIManager::updateHoveredText(bool now)
+{
+    if (m_hoverTextUpdateScheduled && !now || !m_hoveredWidget)
+        return;
+
+    auto func = [this] {
+        if (!m_rootWidget || !m_hoveredWidget)
+            return;
+
+        m_hoverTextUpdateScheduled = false;
+
+        if (m_hoveredWidget->hasEventListener(EVENT_TEXT_HOVER)) {
+            std::string hoveredText = m_hoveredWidget->getTextByPos(g_window.getMousePosition());
+
+            if (hoveredText != m_hoveredText) {
+                std::string oldHovered = m_hoveredText;
+                m_hoveredText = hoveredText;
+
+                if (oldHovered.length() > 0)
+                    m_hoveredWidget->onTextHoverChange(oldHovered, false);
+
+                if (m_hoveredText.length() > 0)
+                    m_hoveredWidget->onTextHoverChange(m_hoveredText, true);
+            }
+        }
+    };
+
+    if (now)
+        func();
+    else {
+        m_hoverTextUpdateScheduled = true;
+        g_dispatcher.deferEvent(func);
+    }
 }

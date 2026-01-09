@@ -734,6 +734,15 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 }
             }
         }
+        else if (node->tag() == "events") {
+            auto split = stdext::split(node->value(), " ");
+            for (const auto& event : split) {
+                auto it = eventMap.find(event);
+                if (it != eventMap.end()) {
+                    setEventListener(it->second);
+                }
+            }
+        }
     }
 }
 
