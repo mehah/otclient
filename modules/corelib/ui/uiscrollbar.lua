@@ -113,20 +113,31 @@ local function parseSliderPos(self, slider, pos, move, useStep)
 
     if (delta > 0 and hotDistance + delta > self.hotDistance) or (delta < 0 and hotDistance + delta < self.hotDistance) then
         local range, pxrange, px, offset, center = calcValues(self)
-        local newvalue = self.value + delta * (range / (pxrange - px))
+        local denom = (pxrange - px)
+        if denom == 0 then
+            -- nothing to move (slider covers full range); keep current value
+            return
+        end
 
-        if useStep and self.step > 1 then
-            local step = self.step
-            local remainder = newvalue % step
-            if remainder ~= 0 then
-                if delta > 0 then
-                    newvalue = newvalue + (step - remainder)
-                else
-                    newvalue = newvalue - remainder
-                end
+        local newvalue = self.value + delta * (range / denom)
+
+        -- protect against invalid numerical results
+        if not (newvalue == newvalue) or newvalue == math.huge or newvalue == -math.huge then
+            if delta > 0 then
+                newvalue = self.maximum
+            else
+                newvalue = self.minimum
             end
         end
 
+        if useStep and self.step and self.step > 0 then
+            local step = self.step
+            -- snap to nearest step for smoother, predictable behaviour
+            newvalue = math.floor((newvalue + step / 2) / step) * step
+        end
+
+        -- ensure final value is numeric and clamped
+        if type(newvalue) ~= 'number' then newvalue = self.value end
         self:setValue(newvalue)
     end
 end
@@ -166,6 +177,27 @@ end
 function UIScrollBar:onSetup()
     self.setupDone = true
     local sliderButton = self:getChildById('sliderButton')
+    -- If the scrollbar is declared inside an OptionScaleScroll (or similar)
+    -- parent widgets may provide instance properties to configure the scrollbar.
+    local parent = self:getParent()
+    if parent then
+        if parent.minimumScrollValue ~= nil then
+            local minv = tonumber(parent.minimumScrollValue)
+            if minv then self:setMinimum(minv) end
+        end
+        if parent.maximumScrollValue ~= nil then
+            local maxv = tonumber(parent.maximumScrollValue)
+            if maxv then self:setMaximum(maxv) end
+        end
+        if parent.scrollSize ~= nil then
+            local stepv = tonumber(parent.scrollSize)
+            if stepv then self:setStep(stepv) end
+        end
+        if parent.defaultScroll ~= nil then
+            -- support older naming if used in styles
+            if parent.defaultScroll then self:setDefaultScroll() end
+        end
+    end
     g_mouse.bindAutoPress(self:getChildById('decrementButton'), function()
         self:onDecrement()
     end, 250, nil, self.autoPressDelay)

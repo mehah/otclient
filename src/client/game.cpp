@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -186,7 +186,7 @@ void Game::processGameStart()
         }
     }, 1000);
 
-    g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onGameStart"); });
+    g_lua.callGlobalField("g_game", "onGameStart");
 }
 
 void Game::processGameEnd()
@@ -1760,7 +1760,7 @@ void Game::leaveMarket()
 {
     if (!canPerformGameAction())
         return;
-        
+
     m_protocolGame->sendMarketLeave();
 
     g_lua.callGlobalField("g_game", "onMarketLeave");
@@ -1813,6 +1813,27 @@ void Game::preyRequest()
         return;
 
     m_protocolGame->sendPreyRequest();
+}
+
+void Game::openPortableForgeRequest()
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendOpenPortableForge();
+}
+
+void Game::forgeRequest(Otc::ForgeAction_t actionType, bool convergence, uint16_t firstItemid, uint8_t firstItemTier, uint16_t secondItemId, bool improveChance, bool tierLoss)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendForgeRequest(actionType, convergence, firstItemid, firstItemTier, secondItemId, improveChance, tierLoss);
+}
+
+void Game::sendForgeBrowseHistoryRequest(uint16_t page)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendForgeBrowseHistoryRequest(page);
 }
 
 void Game::applyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm)
