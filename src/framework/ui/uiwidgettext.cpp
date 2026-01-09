@@ -171,7 +171,7 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
         else if (node->tag() == "ttf-font")
             ttfFontName = node->value();
         else if (node->tag() == "ttf-stroke") {
-            // Pode ser apenas número ou "número cor"
+
             std::string strokeValue = node->value();
             std::istringstream iss(strokeValue);
             iss >> ttfStrokeWidth;
@@ -185,7 +185,7 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
         else if (node->tag() == "ttf-stroke-color")
             ttfStrokeColor = Color(node->value());
         else if (node->tag() == "stroke") {
-            // Suporte para "stroke: 2 black" (formato simplificado)
+
             std::string strokeValue = node->value();
             std::istringstream iss(strokeValue);
             iss >> ttfStrokeWidth;
@@ -195,8 +195,7 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
             }
         }		
     }
-    
-    // Se tiver ttf-font, carregar a fonte TTF primeiro
+
     if (!ttfFontName.empty()) {
         g_logger.debug("parseTextStyle: setting TTF font '{}' size {} stroke {} rgba({},{},{},{})", 
                       ttfFontName, ttfFontSize, ttfStrokeWidth, 
@@ -436,7 +435,7 @@ void UIWidget::setStroke(int strokeWidth, const Color& strokeColor)
         }
         
 
-        int fontSize = 12; // padrão
+        int fontSize = 12;
         std::string currentName = m_font->getName();
         size_t sizePos = currentName.find('_');
         if (sizePos != std::string::npos) {
