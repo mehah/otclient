@@ -73,23 +73,28 @@ MessageSettings = {
     },
     private = {
         color = TextColors.lightblue,
+        consoleTab = 'Local Chat',
         screenTarget = 'privateLabel'
     },
     privateRed = {
         color = TextColors.red,
+        consoleTab = 'Local Chat',
         private = true
     },
     privatePlayerToPlayer = {
         color = TextColors.blue,
+        consoleTab = 'Local Chat',
         private = true
     },
     privatePlayerToNpc = {
         color = TextColors.blue,
+        consoleTab = 'Local Chat',
         private = true,
         npcChat = true
     },
     privateNpcToPlayer = {
         color = TextColors.lightblue,
+        consoleTab = 'Local Chat',
         private = true,
         npcChat = true
     },
