@@ -120,25 +120,9 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_towns", "sort", &TownManager::sort, &g_towns);
 #endif
 
-    /*
-    g_lua.registerSingletonClass("g_sprites");
-    g_lua.bindSingletonFunction("g_sprites", "loadSpr", &LegacySpriteManager::loadSpr, &g_sprites);
-
-    g_lua.bindSingletonFunction("g_sprites", "unload", &LegacySpriteManager::unload, &g_sprites);
-    g_lua.bindSingletonFunction("g_sprites", "isLoaded", &LegacySpriteManager::isLoaded, &g_sprites);
-    g_lua.bindSingletonFunction("g_sprites", "getSprSignature", &LegacySpriteManager::getSignature, &g_sprites);
-    g_lua.bindSingletonFunction("g_sprites", "getSpritesCount", &LegacySpriteManager::getSpritesCount, &g_sprites);
-    */
-
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindSingletonFunction("g_sprites", "saveSpr", &LegacySpriteManager::saveSpr, &g_sprites);
 #endif
-
-    /*
-    g_lua.registerSingletonClass("g_spriteAppearances");
-    g_lua.bindSingletonFunction("g_spriteAppearances", "saveSpriteToFile", &ProtobufSpriteManager::saveSpriteToFile, &g_spriteAppearances);
-    g_lua.bindSingletonFunction("g_spriteAppearances", "saveSheetToFileBySprite", &ProtobufSpriteManager::saveSheetToFileBySprite, &g_spriteAppearances);
-    */
 
     g_lua.registerSingletonClass("g_map");
     g_lua.bindSingletonFunction("g_map", "isLookPossible", &Map::isLookPossible, &g_map);
