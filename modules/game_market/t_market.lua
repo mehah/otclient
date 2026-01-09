@@ -155,6 +155,10 @@ function hide()
     onClearSearch()
 
     lastSelectedItem = {}
+    -- Ensure game input is focused after hiding the market (ESC key)
+    if modules.game_interface and modules.game_interface.getRootPanel then
+        modules.game_interface.getRootPanel():focus()
+    end
 end
 
 function show()
@@ -220,11 +224,9 @@ function closeMarket()
 
     lastSelectedItem = {}
 
-    if modules.game_console then
-        local console = modules.game_console.getConsole()
-        if console then
-            console:focus()
-        end
+    -- Ensure game input is focused so player can walk immediately
+    if modules.game_interface and modules.game_interface.getRootPanel then
+        modules.game_interface.getRootPanel():focus()
     end
 end
 
