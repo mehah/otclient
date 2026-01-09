@@ -121,6 +121,9 @@ public:
         m_spritesFiles.clear();
     }
 
+    // non-copyable
+	ProtobufSpriteManager& operator=(const ProtobufSpriteManager&) = delete;
+
     bool loadSpr(std::string file);
     bool loadRegularSpr(std::string file);
     bool loadCwmSpr(std::string file);
@@ -204,6 +207,9 @@ public:
         m_spritesCount = 0;
         m_sheets.clear();
     }
+
+    // non-copyable
+	ProtobufSpriteManager& operator=(const ProtobufSpriteManager&) = delete;
 
     void reload() override { /* for protobuf assets this is managed per sheet */ };
 

@@ -38,6 +38,13 @@ struct AssetResourceInfo
 class ThingTypeManager
 {
 public:
+    ThingTypeManager() = default;
+    ~ThingTypeManager() = default;
+
+    // non-copyable
+    ThingTypeManager(const ThingTypeManager&) = delete;
+    ThingTypeManager& operator=(const ThingTypeManager&) = delete;
+
     void init();
     void terminate();
 
@@ -137,10 +144,11 @@ public:
         );
     }
 
-    ~AssetResource() {
-        for (auto& m_thingType : m_thingTypes)
-            m_thingType.clear();
-    }
+    ~AssetResource() = default;
+
+    // non-copyable
+    AssetResource(const AssetResource&) = delete;
+    AssetResource& operator=(const AssetResource&) = delete;
 
     uint16_t getId() const { return m_resourceId; }
     

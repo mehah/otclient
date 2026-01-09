@@ -895,7 +895,7 @@ void ThingType::adjustSpriteSizes(const std::vector<Size>& sizes, const std::vec
     }
 }
 
-void ThingType::adjustSpriteFrame(const std::vector<Size>& sizes, const std::vector<uint32_t>& sprites, size_t frameId, size_t spriteIndex)
+void ThingType::adjustSpriteFrame(const std::vector<Size>& sizes, const std::vector<uint32_t>& sprites, const size_t frameId, size_t& spriteIndex)
 {
     for (int x = 0; x < m_size.width(); ++x) {
         for (int y = 0; y < m_size.height(); ++y) {
