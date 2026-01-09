@@ -60,6 +60,9 @@ void ProtocolGame::onConnect()
 
 void ProtocolGame::onRecv(const InputMessagePtr& inputMessage)
 {
+    m_recivedPackeds += 1;
+    m_recivedPackedsSize += inputMessage->getMessageSize();
+
     if (m_firstRecv) {
         m_firstRecv = false;
 

@@ -77,7 +77,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
     auto& list = m_objects[m_currentDrawOrder];
     auto& state = getCurrentState();
 
-    if (!list.empty() && list.back().state == state) {
+    if (!list.empty() && list.back().coords && list.back().state == state) {
         auto& last = list.back();
         coordsBuffer ? last.coords->append(coordsBuffer.get()) : addCoords(*last.coords, method);
     } else if (m_alwaysGroupDrawings) {
@@ -114,7 +114,7 @@ bool DrawPool::updateHash(const DrawMethod& method, const Texture* texture, cons
     state.hash = 0;
 
     { // State Hash
-        if (m_bindedFramebuffers)
+        if (m_bindedFramebuffers > -1)
             stdext::hash_combine(state.hash, m_lastFramebufferId);
 
         if (state.blendEquation != BlendEquation::ADD)
@@ -255,15 +255,11 @@ bool DrawPool::canRepaint()
     if (!m_enabled || shouldRepaint())
         return false;
 
-    uint16_t refreshDelay = m_refreshDelay;
-    if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
-        refreshDelay = m_shaderRefreshDelay;
-
-    return refreshDelay == 0 || m_refreshTimer.ticksElapsed() >= refreshDelay;
+    return canRefresh();
 }
 
 void DrawPool::release() {
-    if (hasFrameBuffer() && !m_hashCtrl.wasModified()) {
+    if (hasFrameBuffer() && !m_hashCtrl.wasModified() && !canRefresh()) {
         for (auto& objs : m_objects)
             objs.clear();
         m_objectsFlushed.clear();
@@ -271,6 +267,8 @@ void DrawPool::release() {
     }
 
     m_refreshTimer.restart();
+
+    SpinLock::Guard guard(m_threadLock);
 
     m_objectsDraw[0].clear();
 
@@ -312,7 +310,7 @@ void DrawPool::release() {
         }
     }
 
-    m_shouldRepaint.store(true, std::memory_order_release);
+    m_shouldRepaint.store(true, std::memory_order_relaxed);
 }
 
 void DrawPool::flush()

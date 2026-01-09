@@ -22,7 +22,9 @@
 
 #include "event.h"
 
-Event::Event(std::function<void()> callback) : m_callback(std::move(callback)) {}
+Event::Event(std::function<void()> callback, std::string function) :
+    m_function(std::move(function)),
+    m_callback(std::move(callback)) {}
 
 Event::~Event()
 {

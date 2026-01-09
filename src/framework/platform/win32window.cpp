@@ -24,6 +24,7 @@
 
 #include "win32window.h"
 #include <framework/core/eventdispatcher.h>
+#include <framework/util/stats.h>
 #include <framework/graphics/image.h>
 
 #include <timeapi.h>
@@ -516,6 +517,7 @@ void WIN32Window::maximize()
 
 void WIN32Window::poll()
 {
+    AutoStat s(STATS_RENDER, "PollWindow");
     fireKeysPress();
     MSG msg;
     while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {

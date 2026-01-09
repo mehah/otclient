@@ -152,6 +152,7 @@ return {
             end, 50)
         end
     },
+    returnDisablesChat                = false,
     smartWalk                         = false,
     autoChaseOverride                 = true,
     moveStack                         = false,

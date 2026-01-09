@@ -45,6 +45,7 @@
 #include "framework/graphics/shadermanager.h"
 #include "framework/ui/uiwidget.h"
 #include <framework/core/graphicalapplication.h>
+#include <framework/util/stats.h>
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;
@@ -52,6 +53,7 @@ double Creature::speedC = 0;
 
 Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
+    g_stats.addCreature();
     m_name.setFont(g_gameConfig.getCreatureNameFont());
     m_name.setAlign(Fw::AlignTopCenter);
     m_typingIconTexture = g_textures.getTexture(g_gameConfig.getTypingIcon());
@@ -59,6 +61,7 @@ Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 
 Creature::~Creature() {
     setWidgetInformation(nullptr);
+    g_stats.removeCreature();
 }
 
 void Creature::onCreate() {

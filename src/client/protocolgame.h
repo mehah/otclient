@@ -130,12 +130,15 @@ public:
     void sendTransferCoins(std::string_view recipient, uint16_t amount);
     void sendOpenTransactionHistory(uint8_t entriesPerPage);
     void sendMarketLeave();
-    void sendMarketBrowse(uint8_t browseId, uint16_t browseType);
+    void sendMarketBrowse(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
     void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint16_t resourceId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
     void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void sendPreyRequest();
+    void sendOpenPortableForge();
+    void sendForgeRequest(Otc::ForgeAction_t actionType, bool convergence = false, uint16_t firstItemid = 0, uint8_t firstItemTier = 0, uint16_t secondItemId = 0, bool improveChance = false, bool tierLoss = false);
+    void sendForgeBrowseHistoryRequest(uint16_t page);
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
     void sendCloseImbuingWindow();
@@ -147,7 +150,7 @@ public:
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
     void sendRequestBestiary();
-    void sendRequestBestiaryOverview(std::string_view catName);
+    void sendRequestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
     void sendRequestBestiarySearch(uint16_t raceId);
     void sendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void sendCyclopediaRequestCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage, uint16_t page);
@@ -175,6 +178,9 @@ protected:
 
 public:
     void addPosition(const OutputMessagePtr& msg, const Position& position);
+
+    int getRecivedPacketsCount() { return m_recivedPackeds; }
+    int getRecivedPacketsSize() { return m_recivedPackedsSize; }
 
 private:
     void parseStoreButtonIndicators(const InputMessagePtr& msg);
@@ -243,11 +249,13 @@ private:
     void parseDistanceMissile(const InputMessagePtr& msg);
     void parseAnthem(const InputMessagePtr& msg);
     void parseItemClasses(const InputMessagePtr& msg);
+    void parseForgeResult(const InputMessagePtr& msg);
     void parseCreatureMark(const InputMessagePtr& msg);
     void parseTrappers(const InputMessagePtr& msg);
     void parseOpenForge(const InputMessagePtr& msg);
     void setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const;
     void addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const;
+    void parseBrowseForgeHistory(const InputMessagePtr& msg);
     void parseCloseForgeWindow(const InputMessagePtr& msg);
     void parseCreatureData(const InputMessagePtr& msg);
     void parseCreatureHealth(const InputMessagePtr& msg);
@@ -398,6 +406,8 @@ private:
     bool m_record{ false };
 
     ticks_t m_lastPartyAnalyzerCall{ 0 };
+    int m_recivedPackeds = 0;
+    int m_recivedPackedsSize = 0;
 
     std::string m_accountName;
     std::string m_accountPassword;

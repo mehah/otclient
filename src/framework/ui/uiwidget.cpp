@@ -34,6 +34,7 @@
 #include "framework/html/htmlnode.h"
 #include "framework/otml/otmlnode.h"
 #include <framework/platform/platformwindow.h>
+#include <framework/util/stats.h>
 
 UIWidget::UIWidget()
 {
@@ -58,6 +59,8 @@ UIWidget::UIWidget()
     initBaseStyle();
     initText();
     initImage();
+
+    g_stats.addWidget(this);
 }
 
 UIWidget::~UIWidget()
@@ -67,6 +70,8 @@ UIWidget::~UIWidget()
     if (!isDestroyed())
         g_logger.warning("widget '{}' was not explicitly destroyed", m_id);
 #endif
+
+    g_stats.removeWidget(this);
 }
 
 void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)

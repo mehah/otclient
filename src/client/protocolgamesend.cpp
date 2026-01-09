@@ -26,6 +26,7 @@
 #include "framework/net/outputmessage.h"
 #include "protocolcodes.h"
 #include "thingtypemanager.h"
+#include "thingtype.h"
 #include "framework/util/crypt.h"
 
 void ProtocolGame::onSend() {}
@@ -1057,12 +1058,19 @@ void ProtocolGame::sendRequestBestiary()
     send(msg);
 }
 
-void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName)
+void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName, bool search, std::vector<uint16_t> raceIds)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBestiaryRequestOverview);
-    msg->addU8(0x00);
-    msg->addString(catName);
+    msg->addU8(search ? 0x01 : 0x00);
+    if (search) {
+        msg->addU16(static_cast<uint16_t>(raceIds.size()));
+        for (const uint16_t raceId : raceIds) {
+            msg->addU16(raceId);
+        }
+    } else {
+        msg->addString(catName);
+    }
     send(msg);
 }
 
@@ -1321,7 +1329,7 @@ void ProtocolGame::sendMarketLeave()
     send(msg);
 }
 
-void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType)
+void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketBrowse);
@@ -1329,6 +1337,13 @@ void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t brows
         msg->addU8(browseId);
         if (browseType > 0) {
             msg->addU16(browseType);
+            // If browseId is 3 (browse item), send tier if item has classification
+            if (browseId == 3) {
+                const auto& thing = g_things.getThingType(browseType, ThingCategoryItem);
+                if (thing && thing->getClassification() > 0) {
+                    msg->addU8(tier);
+                }
+            }
         }
     } else {
         msg->addU16(browseType);
@@ -1342,8 +1357,8 @@ void ProtocolGame::sendMarketCreateOffer(const uint8_t type, const uint16_t item
     msg->addU8(Proto::ClientMarketCreate);
     msg->addU8(type);
     msg->addU16(itemId);
-    if (const auto& item = Item::create(itemId, resourceId)) {
-        if (item->getClassification() > 0) {
+    if (const auto thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId)) {
+        if (thing && thing->getClassification() > 0) {
             msg->addU8(itemTier);
         }
     }
@@ -1390,6 +1405,36 @@ void ProtocolGame::sendPreyRequest()
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientPreyRequest);
+    send(msg);
+}
+
+void ProtocolGame::sendOpenPortableForge() {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientPreyRequest);
+    send(msg);
+}
+
+void ProtocolGame::sendForgeRequest(Otc::ForgeAction_t actionType, bool convergence, uint16_t firstItemid, uint8_t firstItemTier, uint16_t secondItemId, bool improveChance, bool tierLoss) {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeEnter);
+    msg->addU8(static_cast<uint8_t>(actionType));
+
+    if (actionType == Otc::ForgeAction_t::FUSION || actionType == Otc::ForgeAction_t::TRANSFER) {
+        msg->addU8(static_cast<uint8_t>(convergence));
+        msg->addU16(firstItemid);
+        msg->addU8(firstItemTier);
+        msg->addU16(secondItemId);
+        msg->addU8(static_cast<uint8_t>(improveChance));
+        msg->addU8(static_cast<uint8_t>(tierLoss));
+    }
+
+    send(msg);
+}
+
+void ProtocolGame::sendForgeBrowseHistoryRequest(uint16_t page) {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeBrowseHistory);
+    msg->addU8(page);
     send(msg);
 }
 

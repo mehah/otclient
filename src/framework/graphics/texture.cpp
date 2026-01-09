@@ -29,14 +29,19 @@
 #include "texturemanager.h"
 #include "framework/core/eventdispatcher.h"
 #include <framework/core/graphicalapplication.h>
+#include <framework/util/stats.h>
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
 
-Texture::Texture() : m_uniqueId(UID.fetch_add(1)) { generateHash(); }
+Texture::Texture() : m_uniqueId(UID.fetch_add(1)) {
+    generateHash();
+    g_stats.addTexture();
+}
 Texture::Texture(const Size& size) : m_uniqueId(UID.fetch_add(1))
 {
     generateHash();
+    g_stats.addTexture();
     if (!setupSize(size))
         return;
 
@@ -50,6 +55,7 @@ Texture::Texture(const Size& size) : m_uniqueId(UID.fetch_add(1))
 Texture::Texture(const ImagePtr& image, const bool buildMipmaps, const bool compress) : m_uniqueId(UID.fetch_add(1))
 {
     generateHash();
+    g_stats.addTexture();
 
     setProp(Prop::compress, compress);
     setProp(Prop::buildMipmaps, buildMipmaps);
@@ -68,6 +74,7 @@ Texture::~Texture()
             glDeleteTextures(1, &id);
         });
     }
+    g_stats.removeTexture();
 }
 
 void Texture::create()

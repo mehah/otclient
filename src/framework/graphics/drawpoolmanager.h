@@ -113,6 +113,7 @@ public:
     bool isPreDrawing() const;
 
     void removeTextureFromAtlas(uint32_t id, bool smooth);
+    std::string getAtlasStats() const;
 
 private:
     DrawPool* getCurrentPool() const;

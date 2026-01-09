@@ -227,8 +227,9 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         pool->m_framebuffer->bind();
 
     if (shouldRepaint) {
+        SpinLock::Guard guard(pool->m_threadLock);
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
-        pool->m_shouldRepaint.store(false, std::memory_order_release);
+        pool->m_shouldRepaint.store(false, std::memory_order_relaxed);
     }
 
     for (auto& obj : pool->m_objectsDraw[1]) {
@@ -265,4 +266,15 @@ void DrawPoolManager::removeTextureFromAtlas(uint32_t id, bool smooth) {
         if (pool->m_atlas)
             pool->m_atlas->removeTexture(id, smooth);
     }
+}
+
+std::string DrawPoolManager::getAtlasStats() const
+{
+    std::stringstream ss;
+    const auto* mapAtlas = get(DrawPoolType::MAP)->getAtlas();
+    const auto* fgAtlas = get(DrawPoolType::FOREGROUND)->getAtlas();
+
+    ss << "map=" << (mapAtlas ? mapAtlas->getStats() : "disabled");
+    ss << " | fg=" << (fgAtlas ? fgAtlas->getStats() : "disabled");
+    return ss.str();
 }

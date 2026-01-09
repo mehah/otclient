@@ -1760,17 +1760,21 @@ Otc::OperatingSystem_t Game::getOs()
 
 void Game::leaveMarket()
 {
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->sendMarketLeave();
 
     g_lua.callGlobalField("g_game", "onMarketLeave");
 }
 
-void Game::browseMarket(const uint8_t browseId, const uint8_t browseType)
+void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
 {
-    if (!canPerformGameAction())
+    if (!canPerformGameAction()) {
         return;
+    }
 
-    m_protocolGame->sendMarketBrowse(browseId, browseType);
+    m_protocolGame->sendMarketBrowse(browseId, browseType, tier);
 }
 
 void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint16_t resourceId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
@@ -1811,6 +1815,27 @@ void Game::preyRequest()
         return;
 
     m_protocolGame->sendPreyRequest();
+}
+
+void Game::openPortableForgeRequest()
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendOpenPortableForge();
+}
+
+void Game::forgeRequest(Otc::ForgeAction_t actionType, bool convergence, uint16_t firstItemid, uint8_t firstItemTier, uint16_t secondItemId, bool improveChance, bool tierLoss)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendForgeRequest(actionType, convergence, firstItemid, firstItemTier, secondItemId, improveChance, tierLoss);
+}
+
+void Game::sendForgeBrowseHistoryRequest(uint16_t page)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendForgeBrowseHistoryRequest(page);
 }
 
 void Game::applyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm)
@@ -1944,12 +1969,12 @@ void Game::requestBestiary()
     m_protocolGame->sendRequestBestiary();
 }
 
-void Game::requestBestiaryOverview(const std::string_view catName)
+void Game::requestBestiaryOverview(const std::string_view catName, bool search, std::vector<uint16_t> raceIds)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendRequestBestiaryOverview(catName);
+    m_protocolGame->sendRequestBestiaryOverview(catName, search, raceIds);
 }
 
 void Game::requestBestiarySearch(const uint16_t raceId)

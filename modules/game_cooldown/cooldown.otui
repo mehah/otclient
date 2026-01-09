@@ -4,9 +4,9 @@ SpellGroupIcon < UIWidget
   image-source: /images/game/spells/spellgroup-icons-20x20
   focusable: false
   margin-top: 3
-  opacity: 1
+  opacity: 0.5
   $on:
-    opacity: 0.5
+    opacity: 1
 
 
 SpellIcon < UIWidget

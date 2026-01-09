@@ -27,6 +27,7 @@
 #include "framework/core/timer.h"
 
 #include "../stdext/storage.h"
+#include <framework/util/spinlock.h>
 
 struct DrawHashController
 {
@@ -120,10 +121,12 @@ public:
     }
 
     bool shouldRepaint() const {
-        return m_shouldRepaint.load(std::memory_order_acquire);
+        return m_shouldRepaint.load(std::memory_order_relaxed);
     }
 
     void release();
+
+    auto& getThreadLock() { return m_threadLock; }
 
 protected:
 
@@ -203,6 +206,15 @@ private:
     void releaseFrameBuffer(const Rect& dest);
 
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
+
+    bool canRefresh() const
+    {
+        uint16_t refreshDelay = m_refreshDelay;
+        if (m_shaderRefreshDelay > 0 && (refreshDelay == 0 || m_shaderRefreshDelay < refreshDelay))
+            refreshDelay = m_shaderRefreshDelay;
+
+        return refreshDelay > 0 && m_refreshTimer.ticksElapsed() >= refreshDelay;
+    }
 
     bool updateHash(const DrawMethod& method, const Texture* texture, const Color& color, bool hasCoord);
     PoolState getState(const TexturePtr& texture, Texture* textureAtlas, const Color& color);
@@ -334,6 +346,8 @@ private:
 
     TextureAtlasPtr m_atlas;
     std::atomic_bool m_shouldRepaint{ false };
+
+    SpinLock m_threadLock;
 
     friend class DrawPoolManager;
 };

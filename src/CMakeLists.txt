@@ -253,6 +253,7 @@ set(SOURCE_FILES
         framework/stdext/qrcodegen.cpp
         framework/util/color.cpp
         framework/util/crypt.cpp
+        framework/util/stats.cpp
         framework/proxy/proxy.cpp
         framework/proxy/proxy_client.cpp
         framework/net/packet_player.cpp

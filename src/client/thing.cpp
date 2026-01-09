@@ -29,6 +29,17 @@
 #include "framework/core/clock.h"
 #include "framework/graphics/paintershaderprogram.h"
 #include "framework/graphics/shadermanager.h"
+#include <framework/util/stats.h>
+
+Thing::Thing()
+{
+    g_stats.addThing();
+}
+
+Thing::~Thing()
+{
+    g_stats.removeThing();
+}
 
 void Thing::setPosition(const Position& position, uint8_t /*stackPos*/)
 {

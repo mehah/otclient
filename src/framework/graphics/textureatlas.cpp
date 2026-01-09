@@ -174,3 +174,25 @@ void TextureAtlas::flush() {
         }
     }
 }
+
+std::string TextureAtlas::getStats() const
+{
+    std::stringstream ss;
+    ss << "size=" << m_size.width() << "x" << m_size.height()
+        << " cached=" << m_texturesCached.size();
+
+    for (int i = 0; i < ATLAS_FILTER_COUNT; ++i) {
+        const auto& group = m_filterGroups[i];
+        size_t textures = 0;
+        for (const auto& layer : group.layers) {
+            textures += layer.textures.size();
+        }
+        ss << " | " << (i == ATLAS_FILTER_LINEAR ? "linear" : "nearest")
+            << ":layers=" << group.layers.size()
+            << " textures=" << textures
+            << " free=" << group.freeRegions.size()
+            << " inactive=" << group.inactiveTextures.size();
+    }
+
+    return ss.str();
+}

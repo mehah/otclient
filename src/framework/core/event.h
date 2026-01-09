@@ -28,7 +28,7 @@
 class Event : public LuaObject
 {
 public:
-    Event(std::function<void()> callback);
+    Event(std::function<void()> callback, std::string function = "Event");
     ~Event() override;
 
     virtual void execute();
@@ -37,8 +37,10 @@ public:
     bool isCanceled() { return m_canceled; }
     bool isExecuted() { return m_executed; }
     bool isPending() { return !m_canceled && !m_executed; }
+    const std::string& getFunction() { return m_function; }
 
 protected:
+    std::string m_function;
     std::function<void()> m_callback;
     bool m_canceled{ false };
     bool m_executed{ false };

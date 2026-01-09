@@ -124,3 +124,13 @@ std::string LuaObject::getClassName()
     return stdext::demangle_name(typeid(*this).name());
 #endif
 }
+
+int LuaObject::getUseCount()
+{
+    try {
+        const auto self = shared_from_this();
+        return static_cast<int>(self.use_count()) - 1;
+    } catch (...) {
+        return 0;
+    }
+}
