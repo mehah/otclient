@@ -1148,16 +1148,15 @@ function onContainerOpen(container, previousContainer)
     if not previousContainer then
         local panel = modules.game_interface.findContentPanelAvailable(containerWindow, cellSize.height)
         panel:addChild(containerWindow)
-    end
-
-    -- Always set the content height based on the current container's content, with a minimum of one row
-    local minRows = 1
-    if modules.client_options.getOption('openMaximized') then
-        local numLines = math.max(layout:getNumLines(), minRows)
-        containerWindow:setHeight(numLines * step + chromeHeight)
-    else
-        local filledLines = math.max(math.ceil(container:getItemsCount() / layout:getNumColumns()), minRows)
-        containerWindow:setHeight(filledLines * step + chromeHeight)
+        -- Always set the content height based on the current container's content, with a minimum of one row
+        local minRows = 1
+        if modules.client_options.getOption('openMaximized') then
+            local numLines = math.max(layout:getNumLines(), minRows)
+            containerWindow:setHeight(numLines * step + chromeHeight)
+        else
+            local filledLines = math.max(math.ceil(container:getItemsCount() / layout:getNumColumns()), minRows)
+            containerWindow:setHeight(filledLines * step + chromeHeight)
+        end
     end
 
     containerWindow:setup()
