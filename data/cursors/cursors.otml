@@ -11,3 +11,6 @@ Cursors
   text:
     image: textcursor
     hot-spot: 4 9
+  pointer:
+    image: pointer
+    hot-spot: 5 0
