@@ -3548,7 +3548,7 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
         const uint32_t amount = g_game.getProtocolVersion() < 1500 ? msg->getU16() : readPackedCount1500(msg);
 
         uint8_t tier = 0;
-        if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem, resourceId)) {
+        if (const auto& thingType = g_things.getThingType(itemId, ThingCategoryItem, resourceId)) {
             if (std::cmp_greater(thingType->getClassification(), 0)) {
                 tier = attribute;
             }
@@ -5043,11 +5043,11 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             const uint16_t stashItemsCount = msg->getU16();
             for (auto i = 0; i < stashItemsCount; ++i) {
-                ItemSummary item;
+                ItemSummary item = ItemSummary();
                 const uint16_t itemId = msg->getU16();
                 const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
                 const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
-                if (!thing) {
+                if (thing->getId() == 0) {
                     continue;
                 }
                 const uint16_t classification = thing->getClassification();
@@ -5902,7 +5902,7 @@ static uint8_t readMarketItemTier(const InputMessagePtr& msg, uint16_t itemId, u
     }
 
     const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
-    if (!thing) {
+    if (thing->getId() == 0) {
         return 0;
     }
 
@@ -6111,7 +6111,7 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
             var = msg->getU16(); // itemId
             const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
             const auto& thing = g_things.getThingType(var, ThingCategoryItem, resourceId);
-            if (thing) {
+            if (thing->getId() != 0) {
                 const uint16_t classification = thing->getClassification();
                 if (classification > 0) {
                     itemTier = msg->getU8();

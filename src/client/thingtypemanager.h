@@ -75,7 +75,7 @@ public:
     const RaceType& getRaceData(uint32_t raceId);
     RaceList getRacesByName(const std::string& searchString);
 
-    const ThingTypePtr& getNullThingType() { return m_nullThingType; }
+    const ThingTypePtr& getNullThingType() const { return m_nullThingType; }
 
     const ThingTypePtr& getThingType(uint16_t id, ThingCategory category, const uint16_t resourceId) const;
     ThingType* getRawThingType(uint16_t id, ThingCategory category, uint16_t resourceId) const;

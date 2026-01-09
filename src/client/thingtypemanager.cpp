@@ -122,10 +122,10 @@ bool ThingTypeManager::loadOtml(std::string file, uint16_t resourceId)
 
             for (const auto& node2 : node->children()) {
                 const auto id = stdext::safe_cast<uint16_t>(node2->tag());
-                const auto& type = getThingType(id, category, resourceId);
-                if (!type)
-                    throw OTMLException(node2, "thing not found");
-                type->unserializeOtml(node2);
+                const auto& thing = getThingType(id, category, resourceId);
+                if (thing->getId() == 0)
+                    throw OTMLException(node2, "thing not found, using ");
+                thing->unserializeOtml(node2);
             }
         }
         return true;
@@ -365,7 +365,7 @@ const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const Thin
     auto res = getResourceById(resourceId);
     if (!res) {
         g_logger.error("failed to get raw thing type {} in category {}: resource {} not loaded", id, static_cast<uint8_t>(category), resourceId);
-        return nullptr;
+        return getNullThingType();
     }
 
     return res->getThingType(id, category);

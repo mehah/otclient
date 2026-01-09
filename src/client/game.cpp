@@ -1768,13 +1768,13 @@ void Game::leaveMarket()
     g_lua.callGlobalField("g_game", "onMarketLeave");
 }
 
-void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
+void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier, const uint16_t resourceId)
 {
     if (!canPerformGameAction()) {
         return;
     }
 
-    m_protocolGame->sendMarketBrowse(browseId, browseType, tier);
+    m_protocolGame->sendMarketBrowse(browseId, browseType, tier, resourceId);
 }
 
 void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint16_t resourceId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
