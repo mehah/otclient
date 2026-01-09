@@ -1111,22 +1111,6 @@ function onContainerOpen(container, previousContainer)
             child:onDrop(widget, mousePos, true)
         end
     end
-    -- Remove resize restriction on minimize, restore on maximize
-    containerWindow.onMinimize = function()
-        local pagePanel = containerWindow:getChildById('pagePanel')
-        if pagePanel and pagePanel:isVisible() then
-            pagePanel.wasVisibleBeforeMinimize = true
-            pagePanel:setVisible(false)
-        end
-    end
-
-    containerWindow.onMaximize = function()
-        local pagePanel = containerWindow:getChildById('pagePanel')
-        if pagePanel and pagePanel.wasVisibleBeforeMinimize then
-            pagePanel:setVisible(true)
-            pagePanel.wasVisibleBeforeMinimize = nil
-        end
-    end
 
     if not previousContainer then
         local panel = modules.game_interface.findContentPanelAvailable(containerWindow, cellSize.height)
