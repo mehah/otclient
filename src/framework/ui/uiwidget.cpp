@@ -1583,8 +1583,8 @@ UIWidgetPtr UIWidget::getNearestChild(const Point& pos)
             continue;
 
         const Point childCenter = child->getRect().center();
-        const float dx = static_cast<float>(pos.x - childCenter.x);
-        const float dy = static_cast<float>(pos.y - childCenter.y);
+        const auto dx = static_cast<float>(pos.x - childCenter.x);
+        const auto dy = static_cast<float>(pos.y - childCenter.y);
         const float distance = std::sqrt(dx * dx + dy * dy);
         if (distance < minDistance) {
             minDistance = distance;
