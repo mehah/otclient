@@ -374,6 +374,8 @@ void ThingType::unserialize(const uint16_t clientId, const uint16_t resourceId, 
     int count = 0;
     int attr = -1;
     bool done = false;
+    int version = g_game.getClientVersion();
+
     for (int i = 0; i < ThingLastAttr; ++i) {
         ++count;
         attr = fin->getU8();
@@ -382,225 +384,21 @@ void ThingType::unserialize(const uint16_t clientId, const uint16_t resourceId, 
             break;
         }
 
-        if (g_game.getClientVersion() >= 1000) {
-            /* In 10.10+ all attributes from 16 and up were
-             * incremented by 1 to make space for 16 as
-             * "No Movement Animation" flag.
-             */
-            if (attr == 16)
-                attr = ThingAttrNoMoveAnimation;
-            else if (attr == 254) { // Usable
-                attr = ThingAttrUsable;
-            } else if (attr == 35) { // Default Action
-                attr = ThingAttrDefaultAction;
-            } else if (attr > 16)
-                attr -= 1;
-        } else if (g_game.getClientVersion() >= 860) {
-            /* Default attribute values follow
-             * the format of 8.6-9.86.
-             * Therefore no changes here.
-             */
-        } else if (g_game.getClientVersion() >= 780) {
-            /* In 7.80-8.54 all attributes from 8 and higher were
-             * incremented by 1 to make space for 8 as
-             * "Item Charges" flag.
-             */
-            if (attr == 8) {
-                attr = ThingAttrChargeable;
-                continue;
-            }
-            if (attr > 8)
-                attr -= 1;
-        } else if (g_game.getClientVersion() >= 755) {
-            /* In 7.55-7.72 attributes 23 is "Floor Change". */
-            if (attr == 23)
-                attr = ThingAttrFloorChange;
-        } else if (g_game.getClientVersion() >= 740) {
-            /* In 7.4-7.5 attribute "Ground Border" did not exist
-             * attributes 1-15 have to be adjusted.
-             * Several other changes in the format.
-             */
-            if (attr > 0 && attr <= 15)
-                attr += 1;
-            else if (attr == 16)
-                attr = ThingAttrLight;
-            else if (attr == 17)
-                attr = ThingAttrFloorChange;
-            else if (attr == 18)
-                attr = ThingAttrFullGround;
-            else if (attr == 19)
-                attr = ThingAttrElevation;
-            else if (attr == 20)
-                attr = ThingAttrDisplacement;
-            else if (attr == 22)
-                attr = ThingAttrMinimapColor;
-            else if (attr == 23)
-                attr = ThingAttrRotateable;
-            else if (attr == 24)
-                attr = ThingAttrLyingCorpse;
-            else if (attr == 25)
-                attr = ThingAttrHangable;
-            else if (attr == 26)
-                attr = ThingAttrHookSouth;
-            else if (attr == 27)
-                attr = ThingAttrHookEast;
-            else if (attr == 28)
-                attr = ThingAttrAnimateAlways;
-
-            /* "Multi Use" and "Force Use" are swapped */
-            if (attr == ThingAttrMultiUse)
-                attr = ThingAttrForceUse;
-            else if (attr == ThingAttrForceUse)
-                attr = ThingAttrMultiUse;
-        }
+        // translate flag id from dat to otc
+        translateFlagId(version, attr);
 
         const auto thingAttr = static_cast<ThingAttr>(attr);
         m_flags |= thingAttrToThingFlagAttr(thingAttr);
 
-        switch (attr) {
-            case ThingAttrDisplacement:
-            {
-                if (g_game.getClientVersion() >= 755) {
-                    if (g_game.getFeature(Otc::GameNegativeOffset)) {
-                        m_displacement.x = fin->get16();
-                        m_displacement.y = fin->get16();
-                    } else {
-                        m_displacement.x = fin->getU16();
-                        m_displacement.y = fin->getU16();
-                    }
-                } else {
-                    m_displacement.x = 8;
-                    m_displacement.y = 8;
-                }
-                break;
-            }
-            case ThingAttrLight:
-            {
-                m_light.intensity = fin->getU16();
-                m_light.color = fin->getU16();
-                break;
-            }
-            case ThingAttrMarket:
-            {
-                m_market.category = static_cast<ITEM_CATEGORY>(fin->getU16());
-                m_market.tradeAs = fin->getU16();
-                m_market.showAs = fin->getU16();
-                m_market.name = fin->getString();
-                m_market.restrictVocation = fin->getU16();
-                m_market.requiredLevel = fin->getU16();
-                break;
-            }
-            case ThingAttrElevation: m_elevation = fin->getU16(); break;
-            case ThingAttrGround: m_groundSpeed = fin->getU16(); break;
-            case ThingAttrWritable: m_maxTextLength = fin->getU16(); break;
-            case ThingAttrWritableOnce:m_maxTextLength = fin->getU16(); break;
-            case ThingAttrMinimapColor: m_minimapColor = fin->getU16(); break;
-            case ThingAttrCloth: m_clothSlot = fin->getU16(); break;
-            case ThingAttrLensHelp: m_lensHelp = fin->getU16(); break;
-            case ThingAttrDefaultAction: m_defaultAction = static_cast<PLAYER_ACTION>(fin->getU16()); break;
-        }
+        // read flag properties
+        unserializeAttribute(attr, fin);
     }
 
     if (!done)
         throw Exception("corrupt data (id: {}, category: {}, count: {}, lastAttr: {})", m_id, m_category, count, attr);
 
-    const bool hasFrameGroups = category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
-    const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
-
-    m_animationPhases = 0;
-    int totalSpritesCount = 0;
-    std::vector<Size> sizes;
-    std::vector<int> total_sprites;
-
-    for (int i = 0; i < groupCount; ++i) {
-        uint8_t frameGroupType = FrameGroupDefault;
-        if (hasFrameGroups)
-            frameGroupType = fin->getU8();
-
-        const uint8_t width = fin->getU8();
-        const uint8_t height = fin->getU8();
-        m_size = { width, height };
-        sizes.emplace_back(m_size);
-        if (width > 1 || height > 1) {
-            m_realSize = std::max<int>(m_realSize, fin->getU8());
-        }
-
-        m_layers = fin->getU8();
-        m_numPatternX = fin->getU8();
-        m_numPatternY = fin->getU8();
-        if (g_game.getClientVersion() >= 755)
-            m_numPatternZ = fin->getU8();
-        else
-            m_numPatternZ = 1;
-
-        const int groupAnimationsPhases = fin->getU8();
-        m_animationPhases += groupAnimationsPhases;
-
-        if (groupAnimationsPhases > 1 && g_game.getFeature(Otc::GameEnhancedAnimations)) {
-            auto* animator = new Animator;
-            animator->unserialize(groupAnimationsPhases, fin);
-
-            if (frameGroupType == FrameGroupMoving)
-                m_animator = animator;
-            else if (frameGroupType == FrameGroupIdle)
-                m_idleAnimator = animator;
-        }
-
-        const int totalSprites = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * groupAnimationsPhases;
-        total_sprites.push_back(totalSprites);
-        if (totalSpritesCount + totalSprites > 4096)
-            throw Exception("a thing type has more than 4096 sprites");
-
-        m_spritesIndex.resize(totalSpritesCount + totalSprites);
-        for (int j = totalSpritesCount; j < (totalSpritesCount + totalSprites); ++j)
-            m_spritesIndex[j] = g_game.getFeature(Otc::GameSpritesU32) ? fin->getU32() : fin->getU16();
-
-        totalSpritesCount += totalSprites;
-    }
-    if (sizes.size() > 1) {
-        bool hasDifferentSizes = false;
-        const Size& firstSize = sizes[0];
-        for (size_t i = 1; i < sizes.size(); ++i) {
-            if (sizes[i] != firstSize) {
-                hasDifferentSizes = true;
-                break;
-            }
-        }
-        if (hasDifferentSizes) {
-            for (const auto& s : sizes) {
-                m_size.setWidth(std::max<int>(m_size.width(), s.width()));
-                m_size.setHeight(std::max<int>(m_size.height(), s.height()));
-            }
-            const size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
-            if (expectedSize != m_spritesIndex.size()) {
-                const std::vector sprites(std::move(m_spritesIndex));
-                m_spritesIndex.clear();
-                m_spritesIndex.reserve(expectedSize);
-                for (size_t i = 0, idx = 0; i < sizes.size(); ++i) {
-                    const int totalSprites = total_sprites[i];
-                    if (m_size == sizes[i]) {
-                        for (int j = 0; j < totalSprites; ++j) {
-                            m_spritesIndex.push_back(sprites[idx++]);
-                        }
-                        continue;
-                    }
-                    const size_t patterns = (totalSprites / sizes[i].area());
-                    for (size_t p = 0; p < patterns; ++p) {
-                        for (int x = 0; x < m_size.width(); ++x) {
-                            for (int y = 0; y < m_size.height(); ++y) {
-                                if (x < sizes[i].width() && y < sizes[i].height()) {
-                                    m_spritesIndex.push_back(sprites[idx++]);
-                                    continue;
-                                }
-                                m_spritesIndex.push_back(0);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    m_textureData.resize(m_animationPhases);
+    // read sprite size, frame groups, animation info
+    unserializeSpriteInfo(fin);
 }
 
 void ThingType::unserializeOtml(const OTMLNodePtr& node)
@@ -879,6 +677,235 @@ Size ThingType::getBestTextureDimension(int w, int h, const int count)
     }
 
     return bestDimension;
+}
+
+void ThingType::translateFlagId(const int version, int& flagId)
+{
+    if (version >= 1000) {
+        // In 10.10+ all attributes after 16 were incremented by 1
+        // in order to make space for "no movement animation" flag.
+        if (flagId == 16)
+            flagId = ThingAttrNoMoveAnimation;
+        else if (flagId == 254) // Usable
+            flagId = ThingAttrUsable;
+        else if (flagId == 35) // Default Action
+            flagId = ThingAttrDefaultAction;
+        else if (flagId > 16)
+            flagId -= 1;
+    } else if (version >= 860) {
+        // Default attribute values follow the format of 8.6-9.86.
+        // Therefore no changes here.
+        return;
+    } else if (version >= 780) {
+        // In 7.80-8.54 all attributes after 8 were incremented by 1
+        // in order to make space for rune charges flag
+        if (flagId == 8)
+            flagId = ThingAttrChargeable;        
+        else if (flagId > 8)
+            flagId -= 1;
+    } else if (version >= 755) {
+        // In 7.55-7.72 attributes 23 is "Floor Change".
+        if (flagId == 23)
+            flagId = ThingAttrFloorChange;
+    } else if (version >= 740) {
+        // In 7.4-7.5 attribute "Ground Border" did not exist
+        // attributes 1-15 have to be adjusted.
+        if (flagId > 0 && flagId <= 15)
+            flagId += 1;
+
+        // several other changes in the format
+        else if (flagId == 16)
+            flagId = ThingAttrLight;
+        else if (flagId == 17)
+            flagId = ThingAttrFloorChange;
+        else if (flagId == 18)
+            flagId = ThingAttrFullGround;
+        else if (flagId == 19)
+            flagId = ThingAttrElevation;
+        else if (flagId == 20)
+            flagId = ThingAttrDisplacement;
+        else if (flagId == 22)
+            flagId = ThingAttrMinimapColor;
+        else if (flagId == 23)
+            flagId = ThingAttrRotateable;
+        else if (flagId == 24)
+            flagId = ThingAttrLyingCorpse;
+        else if (flagId == 25)
+            flagId = ThingAttrHangable;
+        else if (flagId == 26)
+            flagId = ThingAttrHookSouth;
+        else if (flagId == 27)
+            flagId = ThingAttrHookEast;
+        else if (flagId == 28)
+            flagId = ThingAttrAnimateAlways;
+
+        // "Multi Use" and "Force Use" are swapped
+        if (flagId == ThingAttrMultiUse)
+            flagId = ThingAttrForceUse;
+        else if (flagId == ThingAttrForceUse)
+            flagId = ThingAttrMultiUse;
+    }
+}
+
+void ThingType::unserializeAttribute(int attr, const FileStreamPtr& fin)
+{
+    switch (attr) {
+        case ThingAttrDisplacement:
+        {
+            if (g_game.getClientVersion() >= 755) {
+                if (g_game.getFeature(Otc::GameNegativeOffset)) {
+                    m_displacement.x = fin->get16();
+                    m_displacement.y = fin->get16();
+                } else {
+                    m_displacement.x = fin->getU16();
+                    m_displacement.y = fin->getU16();
+                }
+            } else {
+                m_displacement.x = 8;
+                m_displacement.y = 8;
+            }
+            break;
+        }
+        case ThingAttrLight:
+        {
+            m_light.intensity = fin->getU16();
+            m_light.color = fin->getU16();
+            break;
+        }
+        case ThingAttrMarket:
+        {
+            m_market.category = static_cast<ITEM_CATEGORY>(fin->getU16());
+            m_market.tradeAs = fin->getU16();
+            m_market.showAs = fin->getU16();
+            m_market.name = fin->getString();
+            m_market.restrictVocation = fin->getU16();
+            m_market.requiredLevel = fin->getU16();
+            break;
+        }
+        case ThingAttrElevation: m_elevation = fin->getU16(); break;
+        case ThingAttrGround: m_groundSpeed = fin->getU16(); break;
+        case ThingAttrWritable: m_maxTextLength = fin->getU16(); break;
+        case ThingAttrWritableOnce:m_maxTextLength = fin->getU16(); break;
+        case ThingAttrMinimapColor: m_minimapColor = fin->getU16(); break;
+        case ThingAttrCloth: m_clothSlot = fin->getU16(); break;
+        case ThingAttrLensHelp: m_lensHelp = fin->getU16(); break;
+        case ThingAttrDefaultAction: m_defaultAction = static_cast<PLAYER_ACTION>(fin->getU16()); break;
+    }
+}
+
+void ThingType::unserializeSpriteInfo(const FileStreamPtr& fin)
+{
+    const bool hasFrameGroups = m_category == ThingCategoryCreature && g_game.getFeature(Otc::GameIdleAnimations);
+    const uint8_t groupCount = hasFrameGroups ? fin->getU8() : 1;
+
+    m_animationPhases = 0;
+    int totalSpritesCount = 0;
+    std::vector<Size> sizes;
+    std::vector<int> total_sprites;
+
+    for (int i = 0; i < groupCount; ++i) {
+        uint8_t frameGroupType = FrameGroupDefault;
+        if (hasFrameGroups)
+            frameGroupType = fin->getU8();
+
+        const uint8_t width = fin->getU8();
+        const uint8_t height = fin->getU8();
+        m_size = { width, height };
+        sizes.emplace_back(m_size);
+        if (width > 1 || height > 1) {
+            m_realSize = std::max<int>(m_realSize, fin->getU8());
+        }
+
+        m_layers = fin->getU8();
+        m_numPatternX = fin->getU8();
+        m_numPatternY = fin->getU8();
+        if (g_game.getClientVersion() >= 755)
+            m_numPatternZ = fin->getU8();
+        else
+            m_numPatternZ = 1;
+
+        const int groupAnimationsPhases = fin->getU8();
+        m_animationPhases += groupAnimationsPhases;
+
+        if (groupAnimationsPhases > 1 && g_game.getFeature(Otc::GameEnhancedAnimations)) {
+            auto* animator = new Animator;
+            animator->unserialize(groupAnimationsPhases, fin);
+
+            if (frameGroupType == FrameGroupMoving)
+                m_animator = animator;
+            else if (frameGroupType == FrameGroupIdle)
+                m_idleAnimator = animator;
+        }
+
+        const int totalSprites = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * groupAnimationsPhases;
+        total_sprites.push_back(totalSprites);
+        if (totalSpritesCount + totalSprites > 4096)
+            throw Exception("a thing type has more than 4096 sprites");
+
+        m_spritesIndex.resize(totalSpritesCount + totalSprites);
+        for (int j = totalSpritesCount; j < (totalSpritesCount + totalSprites); ++j)
+            m_spritesIndex[j] = g_game.getFeature(Otc::GameSpritesU32) ? fin->getU32() : fin->getU16();
+
+        totalSpritesCount += totalSprites;
+    }
+    if (sizes.size() > 1) {
+        bool hasDifferentSizes = false;
+        const Size& firstSize = sizes[0];
+        for (size_t i = 1; i < sizes.size(); ++i) {
+            if (sizes[i] != firstSize) {
+                hasDifferentSizes = true;
+                break;
+            }
+        }
+        if (hasDifferentSizes) {
+            adjustSpriteSizes(sizes, total_sprites);
+        }
+    }
+    m_textureData.resize(m_animationPhases);
+}
+
+void ThingType::adjustSpriteSizes(const std::vector<Size>& sizes, const std::vector<int>& total_sprites)
+{
+    for (const auto& s : sizes) {
+        m_size.setWidth(std::max<int>(m_size.width(), s.width()));
+        m_size.setHeight(std::max<int>(m_size.height(), s.height()));
+    }
+
+    const size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
+
+    if (expectedSize == m_spritesIndex.size()) {
+        return;
+    }
+
+    const std::vector sprites(std::move(m_spritesIndex));
+    m_spritesIndex.clear();
+    m_spritesIndex.reserve(expectedSize);
+    for (size_t frameId = 0, spriteIndex = 0; frameId < sizes.size(); ++frameId) {
+        const int totalSprites = total_sprites[frameId];
+        if (m_size == sizes[frameId]) {
+            for (int j = 0; j < totalSprites; ++j) {
+                m_spritesIndex.push_back(sprites[spriteIndex++]);
+            }
+            continue;
+        }
+        const size_t patterns = (totalSprites / sizes[frameId].area());
+        for (size_t p = 0; p < patterns; ++p) {
+            adjustSpriteFrame(sizes, sprites, frameId, spriteIndex);
+        }
+    }
+}
+
+void ThingType::adjustSpriteFrame(const std::vector<Size>& sizes, const std::vector<uint32_t>& sprites, size_t frameId, size_t spriteIndex)
+{
+    for (int x = 0; x < m_size.width(); ++x) {
+        for (int y = 0; y < m_size.height(); ++y) {
+            if (x < sizes[frameId].width() && y < sizes[frameId].height()) {
+                m_spritesIndex.push_back(sprites[spriteIndex++]);
+                continue;
+            }
+            m_spritesIndex.push_back(0);
+        }
+    }
 }
 
 uint32_t ThingType::getSpriteIndex(const int w, const int h, const int l, const int x, const int y, const int z, const int a) const

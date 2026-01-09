@@ -176,6 +176,12 @@ public:
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
+    static void translateFlagId(const int version, int& flagId);
+
+    void unserializeAttribute(int attr, const FileStreamPtr& fin);
+    void unserializeSpriteInfo(const FileStreamPtr& fin);
+    void adjustSpriteSizes(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);
+    void adjustSpriteFrame(const std::vector<Size>& sizes, const std::vector<uint32_t>& sprites, const size_t frameId, size_t& spriteIndex);
 
     void loadTexture(int animationPhase);
 

@@ -81,7 +81,7 @@ public:
     virtual ~ISpriteManager() = default;
 
     virtual ImagePtr getSpriteImage(int id, bool& isLoading) = 0;
-    ImagePtr getSpriteImage(int id)
+    ImagePtr getSpriteImageById(int id)
     {
         bool isLoading = false;
         return getSpriteImage(id, isLoading);
@@ -205,7 +205,7 @@ public:
         m_sheets.clear();
     }
 
-    void reload() override {};
+    void reload() override { /* for protobuf assets this is managed per sheet */ };
 
     void setSpritesCount(const int count) { m_spritesCount = count; }
     int getSpritesCount() const override { return m_spritesCount; }
