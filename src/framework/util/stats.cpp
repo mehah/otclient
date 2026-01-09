@@ -3,10 +3,6 @@
 #include <framework/stdext/time.h>
 #include <framework/ui/ui.h>
 #include <framework/ui/uiwidget.h>
-#include <fstream>
-#include <iomanip>
-#include <map>
-#include <sstream>
 
 Stats g_stats;
 
@@ -139,7 +135,8 @@ void Stats::removeWidget(UIWidget* widget)
     widgets.erase(widget);
 }
 
-struct WidgetTreeNode {
+struct WidgetTreeNode
+{
     UIWidgetPtr widget;
     int children_count;
     std::list<WidgetTreeNode> children;
