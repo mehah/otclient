@@ -1774,88 +1774,15 @@ void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 {
-    uint16_t resourceId = 0;
-
-    const auto& pos = getPosition(msg);
-    if (g_game.getProtocolVersion() >= 1203) {
-        uint8_t effectType = msg->getU8();
-        while (effectType != Otc::MAGIC_EFFECTS_END_LOOP) {
-            switch (effectType) {
-                case Otc::MAGIC_EFFECTS_DELAY:
-                case Otc::MAGIC_EFFECTS_DELTA: {
-                    msg->getU8(); // ?
-                    break;
-                }
-
-                case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
-                case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
-                    const uint16_t shotId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-                    if (g_game.getFeature(Otc::GameMultiSpr)) {
-                        resourceId = msg->getU16();
-                    }
-                    const auto offsetX = static_cast<int8_t>(msg->getU8());
-                    const auto offsetY = static_cast<int8_t>(msg->getU8());
-                    if (!g_things.isValidDatId(shotId, ThingCategoryMissile, resourceId)) {
-                        g_logger.traceError("invalid missile id {}", shotId);
-                        return;
-                    }
-
-                    const auto& missile = std::make_shared<Missile>();
-                    missile->setId(shotId, resourceId);
-
-                    if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
-                        missile->setPath(pos, Position(pos.x + offsetX, pos.y + offsetY, pos.z));
-                    } else {
-                        missile->setPath(Position(pos.x + offsetX, pos.y + offsetY, pos.z), pos);
-                    }
-
-                    g_map.addThing(missile, pos);
-                    break;
-                }
-
-                case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
-                    const uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-                    if (g_game.getFeature(Otc::GameMultiSpr)) {
-                        resourceId = msg->getU16();
-                    }
-
-                    if (!g_things.isValidDatId(effectId, ThingCategoryEffect, resourceId)) {
-                        g_logger.traceError("invalid effect id {}", effectId);
-                        continue;
-                    }
-
-                    const auto& effect = std::make_shared<Effect>();
-                    effect->setId(effectId, resourceId);
-                    g_map.addThing(effect, pos);
-                    break;
-                }
-
-                case Otc::MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT: {
-                    msg->getU8(); // Source
-                    msg->getU16(); // Sound ID
-                    break;
-                }
-
-                case Otc::MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT: {
-                    msg->getU8(); // ENUM
-                    msg->getU8(); // Source
-                    msg->getU16(); // Sound ID
-                    break;
-                }
-                default:
-                    break;
-            }
-
-            effectType = msg->getU8();
-        }
-
+    auto pos = getPosition(msg);
+    if (g_game.getProtocolVersion() >= 1203) {    
+        // read all magic/sound effects
+        while (setMagicEffect(msg, pos, msg->getU8()));
         return;
     }
 
     uint16_t effectId = g_game.getFeature(Otc::GameMagicEffectU16) ? msg->getU16() : msg->getU8();
-    if (g_game.getFeature(Otc::GameMultiSpr)) {
-        resourceId = msg->getU16();
-    }
+    const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
 
     if (g_game.getClientVersion() <= 750) {
         effectId += 1; //hack to fix effects in earlier clients
@@ -3747,6 +3674,87 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
     return 0;
 }
 
+bool ProtocolGame::setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType)
+{
+    uint16_t resourceId = 0;
+    switch (effectType) {
+        case Otc::MAGIC_EFFECTS_END_LOOP:
+            // returning false ends the "while" loop
+            return false;
+        case Otc::MAGIC_EFFECTS_DELAY:
+        case Otc::MAGIC_EFFECTS_DELTA: {
+            msg->getU8(); // ?
+            break;
+        }
+
+        case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
+        case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
+            const uint16_t shotId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
+            if (g_game.getFeature(Otc::GameMultiSpr)) {
+                resourceId = msg->getU16();
+            }
+            const auto offsetX = static_cast<int8_t>(msg->getU8());
+            const auto offsetY = static_cast<int8_t>(msg->getU8());
+            if (!g_things.isValidDatId(shotId, ThingCategoryMissile, resourceId)) {
+                g_logger.traceError("invalid missile id {}", shotId);
+
+                // end the "while" loop
+                return false;
+            }
+
+            const auto& missile = std::make_shared<Missile>();
+            missile->setId(shotId, resourceId);
+
+            if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
+                missile->setPath(pos, Position(pos.x + offsetX, pos.y + offsetY, pos.z));
+            } else {
+                missile->setPath(Position(pos.x + offsetX, pos.y + offsetY, pos.z), pos);
+            }
+
+            g_map.addThing(missile, pos);
+            break;
+        }
+
+        case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
+            const uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
+            if (g_game.getFeature(Otc::GameMultiSpr)) {
+                resourceId = msg->getU16();
+            }
+
+            if (!g_things.isValidDatId(effectId, ThingCategoryEffect, resourceId)) {
+                g_logger.traceError("invalid effect id {}", effectId);
+
+                // effect cannot be drawn
+                // but the loop may continue
+                break;
+            }
+
+            const auto& effect = std::make_shared<Effect>();
+            effect->setId(effectId, resourceId);
+            g_map.addThing(effect, pos);
+            break;
+        }
+
+        case Otc::MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT: {
+            msg->getU8(); // Source
+            msg->getU16(); // Sound ID
+            break;
+        }
+
+        case Otc::MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT: {
+            msg->getU8(); // ENUM
+            msg->getU8(); // Source
+            msg->getU16(); // Sound ID
+            break;
+        }
+        default:
+            break;
+    }
+
+    // continue the "while" loop
+    return true;
+}
+
 Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount/* = true*/) const
 {
     Outfit outfit;
@@ -3872,223 +3880,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
     CreaturePtr creature;
     const bool known = type != Proto::UnknownCreature;
     if (type == Proto::OutdatedCreature || type == Proto::UnknownCreature) {
-        if (known) {
-            const uint32_t creatureId = msg->getU32();
-            creature = g_map.getCreatureById(creatureId);
-            if (!creature) {
-                g_logger.traceError("ProtocolGame::getCreature: server said that a creature is known, but it's not");
-            }
-        } else {
-            const uint32_t removeId = msg->getU32();
-            const uint32_t id = msg->getU32();
-
-            if (id == removeId) {
-                creature = g_map.getCreatureById(id);
-            } else {
-                g_map.removeCreatureById(removeId);
-            }
-
-            uint8_t creatureType;
-            if (g_game.getClientVersion() >= 910) {
-                creatureType = msg->getU8();
-            } else {
-                if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId)
-                    creatureType = Proto::CreatureTypePlayer;
-                else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId)
-                    creatureType = Proto::CreatureTypeMonster;
-                else
-                    creatureType = Proto::CreatureTypeNpc;
-            }
-
-            uint32_t masterId = 0;
-            if (g_game.getClientVersion() >= 1281 && creatureType == Proto::CreatureTypeSummonOwn) {
-                masterId = msg->getU32();
-                if (m_localPlayer->getId() != masterId) {
-                    creatureType = Proto::CreatureTypeSummonOther;
-                }
-            }
-
-            const auto& name = g_game.formatCreatureName(msg->getString());
-
-            if (!creature) {
-                if ((id == m_localPlayer->getId()) ||
-                    // fixes a bug server side bug where GameInit is not sent and local player id is unknown
-                    (creatureType == Proto::CreatureTypePlayer && !m_localPlayer->getId() && name == m_localPlayer->getName())) {
-                    creature = m_localPlayer;
-                } else {
-                    switch (creatureType) {
-                        case Proto::CreatureTypePlayer:
-                            creature = std::make_shared<Player>();
-                            break;
-
-                        case Proto::CreatureTypeNpc:
-                            creature = std::make_shared<Npc>();
-                            break;
-
-                        case Proto::CreatureTypeHidden:
-                        case Proto::CreatureTypeMonster:
-                        case Proto::CreatureTypeSummonOwn:
-                        case Proto::CreatureTypeSummonOther:
-                            creature = std::make_shared<Monster>();
-                            break;
-
-                        default:
-                            g_logger.traceError("ProtocolGame::getCreature: creature type is invalid");
-                    }
-
-                    if (creature) {
-                        creature->onCreate();
-                    }
-                }
-            }
-
-            if (creature) {
-                creature->setId(id);
-                creature->setName(name);
-                creature->setMasterId(masterId);
-
-                g_map.addCreature(creature);
-            }
-        }
-
-        const uint8_t healthPercent = msg->getU8();
-        const auto direction = static_cast<Otc::Direction>(msg->getU8());
-        const auto& outfit = getOutfit(msg);
-
-        Light light;
-        light.intensity = msg->getU8();
-        light.color = msg->getU8();
-
-        const uint16_t speed = msg->getU16();
-
-        if (creature && g_game.getClientVersion() >= 1281) {
-            addCreatureIcon(msg, creature->getId());
-        }
-
-        const uint8_t skull = msg->getU8();
-        const uint8_t shield = msg->getU8();
-
-        // emblem is sent only when the creature is not known
-        uint8_t emblem = 0;
-        uint8_t creatureType = 0;
-        uint8_t icon = 0;
-        bool unpass = true;
-
-        if (g_game.getFeature(Otc::GameCreatureEmblems) && !known) {
-            emblem = msg->getU8();
-        }
-
-        if (g_game.getFeature(Otc::GameThingMarks)) {
-            creatureType = msg->getU8();
-        }
-
-        uint32_t masterId = 0;
-        if (g_game.getClientVersion() >= 1281) {
-            if (creatureType == Proto::CreatureTypeSummonOwn) {
-                masterId = msg->getU32();
-                if (m_localPlayer->getId() != masterId) {
-                    creatureType = Proto::CreatureTypeSummonOther;
-                }
-            } else if (creatureType == Proto::CreatureTypePlayer) {
-                uint8_t vocationId = msg->getU8();
-                if (creature) {
-                    creature->setVocation(vocationId);
-                }
-            }
-        }
-
-        if (g_game.getFeature(Otc::GameCreatureIcons)) {
-            icon = msg->getU8();
-        }
-
-        if (g_game.getFeature(Otc::GameThingMarks)) {
-            const uint8_t mark = msg->getU8(); // mark
-
-            if (g_game.getClientVersion() < 1281) {
-                msg->getU16(); // helpers
-            }
-
-            if (creature) {
-                if (mark == 0xff) {
-                    creature->hideStaticSquare();
-                } else {
-                    creature->showStaticSquare(Color::from8bit(mark));
-                }
-            }
-        }
-
-        if (g_game.getClientVersion() >= 1281) {
-            msg->getU8(); // inspection type
-        }
-
-        if (g_game.getClientVersion() >= 854) {
-            unpass = static_cast<bool>(msg->getU8());
-        }
-
-        if (g_game.getFeature(Otc::GameCreaturePaperdoll)) {
-            uint8_t size = msg->getU8();
-            for (uint8_t i = 0; i < size; ++i) {
-                const auto& paperdoll = getPaperdoll(msg);
-                if (creature)
-                    creature->attachPaperdoll(paperdoll);
-            }
-        }
-
-        std::string shader;
-        if (g_game.getFeature(Otc::GameCreatureShader)) {
-            shader = msg->getString();
-        }
-
-        std::vector<uint16_t> attachedEffectList;
-        if (g_game.getFeature(Otc::GameCreatureAttachedEffect)) {
-            const uint8_t listSize = msg->getU8();
-            for (auto i = -1; ++i < listSize;) {
-                attachedEffectList.push_back(msg->getU16());
-            }
-        }
-
-        if (creature) {
-            creature->setHealthPercent(healthPercent);
-            creature->turn(direction);
-            creature->setOutfit(outfit);
-            creature->setSpeed(speed);
-            creature->setSkull(skull);
-            creature->setShield(shield);
-            creature->setPassable(!unpass);
-            creature->setLight(light);
-            creature->setMasterId(masterId);
-            creature->setShader(shader);
-            creature->clearTemporaryAttachedEffects();
-            std::unordered_set<uint16_t> currentAttachedEffectIds;
-            for (const auto& attachedEffect : creature->getAttachedEffects()) {
-                currentAttachedEffectIds.insert(attachedEffect->getId());
-            }
-
-            for (const auto effectId : attachedEffectList) {
-                const auto& effect = g_attachedEffects.getById(effectId);
-                if (effect && currentAttachedEffectIds.find(effectId) == currentAttachedEffectIds.end()) {
-                    const auto& clonedEffect = effect->clone();
-                    clonedEffect->setPermanent(false);
-                    creature->attachEffect(clonedEffect);
-                }
-            }
-
-            if (emblem > 0) {
-                creature->setEmblem(emblem);
-            }
-
-            if (creatureType > 0) {
-                creature->setType(creatureType);
-            }
-
-            if (icon > 0) {
-                creature->setIcon(icon);
-            }
-
-            if (creature == m_localPlayer && !m_localPlayer->isKnown()) {
-                m_localPlayer->setKnown(true);
-            }
-        }
+        internalGetCreature(msg, creature, known);
     } else if (type == Proto::Creature) {
         // this is send creature turn
         const uint32_t creatureId = msg->getU32();
@@ -6489,4 +6281,230 @@ PaperdollPtr ProtocolGame::getPaperdoll(const InputMessagePtr& msg) const {
         paperdoll->setShader(shader);
 
     return paperdoll;
+}
+
+void ProtocolGame::internalGetCreature(const InputMessagePtr& msg, CreaturePtr& creature, const bool known) const
+{
+    if (known) {
+        const uint32_t creatureId = msg->getU32();
+        creature = g_map.getCreatureById(creatureId);
+        if (!creature) {
+            g_logger.traceError("ProtocolGame::getCreature: server said that a creature is known, but it's not");
+        }
+    } else {
+        const uint32_t removeId = msg->getU32();
+        const uint32_t id = msg->getU32();
+
+        if (id == removeId) {
+            creature = g_map.getCreatureById(id);
+        } else {
+            g_map.removeCreatureById(removeId);
+        }
+
+        uint8_t creatureType;
+        if (g_game.getClientVersion() >= 910) {
+            creatureType = msg->getU8();
+        } else {
+            if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId)
+                creatureType = Proto::CreatureTypePlayer;
+            else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId)
+                creatureType = Proto::CreatureTypeMonster;
+            else
+                creatureType = Proto::CreatureTypeNpc;
+        }
+
+        uint32_t masterId = 0;
+        if (g_game.getClientVersion() >= 1281 && creatureType == Proto::CreatureTypeSummonOwn) {
+            masterId = msg->getU32();
+            if (m_localPlayer->getId() != masterId) {
+                creatureType = Proto::CreatureTypeSummonOther;
+            }
+        }
+
+        const auto& name = g_game.formatCreatureName(msg->getString());
+
+        if (!creature) {
+            if ((id == m_localPlayer->getId()) ||
+                // fixes a bug server side bug where GameInit is not sent and local player id is unknown
+                (creatureType == Proto::CreatureTypePlayer && !m_localPlayer->getId() && name == m_localPlayer->getName())) {
+                creature = m_localPlayer;
+            } else {
+                makeCreature(creature, id, creatureType, name);
+            }
+        }
+
+        if (creature) {
+            creature->setId(id);
+            creature->setName(name);
+            creature->setMasterId(masterId);
+
+            g_map.addCreature(creature);
+        }
+    }
+
+    const uint8_t healthPercent = msg->getU8();
+    const auto direction = static_cast<Otc::Direction>(msg->getU8());
+    const auto& outfit = getOutfit(msg);
+
+    Light light;
+    light.intensity = msg->getU8();
+    light.color = msg->getU8();
+
+    const uint16_t speed = msg->getU16();
+
+    if (creature && g_game.getClientVersion() >= 1281) {
+        addCreatureIcon(msg, creature->getId());
+    }
+
+    const uint8_t skull = msg->getU8();
+    const uint8_t shield = msg->getU8();
+
+    // emblem is sent only when the creature is not known
+    uint8_t emblem = 0;
+    uint8_t creatureType = 0;
+    uint8_t icon = 0;
+    bool unpass = true;
+
+    if (g_game.getFeature(Otc::GameCreatureEmblems) && !known) {
+        emblem = msg->getU8();
+    }
+
+    if (g_game.getFeature(Otc::GameThingMarks)) {
+        creatureType = msg->getU8();
+    }
+
+    uint32_t masterId = 0;
+    if (g_game.getClientVersion() >= 1281) {
+        if (creatureType == Proto::CreatureTypeSummonOwn) {
+            masterId = msg->getU32();
+            if (m_localPlayer->getId() != masterId) {
+                creatureType = Proto::CreatureTypeSummonOther;
+            }
+        } else if (creatureType == Proto::CreatureTypePlayer) {
+            uint8_t vocationId = msg->getU8();
+            if (creature) {
+                creature->setVocation(vocationId);
+            }
+        }
+    }
+
+    if (g_game.getFeature(Otc::GameCreatureIcons)) {
+        icon = msg->getU8();
+    }
+
+    if (g_game.getFeature(Otc::GameThingMarks)) {
+        const uint8_t mark = msg->getU8(); // mark
+
+        if (g_game.getClientVersion() < 1281) {
+            msg->getU16(); // helpers
+        }
+
+        if (creature) {
+            if (mark == 0xff) {
+                creature->hideStaticSquare();
+            } else {
+                creature->showStaticSquare(Color::from8bit(mark));
+            }
+        }
+    }
+
+    if (g_game.getClientVersion() >= 1281) {
+        msg->getU8(); // inspection type
+    }
+
+    if (g_game.getClientVersion() >= 854) {
+        unpass = static_cast<bool>(msg->getU8());
+    }
+
+    if (g_game.getFeature(Otc::GameCreaturePaperdoll)) {
+        uint8_t size = msg->getU8();
+        for (uint8_t i = 0; i < size; ++i) {
+            const auto& paperdoll = getPaperdoll(msg);
+            if (creature)
+                creature->attachPaperdoll(paperdoll);
+        }
+    }
+
+    std::string shader;
+    if (g_game.getFeature(Otc::GameCreatureShader)) {
+        shader = msg->getString();
+    }
+
+    std::vector<uint16_t> attachedEffectList;
+    if (g_game.getFeature(Otc::GameCreatureAttachedEffect)) {
+        const uint8_t listSize = msg->getU8();
+        for (auto i = -1; ++i < listSize;) {
+            attachedEffectList.push_back(msg->getU16());
+        }
+    }
+
+    if (creature) {
+        creature->setHealthPercent(healthPercent);
+        creature->turn(direction);
+        creature->setOutfit(outfit);
+        creature->setSpeed(speed);
+        creature->setSkull(skull);
+        creature->setShield(shield);
+        creature->setPassable(!unpass);
+        creature->setLight(light);
+        creature->setMasterId(masterId);
+        creature->setShader(shader);
+        creature->clearTemporaryAttachedEffects();
+        std::unordered_set<uint16_t> currentAttachedEffectIds;
+        for (const auto& attachedEffect : creature->getAttachedEffects()) {
+            currentAttachedEffectIds.insert(attachedEffect->getId());
+        }
+
+        for (const auto effectId : attachedEffectList) {
+            const auto& effect = g_attachedEffects.getById(effectId);
+            if (effect && currentAttachedEffectIds.find(effectId) == currentAttachedEffectIds.end()) {
+                const auto& clonedEffect = effect->clone();
+                clonedEffect->setPermanent(false);
+                creature->attachEffect(clonedEffect);
+            }
+        }
+
+        if (emblem > 0) {
+            creature->setEmblem(emblem);
+        }
+
+        if (creatureType > 0) {
+            creature->setType(creatureType);
+        }
+
+        if (icon > 0) {
+            creature->setIcon(icon);
+        }
+
+        if (creature == m_localPlayer && !m_localPlayer->isKnown()) {
+            m_localPlayer->setKnown(true);
+        }
+    }
+}
+
+void ProtocolGame::makeCreature(CreaturePtr& creature, const uint32_t id, uint8_t creatureType, const std::string& creatureName) const
+{
+    switch (creatureType) {
+        case Proto::CreatureTypePlayer:
+            creature = std::make_shared<Player>();
+            break;
+
+        case Proto::CreatureTypeNpc:
+            creature = std::make_shared<Npc>();
+            break;
+
+        case Proto::CreatureTypeHidden:
+        case Proto::CreatureTypeMonster:
+        case Proto::CreatureTypeSummonOwn:
+        case Proto::CreatureTypeSummonOther:
+            creature = std::make_shared<Monster>();
+            break;
+
+        default:
+            g_logger.traceError("ProtocolGame::getCreature: creature type is invalid");
+    }
+
+    if (creature) {
+        creature->onCreate();
+    }
 }

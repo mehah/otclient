@@ -388,6 +388,7 @@ public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);
     int setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip);
     int setTileDescription(const InputMessagePtr& msg, Position position);
+    bool setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType);
 
     Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true) const;
     ThingPtr getThing(const InputMessagePtr& msg);
@@ -398,6 +399,8 @@ public:
 
 private:
     PaperdollPtr getPaperdoll(const InputMessagePtr& msg) const;
+    void internalGetCreature(const InputMessagePtr& msg, CreaturePtr& creature, bool known) const;
+    void makeCreature(CreaturePtr& creature, const uint32_t id, uint8_t creatureType, const std::string& creatureName) const;
 
     bool m_enableSendExtendedOpcode{ false };
     bool m_gameInitialized{ false };
