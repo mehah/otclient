@@ -1077,27 +1077,11 @@ function onContainerOpen(container, previousContainer)
     local numLines = layout:getNumLines()
     local chromeHeight = container:hasPages() and 55 or 31
     containerWindow:setContentMinimumHeight(cellSize.height)
-    local function snapToGrid()
-        local currentHeight = containerWindow:getHeight()
-        local rows = math.max(1, math.floor((currentHeight - chromeHeight + step * 0.5) / step))
-        local newHeight = rows * step + chromeHeight
-        
-        if currentHeight ~= newHeight then
-            containerWindow:setHeight(newHeight)
-        end
-    end
+
     local resizeBorder = containerWindow:getChildById('bottomResizeBorder')
     if resizeBorder then
         resizeBorder:setMinimum(step + chromeHeight)
         resizeBorder:setMaximum(numLines * step + chromeHeight)
-        
-        local originalMouseRelease = resizeBorder.onMouseRelease
-        resizeBorder.onMouseRelease = function(self, mousePos, mouseButton)
-            if originalMouseRelease then
-                originalMouseRelease(self, mousePos, mouseButton)
-            end
-            snapToGrid()
-        end
     end
     -- Enables dragging only when mouse press occurs within window bounds (with tolerance margins)
     -- and not over the containerPanel child widget
@@ -1142,20 +1126,22 @@ function onContainerOpen(container, previousContainer)
             pagePanel:setVisible(true)
             pagePanel.wasVisibleBeforeMinimize = nil
         end
-        snapToGrid()
     end
 
     if not previousContainer then
         local panel = modules.game_interface.findContentPanelAvailable(containerWindow, cellSize.height)
         panel:addChild(containerWindow)
+    end
+
+    if not previousContainer or previousContainer:getCapacity() >= container:getCapacity() then
         -- Always set the content height based on the current container's content, with a minimum of one row
         local minRows = 1
         if modules.client_options.getOption('openMaximized') then
             local numLines = math.max(layout:getNumLines(), minRows)
-            containerWindow:setHeight(numLines * step + chromeHeight)
+            containerWindow:setContentHeight(numLines * step + chromeHeight)
         else
             local filledLines = math.max(math.ceil(container:getItemsCount() / layout:getNumColumns()), minRows)
-            containerWindow:setHeight(filledLines * step + chromeHeight)
+            containerWindow:setContentHeight(filledLines * step + chromeHeight)
         end
     end
 
@@ -1167,7 +1153,6 @@ function onContainerOpen(container, previousContainer)
     if currentSortMode and currentSortMode ~= 'none' and not isManualSortEnabled then
         sortContainerItems(container, currentSortMode)
     end
-    snapToGrid()
 end
 
 function onContainerClose(container)
