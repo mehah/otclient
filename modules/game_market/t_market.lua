@@ -127,8 +127,10 @@ function toggle()
     if marketWindow:isVisible() then
         sendMarketLeave()
         marketWindow:hide()
+        marketWindow:unlock()
     else
         marketWindow:show(true)
+        marketWindow:lock()
         marketWindow.contentPanel.searchText:focus()
     end
 end
@@ -137,7 +139,6 @@ function hide()
     if not marketWindow then
         return
     end
-
     local benchmark = g_clock.millis()
     local mainMarket = marketWindow.contentPanel:getChildById('mainMarket')
     local detailsMarket = marketWindow.contentPanel:getChildById('detailsMarket')
@@ -150,12 +151,18 @@ function hide()
 
     onClearMainMarket(true)
     marketWindow:hide()
+    marketWindow:unlock()
     onClearSearch()
 
     lastSelectedItem = {}
+    -- Ensure game input is focused after hiding the market (ESC key)
+    if modules.game_interface and modules.game_interface.getRootPanel then
+        modules.game_interface.getRootPanel():focus()
+    end
 end
 
 function show()
+    marketWindow:lock()
     marketWindow:show(true)
     marketWindow.contentPanel.searchText:focus()
     sortButtons["classFilter"] = -1
@@ -210,17 +217,16 @@ function closeMarket()
 
     marketWindow:setText(tr('Market'))
     marketWindow:hide()
+    marketWindow:unlock()
 
     onClearMainMarket(true)
     onClearSearch()
 
     lastSelectedItem = {}
 
-    if modules.game_console then
-        local console = modules.game_console.getConsole()
-        if console then
-            console:focus()
-        end
+    -- Ensure game input is focused so player can walk immediately
+    if modules.game_interface and modules.game_interface.getRootPanel then
+        modules.game_interface.getRootPanel():focus()
     end
 end
 

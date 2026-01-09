@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -584,10 +584,6 @@ void ThingType::loadTexture(const int animationPhase)
                                 for (int w = 0; w < m_size.width(); ++w) {
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     auto spriteId = m_spritesIndex[spriteIndex];
-
-                                    if (spriteId == 0)
-                                        continue;
-
                                     bool isLoading = false;
                                     const auto& spriteImage = g_things.getSpriteImage(spriteId, m_resourceId, isLoading);
 
@@ -595,8 +591,8 @@ void ThingType::loadTexture(const int animationPhase)
                                         return;
 
                                     if (!spriteImage) {
-                                        g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
-                                        return;
+                                        // Skip blank sprites silently (clients converted with Assets Editor have blank sprites with non-zero IDs)
+                                        continue;
                                     }
 
                                     // verifies that the first block in the lower right corner is transparent.
