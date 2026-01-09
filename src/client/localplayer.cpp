@@ -261,7 +261,7 @@ void LocalPlayer::setStates(const uint64_t states)
     m_states = states;
 
     if (isParalyzed())
-        m_walkTimer.update(-getStepDuration());
+        m_walkTimer.update(getStepDuration());
 
     callLuaField("onStatesChange", states, oldStates);
 }
