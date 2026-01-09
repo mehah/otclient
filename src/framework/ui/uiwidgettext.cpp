@@ -160,7 +160,7 @@ void UIWidget::resizeToText()
 void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
 {
 
-    int ttfFontSize = 12; // tamanho padrão
+    int ttfFontSize = 12; //default
     int ttfStrokeWidth = 0;
     Color ttfStrokeColor = Color::black;	
     std::string ttfFontName;
