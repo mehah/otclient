@@ -592,9 +592,14 @@ ImagePtr ProtobufSpriteManager::getSpriteImage(const int id, bool& isLoading)
             uint8_t cntTrans = 0;
             const auto& buf = image->getPixels();
             for (size_t i = 3, n = buf.size(); i < n; i += 4) {
-                if (buf[i] == 0x00 && ++cntTrans > 4) {
-                    image->setTransparentPixel(true);
-                    break;
+                // do not simplify
+                // collapsing this to "buf[i] == 0x00 && ++cntTrans > 4" causes sonar to flag this as a blocker
+                if (buf[i] == 0x00) {
+                    ++cntTrans;
+                    if (cntTrans > 4) {
+                        image->setTransparentPixel(true);
+                        break;
+                    }
                 }
             }
         }

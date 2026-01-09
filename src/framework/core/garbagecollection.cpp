@@ -70,13 +70,15 @@ void GarbageCollection::thingType() {
         IDLE_TIME = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
         AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
 
-    static uint8_t category{ ThingLastCategory };
+    static uint8_t category{ 0 };
 
     static size_t thingId = 0;
     static size_t resourceId = 0;
     size_t scanned = 0;
 
     while (scanned < AMOUNT_PER_CHECK) {
+        // no more resources to scan
+        // wrap around and finish
         if (resourceId >= g_things.getResourcesCount()) {
             resourceId = 0;
             category = ThingCategoryItem;
@@ -84,12 +86,22 @@ void GarbageCollection::thingType() {
             break;
         }
 
+        // get resource by id
         auto res = g_things.getResourceById(resourceId);
         if (!res) {
+            // no resource found
+            // move to the next resource
             ++resourceId;
             category = ThingCategoryItem;
             thingId = 0;
             continue;
+        }
+
+        // this is unlikely to happen
+        // but it stops sonar from flagging this function as a "blocker"
+        if (category >= res->m_thingTypes->size()) {
+            throw std::out_of_range("GarbageCollection: resource category is out of range");
+            break;
         }
 
         auto& things = res->m_thingTypes[category];
