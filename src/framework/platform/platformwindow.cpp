@@ -96,7 +96,7 @@ void PlatformWindow::processKeyDown(Fw::Key keyCode)
 
 #if defined(__APPLE__)
     if (keyCode == Fw::KeyMeta) {
-        m_inputEvent.keyboardModifiers |= Fw::KeyboardCtrlModifier;
+        m_inputEvent.keyboardModifiers |= Fw::KeyboardPrimaryModifier;
         return;
     }
     if (keyCode == Fw::KeyAlt) {
@@ -104,16 +104,21 @@ void PlatformWindow::processKeyDown(Fw::Key keyCode)
         return;
     }
     if (keyCode == Fw::KeyCtrl) {
-        m_inputEvent.keyboardModifiers |= Fw::KeyboardControlModifier;
+        m_inputEvent.keyboardModifiers |= Fw::KeyboardCtrlModifier;
         return;
     }
 #else
     if (keyCode == Fw::KeyCtrl) {
         m_inputEvent.keyboardModifiers |= Fw::KeyboardCtrlModifier;
+        m_inputEvent.keyboardModifiers |= Fw::KeyboardPrimaryModifier;
         return;
     }
     if (keyCode == Fw::KeyAlt) {
         m_inputEvent.keyboardModifiers |= Fw::KeyboardAltModifier;
+        return;
+    }
+    if (keyCode == Fw::KeyMeta) {
+        m_inputEvent.keyboardModifiers |= Fw::KeyboardMetaModifier;
         return;
     }
 #endif
@@ -150,7 +155,7 @@ void PlatformWindow::processKeyUp(Fw::Key keyCode)
 
 #if defined(__APPLE__)
     if (keyCode == Fw::KeyMeta) {
-        m_inputEvent.keyboardModifiers &= ~Fw::KeyboardCtrlModifier;
+        m_inputEvent.keyboardModifiers &= ~Fw::KeyboardPrimaryModifier;
         return;
     }
     if (keyCode == Fw::KeyAlt) {
@@ -158,16 +163,21 @@ void PlatformWindow::processKeyUp(Fw::Key keyCode)
         return;
     }
     if (keyCode == Fw::KeyCtrl) {
-        m_inputEvent.keyboardModifiers &= ~Fw::KeyboardControlModifier;
+        m_inputEvent.keyboardModifiers &= ~Fw::KeyboardCtrlModifier;
         return;
     }
 #else
     if (keyCode == Fw::KeyCtrl) {
         m_inputEvent.keyboardModifiers &= ~Fw::KeyboardCtrlModifier;
+        m_inputEvent.keyboardModifiers &= ~Fw::KeyboardPrimaryModifier;
         return;
     }
     if (keyCode == Fw::KeyAlt) {
         m_inputEvent.keyboardModifiers &= ~Fw::KeyboardAltModifier;
+        return;
+    }
+    if (keyCode == Fw::KeyMeta) {
+        m_inputEvent.keyboardModifiers &= ~Fw::KeyboardMetaModifier;
         return;
     }
 #endif
