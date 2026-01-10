@@ -33,6 +33,7 @@
 #include "framework/html/htmlmanager.h"
 #include "framework/html/htmlnode.h"
 #include "framework/otml/otmlnode.h"
+#include "framework/graphics/coordsbuffer.h"
 #include <framework/platform/platformwindow.h>
 #include <framework/util/stats.h>
 
@@ -55,6 +56,8 @@ UIWidget::UIWidget()
 
     m_positions.set(Unit::Auto);
     m_clickTimer.stop();
+
+    m_textUnderline = std::make_shared<CoordsBuffer>();
 
     initBaseStyle();
     initText();
