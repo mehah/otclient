@@ -1691,7 +1691,7 @@ void ProtocolGame::sendApplyWheelPoints(const std::vector<uint16_t>& slotPoints,
     g_logger.debug("[Wheel C++ Send] Enviando pacote de ApplyWheelPoints...");
     std::ostringstream oss;
     const auto& buffer = msg->getBuffer();
-    const size_t length = msg->getMessageSize(); // ✅ usa o método existente
+    const size_t length = msg->getMessageSize(); // usa o método existente
     for (size_t i = 0; i < length; ++i) {
         oss << fmt::format("{:02X} ", static_cast<uint8_t>(buffer[i]));
     }

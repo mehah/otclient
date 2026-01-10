@@ -25,9 +25,6 @@ Module
     dofiles 'classes'
     dofiles 'ui'
 
-    dofile 'uiprogressbarsd'
-    dofile 'uiprogressbarsdinverted'
-
     dofile 'inputmessage'
     dofile 'outputmessage'
 

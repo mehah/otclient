@@ -82,7 +82,7 @@ function init()
   end, 500, nil)
 
   wheelButton = modules.game_mainpanel.addToggleButton('wheelButton', tr('Wheel of Destiny'),   
-    '/images/options/wheel', toggle, false, 10)  
+    '/images/options/button_skillwheeldialog', toggle, false, 10)  
   wheelButton:setOn(false)
 
   loadMenu('wheelMenu')

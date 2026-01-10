@@ -1,8 +1,0 @@
-UIWidget  
-  id: gemContainer  
-    
-  Label  
-    anchors.centerIn: parent  
-    !text: tr('Gem Atelier')  
-    text-align: center  
-    font: verdana-11px-antialised

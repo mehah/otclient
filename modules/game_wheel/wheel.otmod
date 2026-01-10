@@ -1,7 +1,7 @@
 Module
   name: game_wheel
-  description: Wheel of Destiny for 13x +
-  author: JP
+  description: Wheel of Destiny
+  author: R!ck && ZLukSrT#8740 && Christianlb
   sandboxed: true
   autoload-priority: 1002
   scripts: [ wheel, classes/geometry, classes/buttons, classes/wheelclass, classes/bonus, classes/icons, classes/gematelier, classes/workshop, classes/wheelnode ]
