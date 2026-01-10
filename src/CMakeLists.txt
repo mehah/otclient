@@ -141,8 +141,14 @@ if(APPLE)
   find_library(FOUNDATION Foundation REQUIRED)
   find_library(IOKIT IOKit REQUIRED)
 endif()
-if(UNIX AND NOT ANDROID AND NOT WASM)
+if(UNIX AND NOT APPLE AND NOT ANDROID AND NOT WASM)
   find_package(X11 REQUIRED)
+endif()
+if(APPLE AND NOT ANDROID AND NOT WASM)
+  find_library(COCOA_LIBRARY Cocoa REQUIRED)
+  find_library(COREVIDEO_LIBRARY CoreVideo REQUIRED)
+  find_library(QUARTZCORE_LIBRARY QuartzCore REQUIRED)
+  find_library(OPENGL_FRAMEWORK OpenGL REQUIRED)
 endif()
 if(WIN32)
   find_package(DbgHelp REQUIRED)
@@ -345,8 +351,6 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
           framework/graphics/texture.cpp
           framework/graphics/texturemanager.cpp
           framework/graphics/shadermanager.cpp
-          framework/platform/win32window.cpp
-          framework/platform/x11window.cpp
           framework/ui/uianchorlayout.cpp
           framework/ui/uiboxlayout.cpp
           framework/ui/uigridlayout.cpp
@@ -387,6 +391,18 @@ if (WASM)
           framework/platform/browserwindow.cpp
           framework/net/webconnection.cpp
   )
+endif()
+
+if(WIN32)
+  set(SOURCE_FILES ${SOURCE_FILES} framework/platform/win32window.cpp)
+elseif(APPLE AND NOT ANDROID AND NOT WASM)
+  set(SOURCE_FILES ${SOURCE_FILES} framework/platform/cocoawindow.mm)
+  set_source_files_properties(framework/platform/cocoawindow.mm PROPERTIES
+    SKIP_UNITY_BUILD_INCLUSION ON
+    SKIP_PRECOMPILE_HEADERS ON
+  )
+elseif(UNIX AND NOT ANDROID AND NOT WASM)
+  set(SOURCE_FILES ${SOURCE_FILES} framework/platform/x11window.cpp)
 endif()
 
 add_library(otclient_core STATIC ${SOURCE_FILES})
@@ -776,7 +792,7 @@ else() # Linux
           protobuf::libprotobuf protobuf
           absl::log_internal_check_op
           Threads::Threads
-          X11::X11
+          $<$<AND:$<PLATFORM_ID:Linux>,$<NOT:$<BOOL:${ANDROID}>>>:X11::X11>
           asio::asio
           OpenAL::OpenAL
           LibLZMA::LibLZMA
@@ -791,6 +807,16 @@ else() # Linux
           Vorbis::vorbisfile
           Vorbis::vorbis
   )
+
+  if(APPLE AND NOT ANDROID AND NOT WASM)
+    target_link_libraries(otclient_core
+            PUBLIC
+            ${COCOA_LIBRARY}
+            ${COREVIDEO_LIBRARY}
+            ${QUARTZCORE_LIBRARY}
+            ${OPENGL_FRAMEWORK}
+    )
+  endif()
 
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(otclient_core

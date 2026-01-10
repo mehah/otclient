@@ -277,7 +277,8 @@ namespace Fw
         KeyboardNoModifier = 0,
         KeyboardCtrlModifier = 1,
         KeyboardAltModifier = 2,
-        KeyboardShiftModifier = 4
+        KeyboardShiftModifier = 4,
+        KeyboardControlModifier = 8
     };
 
     enum WidgetState : int32_t
