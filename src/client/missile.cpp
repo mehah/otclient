@@ -108,14 +108,15 @@ void Missile::setDirection(const Otc::Direction dir) {
     }
 }
 
-void Missile::setId(uint32_t id)
+void Missile::setId(uint32_t id, uint16_t resourceId)
 {
-    if (!g_things.isValidDatId(id, ThingCategoryMissile))
+    if (!g_things.isValidDatId(id, ThingCategoryMissile, resourceId))
         id = 0;
 
     m_clientId = id;
+    m_resourceId = resourceId;
 }
 
 ThingType* Missile::getThingType() const {
-    return g_things.getRawThingType(m_clientId, ThingCategoryMissile);
+    return g_things.getRawThingType(m_clientId, ThingCategoryMissile, m_resourceId);
 }

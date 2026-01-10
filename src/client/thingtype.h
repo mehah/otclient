@@ -37,8 +37,8 @@ using namespace otclient::protobuf;
 class ThingType final : public LuaObject
 {
 public:
-    void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
-    void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
+    void unserializeAppearance(uint16_t clientId, uint16_t resourceId, ProtobufSpriteManagerPtr spriteManager, ThingCategory category, const appearances::Appearance& appearance);
+    void unserialize(uint16_t clientId, uint16_t resourceId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
     void applyAppearanceFlags(const appearances::AppearanceFlags& flags);
 
@@ -52,6 +52,7 @@ public:
     void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color);
 
     uint16_t getId() { return m_id; }
+    uint16_t getResourceId() { return m_resourceId; }
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }
     bool hasAttr(const ThingAttr attr) { return (m_flags & thingAttrToThingFlagAttr(attr)); }
@@ -175,6 +176,16 @@ public:
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
+    static void translateFlagId(const int version, int& flagId);
+    static void translateFlagId740(int& flagId);
+    static void translateFlagId755(int& flagId);
+    static void translateFlagId780(int& flagId);
+    static void translateFlagId1000(int& flagId);
+    void unserializeAttribute(int attr, const FileStreamPtr& fin);
+    void unserializeSpriteInfo(const FileStreamPtr& fin);
+    void unserializeFrameGroup(const FileStreamPtr& fin, const bool hasFrameGroups, std::vector<Size>& sizes, std::vector<int>& total_sprites, int& totalSpritesCount);
+    void adjustSpriteSizes(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);
+    void adjustSpriteFrame(const std::vector<Size>& sizes, const std::vector<uint32_t>& sprites, const size_t frameId, size_t& spriteIndex);
 
     void loadTexture(int animationPhase);
 
@@ -220,6 +231,7 @@ private:
     PLAYER_ACTION m_defaultAction{ 0 };
 
     uint16_t m_id{ 0 };
+    uint16_t m_resourceId{ 0 };
     uint16_t m_groundSpeed{ 0 };
     uint16_t m_maxTextLength{ 0 };
     uint16_t m_upgradeClassification{ 0 };

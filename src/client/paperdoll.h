@@ -122,6 +122,7 @@ private:
     uint8_t m_opacity{ 100 };
     uint16_t m_id{ 0 };
     uint16_t m_thingId{ 0 };
+    uint16_t m_thingResourceId{ 0 };
     uint32_t m_addons{ 0 };
 
     Timer m_timer;

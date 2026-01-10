@@ -34,7 +34,10 @@
 #include <framework/ui/uiwidget.h>
 
 #include "houses.h"
+#include "item.h"
 #include "towns.h"
+
+#include "thingtypemanager.h"
 
 void Map::loadOtbm(const std::string& fileName)
 {
@@ -403,6 +406,9 @@ void Map::saveOtbm(const std::string& fileName)
 
 bool Map::loadOtcm(const std::string& fileName)
 {
+    // otcm does not support resource ids
+    static constexpr uint16_t resourceId = 0;
+
     try {
         const FileStreamPtr fin = g_resources.openFile(fileName);
         if (!fin)
@@ -425,7 +431,7 @@ bool Map::loadOtcm(const std::string& fileName)
                 fin->getU16(); // protocol version
                 fin->getString(); // world name
 
-                if (datSignature != g_things.getDatSignature())
+                if (datSignature != g_things.getDatSignature(resourceId))
                     g_logger.warning("otcm map loaded was created with a different dat signature");
 
                 break;
@@ -459,7 +465,7 @@ bool Map::loadOtcm(const std::string& fileName)
 
                 const int countOrSubType = fin->getU8();
 
-                ItemPtr item = Item::create(id);
+                ItemPtr item = Item::create(id, resourceId);
                 item->setCountOrSubType(countOrSubType);
 
                 if (item->isValid())

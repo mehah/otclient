@@ -24,14 +24,17 @@
 
 #include "game.h"
 #include "gameconfig.h"
-#include "spriteappearances.h"
 #include "framework/core/asyncdispatcher.h"
 #include "framework/core/filestream.h"
 #include "framework/core/graphicalapplication.h"
 #include "framework/core/resourcemanager.h"
 #include "framework/graphics/image.h"
 
-SpriteManager g_sprites;
+#include <nlohmann/json_fwd.hpp>
+#include "lzma.h"
+
+// warnings related to protobuf
+// https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
 
 FileMetadata::FileMetadata(const FileStreamPtr& file) {
     offset = file->getU32();
@@ -40,10 +43,7 @@ FileMetadata::FileMetadata(const FileStreamPtr& file) {
     spriteId = std::stoi(fileName);
 }
 
-void SpriteManager::init() {}
-void SpriteManager::terminate() { unload(); }
-
-void SpriteManager::reload() {
+void LegacySpriteManager::reload() {
     if (g_app.isEncrypted())
         return;
 
@@ -53,7 +53,7 @@ void SpriteManager::reload() {
     load();
 }
 
-void SpriteManager::load() {
+void LegacySpriteManager::load() {
     m_spritesFiles.resize(g_asyncDispatcher.get_thread_count());
     if (g_app.isLoadingAsyncTexture()) {
         for (auto& file : m_spritesFiles)
@@ -61,7 +61,7 @@ void SpriteManager::load() {
     } else (m_spritesFiles[0] = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName)))->file->cache(true);
 }
 
-bool SpriteManager::loadSpr(std::string file)
+bool LegacySpriteManager::loadSpr(std::string file)
 {
     m_spritesCount = 0;
     m_signature = 0;
@@ -82,7 +82,7 @@ bool SpriteManager::loadSpr(std::string file)
     return false;
 }
 
-bool SpriteManager::loadRegularSpr(std::string file)
+bool LegacySpriteManager::loadRegularSpr(std::string file)
 {
     try {
         m_lastFileName = g_resources.guessFilePath(file, "spr");
@@ -101,7 +101,7 @@ bool SpriteManager::loadRegularSpr(std::string file)
     }
 }
 
-bool SpriteManager::loadCwmSpr(std::string file)
+bool LegacySpriteManager::loadCwmSpr(std::string file)
 {
     m_cwmSpritesMetadata.clear();
 
@@ -148,7 +148,7 @@ bool SpriteManager::loadCwmSpr(std::string file)
 }
 
 #ifdef FRAMEWORK_EDITOR
-void SpriteManager::saveSpr(const std::string& fileName)
+void LegacySpriteManager::saveSpr(const std::string& fileName)
 {
     if (!m_loaded)
         throw Exception("failed to save, spr is not loaded");
@@ -206,19 +206,8 @@ void SpriteManager::saveSpr(const std::string& fileName)
 }
 #endif
 
-void SpriteManager::unload()
+ImagePtr LegacySpriteManager::getSpriteImage(const int id, bool& isLoading)
 {
-    m_spritesCount = 0;
-    m_signature = 0;
-    m_spritesFiles.clear();
-}
-
-ImagePtr SpriteManager::getSpriteImage(const int id, bool& isLoading)
-{
-    if (g_game.getProtocolVersion() >= 1281 && !g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
-        return g_spriteAppearances.getSpriteImage(id, isLoading);
-    }
-
     const auto threadId = g_app.isLoadingAsyncTexture() ? stdext::getThreadId() : 0;
     if (const auto& sf = m_spritesFiles[threadId % m_spritesFiles.size()]) {
         if (sf->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING) {
@@ -236,7 +225,7 @@ ImagePtr SpriteManager::getSpriteImage(const int id, bool& isLoading)
     return nullptr;
 }
 
-ImagePtr SpriteManager::getSpriteImageHd(const int id, const FileStreamPtr& file)
+ImagePtr LegacySpriteManager::getSpriteImageHd(const int id, const FileStreamPtr& file)
 {
     const auto it = m_cwmSpritesMetadata.find(id);
     if (it == m_cwmSpritesMetadata.end())
@@ -258,7 +247,7 @@ uint16_t readU16FromBuffer(const uint8_t* data, size_t& offset) {
     return val;
 }
 
-ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
+ImagePtr LegacySpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
 {
     if (id == 0 || !file)
         return nullptr;
@@ -317,26 +306,9 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
             offset += bytesToRead;
 
             if (useAlpha) {
-                for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 4) {
-                    pixels[writePos + 0] = tempBuffer[src + 0];
-                    pixels[writePos + 1] = tempBuffer[src + 1];
-                    pixels[writePos + 2] = tempBuffer[src + 2];
-                    const uint8_t alpha = tempBuffer[src + 3];
-                    pixels[writePos + 3] = alpha;
-
-                    if (alpha != 0xFF) hasAlpha = true;
-                    else if (transparentCount <= 4 && alpha == 0x00) ++transparentCount;
-
-                    writePos += 4;
-                }
+                setPixelsRGBA(pixels, tempBuffer, writePos, actualColoredPixels, maxWriteSize, hasAlpha, transparentCount);
             } else {
-                for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 3) {
-                    pixels[writePos + 0] = tempBuffer[src + 0];
-                    pixels[writePos + 1] = tempBuffer[src + 1];
-                    pixels[writePos + 2] = tempBuffer[src + 2];
-                    pixels[writePos + 3] = 0xFF;
-                    writePos += 4;
-                }
+                setPixelsRGB(pixels, tempBuffer, writePos, actualColoredPixels, maxWriteSize);
             }
         }
 
@@ -354,3 +326,311 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
         return nullptr;
     }
 }
+
+void LegacySpriteManager::setPixelsRGB(uint8_t* pixels, const uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize)
+{
+    for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 3) {
+        pixels[writePos + 0] = tempBuffer[src + 0];
+        pixels[writePos + 1] = tempBuffer[src + 1];
+        pixels[writePos + 2] = tempBuffer[src + 2];
+        pixels[writePos + 3] = 0xFF;
+        writePos += 4;
+    }
+}
+
+void LegacySpriteManager::setPixelsRGBA(uint8_t* pixels, const uint8_t* tempBuffer, int& writePos, const int actualColoredPixels, const int maxWriteSize, bool& hasAlpha, int& transparentCount)
+{
+    for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 4) {
+        pixels[writePos + 0] = tempBuffer[src + 0];
+        pixels[writePos + 1] = tempBuffer[src + 1];
+        pixels[writePos + 2] = tempBuffer[src + 2];
+        const uint8_t alpha = tempBuffer[src + 3];
+        pixels[writePos + 3] = alpha;
+
+        if (alpha != 0xFF) hasAlpha = true;
+        else if (transparentCount <= 4 && alpha == 0x00) ++transparentCount;
+
+        writePos += 4;
+    }
+}
+
+using json = nlohmann::json;
+
+Size SpriteSheet::getSpriteSize() const
+{    
+    // this array includes all possible combinations within 384x384 sheet
+    // if you intend to change that, you will also have to modify the assets editor
+    // CHANGING THIS MAY BREAK READING EXISTING SPRITESHEETS
+
+    // tile sizes in spritesheets, see SpriteLayout for array key definitions
+    static const std::array<Size, 36> sizes = {
+        Size(32,32),  // 0
+        Size(32,64),  // 1
+        Size(64,32),  // 2
+        Size(64,64),  // 3
+        Size(32,96),  // 4
+        Size(32,128), // 5
+        Size(32,192), // 6
+        Size(32,384), // 7
+        Size(64,96),  // 8
+        Size(64,128), // 9
+        Size(64,192), // 10
+        Size(64,384), // 11
+        Size(96,32),  // 12
+        Size(96,64),  // 13
+        Size(96,96),  // 14
+        Size(96,128), // 15
+        Size(96,192), // 16
+        Size(96,384), // 17
+        Size(128,32),  // 18
+        Size(128,64),  // 19
+        Size(128,96),  // 20
+        Size(128,128), // 21
+        Size(128,192), // 22
+        Size(128,384), // 23
+        Size(192,32),  // 24
+        Size(192,64),  // 25
+        Size(192,96),  // 26
+        Size(192,128), // 27
+        Size(192,192), // 28
+        Size(192,384), // 29
+        Size(384,32),  // 30
+        Size(384,64),  // 31
+        Size(384,96),  // 32
+        Size(384,128), // 33
+        Size(384,192), // 34
+        Size(384,384)  // 35
+    };
+
+    if (const auto idx = static_cast<size_t>(spriteLayout); idx < sizes.size())
+        return sizes[idx];
+
+    return sizes[0];
+}
+
+int SpriteSheet::getSpritesPerSheet() const
+{
+    const Size& size = getSpriteSize();
+    const int spritesPerColumn = SpriteSheet::SIZE / size.height();
+
+    return getColumns() * spritesPerColumn;
+}
+
+bool ProtobufSpriteManager::loadSpriteSheet(const SpriteSheetPtr& sheet) const
+{
+    if (sheet->m_loadingState.load(std::memory_order_acquire) == SpriteLoadState::LOADING)
+        return false;
+
+    if (sheet->data)
+        return true;
+
+    if (sheet->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING)
+        return false;
+
+    try {
+        const auto& path = fmt::format("{}{}", getPath(), sheet->file);
+        if (!g_resources.fileExists(path))
+            return false;
+
+        const auto& fin = g_resources.openFile(path);
+        fin->cache(true);
+
+        thread_local static std::array<uint8_t, LZMA_UNCOMPRESSED_SIZE> decompressBuffer;
+
+        /*
+           CIP's header, always 32 (0x20) bytes.
+           Header format:
+           [0x00, X):          A variable number of NULL (0x00) bytes. The amount of pad-bytes can vary depending on how many
+                               bytes the "7-bit integer encoded LZMA file size" take.
+           [X, X + 0x05):      The constant byte sequence [0x70 0x0A 0xFA 0x80 0x24]
+           [X + 0x05, 0x20]:   LZMA file size (Note: excluding the 32 bytes of this header) encoded as a 7-bit integer
+       */
+
+        while (fin->getU8() == 0x00);
+        fin->skip(4);
+        while ((fin->getU8() & 0x80) == 0x80);
+
+        const uint8_t lclppb = fin->getU8();
+
+        lzma_options_lzma options{};
+        options.lc = lclppb % 9;
+
+        const int remainder = lclppb / 9;
+        options.lp = remainder % 5;
+        options.pb = remainder / 5;
+
+        uint32_t dictionarySize = 0;
+        for (uint8_t i = 0; i < 4; ++i) {
+            dictionarySize += fin->getU8() << (i * 8);
+        }
+
+        options.dict_size = dictionarySize;
+
+        fin->skip(8); // cip compressed size
+
+        lzma_stream stream = LZMA_STREAM_INIT;
+
+        const lzma_filter filters[2] = {
+            lzma_filter{LZMA_FILTER_LZMA1, &options},
+            lzma_filter{LZMA_VLI_UNKNOWN, nullptr}
+        };
+
+        if (lzma_ret ret = lzma_raw_decoder(&stream, filters); ret != LZMA_OK) {
+            throw stdext::exception(fmt::format("failed to initialize lzma raw decoder result: {}", ret));
+        }
+
+        stream.next_in = &fin->m_data[fin->tell()];
+        stream.avail_in = fin->size() - fin->tell();
+        stream.next_out = decompressBuffer.data();
+        stream.avail_out = decompressBuffer.size();
+
+        const auto result = lzma_code(&stream, LZMA_RUN);
+        lzma_end(&stream);
+
+        if (result != LZMA_STREAM_END)
+            throw stdext::exception("LZMA decompression failed");
+
+        // pixel offset
+        const uint8_t* bmpOffsetPtr = decompressBuffer.data() + 10;
+        const uint32_t bmpDataOffset =
+            bmpOffsetPtr[0] |
+            (bmpOffsetPtr[1] << 8) |
+            (bmpOffsetPtr[2] << 16) |
+            (bmpOffsetPtr[3] << 24);
+
+        // validate offset
+        if (bmpDataOffset + BYTES_IN_SPRITE_SHEET > LZMA_UNCOMPRESSED_SIZE)
+            throw stdext::exception("sprite sheet image offset out of bounds");
+
+        uint8_t* bufferStart = decompressBuffer.data() + bmpDataOffset;
+
+        // swap BGR ? RGB and fix magenta
+        for (int i = 0; i < BYTES_IN_SPRITE_SHEET; i += 4) {
+            std::swap(bufferStart[i], bufferStart[i + 2]); // B <-> R
+
+            const uint32_t rgb = bufferStart[i] | (bufferStart[i + 1] << 8) | (bufferStart[i + 2] << 16);
+            if (rgb == 0xFF00FF) {
+                bufferStart[i + 0] = 0x00;
+                bufferStart[i + 1] = 0x00;
+                bufferStart[i + 2] = 0x00;
+                bufferStart[i + 3] = 0x00;
+            }
+        }
+
+        // vertical flip
+        constexpr int halfHeight = SpriteSheet::SIZE / 2;
+        uint8_t tempLine[SPRITE_SHEET_WIDTH_BYTES];
+        for (int y = 0; y < halfHeight; ++y) {
+            uint8_t* top = bufferStart + y * SPRITE_SHEET_WIDTH_BYTES;
+            uint8_t* bottom = bufferStart + (SpriteSheet::SIZE - 1 - y) * SPRITE_SHEET_WIDTH_BYTES;
+
+            std::memcpy(tempLine, top, SPRITE_SHEET_WIDTH_BYTES);
+            std::memcpy(top, bottom, SPRITE_SHEET_WIDTH_BYTES);
+            std::memcpy(bottom, tempLine, SPRITE_SHEET_WIDTH_BYTES);
+        }
+
+        sheet->data = std::make_unique<uint8_t[]>(BYTES_IN_SPRITE_SHEET);
+        std::memcpy(sheet->data.get(), bufferStart, BYTES_IN_SPRITE_SHEET);
+
+        sheet->m_loadingState.store(SpriteLoadState::LOADED, std::memory_order_release);
+        return true;
+    } catch (const std::exception& e) {
+        sheet->m_loadingState.store(SpriteLoadState::NONE, std::memory_order_release);
+        g_logger.error("Failed to load single sprite sheet '{}': {}", sheet->file, e.what());
+        return false;
+    }
+}
+
+SpriteSheetPtr ProtobufSpriteManager::getSheetBySpriteId(const int id, bool& isLoading, const bool load /* = true */)
+{
+    if (id == 0) {
+        return nullptr;
+    }
+
+    // find sheet
+    const auto sheetIt = std::ranges::find_if(m_sheets, [=](const SpriteSheetPtr& sheet) {
+        return id >= sheet->firstId && id <= sheet->lastId;
+    });
+
+    if (sheetIt == m_sheets.end())
+        return nullptr;
+
+    const auto& sheet = *sheetIt;
+
+    if (load && !loadSpriteSheet(sheet)) {
+        isLoading = sheet->m_loadingState == SpriteLoadState::LOADING;
+        return nullptr;
+    }
+
+    return sheet;
+}
+
+ImagePtr ProtobufSpriteManager::getSpriteImage(const int id, bool& isLoading)
+{
+    try {
+        const auto& sheet = getSheetBySpriteId(id, isLoading, true);
+        if (!sheet) {
+            return nullptr;
+        }
+
+        const Size& size = sheet->getSpriteSize();
+
+        const auto& image = std::make_shared<Image>(size);
+        uint8_t* pixelData = image->getPixelData();
+
+        const int spriteOffset = id - sheet->firstId;
+        const int allColumns = sheet->getColumns();
+        if (
+            const int spritesPerSheet = sheet->getSpritesPerSheet();
+            spriteOffset < 0 || spriteOffset >= spritesPerSheet
+        ) {
+            g_logger.error("Sprite id {} is out of bounds for sheet {} (offset {}, max {})", id, sheet->file, spriteOffset, spritesPerSheet);
+            return nullptr;
+        }
+        const int spriteRow = std::floor(static_cast<float>(spriteOffset) / static_cast<float>(allColumns));
+        const int spriteColumn = spriteOffset % allColumns;
+
+        const int spriteWidthBytes = size.width() * 4;
+
+        for (int height = size.height() * spriteRow, offset = 0; height < size.height() + (spriteRow * size.height()); height++, offset++) {
+            std::memcpy(&pixelData[offset * spriteWidthBytes], &sheet->data[(height * SPRITE_SHEET_WIDTH_BYTES) + (spriteColumn * spriteWidthBytes)], spriteWidthBytes);
+        }
+
+        if (!image->hasTransparentPixel()) {
+            image->checkTransparentPixels();
+        }
+
+        return image;
+    } catch (const stdext::exception& e) {
+        g_logger.error("Failed to get sprite id {}: {}", id, e.what());
+        return nullptr;
+    }
+}
+
+#ifdef FRAMEWORK_EDITOR
+void ProtobufSpriteManager::saveSpriteToFile(const int id, const std::string& file)
+{
+    if (const auto& sprite = ISpriteManager::getSpriteImageById(id)) {
+        sprite->savePNG(file);
+    }
+}
+
+void ProtobufSpriteManager::saveSpr(const std::string&)
+{
+    g_logger.traceError("ProtobufSpriteManager does not support saveSpr, consider using saveSheetToFile.");
+}
+
+void ProtobufSpriteManager::saveSheetToFileBySprite(const int id, const std::string& file)
+{
+    if (const auto& sheet = getSheetBySpriteId(id)) {
+        Image image({ SpriteSheet::SIZE }, 4, sheet->data.get());
+        image.savePNG(file);
+    }
+}
+
+void ProtobufSpriteManager::saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file)
+{
+    Image image({ SpriteSheet::SIZE }, 4, sheet->data.get());
+    image.savePNG(file);
+}
+#endif

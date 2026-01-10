@@ -181,7 +181,7 @@ public:
     void wrap(const ThingPtr& thing);
     void use(const ThingPtr& thing);
     void useWith(const ItemPtr& item, const ThingPtr& toThing);
-    void useInventoryItem(uint16_t itemId);
+    void useInventoryItem(uint16_t itemId, uint16_t resourceId);
     void useInventoryItemWith(uint16_t itemId, const ThingPtr& toThing);
     ItemPtr findItemInContainers(uint32_t itemId, int subType, uint8_t tier);
 
@@ -284,7 +284,7 @@ public:
 
     // 870 only
     void equipItem(const ItemPtr& item);
-    void equipItemId(const uint16_t itemId, const uint8_t tier);
+    void equipItemId(const uint16_t itemId, const uint8_t tier, const uint16_t resourceId);
     void mount(bool mount);
 
     // 910 only
@@ -325,8 +325,6 @@ public:
 
     void setProtocolVersion(uint16_t version);
     int getProtocolVersion() { return m_protocolVersion; }
-
-    bool isUsingProtobuf() { return getProtocolVersion() >= 1281 && !getFeature(Otc::GameLoadSprInsteadProtobuf); }
 
     void setClientVersion(uint16_t version);
     int getClientVersion() { return m_clientVersion; }
@@ -371,8 +369,9 @@ public:
 
     // market related
     void leaveMarket();
-    void browseMarket(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
-    void createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
+
+    void browseMarket(uint8_t browseId, uint16_t browseType, uint8_t tier = 0, uint16_t resourceId = 0);
+    void createMarketOffer(uint8_t type, uint16_t itemId, uint16_t resourceId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void cancelMarketOffer(uint32_t timestamp, uint16_t counter);
     void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
 

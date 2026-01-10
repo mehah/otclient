@@ -22,6 +22,7 @@
 
 #pragma once
 
+#ifdef FRAMEWORK_EDITOR
 #include <optional>
 #include <string>
 #include <vector>
@@ -40,3 +41,4 @@ std::optional<Request> parseRequest(std::vector<std::string>& args);
 bool run(const Request& request);
 
 } // namespace datdump
+#endif

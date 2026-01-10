@@ -1329,7 +1329,7 @@ void ProtocolGame::sendMarketLeave()
     send(msg);
 }
 
-void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
+void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t browseType, const uint8_t tier, const uint16_t resourceId)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketBrowse);
@@ -1339,8 +1339,8 @@ void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t brows
             msg->addU16(browseType);
             // If browseId is 3 (browse item), send tier if item has classification
             if (browseId == 3) {
-                const auto& thing = g_things.getThingType(browseType, ThingCategoryItem);
-                if (thing && thing->getClassification() > 0) {
+                const auto& thing = g_things.getThingType(browseType, ThingCategoryItem, resourceId);
+                if (thing->getClassification() > 0) {
                     msg->addU8(tier);
                 }
             }
@@ -1351,13 +1351,13 @@ void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t brows
     send(msg);
 }
 
-void ProtocolGame::sendMarketCreateOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
+void ProtocolGame::sendMarketCreateOffer(const uint8_t type, const uint16_t itemId, const uint16_t resourceId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketCreate);
     msg->addU8(type);
     msg->addU16(itemId);
-    if (const auto& thing = g_things.getThingType(itemId, ThingCategoryItem)) {
+    if (const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId)) {
         if (thing->getClassification() > 0) {
             msg->addU8(itemTier);
         }

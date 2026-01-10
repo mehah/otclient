@@ -292,7 +292,6 @@ set(SOURCE_FILES
         client/protocolgamesend.cpp
         client/paperdoll.cpp
         client/paperdollmanager.cpp
-        client/spriteappearances.cpp
         client/spritemanager.cpp
         client/statictext.cpp
         client/thing.cpp

@@ -424,6 +424,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     if (getFeature(Otc::GamePlayerMounts)) {
         Outfit mountOutfit;
         mountOutfit.setId(currentOutfit.getMount());
+        mountOutfit.setResourceId(currentOutfit.getMountResourceId());
         mountOutfit.setCategory(ThingCategoryCreature);
 
         virtualMountCreature = std::make_shared<Creature>();
@@ -434,6 +435,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     if (getFeature(Otc::GamePlayerFamiliars)) {
         Outfit familiarOutfit;
         familiarOutfit.setId(currentOutfit.getFamiliar());
+        familiarOutfit.setResourceId(currentOutfit.getFamiliarResourceId());
         familiarOutfit.setCategory(ThingCategoryCreature);
     }
 
@@ -841,9 +843,9 @@ void Game::use(const ThingPtr& thing)
     g_lua.callGlobalField("g_game", "onUse", pos, thing->getId(), thing->getStackPos(), 0);
 }
 
-void Game::useInventoryItem(const uint16_t itemId)
+void Game::useInventoryItem(const uint16_t itemId, const uint16_t resourceId)
 {
-    if (!canPerformGameAction() || !g_things.isValidDatId(itemId, ThingCategoryItem))
+    if (!canPerformGameAction() || !g_things.isValidDatId(itemId, ThingCategoryItem, resourceId))
         return;
 
     const auto& pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
@@ -1479,13 +1481,13 @@ void Game::equipItem(const ItemPtr& item)
     }
 }
 
-void Game::equipItemId(const uint16_t itemId, const uint8_t tier)
+void Game::equipItemId(const uint16_t itemId, const uint8_t tier, const uint16_t resourceId)
 {
     if (!canPerformGameAction())
         return;
 
     if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
-        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
         if (thing && thing->getClassification() > 0) {
             m_protocolGame->sendEquipItemWithTier(itemId, tier);
             return;
@@ -1766,21 +1768,21 @@ void Game::leaveMarket()
     g_lua.callGlobalField("g_game", "onMarketLeave");
 }
 
-void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
+void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier, const uint16_t resourceId)
 {
     if (!canPerformGameAction()) {
         return;
     }
 
-    m_protocolGame->sendMarketBrowse(browseId, browseType, tier);
+    m_protocolGame->sendMarketBrowse(browseId, browseType, tier, resourceId);
 }
 
-void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
+void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint16_t resourceId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendMarketCreateOffer(type, itemId, itemTier, amount, price, anonymous);
+    m_protocolGame->sendMarketCreateOffer(type, itemId, resourceId, itemTier, amount, price, anonymous);
 }
 
 void Game::cancelMarketOffer(const uint32_t timestamp, const uint16_t counter)

@@ -36,7 +36,7 @@ AttachedEffectPtr AttachedEffectManager::getById(const uint16_t id) {
     }
 
     const auto& obj = it->second;
-    if (obj->m_thingId > 0 && !g_things.isValidDatId(obj->m_thingId, obj->m_thingCategory)) {
+    if (obj->m_thingId > 0 && !g_things.isValidDatId(obj->m_thingId, obj->m_thingCategory, obj->m_resourceId)) {
         g_logger.error("AttachedEffectManager::getById({}): invalid thing with id {}.", id, obj->m_thingId);
         return nullptr;
     }

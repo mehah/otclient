@@ -547,7 +547,7 @@ namespace Otc
         GameDoublePlayerGoodsMoney = 98,
 
         //  others
-        GameLoadSprInsteadProtobuf = 100,
+        GameLoadSprInsteadProtobuf = 100, // deprecated
         GameItemShader = 101,
         GameCreatureShader = 102,
         GameCreatureAttachedEffect = 103,
@@ -576,6 +576,7 @@ namespace Otc
         GameForgeSkillStats = 126,
         GameCharacterSkillStats = 127,
         GameCreaturePaperdoll = 128,
+        GameMultiSpr = 129,
         LastGameFeature
     };
 
@@ -877,7 +878,9 @@ namespace Otc
     {
         IMBUEMENT_WINDOW_CHOICE = 0,
         IMBUEMENT_WINDOW_SELECT_ITEM = 1,
-        IMBUEMENT_WINDOW_SCROLL = 2
+        IMBUEMENT_WINDOW_SCROLL = 2,
+
+        IMBUEMENT_WINDOW_LAST
     };
 
     enum Vocations_t : uint8_t

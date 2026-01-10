@@ -130,8 +130,8 @@ public:
     void sendTransferCoins(std::string_view recipient, uint16_t amount);
     void sendOpenTransactionHistory(uint8_t entriesPerPage);
     void sendMarketLeave();
-    void sendMarketBrowse(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
-    void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
+    void sendMarketBrowse(uint8_t browseId, uint16_t browseType, uint8_t tier = 0, uint16_t resourceId = 0);
+    void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint16_t resourceId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
     void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
@@ -388,6 +388,7 @@ public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);
     int setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip);
     int setTileDescription(const InputMessagePtr& msg, Position position);
+    bool setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType);
 
     Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true) const;
     ThingPtr getThing(const InputMessagePtr& msg);
@@ -398,6 +399,12 @@ public:
 
 private:
     PaperdollPtr getPaperdoll(const InputMessagePtr& msg) const;
+    void internalGetCreature(const InputMessagePtr& msg, CreaturePtr& creature, bool known) const;
+    void creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& creature, uint32_t& creatureId, const bool known) const;
+    void makeCreature(CreaturePtr& creature, uint8_t creatureType) const;
+    void getImbuingIngredients(const InputMessagePtr& msg, std::vector<Imbuement>& imbuements, std::vector<ItemPtr>& neededItemsList);
+    void setExtendedCosmetics(const InputMessagePtr& msg, const CreaturePtr& creature) const;
+    void setCreatureIcons(const InputMessagePtr& msg, const CreaturePtr& creature, const uint32_t creatureId, const bool known) const;
 
     bool m_enableSendExtendedOpcode{ false };
     bool m_gameInitialized{ false };

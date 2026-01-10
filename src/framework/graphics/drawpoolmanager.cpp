@@ -247,7 +247,7 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
 void DrawPoolManager::drawPool(const DrawPoolType type) {
     const auto pool = get(type);
 
-    if (!pool->isEnabled())
+    if (!pool || !pool->isEnabled())
         return;
 
     drawObjects(pool);

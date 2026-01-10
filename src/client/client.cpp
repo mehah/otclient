@@ -27,7 +27,6 @@
 #include "map.h"
 #include "mapview.h"
 #include "minimap.h"
-#include "spriteappearances.h"
 #include "spritemanager.h"
 #include "thingtypemanager.h"
 #include "uimap.h"
@@ -52,8 +51,6 @@ void Client::init(std::vector<std::string>& /*args*/)
     g_minimap.init();
     g_game.init();
     g_shaders.init();
-    g_sprites.init();
-    g_spriteAppearances.init();
     g_things.init();
 }
 
@@ -68,8 +65,6 @@ void Client::terminate()
     g_map.terminate();
     g_minimap.terminate();
     g_things.terminate();
-    g_sprites.terminate();
-    g_spriteAppearances.terminate();
     g_shaders.terminate();
     g_paperdolls.clear();
     g_gameConfig.terminate();
@@ -139,17 +134,17 @@ bool Client::canDraw(const DrawPoolType type) const
 
 bool Client::isLoadingAsyncTexture()
 {
-    return g_game.isUsingProtobuf();
+    return true; // deprecated / to be discussed
 }
 
 bool Client::isUsingProtobuf()
 {
-    return g_game.isUsingProtobuf();
+    return true; // deprecated / to be discussed
 }
 
 void Client::onLoadingAsyncTextureChanged(bool /*loadingAsync*/)
 {
-    g_sprites.reload();
+    g_things.reloadSprites();
 }
 
 void Client::doMapScreenshot(std::string file)

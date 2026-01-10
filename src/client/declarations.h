@@ -59,6 +59,10 @@ class TileBlock;
 class AttachedEffect;
 class AttachableObject;
 class Paperdoll;
+class AssetResource;
+class ISpriteManager;
+class ProtobufSpriteManager;
+struct AssetResourceInfo;
 
 #ifdef FRAMEWORK_EDITOR
 class House;
@@ -87,6 +91,9 @@ using ItemTypePtr = std::shared_ptr<ItemType>;
 using AttachedEffectPtr = std::shared_ptr<AttachedEffect>;
 using AttachableObjectPtr = std::shared_ptr<AttachableObject>;
 using PaperdollPtr = std::shared_ptr<Paperdoll>;
+using AssetResourcePtr = std::shared_ptr<AssetResource>;
+using SpriteManagerPtr = std::shared_ptr<ISpriteManager>;
+using ProtobufSpriteManagerPtr = std::shared_ptr<ProtobufSpriteManager>;
 
 #ifdef FRAMEWORK_EDITOR
 using HousePtr = std::shared_ptr<House>;
@@ -103,6 +110,9 @@ using SpawnMap = std::unordered_map<Position, SpawnPtr, Position::Hasher>;
 using ThingList = std::vector<ThingPtr>;
 using ThingTypeList = std::vector<ThingTypePtr>;
 using ItemTypeList = std::vector<ItemTypePtr>;
+using AssetResourceList = std::vector<AssetResourcePtr>;
+using SpriteManagerList = std::vector<SpriteManagerPtr>;
+using PackInfoResourceList = std::vector<AssetResourceInfo>;
 
 using TileList = std::list<TilePtr>;
 using ItemVector = std::vector<ItemPtr>;

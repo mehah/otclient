@@ -31,7 +31,7 @@ public:
     UIItem();
     void drawSelf(DrawPoolType drawPane) override;
 
-    void setItemId(int id);
+    void setItemId(int id, uint16_t resourceId = 0);
     void setItemCount(int count);
     void setItemSubType(int subType);
     void setItemVisible(const bool visible) { m_itemVisible = visible; }
@@ -57,6 +57,7 @@ protected:
     std::string m_shaderName;
     ItemPtr m_item;
     uint32_t m_itemId{ 0 };
+    uint16_t m_resourceId{ 0 };
     bool m_virtual{ false };
     bool m_showId{ false };
     bool m_itemVisible{ true };

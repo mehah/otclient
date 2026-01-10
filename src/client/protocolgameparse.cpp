@@ -1679,9 +1679,10 @@ void ProtocolGame::parseOpenNpcTrade(const InputMessagePtr& msg)
 
     for (auto i = 0; i < listCount; ++i) {
         const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const uint8_t itemCount = msg->getU8();
 
-        const auto item = Item::create(itemId);
+        const auto item = Item::create(itemId, resourceId);
         item->setCountOrSubType(itemCount);
 
         const auto& itemName = msg->getString();
@@ -1714,9 +1715,10 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
 
     for (auto i = 0; i < itemsListSize; ++i) {
         const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const uint16_t itemAmount = g_game.getFeature(Otc::GameDoubleShopSellAmount) ? msg->getU16() : msg->getU8();
 
-        goods.emplace_back(Item::create(itemId), itemAmount);
+        goods.emplace_back(Item::create(itemId, resourceId), itemAmount);
     }
 
     g_game.processPlayerGoods(money, goods);
@@ -1772,88 +1774,27 @@ void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
 
 void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 {
-    const auto& pos = getPosition(msg);
-    if (g_game.getProtocolVersion() >= 1203) {
-        uint8_t effectType = msg->getU8();
-        while (effectType != Otc::MAGIC_EFFECTS_END_LOOP) {
-            switch (effectType) {
-                case Otc::MAGIC_EFFECTS_DELAY:
-                case Otc::MAGIC_EFFECTS_DELTA: {
-                    msg->getU8(); // ?
-                    break;
-                }
-
-                case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
-                case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
-                    const uint16_t shotId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-                    const auto offsetX = static_cast<int8_t>(msg->getU8());
-                    const auto offsetY = static_cast<int8_t>(msg->getU8());
-                    if (!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
-                        g_logger.traceError("invalid missile id {}", shotId);
-                        return;
-                    }
-
-                    const auto& missile = std::make_shared<Missile>();
-                    missile->setId(shotId);
-
-                    if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
-                        missile->setPath(pos, Position(pos.x + offsetX, pos.y + offsetY, pos.z));
-                    } else {
-                        missile->setPath(Position(pos.x + offsetX, pos.y + offsetY, pos.z), pos);
-                    }
-
-                    g_map.addThing(missile, pos);
-                    break;
-                }
-
-                case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
-                    const uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-                    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
-                        g_logger.traceError("invalid effect id {}", effectId);
-                        continue;
-                    }
-
-                    const auto& effect = std::make_shared<Effect>();
-                    effect->setId(effectId);
-                    g_map.addThing(effect, pos);
-                    break;
-                }
-
-                case Otc::MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT: {
-                    msg->getU8(); // Source
-                    msg->getU16(); // Sound ID
-                    break;
-                }
-
-                case Otc::MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT: {
-                    msg->getU8(); // ENUM
-                    msg->getU8(); // Source
-                    msg->getU16(); // Sound ID
-                    break;
-                }
-                default:
-                    break;
-            }
-
-            effectType = msg->getU8();
-        }
-
+    auto pos = getPosition(msg);
+    if (g_game.getProtocolVersion() >= 1203) {    
+        // read all magic/sound effects
+        while (setMagicEffect(msg, pos, msg->getU8()));
         return;
     }
 
     uint16_t effectId = g_game.getFeature(Otc::GameMagicEffectU16) ? msg->getU16() : msg->getU8();
+    const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
 
     if (g_game.getClientVersion() <= 750) {
         effectId += 1; //hack to fix effects in earlier clients
     }
 
-    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
+    if (!g_things.isValidDatId(effectId, ThingCategoryEffect, resourceId)) {
         g_logger.traceError("invalid effect id {}", effectId);
         return;
     }
 
     const auto& effect = std::make_shared<Effect>();
-    effect->setId(effectId);
+    effect->setId(effectId, resourceId);
 
     g_map.addThing(effect, pos);
 }
@@ -1862,7 +1803,12 @@ void ProtocolGame::parseRemoveMagicEffect(const InputMessagePtr& msg)
 {
     getPosition(msg);
     uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
+    uint16_t resourceId = 0;
+    if (g_game.getFeature(Otc::GameMultiSpr)) {
+        resourceId = msg->getU16();
+    }
+
+    if (!g_things.isValidDatId(effectId, ThingCategoryEffect, resourceId)) {
         g_logger.warning("[ProtocolGame::parseRemoveMagicEffect] - Invalid effectId type {}", effectId);
         return;
     }
@@ -1892,13 +1838,18 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
     const auto& toPos = getPosition(msg);
 
     const uint16_t shotId = g_game.getFeature(Otc::GameDistanceEffectU16) ? msg->getU16() : msg->getU8();
-    if (!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
+    uint16_t resourceId = 0;
+    if (g_game.getFeature(Otc::GameMultiSpr)) {
+        resourceId = msg->getU16();
+    }
+
+    if (!g_things.isValidDatId(shotId, ThingCategoryMissile, resourceId)) {
         g_logger.traceError("invalid missile id {}", shotId);
         return;
     }
 
     const auto& missile = std::make_shared<Missile>();
-    missile->setId(shotId);
+    missile->setId(shotId, resourceId);
     missile->setPath(fromPos, toPos);
 
     g_map.addThing(missile, fromPos);
@@ -2164,12 +2115,7 @@ void ProtocolGame::setCreatureVocation(const InputMessagePtr& msg, const uint32_
 
 void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const
 {
-    const auto& creature = g_map.getCreatureById(creatureId);
-    if (!creature) {
-        g_logger.traceDebug("ProtocolGame::addCreatureIcon: could not get creature with id {}", creatureId);
-        return;
-    }
-
+    // read the packet
     const uint8_t sizeIcons = msg->getU8();
     std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> icons; // icon, category, count
     for (auto i = 0; i < sizeIcons; ++i) {
@@ -2177,6 +2123,13 @@ void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const uint32_t cr
         const uint8_t category = msg->getU8(); // icon.category -- 0x00 = monster // 0x01 = player?
         const uint16_t count = msg->getU16(); // icon.count
         icons.emplace_back(icon, category, count);
+    }
+
+    // update the icons if creature found
+    const auto& creature = g_map.getCreatureById(creatureId);
+    if (!creature) {
+        g_logger.traceDebug("ProtocolGame::addCreatureIcon: could not get creature with id {}", creatureId);
+        return;
     }
     creature->setIcons(icons);
 }
@@ -3477,7 +3430,10 @@ void ProtocolGame::parseItemInfo(const InputMessagePtr& msg) const
 
     for (auto i = 0; i < listCount; ++i) {
         const auto& item = std::make_shared<Item>();
-        item->setId(msg->getU16());
+        const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+
+        item->setId(itemId, resourceId);
         item->setCountOrSubType(g_game.getFeature(Otc::GameCountU16) ? msg->getU16() : msg->getU8());
         const auto& desc = msg->getString();
         itemList.emplace_back(item, desc);
@@ -3515,12 +3471,13 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
 
     for (uint16_t i = 0; std::cmp_less(i, size); ++i) {
         const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const uint8_t attribute = msg->getU8();
 
         const uint32_t amount = g_game.getProtocolVersion() < 1500 ? msg->getU16() : readPackedCount1500(msg);
 
         uint8_t tier = 0;
-        if (const auto thingType = g_things.getThingType(itemId, ThingCategoryItem)) {
+        if (const auto& thingType = g_things.getThingType(itemId, ThingCategoryItem, resourceId)) {
             if (std::cmp_greater(thingType->getClassification(), 0)) {
                 tier = attribute;
             }
@@ -3703,7 +3660,12 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
             g_logger.traceError("ProtocolGame::setTileDescription: too many things, pos={}, stackpos={}", position, stackPos);
         }
 
-        const auto& thing = getThing(msg);
+        const auto thing = getThing(msg);
+        if (!thing) {
+            g_logger.traceError("ProtocolGame::setTileDescription: failed to get thing at pos={}, stackpos={}", position, stackPos);
+            continue;
+        }
+
         if (thing->isLocalPlayer()) {
             thing->static_self_cast<LocalPlayer>()->resetPreWalk();
         }
@@ -3714,11 +3676,94 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
     return 0;
 }
 
+bool ProtocolGame::setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType)
+{
+    uint16_t resourceId = 0;
+    switch (effectType) {
+        case Otc::MAGIC_EFFECTS_END_LOOP:
+            // returning false ends the "while" loop
+            return false;
+        case Otc::MAGIC_EFFECTS_DELAY:
+        case Otc::MAGIC_EFFECTS_DELTA: {
+            msg->getU8(); // ?
+            break;
+        }
+
+        case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
+        case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
+            const uint16_t shotId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
+            if (g_game.getFeature(Otc::GameMultiSpr)) {
+                resourceId = msg->getU16();
+            }
+            const auto offsetX = static_cast<int8_t>(msg->getU8());
+            const auto offsetY = static_cast<int8_t>(msg->getU8());
+            if (!g_things.isValidDatId(shotId, ThingCategoryMissile, resourceId)) {
+                g_logger.traceError("invalid missile id {}", shotId);
+
+                // end the "while" loop
+                return false;
+            }
+
+            const auto& missile = std::make_shared<Missile>();
+            missile->setId(shotId, resourceId);
+
+            if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
+                missile->setPath(pos, Position(pos.x + offsetX, pos.y + offsetY, pos.z));
+            } else {
+                missile->setPath(Position(pos.x + offsetX, pos.y + offsetY, pos.z), pos);
+            }
+
+            g_map.addThing(missile, pos);
+            break;
+        }
+
+        case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
+            const uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
+            if (g_game.getFeature(Otc::GameMultiSpr)) {
+                resourceId = msg->getU16();
+            }
+
+            if (!g_things.isValidDatId(effectId, ThingCategoryEffect, resourceId)) {
+                g_logger.traceError("invalid effect id {}", effectId);
+
+                // effect cannot be drawn
+                // but the loop may continue
+                break;
+            }
+
+            const auto& effect = std::make_shared<Effect>();
+            effect->setId(effectId, resourceId);
+            g_map.addThing(effect, pos);
+            break;
+        }
+
+        case Otc::MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT: {
+            msg->getU8(); // Source
+            msg->getU16(); // Sound ID
+            break;
+        }
+
+        case Otc::MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT: {
+            msg->getU8(); // ENUM
+            msg->getU8(); // Source
+            msg->getU16(); // Sound ID
+            break;
+        }
+        default:
+            break;
+    }
+
+    // continue the "while" loop
+    return true;
+}
+
 Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount/* = true*/) const
 {
     Outfit outfit;
 
     uint16_t lookType = g_game.getFeature(Otc::GameLooktypeU16) ? msg->getU16() : msg->getU8();
+    const uint16_t outfitResourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+    outfit.setResourceId(outfitResourceId);
 
     if (lookType != 0) {
         outfit.setCategory(ThingCategoryCreature);
@@ -3728,7 +3773,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
         const uint8_t feet = msg->getU8();
         const uint8_t addons = g_game.getFeature(Otc::GamePlayerAddons) ? msg->getU8() : 0;
 
-        if (!g_things.isValidDatId(lookType, ThingCategoryCreature)) {
+        if (!g_things.isValidDatId(lookType, ThingCategoryCreature, outfitResourceId)) {
             g_logger.traceError("invalid outfit looktype {}", lookType);
             lookType = 0;
         }
@@ -3741,11 +3786,12 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
         outfit.setAddons(addons);
     } else {
         uint16_t lookTypeEx = msg->getU16();
+        
         if (lookTypeEx == 0) {
             outfit.setCategory(ThingCategoryEffect);
             outfit.setAuxId(13); // invisible effect id
         } else {
-            if (!g_things.isValidDatId(lookTypeEx, ThingCategoryItem)) {
+            if (!g_things.isValidDatId(lookTypeEx, ThingCategoryItem, outfitResourceId)) {
                 g_logger.traceError("invalid outfit looktypeex {}", lookTypeEx);
                 lookTypeEx = 0;
             }
@@ -3756,6 +3802,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
 
     if (g_game.getFeature(Otc::GamePlayerMounts) && parseMount) {
         const uint16_t mount = msg->getU16();
+        const uint16_t mountResourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         if (g_game.getClientVersion() >= 1281 && mount != 0) {
             msg->getU8(); //head
             msg->getU8(); //body
@@ -3763,9 +3810,12 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
             msg->getU8(); //feet
         }
         outfit.setMount(mount);
+        outfit.setMountResourceId(mountResourceId);
     }
 
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader) && parseMount) {
+        // to do: support resource ids
+
         const uint16_t wings = msg->getU16();
         outfit.setWing(wings);
 
@@ -3832,221 +3882,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
     CreaturePtr creature;
     const bool known = type != Proto::UnknownCreature;
     if (type == Proto::OutdatedCreature || type == Proto::UnknownCreature) {
-        if (known) {
-            const uint32_t creatureId = msg->getU32();
-            creature = g_map.getCreatureById(creatureId);
-            if (!creature) {
-                g_logger.traceError("ProtocolGame::getCreature: server said that a creature is known, but it's not");
-            }
-        } else {
-            const uint32_t removeId = msg->getU32();
-            const uint32_t id = msg->getU32();
-
-            if (id == removeId) {
-                creature = g_map.getCreatureById(id);
-            } else {
-                g_map.removeCreatureById(removeId);
-            }
-
-            uint8_t creatureType;
-            if (g_game.getClientVersion() >= 910) {
-                creatureType = msg->getU8();
-            } else {
-                if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId)
-                    creatureType = Proto::CreatureTypePlayer;
-                else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId)
-                    creatureType = Proto::CreatureTypeMonster;
-                else
-                    creatureType = Proto::CreatureTypeNpc;
-            }
-
-            uint32_t masterId = 0;
-            if (g_game.getClientVersion() >= 1281 && creatureType == Proto::CreatureTypeSummonOwn) {
-                masterId = msg->getU32();
-                if (m_localPlayer->getId() != masterId) {
-                    creatureType = Proto::CreatureTypeSummonOther;
-                }
-            }
-
-            const auto& name = g_game.formatCreatureName(msg->getString());
-
-            if (!creature) {
-                if ((id == m_localPlayer->getId()) ||
-                    // fixes a bug server side bug where GameInit is not sent and local player id is unknown
-                    (creatureType == Proto::CreatureTypePlayer && !m_localPlayer->getId() && name == m_localPlayer->getName())) {
-                    creature = m_localPlayer;
-                } else {
-                    switch (creatureType) {
-                        case Proto::CreatureTypePlayer:
-                            creature = std::make_shared<Player>();
-                            break;
-
-                        case Proto::CreatureTypeNpc:
-                            creature = std::make_shared<Npc>();
-                            break;
-
-                        case Proto::CreatureTypeHidden:
-                        case Proto::CreatureTypeMonster:
-                        case Proto::CreatureTypeSummonOwn:
-                        case Proto::CreatureTypeSummonOther:
-                            creature = std::make_shared<Monster>();
-                            break;
-
-                        default:
-                            g_logger.traceError("ProtocolGame::getCreature: creature type is invalid");
-                    }
-
-                    if (creature) {
-                        creature->onCreate();
-                    }
-                }
-            }
-
-            if (creature) {
-                creature->setId(id);
-                creature->setName(name);
-                creature->setMasterId(masterId);
-
-                g_map.addCreature(creature);
-            }
-        }
-
-        const uint8_t healthPercent = msg->getU8();
-        const auto direction = static_cast<Otc::Direction>(msg->getU8());
-        const auto& outfit = getOutfit(msg);
-
-        Light light;
-        light.intensity = msg->getU8();
-        light.color = msg->getU8();
-
-        const uint16_t speed = msg->getU16();
-
-        if (g_game.getClientVersion() >= 1281) {
-            addCreatureIcon(msg, creature->getId());
-        }
-
-        const uint8_t skull = msg->getU8();
-        const uint8_t shield = msg->getU8();
-
-        // emblem is sent only when the creature is not known
-        uint8_t emblem = 0;
-        uint8_t creatureType = 0;
-        uint8_t icon = 0;
-        bool unpass = true;
-
-        if (g_game.getFeature(Otc::GameCreatureEmblems) && !known) {
-            emblem = msg->getU8();
-        }
-
-        if (g_game.getFeature(Otc::GameThingMarks)) {
-            creatureType = msg->getU8();
-        }
-
-        uint32_t masterId = 0;
-        if (g_game.getClientVersion() >= 1281) {
-            if (creatureType == Proto::CreatureTypeSummonOwn) {
-                masterId = msg->getU32();
-                if (m_localPlayer->getId() != masterId) {
-                    creatureType = Proto::CreatureTypeSummonOther;
-                }
-            } else if (creatureType == Proto::CreatureTypePlayer) {
-                uint8_t vocationId = msg->getU8();
-                creature->setVocation(vocationId);
-            }
-        }
-
-        if (g_game.getFeature(Otc::GameCreatureIcons)) {
-            icon = msg->getU8();
-        }
-
-        if (g_game.getFeature(Otc::GameThingMarks)) {
-            const uint8_t mark = msg->getU8(); // mark
-
-            if (g_game.getClientVersion() < 1281) {
-                msg->getU16(); // helpers
-            }
-
-            if (creature) {
-                if (mark == 0xff) {
-                    creature->hideStaticSquare();
-                } else {
-                    creature->showStaticSquare(Color::from8bit(mark));
-                }
-            }
-        }
-
-        if (g_game.getClientVersion() >= 1281) {
-            msg->getU8(); // inspection type
-        }
-
-        if (g_game.getClientVersion() >= 854) {
-            unpass = static_cast<bool>(msg->getU8());
-        }
-
-        if (g_game.getFeature(Otc::GameCreaturePaperdoll)) {
-            uint8_t size = msg->getU8();
-            for (uint8_t i = 0; i < size; ++i) {
-                const auto& paperdoll = getPaperdoll(msg);
-                if (creature)
-                    creature->attachPaperdoll(paperdoll);
-            }
-        }
-
-        std::string shader;
-        if (g_game.getFeature(Otc::GameCreatureShader)) {
-            shader = msg->getString();
-        }
-
-        std::vector<uint16_t> attachedEffectList;
-        if (g_game.getFeature(Otc::GameCreatureAttachedEffect)) {
-            const uint8_t listSize = msg->getU8();
-            for (auto i = -1; ++i < listSize;) {
-                attachedEffectList.push_back(msg->getU16());
-            }
-        }
-
-        if (creature) {
-            creature->setHealthPercent(healthPercent);
-            creature->turn(direction);
-            creature->setOutfit(outfit);
-            creature->setSpeed(speed);
-            creature->setSkull(skull);
-            creature->setShield(shield);
-            creature->setPassable(!unpass);
-            creature->setLight(light);
-            creature->setMasterId(masterId);
-            creature->setShader(shader);
-            creature->clearTemporaryAttachedEffects();
-            std::unordered_set<uint16_t> currentAttachedEffectIds;
-            for (const auto& attachedEffect : creature->getAttachedEffects()) {
-                currentAttachedEffectIds.insert(attachedEffect->getId());
-            }
-
-            for (const auto effectId : attachedEffectList) {
-                const auto& effect = g_attachedEffects.getById(effectId);
-                if (effect && currentAttachedEffectIds.find(effectId) == currentAttachedEffectIds.end()) {
-                    const auto& clonedEffect = effect->clone();
-                    clonedEffect->setPermanent(false);
-                    creature->attachEffect(clonedEffect);
-                }
-            }
-
-            if (emblem > 0) {
-                creature->setEmblem(emblem);
-            }
-
-            if (creatureType > 0) {
-                creature->setType(creatureType);
-            }
-
-            if (icon > 0) {
-                creature->setIcon(icon);
-            }
-
-            if (creature == m_localPlayer && !m_localPlayer->isKnown()) {
-                m_localPlayer->setKnown(true);
-            }
-        }
+        internalGetCreature(msg, creature, known);
     } else if (type == Proto::Creature) {
         // this is send creature turn
         const uint32_t creatureId = msg->getU32();
@@ -4080,7 +3916,9 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         id = msg->getU16();
     }
 
-    const auto& item = Item::create(id);
+    const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+
+    const auto& item = Item::create(id, resourceId);
 
     if (!item) {
         throw Exception("ProtocolGame::getItem: unable to create item with invalid id {}", id);
@@ -4712,8 +4550,9 @@ void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
 
     for (auto i = 0; i < priceCount; ++i) {
         const uint16_t itemId = msg->getU16(); // item client id
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         if (g_game.getClientVersion() >= 1281) {
-            const auto& item = Item::create(itemId);
+            const auto& item = Item::create(itemId, resourceId);
 
             // note: vanilla client allows made-up client ids
             // their classification is assumed as 0
@@ -4962,7 +4801,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < inventoryItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& itemCreated = Item::create(itemId, resourceId);
                 const uint16_t classification = itemCreated->getClassification();
 
                 uint8_t itemTier = 0;
@@ -4980,7 +4820,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < storeItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& itemCreated = Item::create(itemId, resourceId);
                 const uint16_t classification = itemCreated->getClassification();
 
                 uint8_t itemTier = 0;
@@ -4998,8 +4839,9 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < stashItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
-                if (!thing) {
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
+                if (thing->getId() == 0) {
                     continue;
                 }
                 const uint16_t classification = thing->getClassification();
@@ -5019,7 +4861,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < depotItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& itemCreated = Item::create(itemId, resourceId);
                 const uint16_t classification = itemCreated->getClassification();
 
                 uint8_t itemTier = 0;
@@ -5037,7 +4880,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < inboxItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
+                const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+                const auto& itemCreated = Item::create(itemId, resourceId);
                 const uint16_t classification = itemCreated->getClassification();
 
                 uint8_t itemTier = 0;
@@ -5723,9 +5567,10 @@ Imbuement ProtocolGame::getImbuementInfo(const InputMessagePtr& msg)
     const uint8_t itemsSize = msg->getU8();
     for (auto i = 0; std::cmp_less(i, itemsSize); ++i) {
         const uint16_t itemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const auto& itemName = msg->getString();
         const uint16_t itemCount = msg->getU16();
-        const auto& item = Item::create(itemId);
+        const auto& item = Item::create(itemId, resourceId);
         item->setCount(itemCount);
         imbuement.sources.emplace_back(item, itemName);
     }
@@ -5747,78 +5592,64 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
 {
     uint8_t windowType = Otc::IMBUEMENT_WINDOW_SELECT_ITEM;
     if (g_game.getClientVersion() >= 1510) {
-        windowType = static_cast<Otc::Imbuement_Window_t>(msg->getU8()); // window type
+        // 0 = Choice, 1 = Select Item, 2 = Scroll
+        windowType = static_cast<Otc::Imbuement_Window_t>(msg->getU8());
         msg->getU8(); // unknown byte
     }
-    switch (windowType) {
-        case Otc::IMBUEMENT_WINDOW_CHOICE: {
-            const uint16_t itemId = msg->getU16(); // item client ID
-            const uint32_t unknown = msg->getU32(); // unknown
 
-            g_lua.callGlobalField("g_game", "onOpenImbuementWindow", itemId, unknown);
-            break;
-        }
-        case Otc::IMBUEMENT_WINDOW_SCROLL: {
-            msg->getU8(); // unknown byte
-            msg->getU8(); // unknown byte
-            const uint16_t imbuementsSize = msg->getU16();
-            std::vector<Imbuement> imbuements;
-            for (auto i = 0; i < imbuementsSize; ++i) {
-                imbuements.push_back(getImbuementInfo(msg));
-            }
-            const uint32_t neededItemsListCount = msg->getU32();
-            std::vector<ItemPtr> neededItemsList;
-            neededItemsList.reserve(neededItemsListCount);
-            for (uint32_t i = 0; i < neededItemsListCount; ++i) {
-                const uint16_t needItemId = msg->getU16();
-                const uint16_t count = msg->getU16();
-                const auto& needItem = Item::create(needItemId);
-                needItem->setCount(count);
-                neededItemsList.push_back(needItem);
-            }
+    if (windowType >= Otc::IMBUEMENT_WINDOW_LAST) {
+        g_logger.error("ProtocolGame::parseImbuementWindow: Unsupported window type");
+        return;
+    } else if (windowType == Otc::IMBUEMENT_WINDOW_CHOICE) {
+        const uint16_t itemId = msg->getU16();
+        const uint32_t unknown = msg->getU32(); // new imbuement duration?
 
-            g_lua.callGlobalField("g_game", "onImbuementScroll", imbuements, neededItemsList);
-            break;
-        }
-        case Otc::IMBUEMENT_WINDOW_SELECT_ITEM: {
-            const uint16_t itemId = msg->getU16(); // item client ID
-            const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
-            if (thing) {
-                const uint16_t classification = thing->getClassification();
-                if (classification > 0) {
-                    msg->getU8(); // upgradeClass
-                }
-            }
-            const uint8_t slot = msg->getU8();
-            std::unordered_map<int, std::tuple<Imbuement, uint32_t, uint32_t>> activeSlots;
-            for (auto i = 0; i < slot; i++) {
-                const uint8_t firstByte = msg->getU8();
-                if (firstByte == 0x01) {
-                    Imbuement imbuement = getImbuementInfo(msg);
-                    const uint32_t duration = msg->getU32();
-                    const uint32_t removalCost = msg->getU32();
-                    activeSlots[i] = std::make_tuple(imbuement, duration, removalCost);
-                }
-            }
-            const uint16_t imbuementsSize = msg->getU16();
-            std::vector<Imbuement> imbuements;
-            for (auto i = 0; i < imbuementsSize; ++i) {
-                imbuements.push_back(getImbuementInfo(msg));
-            }
-            const uint32_t neededItemsListCount = msg->getU32();
-            std::vector<ItemPtr> neededItemsList;
-            neededItemsList.reserve(neededItemsListCount);
-            for (uint32_t i = 0; i < neededItemsListCount; ++i) {
-                const uint16_t needItemId = msg->getU16();
-                const uint16_t count = msg->getU16();
-                const auto& needItem = Item::create(needItemId);
-                needItem->setCount(count);
-                neededItemsList.push_back(needItem);
-            }
-            g_lua.callGlobalField("g_game", "onImbuementWindow", itemId, slot, activeSlots, imbuements, neededItemsList);
-            break;
+        g_lua.callGlobalField("g_game", "onOpenImbuementWindow", itemId, unknown);
+        return;
+    }
+
+    std::vector<Imbuement> imbuements;
+    std::vector<ItemPtr> neededItemsList;
+
+    if (windowType == Otc::IMBUEMENT_WINDOW_SCROLL) {
+        msg->getU16(); // scroll clientid?
+
+        getImbuingIngredients(msg, imbuements, neededItemsList);
+        g_lua.callGlobalField("g_game", "onImbuementScroll", imbuements, neededItemsList);
+        return;
+    }
+    
+    const uint16_t itemId = msg->getU16();
+    const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+    const auto& item = Item::create(itemId, resourceId);
+    if (!item) {
+        throw Exception("ProtocolGame::parseImbuementWindow: unable to create item with invalid id {}", itemId);
+    }
+    if (item->getId() == 0) {
+        throw Exception("ProtocolGame::parseImbuementWindow: unable to create item with invalid id {}", itemId);
+    }
+
+    if (item->getClassification() > 0) {
+        msg->getU8(); // tier
+    }
+
+    // imbuing slots
+    const uint8_t imbuingSlotCount = msg->getU8();
+    std::unordered_map<int, std::tuple<Imbuement, uint32_t, uint32_t>> activeSlots;
+
+    for (auto i = 0; std::cmp_less(i, imbuingSlotCount); i++) {
+        const uint8_t firstByte = msg->getU8();
+        if (firstByte == 0x01) {
+            Imbuement imbuement = getImbuementInfo(msg);
+            const uint32_t duration = msg->getU32();
+            const uint32_t removalCost = msg->getU32();
+            activeSlots[i] = std::make_tuple(imbuement, duration, removalCost);
         }
     }
+
+    getImbuingIngredients(msg, imbuements, neededItemsList);
+
+    g_lua.callGlobalField("g_game", "onImbuementItem", itemId, imbuingSlotCount, activeSlots, imbuements, neededItemsList);
 }
 
 void ProtocolGame::parseCloseImbuementWindow(const InputMessagePtr& /*msg*/)
@@ -5833,14 +5664,14 @@ void ProtocolGame::parseError(const InputMessagePtr& msg)
     g_lua.callGlobalField("g_game", "onServerError", code, error);
 }
 
-static uint8_t readMarketItemTier(const InputMessagePtr& msg, uint16_t itemId, int clientVersion)
+static uint8_t readMarketItemTier(const InputMessagePtr& msg, uint16_t itemId, uint16_t resourceId, int clientVersion)
 {
     if (clientVersion < 1281) {
         return 0;
     }
 
-    const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
-    if (!thing) {
+    const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
+    if (thing->getId() == 0) {
         return 0;
     }
 
@@ -5860,7 +5691,8 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
 
     for (auto i = 0; i < itemsSentCount; ++i) {
         const uint16_t itemId = msg->getU16();
-        const uint8_t itemTier = readMarketItemTier(msg, itemId, g_game.getClientVersion());
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+        const uint8_t itemTier = readMarketItemTier(msg, itemId, resourceId, g_game.getClientVersion());
         const uint16_t count = msg->getU16();
         depotItems.push_back({ itemId, itemTier, count });
     }
@@ -5986,11 +5818,12 @@ static std::vector<std::vector<uint64_t>> readMarketStatsList(
 void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
 {
     const uint16_t itemId = msg->getU16();
+    const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
 
     const int clientVersion = g_game.getClientVersion();
     const bool pricesAreU64 = (clientVersion >= 1281);
 
-    const uint8_t itemTier = readMarketItemTier(msg, itemId, clientVersion);
+    const uint8_t itemTier = readMarketItemTier(msg, itemId, resourceId, clientVersion);
     auto descriptions = readMarketDescriptions(msg, clientVersion);
 
     const uint32_t timeThing = (time(nullptr) / 1000) * 86400;
@@ -6006,12 +5839,16 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
     const uint32_t timestamp = msg->getU32();
     const uint16_t counter = msg->getU16();
     uint16_t itemId = 0;
+    uint16_t resourceId = 0;
     uint8_t itemTier = 0;
 
     const int clientVersion = g_game.getClientVersion();
     if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS || var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         itemId = msg->getU16();
-        itemTier = readMarketItemTier(msg, itemId, clientVersion);
+        if (g_game.getFeature(Otc::GameMultiSpr)) {
+            resourceId = msg->getU16();
+        }
+        itemTier = readMarketItemTier(msg, itemId, resourceId, clientVersion);
     } else {
         itemId = var;
     }
@@ -6041,8 +5878,9 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
         var = msg->getU8();
         if (var == 3) {
             var = msg->getU16(); // itemId
-            const auto& thing = g_things.getThingType(var, ThingCategoryItem);
-            if (thing) {
+            const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+            const auto& thing = g_things.getThingType(var, ThingCategoryItem, resourceId);
+            if (thing->getId() != 0) {
                 const uint16_t classification = thing->getClassification();
                 if (classification > 0) {
                     itemTier = msg->getU8();
@@ -6420,4 +6258,288 @@ PaperdollPtr ProtocolGame::getPaperdoll(const InputMessagePtr& msg) const {
         paperdoll->setShader(shader);
 
     return paperdoll;
+}
+
+void ProtocolGame::internalGetCreature(const InputMessagePtr& msg, CreaturePtr& creature, const bool known) const
+{
+    uint32_t creatureId;
+    creatureFromPacket(msg, creature, creatureId, known);
+
+    const uint8_t healthPercent = msg->getU8();
+    const auto direction = static_cast<Otc::Direction>(msg->getU8());
+    const auto& outfit = getOutfit(msg);
+
+    Light light;
+    light.intensity = msg->getU8();
+    light.color = msg->getU8();
+
+    const uint16_t speed = msg->getU16();
+
+    // ui icons (skull, emblem, quest icons, npc icons, etc)
+    // NOTE: creatureId is passed here separately because it's in the packet but the creaure may be null
+    setCreatureIcons(msg, creature, creatureId, known);
+
+    int version = g_game.getClientVersion();
+
+    // open pvp "aggression" frames
+    if (g_game.getFeature(Otc::GameThingMarks)) {
+        const uint8_t frameColor = msg->getU8();
+
+        if (creature) {
+            if (frameColor == 0xff) {
+                // creature does not have any frame
+                creature->hideStaticSquare();
+            } else {
+                // display frame with color
+                creature->showStaticSquare(Color::from8bit(frameColor));
+            }
+        }
+
+        // lightning icon indicating multiple guild members online
+        if (version < 1281) {
+            msg->getU16();
+        }
+    }
+
+    // permissions for inspect player feature
+    if (version >= 1281) {
+        msg->getU8(); // inspection type
+    }
+
+    // walkthrough
+    bool unpass = false;
+    if (version >= 854) {
+        unpass = static_cast<bool>(msg->getU8());
+    }
+
+    // aura, wings, shader, paperdoll
+    setExtendedCosmetics(msg, creature);
+
+    if (creature) {
+        creature->setHealthPercent(healthPercent);
+        creature->turn(direction);
+        creature->setOutfit(outfit);
+        creature->setSpeed(speed);
+        creature->setPassable(!unpass);
+        creature->setLight(light);
+        if (creature == m_localPlayer && !m_localPlayer->isKnown()) {
+            m_localPlayer->setKnown(true);
+        }
+    }
+}
+
+void ProtocolGame::creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& creature, uint32_t& creatureId, const bool known) const
+{
+    if (known) {
+        creatureId = msg->getU32();
+        creature = g_map.getCreatureById(creatureId);
+        if (!creature) {
+            g_logger.traceError("ProtocolGame::getCreature: server said that a creature is known, but it's not");
+        }
+
+        return;
+    }
+
+    const uint32_t removeId = msg->getU32();
+    creatureId = msg->getU32();
+
+    if (creatureId == removeId) {
+        creature = g_map.getCreatureById(creatureId);
+    } else {
+        g_map.removeCreatureById(removeId);
+    }
+
+    uint8_t creatureType;
+    if (g_game.getClientVersion() >= 910) {
+        creatureType = msg->getU8();
+    } else {
+        if (creatureId >= Proto::PlayerStartId && creatureId < Proto::PlayerEndId)
+            creatureType = Proto::CreatureTypePlayer;
+        else if (creatureId >= Proto::MonsterStartId && creatureId < Proto::MonsterEndId)
+            creatureType = Proto::CreatureTypeMonster;
+        else
+            creatureType = Proto::CreatureTypeNpc;
+    }
+
+    uint32_t masterId = 0;
+    if (g_game.getClientVersion() >= 1281 && creatureType == Proto::CreatureTypeSummonOwn) {
+        masterId = msg->getU32();
+        if (m_localPlayer->getId() != masterId) {
+            creatureType = Proto::CreatureTypeSummonOther;
+        }
+    }
+
+    const auto& name = g_game.formatCreatureName(msg->getString());
+
+    if (!creature) {
+        if ((creatureId == m_localPlayer->getId()) ||
+            // fixes a bug server side bug where GameInit is not sent and local player id is unknown
+            (creatureType == Proto::CreatureTypePlayer && !m_localPlayer->getId() && name == m_localPlayer->getName())) {
+            creature = m_localPlayer;
+        } else {
+            makeCreature(creature, creatureType);
+        }
+    }
+
+    if (creature) {
+        creature->setId(creatureId);
+        creature->setName(name);
+        creature->setMasterId(masterId);
+
+        g_map.addCreature(creature);
+    }
+}
+
+void ProtocolGame::makeCreature(CreaturePtr& creature, uint8_t creatureType) const
+{
+    switch (creatureType) {
+        case Proto::CreatureTypePlayer:
+            creature = std::make_shared<Player>();
+            break;
+
+        case Proto::CreatureTypeNpc:
+            creature = std::make_shared<Npc>();
+            break;
+
+        case Proto::CreatureTypeHidden:
+        case Proto::CreatureTypeMonster:
+        case Proto::CreatureTypeSummonOwn:
+        case Proto::CreatureTypeSummonOther:
+            creature = std::make_shared<Monster>();
+            break;
+
+        default:
+            g_logger.traceError("ProtocolGame::getCreature: creature type is invalid");
+    }
+
+    if (creature) {
+        creature->onCreate();
+    }
+}
+
+void ProtocolGame::getImbuingIngredients(const InputMessagePtr& msg, std::vector<Imbuement>& imbuements, std::vector<ItemPtr>& neededItemsList)
+{
+    const uint16_t imbuementsSize = msg->getU16();
+    for (auto i = 0; i < imbuementsSize; ++i) {
+        imbuements.push_back(getImbuementInfo(msg));
+    }
+
+    const uint32_t neededItemsListCount = msg->getU32();
+    neededItemsList.reserve(neededItemsListCount);
+    for (uint32_t i = 0; i < neededItemsListCount; ++i) {
+        const uint16_t needItemId = msg->getU16();
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+        const uint16_t count = msg->getU16();
+        const auto& needItem = Item::create(needItemId, resourceId);
+        needItem->setCount(count);
+        neededItemsList.push_back(needItem);
+    }
+}
+
+void ProtocolGame::setExtendedCosmetics(const InputMessagePtr& msg, const CreaturePtr& creature) const
+{
+    if (g_game.getFeature(Otc::GameCreaturePaperdoll)) {
+        uint8_t size = msg->getU8();
+        for (uint8_t i = 0; i < size; ++i) {
+            const auto& paperdoll = getPaperdoll(msg);
+            if (creature)
+                creature->attachPaperdoll(paperdoll);
+        }
+    }
+
+    std::string shader;
+    if (g_game.getFeature(Otc::GameCreatureShader)) {
+        shader = msg->getString();
+    }
+
+    std::vector<uint16_t> attachedEffectList;
+    if (g_game.getFeature(Otc::GameCreatureAttachedEffect)) {
+        const uint8_t listSize = msg->getU8();
+        for (auto i = -1; ++i < listSize;) {
+            attachedEffectList.push_back(msg->getU16());
+        }
+    }
+
+    if (!creature) {
+        return;
+    }
+
+    creature->setShader(shader);
+    creature->clearTemporaryAttachedEffects();
+    std::unordered_set<uint16_t> currentAttachedEffectIds;
+    for (const auto& attachedEffect : creature->getAttachedEffects()) {
+        currentAttachedEffectIds.insert(attachedEffect->getId());
+    }
+
+    for (const auto effectId : attachedEffectList) {
+        const auto& effect = g_attachedEffects.getById(effectId);
+        if (effect && currentAttachedEffectIds.find(effectId) == currentAttachedEffectIds.end()) {
+            const auto& clonedEffect = effect->clone();
+            clonedEffect->setPermanent(false);
+            creature->attachEffect(clonedEffect);
+        }
+    }
+}
+
+void ProtocolGame::setCreatureIcons(const InputMessagePtr& msg, const CreaturePtr& creature, const uint32_t creatureId, const bool known) const
+{
+    // creature icons (quest, fiendish, weakened, etc)
+    int version = g_game.getClientVersion();
+    if (version >= 1281) {
+        addCreatureIcon(msg, creatureId);
+    }
+
+    const uint8_t skull = msg->getU8();
+    const uint8_t partyShield = msg->getU8();
+
+    // emblem is sent only when the creature is not known
+    uint8_t guildEmblem = 0;
+    uint8_t creatureType = 0;
+    uint8_t npcIcon = 0;
+    bool unpass = true;
+
+    if (g_game.getFeature(Otc::GameCreatureEmblems) && !known) {
+        guildEmblem = msg->getU8();
+    }
+
+    if (g_game.getFeature(Otc::GameThingMarks)) {
+        creatureType = msg->getU8();
+    }
+
+    uint32_t masterId = 0;
+    uint8_t vocationId = 0;
+    if (version >= 1281) {
+        if (creatureType == Proto::CreatureTypeSummonOwn) {
+            masterId = msg->getU32();
+            if (m_localPlayer->getId() != masterId) {
+                creatureType = Proto::CreatureTypeSummonOther;
+            }
+        } else if (creatureType == Proto::CreatureTypePlayer) {
+            vocationId = msg->getU8();
+        }
+    }
+
+    // npc icon
+    if (g_game.getFeature(Otc::GameCreatureIcons)) {
+        npcIcon = msg->getU8();
+    }
+
+    if (creature) {
+        creature->setSkull(skull);
+        creature->setShield(partyShield);
+        creature->setMasterId(masterId);
+        creature->setVocation(vocationId);
+
+        if (guildEmblem > 0) {
+            creature->setEmblem(guildEmblem);
+        }
+
+        if (creatureType > 0) {
+            creature->setType(creatureType);
+        }
+
+        if (npcIcon > 0) {
+            creature->setIcon(npcIcon);
+        }
+    }
 }

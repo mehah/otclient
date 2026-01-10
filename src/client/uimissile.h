@@ -31,7 +31,7 @@ public:
     UIMissile();
     void drawSelf(DrawPoolType drawPane) override;
 
-    void setMissileId(int id);
+    void setMissileId(int id, uint16_t resourceId = 0);
     void setMissileVisible(const bool visible) { m_missileVisible = visible; }
     void setMissile(const MissilePtr& missile);
     void setVirtual(const bool virt) { m_virtual = virt; }
