@@ -48,27 +48,19 @@ end
 
 function determineKeyComboDesc(keyCode, keyboardModifiers)
     local keyCombo = {}
-    if keyCode == KeyCtrl or keyCode == KeyShift or keyCode == KeyAlt then
+    if keyCode == KeyCtrlCmd or keyCode == KeyShift or keyCode == KeyAltOpt or keyCode == KeyControl then
         table.insert(keyCombo, keyCode)
     elseif KeyCodeDescs[keyCode] ~= nil then
-        if keyboardModifiers == KeyboardCtrlModifier then
-            table.insert(keyCombo, KeyCtrl)
-        elseif keyboardModifiers == KeyboardAltModifier then
-            table.insert(keyCombo, KeyAlt)
-        elseif keyboardModifiers == KeyboardCtrlAltModifier then
-            table.insert(keyCombo, KeyCtrl)
-            table.insert(keyCombo, KeyAlt)
-        elseif keyboardModifiers == KeyboardShiftModifier then
-            table.insert(keyCombo, KeyShift)
-        elseif keyboardModifiers == KeyboardCtrlShiftModifier then
-            table.insert(keyCombo, KeyCtrl)
-            table.insert(keyCombo, KeyShift)
-        elseif keyboardModifiers == KeyboardAltShiftModifier then
-            table.insert(keyCombo, KeyAlt)
-            table.insert(keyCombo, KeyShift)
-        elseif keyboardModifiers == KeyboardCtrlAltShiftModifier then
-            table.insert(keyCombo, KeyCtrl)
-            table.insert(keyCombo, KeyAlt)
+        if bit.band(keyboardModifiers, KeyboardControlModifier) ~= 0 then
+            table.insert(keyCombo, KeyControl)
+        end
+        if bit.band(keyboardModifiers, KeyboardCtrlModifier) ~= 0 then
+            table.insert(keyCombo, KeyCtrlCmd)
+        end
+        if bit.band(keyboardModifiers, KeyboardAltModifier) ~= 0 then
+            table.insert(keyCombo, KeyAltOpt)
+        end
+        if bit.band(keyboardModifiers, KeyboardShiftModifier) ~= 0 then
             table.insert(keyCombo, KeyShift)
         end
         table.insert(keyCombo, keyCode)
@@ -275,5 +267,13 @@ function g_keyboard.isShiftPressed()
         return false
     else
         return bit.band(g_window.getKeyboardModifiers(), KeyboardShiftModifier) ~= 0
+    end
+end
+
+function g_keyboard.isControlPressed()
+    if (g_platform.isMobile()) then
+        return false
+    else
+        return bit.band(g_window.getKeyboardModifiers(), KeyboardControlModifier) ~= 0
     end
 end
