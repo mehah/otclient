@@ -61,12 +61,12 @@ public:
     void loadXml(const std::string& file);
     void saveDat(const std::string& fileName, uint16_t resourceId = 0);
     void saveSpr(const std::string& fileName, uint16_t resourceId = 0);
-    uint32_t getOtbMajorVersion() { return m_otbMajorVersion; }
-    uint32_t getOtbMinorVersion() { return m_otbMinorVersion; }
-    bool isXmlLoaded() { return m_xmlLoaded; }
-    bool isOtbLoaded() { return m_otbLoaded; }
-    bool isValidOtbId(uint16_t id) { return id >= 1 && id < m_itemTypes.size(); }
-    const ItemTypeList& getItemTypes() { return m_itemTypes; }
+    uint32_t getOtbMajorVersion() const { return m_otbMajorVersion; }
+    uint32_t getOtbMinorVersion() const { return m_otbMinorVersion; }
+    bool isXmlLoaded() const { return m_xmlLoaded; }
+    bool isOtbLoaded() const { return m_otbLoaded; }
+    bool isValidOtbId(uint16_t id) const { return id >= 1 && id < m_itemTypes.size(); }
+    const ItemTypeList& getItemTypes() const { return m_itemTypes; }
     void addItemType(const ItemTypePtr& itemType);
     const ItemTypePtr& findItemTypeByClientId(uint16_t id);
     const ItemTypePtr& findItemTypeByName(const std::string& name);
