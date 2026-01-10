@@ -6330,7 +6330,7 @@ void ProtocolGame::internalGetCreature(const InputMessagePtr& msg, CreaturePtr& 
 
 void ProtocolGame::creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& creature, uint32_t& creatureId, const bool known) const
 {
-    if (!known) {
+    if (known) {
         creatureId = msg->getU32();
         creature = g_map.getCreatureById(creatureId);
         if (!creature) {
@@ -6387,7 +6387,7 @@ void ProtocolGame::creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& c
         creature->setMasterId(masterId);
 
         g_map.addCreature(creature);
-    }   
+    }
 }
 
 void ProtocolGame::makeCreature(CreaturePtr& creature, uint8_t creatureType) const
@@ -6458,6 +6458,10 @@ void ProtocolGame::setExtendedCosmetics(const InputMessagePtr& msg, const Creatu
         for (auto i = -1; ++i < listSize;) {
             attachedEffectList.push_back(msg->getU16());
         }
+    }
+
+    if (!creature) {
+        return;
     }
 
     creature->setShader(shader);
