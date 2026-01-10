@@ -15,10 +15,6 @@ on:
       - "src/**"
       - ".github/workflows/build-macos.yml"
 
-permissions:
-  contents: read
-  pull-requests: read
-
 env:
   LUKKA_RUN_VCPKG_SHA: "${{ vars.LUKKA_RUN_VCPKG_SHA != '' && vars.LUKKA_RUN_VCPKG_SHA || 'b3dd708d38df5c856fe1c18dc0d59ab771f93921' }}"
   CMAKE_BUILD_PARALLEL_LEVEL: 2
@@ -27,6 +23,8 @@ env:
 jobs:
   cancel-runs:
     if: github.event_name == 'pull_request' && github.ref != 'refs/heads/main'
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
@@ -36,6 +34,9 @@ jobs:
 
   build:
     if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+    permissions:
+      contents: read
+      pull-requests: read
     name: ${{ matrix.os }}-${{ matrix.buildtype }}
     runs-on: ${{ matrix.os }}
     env:
@@ -49,10 +50,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14]
+        os: [macos-15]
         buildtype: [macos-release]
         include:
-          - os: macos-14
+          - os: macos-15
             triplet: arm64-osx
             cmake_build_type: Release
 
@@ -61,7 +62,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ github.event_name == 'push' && github.repository || (github.event.pull_request.head.repo.fork && github.repository || github.event.pull_request.head.repo.full_name) }}
-          ref: ${{ github.event_name == 'push' && github.ref || (github.event.pull_request.head.repo.fork && github.event.pull_request.base.ref || github.event.pull_request.head.ref) }}
+          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Get vcpkg commit ID
