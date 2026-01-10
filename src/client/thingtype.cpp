@@ -1181,6 +1181,7 @@ void ThingType::exportImage(const std::string& fileName)
     if (m_spritesIndex.empty())
         throw Exception("cannot export thingtype without sprites");
 
+    auto sprMgr = g_things.getSpriteManagerById(m_resourceId);
     const auto& image = std::make_shared<Image>(Size(g_gameConfig.getSpriteSize() * m_size.width() * m_layers * m_numPatternX, g_gameConfig.getSpriteSize() * m_size.height() * m_animationPhases * m_numPatternY * m_numPatternZ));
     for (int z = 0; z < m_numPatternZ; ++z) {
         for (int y = 0; y < m_numPatternY; ++y) {
@@ -1191,7 +1192,7 @@ void ThingType::exportImage(const std::string& fileName)
                             for (int h = 0; h < m_size.height(); ++h) {
                                 image->blit(Point(g_gameConfig.getSpriteSize() * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
                                             g_gameConfig.getSpriteSize() * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
-                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
+                                    sprMgr->getSpriteImageById(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
                             }
                         }
                     }

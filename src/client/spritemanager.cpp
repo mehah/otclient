@@ -607,11 +607,17 @@ ImagePtr ProtobufSpriteManager::getSpriteImage(const int id, bool& isLoading)
     }
 }
 
+#ifdef FRAMEWORK_EDITOR
 void ProtobufSpriteManager::saveSpriteToFile(const int id, const std::string& file)
 {
     if (const auto& sprite = ISpriteManager::getSpriteImageById(id)) {
         sprite->savePNG(file);
     }
+}
+
+void ProtobufSpriteManager::saveSpr(const std::string&)
+{
+    g_logger.traceError("ProtobufSpriteManager does not support saveSpr, consider using saveSheetToFile.");
 }
 
 void ProtobufSpriteManager::saveSheetToFileBySprite(const int id, const std::string& file)
@@ -627,3 +633,4 @@ void ProtobufSpriteManager::saveSheetToFile(const SpriteSheetPtr& sheet, const s
     Image image({ SpriteSheet::SIZE }, 4, sheet->data.get());
     image.savePNG(file);
 }
+#endif

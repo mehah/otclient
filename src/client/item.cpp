@@ -316,7 +316,7 @@ void Item::setOtbId(uint16_t id)
     m_serverId = id;
 
     id = itemType->getClientId();
-    if (!g_things.isValidDatId(id, ThingCategoryItem))
+    if (!g_things.isValidDatId(id, ThingCategoryItem, m_resourceId))
         id = 0;
 
     m_clientId = id;

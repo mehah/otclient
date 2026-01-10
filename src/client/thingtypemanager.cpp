@@ -542,37 +542,19 @@ ItemTypeList ThingTypeManager::findItemTypeByCategory(ItemCategory category)
     return ret;
 }
 
-void ThingTypeManager::saveDat(const std::string& fileName)
+void ThingTypeManager::saveDat(const std::string& fileName, uint16_t resourceId)
 {
-    if (!m_datLoaded)
-        throw Exception("failed to save, dat is not loaded");
+    auto res = g_things.getResourceById(resourceId);
+    if (!res)
+        throw Exception("failed to save, resource not found");
 
-    try {
-        const auto& fin = g_resources.createFile(fileName);
-        if (!fin)
-            throw Exception("failed to open file '{}' for write", fileName);
+    res->saveDat(fileName);
+}
 
-        fin->cache();
-
-        fin->addU32(m_datSignature);
-
-        for (const auto& m_thingType : m_thingTypes)
-            fin->addU16(m_thingType.size() - 1);
-
-        for (int category = 0; category < ThingLastCategory; ++category) {
-            uint16_t firstId = 1;
-            if (category == ThingCategoryItem)
-                firstId = 100;
-
-            for (uint16_t id = firstId; id < m_thingTypes[category].size(); ++id)
-                m_thingTypes[category][id]->serialize(fin);
-        }
-
-        fin->flush();
-        fin->close();
-    } catch (const std::exception& e) {
-        g_logger.error("Failed to save '{}': {}", fileName, e.what());
-    }
+void ThingTypeManager::saveSpr(const std::string& fileName, uint16_t resourceId)
+{
+    if (auto res = g_things.getSpriteManagerById(resourceId))
+        res->saveSpr(fileName);
 }
 
 void ThingTypeManager::loadOtb(const std::string& file)
@@ -716,6 +698,42 @@ bool AssetResource::loadDat(const std::string& file)
         return false;
     }
 }
+
+#ifdef FRAMEWORK_EDITOR
+void AssetResource::saveDat(const std::string& file)
+{
+    try {
+        if (!isDatLoaded()) {
+            throw Exception("failed to save {}, dat is not loaded", file);
+        }
+
+        const auto& fin = g_resources.createFile(file);
+        if (!fin)
+            throw Exception("failed to open file '{}' for write", file);
+
+        fin->cache();
+
+        fin->addU32(m_datSignature);
+
+        for (const auto& m_thingType : m_thingTypes)
+            fin->addU16(m_thingType.size() - 1);
+
+        for (int category = 0; category < ThingLastCategory; ++category) {
+            uint16_t firstId = 1;
+            if (category == ThingCategoryItem)
+                firstId = 100;
+
+            for (uint16_t id = firstId; id < m_thingTypes[category].size(); ++id)
+                m_thingTypes[category][id]->serialize(fin);
+        }
+
+        fin->flush();
+        fin->close();
+    } catch (const std::exception& e) {
+        g_logger.error("Failed to save '{}': {}", file, e.what());
+    }
+}
+#endif
 
 SpriteManagerPtr AssetResource::loadAppearances(const std::string& file)
 {

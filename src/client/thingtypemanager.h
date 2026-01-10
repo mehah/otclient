@@ -59,7 +59,8 @@ public:
     void parseItemType(uint16_t id, pugi::xml_node node);
     void loadOtb(const std::string& file);
     void loadXml(const std::string& file);
-    void saveDat(const std::string& fileName);
+    void saveDat(const std::string& fileName, uint16_t resourceId = 0);
+    void saveSpr(const std::string& fileName, uint16_t resourceId = 0);
     uint32_t getOtbMajorVersion() { return m_otbMajorVersion; }
     uint32_t getOtbMinorVersion() { return m_otbMinorVersion; }
     bool isXmlLoaded() { return m_xmlLoaded; }
@@ -165,6 +166,10 @@ public:
     bool loadDat(const std::string& file);
     bool isDatLoaded() const { return m_datLoaded; }
     bool isValidDatId(const uint16_t id, const ThingCategory category) const { return category < ThingLastCategory && id >= 1 && id < m_thingTypes[category].size(); }
+
+#ifdef FRAMEWORK_EDITOR
+    void saveDat(const std::string& file);
+#endif
 
     // protobuf assets
     SpriteManagerPtr loadAppearances(const std::string& file);

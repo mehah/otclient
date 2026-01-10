@@ -98,6 +98,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "loadOtb", &ThingTypeManager::loadOtb, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadXml", &ThingTypeManager::loadXml, &g_things);
     g_lua.bindSingletonFunction("g_things", "isOtbLoaded", &ThingTypeManager::isOtbLoaded, &g_things);
+    g_lua.bindSingletonFunction("g_things", "saveSpr", &ThingTypeManager::saveSpr, &g_things);
 
     g_lua.registerSingletonClass("g_houses");
     g_lua.bindSingletonFunction("g_houses", "clear", &HouseManager::clear, &g_houses);
@@ -118,10 +119,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_towns", "removeTown", &TownManager::removeTown, &g_towns);
     g_lua.bindSingletonFunction("g_towns", "getTowns", &TownManager::getTowns, &g_towns);
     g_lua.bindSingletonFunction("g_towns", "sort", &TownManager::sort, &g_towns);
-#endif
-
-#ifdef FRAMEWORK_EDITOR
-    g_lua.bindSingletonFunction("g_sprites", "saveSpr", &LegacySpriteManager::saveSpr, &g_sprites);
 #endif
 
     g_lua.registerSingletonClass("g_map");

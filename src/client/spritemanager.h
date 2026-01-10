@@ -92,6 +92,9 @@ public:
     virtual void reload() = 0;
     virtual bool isLoaded() const { return false; }
     virtual bool isProtobuf() const { return false; }
+#ifdef FRAMEWORK_EDITOR
+    virtual void saveSpr(const std::string& fileName) = 0;
+#endif
 };
 
 class FileMetadata
@@ -134,7 +137,7 @@ public:
     void reload() override;
 
 #ifdef FRAMEWORK_EDITOR
-    void saveSpr(const std::string& fileName);
+    void saveSpr(const std::string& fileName) override;
 #endif
 
     uint32_t getSignature() const { return m_signature; }
@@ -231,8 +234,6 @@ public:
     std::string getPath() const { return m_path; }
 
     bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;
-    void saveSheetToFileBySprite(int id, const std::string& file);
-    void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
     SpriteSheetPtr getSheetBySpriteId(int id, bool load = true) {
         bool isLoading = false;
         return getSheetBySpriteId(id, isLoading, load);
@@ -242,7 +243,13 @@ public:
     void addSpriteSheet(const SpriteSheetPtr& sheet) { m_sheets.emplace_back(sheet); }
 
     ImagePtr getSpriteImage(int id, bool& isLoading) override;
+
+#ifdef FRAMEWORK_EDITOR
+    void saveSheetToFileBySprite(int id, const std::string& file);
+    void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
+    void saveSpr(const std::string& fileName) override;
     void saveSpriteToFile(int id, const std::string& file);
+#endif
 
     bool isLoaded() const override { return true; }
     bool isProtobuf() const override { return true; }
