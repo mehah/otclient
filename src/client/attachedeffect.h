@@ -47,7 +47,7 @@ public:
     Size getSize() { return m_size; }
     void setSize(const Size& s) { m_size = s; }
 
-    bool isHidedOwner() { return m_hideOwner; }
+    bool isOwnerHidden() { return m_hideOwner; }
     void setHideOwner(const bool v) { m_hideOwner = v; }
 
     bool isTransform() { return m_transform; }

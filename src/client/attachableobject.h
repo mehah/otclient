@@ -73,7 +73,7 @@ public:
     UIWidgetPtr getAttachedWidgetById(const std::string& id);
 
 protected:
-    struct Data
+    struct AttachedObjects
     {
         std::vector<AttachedEffectPtr> attachedEffects;
         std::vector<ParticleEffectPtr> attachedParticles;
@@ -88,11 +88,11 @@ protected:
 
     auto getData() {
         if (!m_data)
-            m_data = std::make_shared<Data>();
+            m_data = std::make_shared<AttachedObjects>();
         return m_data;
     }
 
-    std::shared_ptr<Data> m_data;
+    std::shared_ptr<AttachedObjects> m_data;
 
     uint8_t m_ownerHidden{ 0 };
 };

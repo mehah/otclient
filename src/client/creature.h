@@ -51,7 +51,6 @@ public:
     void draw(const Rect& destRect, uint8_t size, bool center = false);
     void drawLight(const Point& dest, LightView* lightView) override;
 
-    void internalDraw(Point dest, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags);
 
     // note: unlike other classes that derive from Thing, this one sets creatureId
@@ -98,6 +97,7 @@ public:
     void allowAppearWalk() { m_allowAppearWalk = true; }
     virtual void walk(const Position& oldPos, const Position& newPos);
     virtual void stopWalk();
+    void updateFlight();
 
     bool isDrawingOutfitColor() const { return m_drawOutfitColor; }
     void setDrawOutfitColor(const bool draw) { m_drawOutfitColor = draw; }
@@ -174,9 +174,10 @@ public:
     bool getTyping() { return m_typing; }
     void setTypingIconTexture(const std::string& filename);
     void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) {
-        m_bounce = { .minHeight =
-minHeight,
-.height = height, .speed = speed
+        m_bounce = {
+            .minHeight = minHeight,
+            .height = height,
+            .speed = speed,
         };
     }
 
@@ -229,6 +230,7 @@ protected:
 
     ThingType* getThingType() const override;
     ThingType* getMountThingType() const;
+    ThingType* getWingsThingType() const;
 
     void onDeath();
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
@@ -243,13 +245,20 @@ protected:
     int16_t m_lastMapDuration = -1;
 
 private:
+    // methods for drawing creature sprites specifically
+    void drawOutfit(Point& dest, const Color& color, const bool replaceColorShader);
+    void drawCreatureOutfit(Point& dest, const Color& color, const int animationPhase, const bool replaceColorShader);
+    void drawItemOutfit(Point& dest, const Color& color, const bool replaceColorShader);
+    void internalDraw(Point dest, const Color& color = Color::white);
+    int getBounceOffset() const;
+
     void nextWalkUpdate();
     void updateJump();
     void updateShield();
     void updateWalkingTile();
     void updateWalkAnimation();
 
-    uint16_t getCurrentAnimationPhase(bool mount = false);
+    uint16_t getCurrentAnimationPhase(const ThingType* thingType, bool idle = false);
 
     struct CachedStep
     {

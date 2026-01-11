@@ -98,10 +98,11 @@ public:
     uint8_t getFeetColor() { return m_feet; }
 
     void setColorByOutfit(const Outfit& outfit) {
-        m_head = outfit.getHead();
-        m_body = outfit.getBody();
-        m_legs = outfit.getLegs();
-        m_feet = outfit.getFeet();
+        const auto colors = outfit.getBaseOutfit();
+        m_head = colors.head;
+        m_body = colors.body;
+        m_legs = colors.legs;
+        m_feet = colors.feet;
     }
 
     void reset();

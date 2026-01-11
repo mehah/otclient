@@ -48,7 +48,7 @@ void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
 
     onStartAttachEffect(obj);
 
-    if (obj->isHidedOwner())
+    if (obj->isOwnerHidden())
         ++m_ownerHidden;
 
     if (obj->getDuration() > 0) {
@@ -94,7 +94,7 @@ bool AttachableObject::detachEffectById(uint16_t id)
 
 void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect, const bool callEvent)
 {
-    if (effect->isHidedOwner())
+    if (effect->isOwnerHidden())
         --m_ownerHidden;
 
     onStartDetachEffect(effect);

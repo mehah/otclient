@@ -113,43 +113,31 @@ Color Outfit::getColor(int color)
 
 void Outfit::resetClothes()
 {
-    setHead(0);
-    setBody(0);
-    setLegs(0);
-    setFeet(0);
-    setMount(0);
-    setFamiliar(0);
-    setWing(0);
-    setAura(0);
-    setEffect(0);
+    m_outfit.resetColors();
+    applyMount(ColorOutfit());
+    applyFamiliar(SimpleOutfit());
+    applyWings(SimpleOutfit());
+    applyAura(EffectOutfit());
+    applyParticles(EffectOutfit());
     setShader("Outfit - Default");
 }
 
-void Outfit::setHead(const uint8_t head) {
-    if (m_outfit.head == head)
-        return;
-
-    m_outfit.head = head;
-    m_outfit.headColor = getColor(head);
+void ColorOutfit::applyColors()
+{
+    headColor = Outfit::getColor(head);
+    bodyColor = Outfit::getColor(body);
+    legsColor = Outfit::getColor(legs);
+    feetColor = Outfit::getColor(feet);
 }
-void Outfit::setBody(const uint8_t body) {
-    if (m_outfit.body == body)
-        return;
 
-    m_outfit.body = body;
-    m_outfit.bodyColor = getColor(body);
-}
-void Outfit::setLegs(const uint8_t legs) {
-    if (m_outfit.legs == legs)
-        return;
-
-    m_outfit.legs = legs;
-    m_outfit.legsColor = getColor(legs);
-}
-void Outfit::setFeet(const uint8_t feet) {
-    if (m_outfit.feet == feet)
-        return;
-
-    m_outfit.feet = feet;
-    m_outfit.feetColor = getColor(feet);
+void ColorOutfit::resetColors()
+{
+    head = 0;
+    body = 0;
+    legs = 0;
+    feet = 0;
+    headColor = Color::white;
+    bodyColor = Color::white;
+    legsColor = Color::white;
+    feetColor = Color::white;
 }

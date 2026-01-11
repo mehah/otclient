@@ -168,21 +168,24 @@ namespace {
             otcRaceType.name = protobufRace.name();
             otcRaceType.boss = boss;
 
-            Outfit otcOutfit;
             const auto& protobufOutfit = protobufRace.outfit();
-            if (protobufOutfit.lookitem() != 0) {
-                otcOutfit.setAuxId(static_cast<uint16_t>(protobufOutfit.lookitem()));
-            } else {
-                otcOutfit.setId(static_cast<uint16_t>(protobufOutfit.looktype()));
-                otcOutfit.setAddons(static_cast<uint8_t>(protobufOutfit.lookaddons()));
-                if (protobufOutfit.has_colors()) {
-                    const auto& pbColors = protobufOutfit.colors();
-                    otcOutfit.setHead(static_cast<uint8_t>(pbColors.head()));
-                    otcOutfit.setBody(static_cast<uint8_t>(pbColors.body()));
-                    otcOutfit.setLegs(static_cast<uint8_t>(pbColors.legs()));
-                    otcOutfit.setFeet(static_cast<uint8_t>(pbColors.feet()));
-                }
+
+            ColorOutfit parsedOutfit;
+            parsedOutfit.type = static_cast<uint16_t>(protobufOutfit.looktype());
+            parsedOutfit.typeEx = static_cast<uint16_t>(protobufOutfit.lookitem());
+
+            if (protobufOutfit.has_colors()) {
+                const auto& pbColors = protobufOutfit.colors();
+                parsedOutfit.head = static_cast<uint8_t>(pbColors.head());
+                parsedOutfit.body = static_cast<uint8_t>(pbColors.body());
+                parsedOutfit.legs = static_cast<uint8_t>(pbColors.legs());
+                parsedOutfit.feet = static_cast<uint8_t>(pbColors.feet());
+                parsedOutfit.applyColors();
             }
+
+            Outfit otcOutfit;
+            otcOutfit.applyOutfit(parsedOutfit);
+            otcOutfit.setAddons(static_cast<uint8_t>(protobufOutfit.lookaddons()));
 
             otcRaceType.outfit = otcOutfit;
             otcRaceList.emplace_back(otcRaceType);

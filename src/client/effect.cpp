@@ -35,7 +35,7 @@
 
 void Effect::draw(const Point& dest, const bool drawThings, LightView* lightView)
 {
-    if (!canDraw() || isHided())
+    if (!canDraw() || isHidden())
         return;
 
     // It only starts to draw when the first effect as it is about to end.

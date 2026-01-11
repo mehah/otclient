@@ -67,7 +67,6 @@ AttachedEffectPtr AttachedEffect::clone()
             }
         }
     }
-
     return obj;
 }
 
@@ -183,15 +182,15 @@ int AttachedEffect::getCurrentAnimationPhase()
         return animator->getPhaseAt(m_animationTimer, getSpeed());
 
     if (thingTye->isEffect()) {
-        const int lastPhase = thingTye->getAnimationPhases() - 1;
+        const int lastPhase = thingTye->getAnimationPhase() - 1;
         const int phase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / (g_gameConfig.getEffectTicksPerFrame() / getSpeed())), lastPhase);
         if (phase == lastPhase) m_animationTimer.restart();
         return phase;
     }
 
     if (thingTye->isCreature() && thingTye->isAnimateAlways()) {
-        const int ticksPerFrame = std::round(1000 / thingTye->getAnimationPhases()) / getSpeed();
-        return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * thingTye->getAnimationPhases())) / ticksPerFrame;
+        const int ticksPerFrame = std::round(1000 / thingTye->getAnimationPhase()) / getSpeed();
+        return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * thingTye->getAnimationPhase())) / ticksPerFrame;
     }
 
     return 0;

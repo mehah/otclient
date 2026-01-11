@@ -2932,7 +2932,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
 
     // mount color bytes are required here regardless of having one
     if (g_game.getClientVersion() >= 1281) {
-        if (currentOutfit.getMount() == 0) {
+        if (currentOutfit.getMount().type == 0) {
             msg->getU8(); //head
             msg->getU8(); //body
             msg->getU8(); //legs
@@ -3759,72 +3759,89 @@ bool ProtocolGame::setMagicEffect(const InputMessagePtr& msg, Position& pos, uin
 
 Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount/* = true*/) const
 {
+    const bool multiSpr = g_game.getFeature(Otc::GameMultiSpr);
+
     Outfit outfit;
 
-    uint16_t lookType = g_game.getFeature(Otc::GameLooktypeU16) ? msg->getU16() : msg->getU8();
-    const uint16_t outfitResourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
-    outfit.setResourceId(outfitResourceId);
+    ColorOutfit baseOutfit;
+    baseOutfit.type = g_game.getFeature(Otc::GameLooktypeU16) ? msg->getU16() : msg->getU8();
+    baseOutfit.resourceId = multiSpr ? msg->getU16() : 0;
 
-    if (lookType != 0) {
+    if (baseOutfit.type != 0) {
         outfit.setCategory(ThingCategoryCreature);
-        const uint8_t head = msg->getU8();
-        const uint8_t body = msg->getU8();
-        const uint8_t legs = msg->getU8();
-        const uint8_t feet = msg->getU8();
+        baseOutfit.head = msg->getU8();
+        baseOutfit.body = msg->getU8();
+        baseOutfit.legs = msg->getU8();
+        baseOutfit.feet = msg->getU8();
+        baseOutfit.applyColors();
+
         const uint8_t addons = g_game.getFeature(Otc::GamePlayerAddons) ? msg->getU8() : 0;
 
-        if (!g_things.isValidDatId(lookType, ThingCategoryCreature, outfitResourceId)) {
-            g_logger.traceError("invalid outfit looktype {}", lookType);
-            lookType = 0;
+        if (!g_things.isValidDatId(baseOutfit.type, ThingCategoryCreature, baseOutfit.resourceId)) {
+            g_logger.traceError("invalid outfit looktype {}", baseOutfit.type);
+            baseOutfit.type = 0;
         }
 
-        outfit.setId(lookType);
-        outfit.setHead(head);
-        outfit.setBody(body);
-        outfit.setLegs(legs);
-        outfit.setFeet(feet);
         outfit.setAddons(addons);
     } else {
-        uint16_t lookTypeEx = msg->getU16();
+        baseOutfit.typeEx = msg->getU16();
         
-        if (lookTypeEx == 0) {
+        if (baseOutfit.typeEx == 0) {
             outfit.setCategory(ThingCategoryEffect);
-            outfit.setAuxId(13); // invisible effect id
+            baseOutfit.typeEx = 13; // invisible effect id
+            baseOutfit.resourceId = 0;
         } else {
-            if (!g_things.isValidDatId(lookTypeEx, ThingCategoryItem, outfitResourceId)) {
-                g_logger.traceError("invalid outfit looktypeex {}", lookTypeEx);
-                lookTypeEx = 0;
+            if (!g_things.isValidDatId(baseOutfit.typeEx, ThingCategoryItem, baseOutfit.resourceId)) {
+                g_logger.traceError("invalid outfit looktypeex {}", baseOutfit.typeEx);
+                baseOutfit.typeEx = 0;
+                baseOutfit.resourceId = 0;
             }
             outfit.setCategory(ThingCategoryItem);
-            outfit.setAuxId(lookTypeEx);
         }
     }
-
+    outfit.applyOutfit(baseOutfit);
+    
     if (g_game.getFeature(Otc::GamePlayerMounts) && parseMount) {
-        const uint16_t mount = msg->getU16();
-        const uint16_t mountResourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
-        if (g_game.getClientVersion() >= 1281 && mount != 0) {
-            msg->getU8(); //head
-            msg->getU8(); //body
-            msg->getU8(); //legs
-            msg->getU8(); //feet
+        ColorOutfit mount;
+        mount.type = msg->getU16();
+        mount.resourceId = multiSpr ? msg->getU16() : 0;
+
+        if (g_game.getClientVersion() >= 1281 && mount.type != 0) {
+            mount.head = msg->getU8();
+            mount.body = msg->getU8();
+            mount.legs = msg->getU8();
+            mount.feet = msg->getU8();
+            mount.applyColors();
         }
-        outfit.setMount(mount);
-        outfit.setMountResourceId(mountResourceId);
+        outfit.applyMount(mount);
     }
 
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader) && parseMount) {
-        // to do: support resource ids
+        // wings
+        SimpleOutfit wings;
+        wings.type = msg->getU16();
+        wings.resourceId = multiSpr ? msg->getU16() : 0;
+        outfit.applyWings(wings);
 
-        const uint16_t wings = msg->getU16();
-        outfit.setWing(wings);
+        // aura
+        EffectOutfit aura;
+        aura.type = msg->getU16();
+        if (multiSpr) {
+            aura.resourceId = msg->getU16();
+            aura.category = static_cast<ThingCategory>(msg->getU8());
+        }
+        outfit.applyAura(aura);
 
-        const uint16_t auras = msg->getU16();
-        outfit.setAura(auras);
+        // effect
+        EffectOutfit effect;
+        effect.type = msg->getU16();
+        if (multiSpr) {
+            effect.resourceId = msg->getU16();
+            effect.category = static_cast<ThingCategory>(msg->getU8());
+        }
+        outfit.applyParticles(effect);
 
-        const uint16_t effects = msg->getU16();
-        outfit.setEffect(effects);
-
+        // shader
         outfit.setShader(msg->getString());
     }
 

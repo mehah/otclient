@@ -185,7 +185,7 @@ public:
     bool isHighlighted() { return m_highlightColor != Color::white; }
     void setHighlight(const Color& color) { if (m_highlightColor != color) m_highlightColor = color; }
 
-    bool isHided() { return isOwnerHidden(); }
+    bool isHidden() { return isOwnerHidden(); }
 
     uint8_t getPatternX()const { return m_numPatternX; }
     uint8_t getPatternY()const { return m_numPatternY; }

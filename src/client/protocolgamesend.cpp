@@ -797,6 +797,9 @@ void ProtocolGame::sendTyping(const bool typing)
 
 void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
 {
+    const bool multiSpr = g_game.getFeature(Otc::GameMultiSpr);
+    const auto base = outfit.getBaseOutfit();
+
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientChangeOutfit);
 
@@ -805,44 +808,80 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
     }
 
     if (g_game.getFeature(Otc::GameLooktypeU16))
-        msg->addU16(outfit.getId());
+        msg->addU16(base.type);
     else
-        msg->addU8(static_cast<uint8_t>(outfit.getId()));
+        msg->addU8(static_cast<uint8_t>(base.type));
 
-    msg->addU8(outfit.getHead());
-    msg->addU8(outfit.getBody());
-    msg->addU8(outfit.getLegs());
-    msg->addU8(outfit.getFeet());
+    if (multiSpr)
+        msg->addU16(base.resourceId);
+
+    msg->addU8(base.head);
+    msg->addU8(base.body);
+    msg->addU8(base.legs);
+    msg->addU8(base.feet);
 
     if (g_game.getFeature(Otc::GamePlayerAddons))
         msg->addU8(outfit.getAddons());
 
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
-        msg->addU16(outfit.getMount());
+        const auto mount = outfit.getMount();
+        msg->addU16(mount.type);
+        if (multiSpr)
+            msg->addU16(mount.resourceId);
+
         if (g_game.getClientVersion() >= 1281) {
-            msg->addU8(0x00);
-            msg->addU8(0x00);
-            msg->addU8(0x00);
-            msg->addU8(0x00);
+            msg->addU8(mount.head);
+            msg->addU8(mount.body);
+            msg->addU8(mount.legs);
+            msg->addU8(mount.feet);
         }
     }
 
+    // outfit window "mount" checkbox
     if (g_game.getClientVersion() >= 1334) {
         msg->addU8(outfit.hasMount());
     }
 
+    // familiar
     if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
-        msg->addU16(outfit.getFamiliar()); //familiars
+        const auto familiar = outfit.getFamiliar();
+        msg->addU16(familiar.type); //familiars
+
+        if (multiSpr)
+            msg->addU16(familiar.resourceId);
     }
 
+    // outfit window "randomize mount" checkbox
     if (g_game.getClientVersion() >= 1281) {
-        msg->addU8(0x00); //randomizeMount
+        msg->addU8(0x00); // not implemented
     }
+
+    // extended cosmetics
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
-        msg->addU16(outfit.getWing());  // wings
-        msg->addU16(outfit.getAura());  // auras
-        msg->addU16(outfit.getEffect()); // effects
-        msg->addString(outfit.getShader()); // shader
+        // wings
+        const auto wings = outfit.getWings();
+        msg->addU16(wings.type);
+        if (multiSpr)
+            msg->addU16(wings.resourceId);
+
+        // aura
+        const auto aura = outfit.getAura();
+        msg->addU16(aura.type);
+        if (multiSpr) {
+            msg->addU16(aura.resourceId);
+            msg->addU8(aura.category);
+        }
+
+        // effect
+        const auto effect = outfit.getEffect();
+        msg->addU16(effect.type);
+        if (multiSpr) {
+            msg->addU16(effect.resourceId);
+            msg->addU8(effect.category);
+        }
+        
+        // shader
+        msg->addString(outfit.getShader());
     }
 
     send(msg);
