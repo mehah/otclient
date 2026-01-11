@@ -1,3 +1,10 @@
+HarmonyIcon < UIWidget
+  size: 13 13
+  !tooltip: 'Harmoney'
+  image-source: /images/game/vocations/monk/icon-combopoint-empty
+  $on:
+    image-source: /images/game/vocations/monk/icon-combopoint-filled
+
 StatsBarDarkBackground < UIWidget
   UIWidget
     anchors.fill: parent
@@ -347,11 +354,71 @@ TopStatsBarLargeOnTop < UIWidget
     margin-right: 7
     height: 27
 
+  Panel
+    id: harmonies
+    anchors.top: icons.top
+    anchors.left: icons.right
+    padding: 2
+    $disabled:
+      visible: false
+      margin-left: 0
+      margin-top: 0
+      size: 0 0
+    $!disabled:
+      visible: true
+      margin-left: 7
+      margin-top: -1
+      size : 80 18
+
+    layout:
+      type: horizontalBox
+      spacing: 3
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+
+  VerticalSeparator
+    id: separatorHarmoniesSerene
+    anchors.top: icons.top
+    anchors.left: harmonies.right
+    anchors.bottom: icons.bottom
+    $disabled:
+      visible: false
+      margin-left: 0
+      margin-top: 0
+      margin-bottom: 0
+    $!disabled:
+      visible: true
+      margin-left: 5
+      margin-top: 2
+      margin-bottom: 2
+
+  UIWidget
+    id: serene
+    anchors.top: icons.top
+    anchors.left: separatorHarmoniesSerene.right
+    !tooltip: 'Serene'
+    image-source: /images/game/vocations/monk/icon-serene-off
+    $on:
+      image-source: /images/game/vocations/monk/icon-serene-on
+    @onSetup: self:setOn(true)
+    $disabled:
+      visible: false
+      size: 0 0
+      margin-left: -10
+    $!disabled:
+      visible: true
+      size: 13 13
+      margin-left: 3
+      margin-top: 1
+
   StatsBarUp
     id: mana
     anchors.top: icons.top
     anchors.right: parent.right
-    anchors.left: icons.right
+    anchors.left: serene.right
     !statsbar-type: 'mana'
     !statsbar-size: 'large'
     !statsbar-orientation: 'horizontal'
@@ -362,9 +429,9 @@ TopStatsBarLargeOnTop < UIWidget
 
   StatsBarUp
     id: manashield
-    anchors.top: mana.bottom
+    anchors.top: icons.bottom
     anchors.right: parent.right
-    anchors.left: icons.right
+    anchors.left: serene.right
     !statsbar-type: 'manashield'
     !statsbar-size: 'large'
     !statsbar-orientation: 'horizontal'
@@ -445,6 +512,64 @@ TopStatsBarParallelOnTop < UIWidget
     layout:
       type: horizontalBox
 
+  Panel
+    id: harmonies
+    anchors.top: skills.bottom
+    anchors.left: icons.right
+    padding: 2
+    $disabled:
+      visible: false
+      margin-left: 0
+      margin-top: 0
+      size: 0 0
+    $!disabled:
+      visible: true
+      margin-left: 7
+      margin-top: -1
+      size : 80 18
+    layout:
+      type: horizontalBox
+      spacing: 3
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+
+  VerticalSeparator
+    id: separatorHarmoniesSerene
+    anchors.top: skills.bottom
+    anchors.left: harmonies.right
+    anchors.bottom: parent.bottom
+    $disabled:
+      visible: false
+      margin-left: 0
+      margin-top: 0
+      margin-bottom: 0
+    $!disabled:
+      visible: true
+      margin-left: 5
+      margin-top: 2
+      margin-bottom: 2
+
+  UIWidget
+    id: serene
+    anchors.top: skills.bottom
+    anchors.left: separatorHarmoniesSerene.right
+    image-source: /images/game/vocations/monk/icon-serene-off
+    $on:
+      image-source: /images/game/vocations/monk/icon-serene-on
+    @onSetup: self:setOn(true)
+    $disabled:
+      visible: false
+      size: 0 0
+      margin-left: 0
+    $!disabled:
+      visible: true
+      size: 13 13
+      margin-left: 3
+      margin-top: 1
+
 TopStatsBarDefaultOnTop < UIWidget
   StatsBarTopWithShrink
     anchors.fill: parent
@@ -508,6 +633,63 @@ TopStatsBarDefaultOnTop < UIWidget
     layout:
       type: horizontalBox
 
+  Panel
+    id: harmonies
+    anchors.top: skills.bottom
+    anchors.left: prev.right
+    padding: 2
+    $disabled:
+      visible: false
+      margin-left: 0
+      margin-top: 0
+      size: 0 0
+    $!disabled:
+      visible: true
+      margin-left: 7
+      margin-top: -1
+      size : 80 18
+    layout:
+      type: horizontalBox
+      spacing: 3
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+  VerticalSeparator
+    id: separatorHarmoniesSerene
+
+    anchors.top: skills.bottom
+    anchors.left: prev.right
+    anchors.bottom: parent.bottom
+    $disabled:
+      visible: false
+      margin-left: 0
+      margin-top: 0
+      margin-bottom: 0
+    $!disabled:
+      visible: true
+      margin-left: 5
+      margin-top: 2
+      margin-bottom: 2
+  UIWidget
+    id: serene
+    anchors.top: skills.bottom
+    anchors.left: prev.right
+    image-source: /images/game/vocations/monk/icon-serene-off
+    $on:
+      image-source: /images/game/vocations/monk/icon-serene-on
+    @onSetup: self:setOn(true)
+    $disabled:
+      visible: false
+      size: 0 0
+      margin-left: 0
+    $!disabled:
+      visible: true
+      size: 13 13
+      margin-left: 3
+      margin-top: 1
+
 TopStatsBarCompactOnTop < UIWidget
   StatsBarTopWithShrink
     anchors.fill: parent
@@ -522,6 +704,64 @@ TopStatsBarCompactOnTop < UIWidget
     size: 103 14
     layout:
       type: horizontalBox
+
+  Panel
+    id: harmonies
+    anchors.top: icons.top
+    anchors.left: icons.right
+    padding: 2
+    $disabled:
+      visible: false
+      margin-left: 0
+      margin-top: 0
+      size: 0 0
+    $!disabled:
+      visible: true
+      margin-left: 7
+      margin-top: -1
+      size : 80 18
+
+    layout:
+      type: horizontalBox
+      spacing: 3
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+    HarmonyIcon
+  VerticalSeparator
+    id: separatorHarmoniesSerene
+    anchors.top: icons.top
+    anchors.left: harmonies.right
+    anchors.bottom: skills.top
+    $disabled:
+      visible: false
+      margin-left: 0
+      margin-top: 0
+      margin-bottom: 0
+    $!disabled:
+      visible: true
+      margin-left: 5
+      margin-top: 2
+      margin-bottom: 2
+  UIWidget
+    id: serene
+    anchors.top: icons.top
+    anchors.left: separatorHarmoniesSerene.right
+    !tooltip: 'Serene'
+    image-source: /images/game/vocations/monk/icon-serene-off
+    $on:
+      image-source: /images/game/vocations/monk/icon-serene-on
+    @onSetup: self:setOn(true)
+    $disabled:
+      visible: false
+      size: 0 0
+      margin-left: -10
+    $!disabled:
+      visible: true
+      size: 13 13
+      margin-left: 3
+      margin-top: 1
 
   StatsBarUp
     id: health
@@ -540,7 +780,7 @@ TopStatsBarCompactOnTop < UIWidget
     id: mana
     anchors.top: icons.top
     anchors.right: parent.right
-    anchors.left: icons.right
+    anchors.left: serene.right
     !statsbar-type: 'mana'
     !statsbar-size: 'small'
     !statsbar-orientation: 'horizontal'
@@ -551,7 +791,7 @@ TopStatsBarCompactOnTop < UIWidget
 
   StatsBarUp
     id: manashield
-    anchors.top: mana.bottom
+    anchors.top: icons.bottom
     anchors.right: parent.right
     anchors.left: icons.right
     !statsbar-type: 'manashield'
