@@ -78,6 +78,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "loadSpr", &ThingTypeManager::loadSpr, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadOtml", &ThingTypeManager::loadOtml, &g_things);
     g_lua.bindSingletonFunction("g_things", "isDatLoaded", &ThingTypeManager::isDatLoaded, &g_things);
+    g_lua.bindSingletonFunction("g_things", "getSprSignature", &ThingTypeManager::getSprSignature, &g_things);
     g_lua.bindSingletonFunction("g_things", "getDatSignature", &ThingTypeManager::getDatSignature, &g_things);
     g_lua.bindSingletonFunction("g_things", "getContentRevision", &ThingTypeManager::getContentRevision, &g_things);
     g_lua.bindSingletonFunction("g_things", "getThingType", &ThingTypeManager::getThingType, &g_things);

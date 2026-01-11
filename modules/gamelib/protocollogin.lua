@@ -51,7 +51,7 @@ function ProtocolLogin:sendLoginPacket()
     else
         msg:addU32(g_things.getDatSignature())
     end
-    msg:addU32(g_sprites.getSprSignature())
+    msg:addU32(g_things.getSprSignature())
     msg:addU32(PIC_SIGNATURE)
 
     if g_game.getFeature(GamePreviewState) then

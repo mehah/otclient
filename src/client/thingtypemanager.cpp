@@ -302,6 +302,12 @@ SpriteManagerPtr ThingTypeManager::getSpriteManagerById(const uint16_t resourceI
     return m_spriteManagers[resourceId];
 }
 
+uint32_t ThingTypeManager::getSprSignature(const uint16_t resourceId) const
+{
+    auto res = getSpriteManagerById(resourceId);
+    return res ? res->getSignature() : 0;
+}
+
 uint32_t ThingTypeManager::getDatSignature(const uint16_t resourceId) const
 {
     auto res = getResourceById(resourceId);

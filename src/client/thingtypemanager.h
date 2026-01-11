@@ -93,6 +93,7 @@ public:
     AssetResourcePtr getResourceById(const uint16_t resourceId) const;
     SpriteManagerPtr getSpriteManagerById(const uint16_t resourceId) const;
     size_t getResourcesCount() const { return m_assetResources.size(); }
+    uint32_t getSprSignature(const uint16_t resourceId = 0) const;
     uint32_t getDatSignature(const uint16_t resourceId = 0) const;
     uint16_t getContentRevision(const uint16_t resourceId = 0) const;
 

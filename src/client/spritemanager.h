@@ -92,6 +92,9 @@ public:
     virtual void reload() = 0;
     virtual bool isLoaded() const { return false; }
     virtual bool isProtobuf() const { return false; }
+
+    virtual uint32_t getSignature() const { return 0; }
+
 #ifdef FRAMEWORK_EDITOR
     virtual void saveSpr(const std::string& fileName) = 0;
 #endif
@@ -140,7 +143,7 @@ public:
     void saveSpr(const std::string& fileName) override;
 #endif
 
-    uint32_t getSignature() const { return m_signature; }
+    uint32_t getSignature() const override { return m_signature; }
     int getSpritesCount() const override { return m_spritesCount; }
 
     ImagePtr getSpriteImage(int id, bool& isLoading) override;
@@ -226,6 +229,8 @@ public:
     ProtobufSpriteManager& operator=(ProtobufSpriteManager&&) = delete;
 
     void reload() override { /* for protobuf assets this is managed per sheet */ };
+
+    uint32_t getSignature() const override { return 0; }
 
     void setSpritesCount(const int count) { m_spritesCount = count; }
     int getSpritesCount() const override { return m_spritesCount; }
