@@ -786,6 +786,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("hasClockExpire", &Item::hasClockExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpire", &Item::hasExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpireStop", &Item::hasExpireStop);
+    g_lua.bindClassMemberFunction<Item>("isDualWield", &Item::isDualWield);
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindClassMemberFunction<Item>("getName", &Item::getName);
     g_lua.bindClassMemberFunction<Item>("getServerId", &Item::getServerId);
