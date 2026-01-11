@@ -331,17 +331,8 @@ void Creature::drawOutfit(Point& dest, const Color& color, const bool replaceCol
     if (m_outfit.hasMount()) {
         dest -= getMountThingType()->getDisplacement() * g_drawPool.getScaleFactor();
 
-        if (!replaceColorShader && hasMountShader()) {
-            g_drawPool.setShaderProgram(g_shaders.getShaderById(m_mountShaderId), true/*, [this]()-> void {
-                m_mountShader->bind();
-                m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
-            }*/);
-        }
-
         if (auto* thing = getMountThingType())
-            thing->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(thing), color);
-
-        dest += getDisplacement() * g_drawPool.getScaleFactor();
+            drawCreatureMount(dest, color, getCurrentAnimationPhase(thing), replaceColorShader);
     }
 
     // wings (direction south, east)
@@ -395,6 +386,7 @@ void Creature::drawCreatureOutfit(Point& dest, const Color& color, const int ani
 
             datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
 
+            // mount colors
             if (m_drawOutfitColor && !replaceColorShader && getLayers() > 1) {
                 auto colors = m_outfit.getBaseOutfit();
                 g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
@@ -413,6 +405,45 @@ void Creature::drawCreatureOutfit(Point& dest, const Color& color, const int ani
         const auto& destFB = Rect(dest - p, Size{ size });
 
         g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
+
+        g_drawPool.bindFrameBuffer(destFB.size());
+        drawCreature(p);
+        g_drawPool.releaseFrameBuffer(destFB);
+        g_drawPool.resetShaderProgram();
+    } else drawCreature(dest);
+}
+
+void Creature::drawCreatureMount(Point& dest, const Color& color, const int animationPhase, const bool replaceColorShader)
+{
+    const auto& datType = getMountThingType();
+    const bool useFramebuffer = !replaceColorShader && hasMountShader() && g_shaders.getShaderById(m_mountShaderId)->useFramebuffer();
+    const auto& drawCreature = [&](const Point& dest) {
+        if (!replaceColorShader && hasMountShader() && !useFramebuffer) {
+            g_drawPool.setShaderProgram(g_shaders.getShaderById(m_mountShaderId), true/*, [this]()-> void {
+                m_mountShader->bind();
+                m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
+            }*/);
+        }
+
+        datType->draw(dest, 0, m_numPatternX, 0, 0, animationPhase, color);
+
+        if (m_drawOutfitColor && !replaceColorShader && getLayers() > 1) {
+            auto colors = m_outfit.getMount();
+            g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
+            datType->draw(dest, SpriteMaskYellow, m_numPatternX, 0, 0, animationPhase, colors.headColor);
+            datType->draw(dest, SpriteMaskRed, m_numPatternX, 0, 0, animationPhase, colors.bodyColor);
+            datType->draw(dest, SpriteMaskGreen, m_numPatternX, 0, 0, animationPhase, colors.legsColor);
+            datType->draw(dest, SpriteMaskBlue, m_numPatternX, 0, 0, animationPhase, colors.feetColor);
+            g_drawPool.resetCompositionMode();
+        }
+    };
+
+    if (useFramebuffer) {
+        const int size = static_cast<int>(g_gameConfig.getSpriteSize() * std::max<int>(datType->getSize().area(), 2) * g_drawPool.getScaleFactor());
+        const auto& p = (Point(size) - Point(datType->getExactHeight())) / 2;
+        const auto& destFB = Rect(dest - p, Size{ size });
+
+        g_drawPool.setShaderProgram(g_shaders.getShaderById(m_mountShaderId), true/*, shaderAction*/);
 
         g_drawPool.bindFrameBuffer(destFB.size());
         drawCreature(p);

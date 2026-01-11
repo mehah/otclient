@@ -248,6 +248,7 @@ private:
     // methods for drawing creature sprites specifically
     void drawOutfit(Point& dest, const Color& color, const bool replaceColorShader);
     void drawCreatureOutfit(Point& dest, const Color& color, const int animationPhase, const bool replaceColorShader);
+    void drawCreatureMount(Point& dest, const Color& color, const int animationPhase, const bool replaceColorShader);
     void drawItemOutfit(Point& dest, const Color& color, const bool replaceColorShader);
     void internalDraw(Point dest, const Color& color = Color::white);
     int getBounceOffset() const;
