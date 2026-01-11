@@ -329,10 +329,11 @@ void Creature::drawOutfit(Point& dest, const Color& color, const bool replaceCol
 
     // mount
     if (m_outfit.hasMount()) {
-        dest -= getMountThingType()->getDisplacement() * g_drawPool.getScaleFactor();
-
         if (auto* thing = getMountThingType())
             drawCreatureMount(dest, color, getCurrentAnimationPhase(thing), replaceColorShader);
+
+        dest += getDisplacement() * g_drawPool.getScaleFactor();
+        dest -= getMountThingType()->getDisplacement() * g_drawPool.getScaleFactor();
     }
 
     // wings (direction south, east)
