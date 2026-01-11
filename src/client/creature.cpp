@@ -320,32 +320,6 @@ void Creature::drawOutfit(Point& dest, const Color& color, const bool replaceCol
 
     const float scale = g_drawPool.getScaleFactor();
 
-    // aura settings
-    const bool drawAura = m_outfit.hasAura();
-    Point auraDest = dest;
-    Point topAuraDest = dest;
-    ThingType* aura = nullptr;
-    uint16_t auraPhase = m_walkAnimationPhase;
-
-    // aura bottom layer (pattern_z = 0)
-    if (drawAura) {
-        const auto auraType = m_outfit.getAura();
-        if (aura = g_things.getRawThingType(auraType.type, auraType.category, auraType.resourceId)) {
-            int auraHeight = aura->getHeight();
-            int auraWidth = aura->getWidth();
-            if (auraHeight > 1 || auraWidth > 1) {
-                Point offset = Point(auraWidth > 1 ? (auraWidth - 1) * 16 : 0, auraHeight > 1 ? (auraHeight - 1) * 16 : 0);
-                topAuraDest += offset * scale;
-                auraDest += offset * scale;
-            }
-
-            // draw aura
-            auto anim = aura->getIdleAnimator();
-            auraPhase = anim ? anim->getPhase() : auraPhase;
-            aura->draw(auraDest, 0, 0, 0, 0, auraPhase, color);
-        }
-    }
-
     // determines the frame group to be used
     const bool flying = m_outfit.hasWings();
     const uint16_t animationPhase = getCurrentAnimationPhase(getThingType(), flying);
@@ -394,12 +368,6 @@ void Creature::drawOutfit(Point& dest, const Color& color, const bool replaceCol
         // draw wings thing type
         if (auto* wings = getWingsThingType())
             wings->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(wings), color);
-    }
-
-    // aura top layer (pattern_z = 1)
-    if (aura && aura->getNumPatternZ() > 1) {
-        // draw aura
-        aura->draw(topAuraDest, 0, 0, 0, 1, auraPhase, color);
     }
 
     // particles
@@ -529,9 +497,38 @@ void Creature::internalDraw(Point dest, const Color& color)
     };*/
 
     Point originalDest = dest;
+    const float scale = g_drawPool.getScaleFactor();
+    const bool visible = !isHidden();
+
+    // aura settings
+    const bool drawAura = m_outfit.hasAura();
+    Point auraDest = dest;
+    Point topAuraDest = dest;
+    ThingType* aura = nullptr;
+    uint16_t auraPhase = m_walkAnimationPhase;
+    if (visible) {
+        // aura bottom layer (pattern_z = 0)
+        if (drawAura) {
+            const auto auraType = m_outfit.getAura();
+            if (aura = g_things.getRawThingType(auraType.type, auraType.category, auraType.resourceId)) {
+                int auraHeight = aura->getHeight();
+                int auraWidth = aura->getWidth();
+                if (auraHeight > 1 || auraWidth > 1) {
+                    Point offset = Point(auraWidth > 1 ? (auraWidth - 1) * 16 : 0, auraHeight > 1 ? (auraHeight - 1) * 16 : 0);
+                    topAuraDest += offset * scale;
+                    auraDest += offset * scale;
+                }
+
+                // draw aura
+                auto anim = aura->getIdleAnimator();
+                auraPhase = anim ? anim->getPhase() : auraPhase;
+                aura->draw(auraDest, 0, 0, 0, 0, auraPhase, color);
+            }
+        }
+    }
 
     if (!m_jumpOffset.isNull()) {
-        const auto& jumpOffset = m_jumpOffset * g_drawPool.getScaleFactor();
+        const auto& jumpOffset = m_jumpOffset * scale;
         dest -= Point(std::round(jumpOffset.x), std::round(jumpOffset.y));
     } else {
         dest -= getBounceOffset();
@@ -543,8 +540,14 @@ void Creature::internalDraw(Point dest, const Color& color)
     else
         drawAttachedEffect(originalDest, dest, nullptr, false); // On Bottom
 
-    if (!isHidden()) {
+    if (visible) {
         drawOutfit(dest, color, replaceColorShader);
+    }
+
+    // aura top layer (pattern_z = 1)
+    if (aura && aura->getNumPatternZ() > 0) {
+        // draw aura
+        aura->draw(topAuraDest, 0, 0, 0, 1, auraPhase, color);
     }
 
     if (replaceColorShader)
@@ -619,7 +622,7 @@ void Creature::stopWalk()
 void Creature::updateFlight()
 {
     if (m_outfit.hasWings()) {
-        setBounce(6, 7, 10000);
+        setBounce(5, 6, 10000);
     } else {
         setBounce(0, 0, 0);
     }
