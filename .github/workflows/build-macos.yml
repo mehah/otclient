@@ -89,8 +89,16 @@ jobs:
           restore-keys: |
             vcpkg-${{ matrix.buildtype }}-
 
+      - name: Setup Python
+        id: python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@a400452f634fe49e9f18d388aeb1809dcc642136
+        env:
+          VCPKG_PYTHON3: ${{ steps.python.outputs.python-path }}
         with:
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
