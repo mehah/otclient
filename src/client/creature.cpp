@@ -318,10 +318,38 @@ void Creature::drawOutfit(Point& dest, const Color& color, const bool replaceCol
     // the vanilla client also allows items to be drawn on top of mounts
     // protocol 1320 example (server function "addcreature"): u16 looktype 0, u16 looktypeEx (itemId), u16 lookMount, 4x u8 mount color
 
+    const float scale = g_drawPool.getScaleFactor();
+
+    // aura settings
+    const bool drawAura = m_outfit.hasAura();
+    Point auraDest = dest;
+    Point topAuraDest = dest;
+    ThingType* aura = nullptr;
+    uint16_t auraPhase = m_walkAnimationPhase;
+
+    // aura bottom layer (pattern_z = 0)
+    if (drawAura) {
+        const auto auraType = m_outfit.getAura();
+        if (aura = g_things.getRawThingType(auraType.type, auraType.category, auraType.resourceId)) {
+            int auraHeight = aura->getHeight();
+            int auraWidth = aura->getWidth();
+            if (auraHeight > 1 || auraWidth > 1) {
+                Point offset = Point(auraWidth > 1 ? (auraWidth - 1) * 16 : 0, auraHeight > 1 ? (auraHeight - 1) * 16 : 0);
+                topAuraDest += offset * scale;
+                auraDest += offset * scale;
+            }
+
+            // draw aura
+            auto anim = aura->getIdleAnimator();
+            auraPhase = anim ? anim->getPhase() : auraPhase;
+            aura->draw(auraDest, 0, 0, 0, 0, auraPhase, color);
+        }
+    }
+
     // determines the frame group to be used
     const bool flying = m_outfit.hasWings();
     const uint16_t animationPhase = getCurrentAnimationPhase(getThingType(), flying);
-         
+
     // paperdoll (bottom)
     const bool mounted = m_outfit.hasMount();
     for (const auto& paperdoll : m_paperdolls)
@@ -332,8 +360,8 @@ void Creature::drawOutfit(Point& dest, const Color& color, const bool replaceCol
         if (auto* thing = getMountThingType())
             drawCreatureMount(dest, color, getCurrentAnimationPhase(thing), replaceColorShader);
 
-        dest += getDisplacement() * g_drawPool.getScaleFactor();
-        dest -= getMountThingType()->getDisplacement() * g_drawPool.getScaleFactor();
+        dest += getDisplacement() * scale;
+        dest -= getMountThingType()->getDisplacement() * scale;
     }
 
     // wings (direction south, east)
@@ -366,6 +394,17 @@ void Creature::drawOutfit(Point& dest, const Color& color, const bool replaceCol
         // draw wings thing type
         if (auto* wings = getWingsThingType())
             wings->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(wings), color);
+    }
+
+    // aura top layer (pattern_z = 1)
+    if (aura && aura->getNumPatternZ() > 1) {
+        // draw aura
+        aura->draw(topAuraDest, 0, 0, 0, 1, auraPhase, color);
+    }
+
+    // particles
+    if (m_outfit.hasParticles()) {
+        // draw particles
     }
 }
 

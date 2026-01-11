@@ -122,8 +122,7 @@ private:
     uint8_t m_lastAnimation{ 0 };
     DrawOrder m_drawOrder{ THIRD };
 
-    uint16_t m_id{ 0 };
-    uint16_t m_resourceId{ 0 };
+    uint16_t m_id{ 0 }; // slot number
     uint16_t m_duration{ 0 };
 
     uint32_t m_frame{ 0 };
@@ -139,7 +138,8 @@ private:
     Outfit m_outfitOwner;
     Light m_light;
 
-    uint16_t m_thingId{ 0 };
+    uint16_t m_thingId{ 0 }; // effect clientId
+    uint16_t m_resourceId{ 0 }; // effect resourceId
     ThingCategory m_thingCategory{ ThingInvalidCategory };
 
     Size m_size;

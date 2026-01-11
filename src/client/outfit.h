@@ -122,6 +122,8 @@ public:
 
     bool hasMount() const { return m_mount.type > 0; }
     bool hasWings() const { return m_wings.type > 0; }
+    bool hasAura() const { return m_aura.type > 0; }
+    bool hasParticles() const { return m_effect.type > 0; }
 
     ThingCategory getCategory() const { return m_category; }
     bool isCreature() const { return m_category == ThingCategoryCreature; }
