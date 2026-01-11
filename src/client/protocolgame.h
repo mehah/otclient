@@ -52,14 +52,14 @@ public:
     void sendTurnSouth();
     void sendTurnWest();
     void sendGmTeleport(const Position& pos);
-    void sendEquipItemWithTier(uint16_t itemId, uint8_t tierOrFluid);
-    void sendEquipItemWithCountOrSubType(uint16_t itemId, uint16_t tierOrFluid);
-    void sendMove(const Position& fromPos, uint16_t thingId, uint8_t stackpos, const Position& toPos, uint16_t count);
-    void sendInspectNpcTrade(uint16_t itemId, uint16_t count);
-    void sendBuyItem(uint16_t itemId, uint8_t subType, uint16_t amount, bool ignoreCapacity, bool buyWithBackpack);
-    void sendSellItem(uint16_t itemId, uint8_t subType, uint16_t amount, bool ignoreEquipped);
+    void sendEquipItemWithTier(uint16_t itemId, uint16_t resourceId, uint8_t tierOrFluid);
+    void sendEquipItemWithCountOrSubType(uint16_t itemId, uint16_t resourceId, uint16_t tierOrFluid);
+    void sendMove(const Position& fromPos, uint16_t thingId, uint16_t resourceId, uint8_t stackpos, const Position& toPos, uint16_t count);
+    void sendInspectNpcTrade(uint16_t itemId, uint16_t resourceId, uint16_t count);
+    void sendBuyItem(uint16_t itemId, uint16_t resourceId, uint8_t subType, uint16_t amount, bool ignoreCapacity, bool buyWithBackpack);
+    void sendSellItem(uint16_t itemId, uint16_t resourceId, uint8_t subType, uint16_t amount, bool ignoreEquipped);
     void sendCloseNpcTrade();
-    void sendRequestTrade(const Position& pos, uint16_t thingId, uint8_t stackpos, uint32_t creatureId);
+    void sendRequestTrade(const Position& pos, uint16_t thingId, uint16_t resourceId, uint8_t stackpos, uint32_t creatureId);
     void sendInspectTrade(bool counterOffer, uint8_t index);
     void sendAcceptTrade();
     void sendRejectTrade();
@@ -72,7 +72,7 @@ public:
     void sendUpContainer(uint8_t containerId);
     void sendEditText(uint32_t id, std::string_view text);
     void sendEditList(uint32_t id, uint8_t doorId, std::string_view text);
-    void sendLook(const Position& position, uint16_t itemId, uint8_t stackpos);
+    void sendLook(const Position& position, uint16_t itemId, uint16_t resourceId, uint8_t stackpos);
     void sendLookCreature(uint32_t creatureId);
     void sendTalk(Otc::MessageMode mode, uint16_t channelId, std::string_view receiver, std::string_view message);
     void sendRequestChannels();
@@ -114,7 +114,7 @@ public:
     void sendRequestQuestLog();
     void sendRequestQuestLine(uint16_t questId);
     void sendNewNewRuleViolation(uint8_t reason, uint8_t action, std::string_view characterName, std::string_view comment, std::string_view translation);
-    void sendRequestItemInfo(uint16_t itemId, uint8_t subType, uint8_t index);
+    void sendRequestItemInfo(uint16_t itemId, uint16_t resourceId, uint8_t subType, uint8_t index);
     void sendAnswerModalDialog(uint32_t dialog, uint8_t button, uint8_t choice);
     void sendBrowseField(const Position& position);
     void sendSeekInContainer(uint8_t containerId, uint16_t index);
@@ -137,7 +137,10 @@ public:
     void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void sendPreyRequest();
     void sendOpenPortableForge();
-    void sendForgeRequest(Otc::ForgeAction_t actionType, bool convergence = false, uint16_t firstItemid = 0, uint8_t firstItemTier = 0, uint16_t secondItemId = 0, bool improveChance = false, bool tierLoss = false);
+    void sendForgeRequest(
+        Otc::ForgeAction_t actionType, bool convergence = false, uint16_t firstItemid = 0, uint16_t firstItemResourceId = 0, uint8_t firstItemTier = 0,
+        uint16_t secondItemId = 0, uint16_t secondItemResourceId = 0, bool improveChance = false, bool tierLoss = false
+    );
     void sendForgeBrowseHistoryRequest(uint16_t page);
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
@@ -145,8 +148,8 @@ public:
     void sendOpenRewardWall();
     void sendOpenRewardHistory();
     void sendGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
-    void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
-    void sendStashStow(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action);
+    void sendStashWithdraw(uint16_t itemId, uint16_t resourceId, uint32_t count, uint8_t stackpos);
+    void sendStashStow(const Position& position, const uint16_t itemId, const uint16_t resourceId, const uint32_t count, const uint8_t stackpos, const uint8_t action);
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
     void sendRequestBestiary();
@@ -159,11 +162,11 @@ public:
     void sendRequestBossSlootInfo();
     void sendRequestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
-    void sendQuickLoot(const uint8_t variant, const Position& pos, const uint16_t itemId, const uint8_t stackpos);
+    void sendQuickLoot(const uint8_t variant, const Position& pos, const uint16_t itemId, const uint16_t resourceId, const uint8_t stackpos);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
-    void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
+    void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint16_t resourceId, uint8_t stackpos, bool useMainAsFallback);
     void sendInspectionNormalObject(const Position& position);
-    void sendInspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
+    void sendInspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint16_t resourceId, uint8_t itemCount);
 
     // otclient only
     void sendChangeMapAwareRange(uint8_t xrange, uint8_t yrange);
