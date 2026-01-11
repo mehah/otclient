@@ -222,7 +222,8 @@ SpellGroups = {
     [7] = 'Focus',
     [8] = 'UltimateStrikes',
     [9] = 'GreatBeams',
-    [10] = 'BurstsOfNature'
+    [10] = 'BurstsOfNature',
+    [11] = 'Virtue'
 }
 
 SpellRunesData = {
