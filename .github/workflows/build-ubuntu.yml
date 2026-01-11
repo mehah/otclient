@@ -62,7 +62,7 @@ jobs:
 
         with:
           repository: ${{ github.event_name == 'push' && github.repository || (github.event.pull_request.head.repo.fork && github.repository || github.event.pull_request.head.repo.full_name) }}
-          ref: ${{ github.event_name == 'push' && github.ref || (github.event.pull_request.head.repo.fork && github.event.pull_request.base.ref || github.event.pull_request.head.ref) }}
+          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: Install Linux Dependencies
         run: |
