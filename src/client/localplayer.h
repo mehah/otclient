@@ -134,6 +134,7 @@ public:
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }
     bool isParalyzed() const { return (m_states & Otc::IconParalyze) == Otc::IconParalyze; }
+    bool isSerene() { return m_serene; }
 
     LocalPlayerPtr asLocalPlayer() { return static_self_cast<LocalPlayer>(); }
     bool isLocalPlayer() const override { return true; }
@@ -146,7 +147,7 @@ public:
     void resetPreWalk() { m_preWalks.clear(); }
     auto getPreWalkingSize() { return m_preWalks.size(); }
 
-    bool getSerene() { return m_serene; }
+
 private:
     struct Skill
     {

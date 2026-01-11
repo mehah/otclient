@@ -279,7 +279,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
                 backgroundRect.moveTop(backgroundRect.bottom());
                 Rect sereneBackgroundRect(backgroundRect.center().x - (11 / 2) - 1, backgroundRect.y(), 11 + 2, backgroundRect.height() - 2 + 2);
                 g_drawPool.addFilledRect(sereneBackgroundRect, Color::black);
-                Color sereneColor = player->getSerene() ? Color(0xD4, 0x37, 0xFF) : Color(64, 64, 64);
+                Color sereneColor = player->isSerene() ? Color(0xD4, 0x37, 0xFF) : Color(64, 64, 64);
                 Rect sereneSubBarRect = sereneBackgroundRect.expanded(-1);
                 sereneSubBarRect.setWidth(11);
                 sereneSubBarRect.setHeight(backgroundRect.height() - 2);
