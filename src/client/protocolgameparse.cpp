@@ -4372,16 +4372,16 @@ void ProtocolGame::parseMonkData(const InputMessagePtr& msg) {
             break;
         }
         case Otc::TYPES_SERENE: {
-            const bool hasSerene = static_cast<bool>(msg->getU8());
+            const auto hasSerene = static_cast<bool>(msg->getU8());
             m_localPlayer->setSerene(hasSerene);
             break;
         }
         case Otc::TYPES_VIRTUE: {
             const uint8_t virtueValue = msg->getU8();
+            g_logger.debug("unused {} TO-DO L4381", virtueValue);
             break;
         }
         default:
-            g_logger.error("Unknown MonkData subtype: {}", static_cast<int>(subtype));
             break;
     }
 }
