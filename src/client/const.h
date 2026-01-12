@@ -1061,6 +1061,8 @@ enum ThingFlagAttr :uint64_t
     ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46,
     ThingFlagAttrAmmo = static_cast<uint64_t>(1) << 47,
     ThingFlagAttrFloorChange = static_cast<uint64_t>(1) << 48,
+    ThingFlagAttrDualWield = static_cast<uint64_t>(1) << 49,
+    ThingFlagAttrSkillWheelGem = static_cast<uint64_t>(1) << 50,
 };
 
 enum STACK_PRIORITY : uint8_t
@@ -1109,11 +1111,8 @@ enum ITEM_CATEGORY : uint8_t
     ITEM_CATEGORY_TIBIA_COINS = 23,
     ITEM_CATEGORY_CREATURE_PRODUCTS = 24,
     ITEM_CATEGORY_QUIVER = 25,
-    ITEM_CATEGORY_TWOHANDWEAPON = 26,
-    ITEM_CATEGORY_HELMETS = 27,
-    ITEM_CATEGORY_BACKPACK = 28,
-    ITEM_CATEGORY_ONEHANDWEAPON = 29,
-    ITEM_CATEGORY_ARROW = 30
+    ITEM_CATEGORY_SOUL_CORES = 26,
+    ITEM_CATEGORY_FIST_WEAPONS = 27,
 };
 
 enum SpriteMask :uint8_t
