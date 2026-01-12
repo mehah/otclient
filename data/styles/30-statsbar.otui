@@ -328,6 +328,7 @@ TopStatsSkillElement < UIWidget
 
 MonkStats < UIWidget
   id: monkStats
+  enabled: false
   $disabled:
     visible: false
     margin-left: 0
