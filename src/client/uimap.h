@@ -45,6 +45,7 @@ public:
     void setDrawLights(bool enable);
     void setLimitVisibleDimension(bool enable);
     void setDrawManaBar(bool enable);
+    void setDrawHarmony(bool enable);
     void setShader(std::string_view name, float fadein, float fadeout);
     void setMinimumAmbientLight(float intensity);
     void setDrawViewportEdge(bool force);
