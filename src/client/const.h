@@ -44,8 +44,9 @@ namespace Otc
         DrawBars = 1 << 2,
         DrawNames = 1 << 3,
         DrawManaBar = 1 << 4,
+        DrawHarmony = 1 << 5,
         DrawThingsAndLights = DrawThings | DrawLights,
-        DrawCreatureInfo = DrawBars | DrawNames | DrawManaBar,
+        DrawCreatureInfo = DrawBars | DrawNames | DrawManaBar | DrawHarmony,
     };
 
     enum DatOpts : uint8_t
@@ -576,6 +577,7 @@ namespace Otc
         GameForgeSkillStats = 126,
         GameCharacterSkillStats = 127,
         GameCreaturePaperdoll = 128,
+        GameVocationMonk = 130, //GameMultiSpr is 129
         LastGameFeature
     };
 
@@ -902,6 +904,14 @@ namespace Otc
         PARTYANALYZERACTION_RESET = 0,
         PARTYANALYZERACTION_PRICETYPE = 1,
         PARTYANALYZERACTION_PRICEVALUE = 2,
+    };
+
+    enum VocationMonkTypes_t : uint8_t
+    {
+        TYPES_HARMONY = 0,
+        TYPES_SERENE = 1,
+        TYPES_VIRTUE = 2,
+        TYPES_LAST
     };
 
     enum FloorViewMode
