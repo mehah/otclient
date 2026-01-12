@@ -1702,7 +1702,6 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
     if (g_game.getClientVersion() >= 1281) {
         money = m_localPlayer->getTotalMoney();
     } else {
-        uint64_t money;
         if (g_game.getFeature(Otc::GameDoublePlayerGoodsMoney))
             money = msg->getU64();
         else

@@ -1121,6 +1121,7 @@ function addTabText(text, speaktype, tab, creatureName)
     if speaktype.npcChat and (g_game.getCharacterName() ~= creatureName or g_game.getCharacterName() == 'Account Manager') then
         local highlightData = getHighlightedText(text, speaktype.color, "#1f9ffe")
         label:setColoredText(highlightData)
+        label.coloredData = highlightData
         if not label:hasEventListener(EVENT_TEXT_CLICK) and not label:hasEventListener(EVENT_TEXT_HOVER) then
             label:setEventListener(EVENT_TEXT_CLICK)
             label:setEventListener(EVENT_TEXT_HOVER)
@@ -1132,6 +1133,7 @@ function addTabText(text, speaktype, tab, creatureName)
     else
         if speaktype.colored then
             label:setColoredText(text)
+            label.coloredData = text
         else
             label:setText(text)
         end
@@ -1141,7 +1143,16 @@ function addTabText(text, speaktype, tab, creatureName)
         local readOnlyBuffer = readOnlyPanel:getChildById('panel')
         local readOnlyLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
         readOnlyLabel:setId('consoleLabel' .. readOnlyBuffer:getChildCount())
-        if speaktype.colored then
+        if speaktype.npcChat and (g_game.getCharacterName() ~= creatureName or g_game.getCharacterName() == 'Account Manager') then
+            local highlightData = getHighlightedText(text, speaktype.color, "#1f9ffe")
+            readOnlyLabel:setColoredText(highlightData)
+            readOnlyLabel:setEventListener(EVENT_TEXT_CLICK)
+            readOnlyLabel:setEventListener(EVENT_TEXT_HOVER)
+            connect(readOnlyLabel, {
+                onTextClick = onConsoleTextClicked,
+                onTextHoverChange = onConsoleTextHovered
+            })
+        elseif speaktype.colored then
             readOnlyLabel:setColoredText(text)
         else
             readOnlyLabel:setText(text)
@@ -2385,10 +2396,23 @@ function copyMessagesToReadOnlyPanel(channelName)
     for _, sourceLabel in pairs(sourceBuffer:getChildren()) do
         local clonedLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
         clonedLabel:setId('consoleLabel' .. readOnlyBuffer:getChildCount())
-        clonedLabel:setText(sourceLabel:getText())
+        if sourceLabel.coloredData then
+            clonedLabel:setColoredText(sourceLabel.coloredData)
+        else
+            clonedLabel:setText(sourceLabel:getText())
+        end
         clonedLabel:setColor(sourceLabel:getColor())
-        if sourceLabel.coloredText then
-            clonedLabel:setColoredText(sourceLabel:getColoredText())
+        if sourceLabel:hasEventListener(EVENT_TEXT_CLICK) then
+            clonedLabel:setEventListener(EVENT_TEXT_CLICK)
+            connect(clonedLabel, {
+                onTextClick = onConsoleTextClicked
+            })
+        end
+        if sourceLabel:hasEventListener(EVENT_TEXT_HOVER) then
+            clonedLabel:setEventListener(EVENT_TEXT_HOVER)
+            connect(clonedLabel, {
+                onTextHoverChange = onConsoleTextHovered
+            })
         end
     end
 end
