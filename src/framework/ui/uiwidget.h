@@ -26,7 +26,6 @@
 
 #include <framework/core/timer.h>
 #include <framework/graphics/declarations.h>
-#include <framework/graphics/coordsbuffer.h>
 #include <framework/html/declarations.h>
 #include <framework/luaengine/luaobject.h>
 
