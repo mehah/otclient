@@ -1003,7 +1003,7 @@ protected:
     float m_fontScale{ 1.f };
 
     uint16_t m_textOverflowLength{ 0 };
-    CoordsBufferPtr m_textUnderline = std::make_shared<CoordsBuffer>();
+    CoordsBufferPtr m_textUnderline;
 
     const AtlasRegion* m_atlasRegion = nullptr;
 
