@@ -23,6 +23,7 @@
 #pragma once
 
 #include "timer.h"
+#include "client/thingtype.h"
 #include <framework/global.h>
 
 class GarbageCollection
@@ -34,6 +35,8 @@ public:
     static void thingType();
 
 private:
+    static void processThingsInCategory(ThingTypeList& things, size_t& thingId, size_t& scanned, size_t maxAmount);
+
     static bool canCheck(Timer& timer, const uint32_t delay) {
         if (timer.ticksElapsed() < delay)
             return false;

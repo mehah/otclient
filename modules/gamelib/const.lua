@@ -193,7 +193,7 @@ GameAnthem = 95
 GameVipGroups = 96
 GameBosstiary = 97
 GameDoublePlayerGoodsMoney = 98
-GameLoadSprInsteadProtobuf = 100
+GameLoadSprInsteadProtobuf = 100 -- deprecated
 GameItemShader = 101
 GameCreatureShader = 102
 GameCreatureAttachedEffect = 103
@@ -222,6 +222,7 @@ GameMapCache = 125
 GameForgeSkillStats = 126
 GameCharacterSkillStats = 127
 GameCreaturePaperdoll = 128
+GameMultiSpr = 129
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'

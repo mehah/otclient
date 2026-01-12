@@ -23,32 +23,50 @@
 #pragma once
 
 #include "staticdata.h"
+#include "spritemanager.h"
 
 using RaceList = std::vector<RaceType>;
 static const RaceType emptyRaceType{};
 
+struct AssetResourceInfo
+{
+    uint16_t resourceId = 0;
+    int clientVersionId = 0;
+    std::string dir;
+};
+
 class ThingTypeManager
 {
 public:
+    ThingTypeManager() = default;
+    ~ThingTypeManager() = default;
+
+    // non-copyable
+    ThingTypeManager(const ThingTypeManager&) = delete;
+    ThingTypeManager& operator=(const ThingTypeManager&) = delete;
+
     void init();
     void terminate();
 
-    bool loadDat(std::string file);
-    bool loadOtml(std::string file);
-    bool loadAppearances(const std::string& file);
+    bool loadDat(const std::string& file, const uint16_t resourceId);
+    bool loadSpr(const std::string& file, const uint16_t resourceId);
+    bool loadOtml(std::string file, uint16_t resourceId);
+    bool loadAppearances(const std::string& file, const uint16_t resourceId);
     bool loadStaticData(const std::string& file);
+    PackInfoResourceList decodePackInfo(const std::string& file);
 
 #ifdef FRAMEWORK_EDITOR
     void parseItemType(uint16_t id, pugi::xml_node node);
     void loadOtb(const std::string& file);
     void loadXml(const std::string& file);
-    void saveDat(const std::string& fileName);
-    uint32_t getOtbMajorVersion() { return m_otbMajorVersion; }
-    uint32_t getOtbMinorVersion() { return m_otbMinorVersion; }
-    bool isXmlLoaded() { return m_xmlLoaded; }
-    bool isOtbLoaded() { return m_otbLoaded; }
-    bool isValidOtbId(uint16_t id) { return id >= 1 && id < m_itemTypes.size(); }
-    const ItemTypeList& getItemTypes() { return m_itemTypes; }
+    void saveDat(const std::string& fileName, uint16_t resourceId = 0);
+    void saveSpr(const std::string& fileName, uint16_t resourceId = 0);
+    uint32_t getOtbMajorVersion() const { return m_otbMajorVersion; }
+    uint32_t getOtbMinorVersion() const { return m_otbMinorVersion; }
+    bool isXmlLoaded() const { return m_xmlLoaded; }
+    bool isOtbLoaded() const { return m_otbLoaded; }
+    bool isValidOtbId(uint16_t id) const { return id >= 1 && id < m_itemTypes.size(); }
+    const ItemTypeList& getItemTypes() const { return m_itemTypes; }
     void addItemType(const ItemTypePtr& itemType);
     const ItemTypePtr& findItemTypeByClientId(uint16_t id);
     const ItemTypePtr& findItemTypeByName(const std::string& name);
@@ -65,29 +83,45 @@ public:
     const RaceType& getRaceData(uint32_t raceId);
     RaceList getRacesByName(const std::string& searchString);
 
-    const ThingTypePtr& getNullThingType() { return m_nullThingType; }
+    const ThingTypePtr& getNullThingType() const { return m_nullThingType; }
 
-    const ThingTypePtr& getThingType(uint16_t id, ThingCategory category);
-    ThingType* getRawThingType(uint16_t id, ThingCategory category);
+    const ThingTypePtr& getThingType(uint16_t id, ThingCategory category, const uint16_t resourceId) const;
+    ThingType* getRawThingType(uint16_t id, ThingCategory category, uint16_t resourceId) const;
 
-    const ThingTypeList& getThingTypes(ThingCategory category);
+    const ThingTypeList& getThingTypes(ThingCategory category, uint16_t resourceId = 0);
 
-    uint32_t getDatSignature() { return m_datSignature; }
-    uint16_t getContentRevision() { return m_contentRevision; }
+    AssetResourcePtr getResourceById(const uint16_t resourceId) const;
+    SpriteManagerPtr getSpriteManagerById(const uint16_t resourceId) const;
+    size_t getResourcesCount() const { return m_assetResources.size(); }
+    uint32_t getSprSignature(const uint16_t resourceId = 0) const;
+    uint32_t getDatSignature(const uint16_t resourceId = 0) const;
+    uint16_t getContentRevision(const uint16_t resourceId = 0) const;
 
-    bool isDatLoaded() { return m_datLoaded; }
-    bool isValidDatId(const uint16_t id, const ThingCategory category) const { return category < ThingLastCategory && id >= 1 && id < m_thingTypes[category].size(); }
+    ImagePtr getSpriteImage(int id, uint16_t resourceId, bool& isLoading);
+
+    bool isDatLoaded();
+    bool isValidDatId(const uint16_t id, const ThingCategory category, const uint16_t resourceId) const;
+
+    void reloadSprites();
+    bool isSprLoaded(uint16_t resourceId);
+    bool isUsingProtobuf(uint16_t resourceId);
 
 private:
-    ThingTypeList m_thingTypes[ThingLastCategory];
-    RaceList m_monsterRaces;
+
+    // loaded spr/dat/assets storage
+    // resources 0 .. n
+    AssetResourceList m_assetResources;
+
+    // loaded sprite managers
+    // contains dedicated sprite manager for each loaded resource
+    // if assets: uses ProtobufSpriteManager object
+    // if spr/dat: uses LegacySpriteManager object
+    SpriteManagerList m_spriteManagers;
 
     ThingTypePtr m_nullThingType;
 
-    bool m_datLoaded{ false };
-
-    uint32_t m_datSignature{ 0 };
-    uint16_t m_contentRevision{ 0 };
+    // to do: m_resourceId support
+    RaceList m_monsterRaces;
 
 #ifdef FRAMEWORK_EDITOR
     ItemTypePtr m_nullItemType;
@@ -98,8 +132,60 @@ private:
     bool m_xmlLoaded{ false };
     bool m_otbLoaded{ false };
 #endif
-
-    friend class GarbageCollection;
 };
 
 extern ThingTypeManager g_things;
+
+class AssetResource : public std::enable_shared_from_this<AssetResource>
+{
+public:
+    // AssetResource::Create(resourceId)
+    static std::shared_ptr<AssetResource> Create(uint16_t resourceId) {
+        // Using 'new' here intentionally due to private constructor
+        return std::shared_ptr<AssetResource>(new AssetResource(resourceId));
+    }
+
+    ~AssetResource() = default;
+
+    // non-copyable
+    AssetResource(const AssetResource&) = delete;
+    AssetResource& operator=(const AssetResource&) = delete;
+
+    uint16_t getId() const { return m_resourceId; }
+    
+    uint32_t getDatSignature() const { return m_datSignature; }
+    uint16_t getContentRevision() const { return m_contentRevision; }
+
+    const ThingTypeList& getThingTypes(const ThingCategory category);
+
+    const ThingTypePtr& getThingType(uint16_t id, ThingCategory category);
+    ThingType* getRawThingType(uint16_t id, ThingCategory category);
+
+    void findThingTypesByAttr(ThingAttr attr, ThingCategory category, ThingTypeList& out) const;
+
+    // spr/dat
+    bool loadDat(const std::string& file);
+    bool isDatLoaded() const { return m_datLoaded; }
+    bool isValidDatId(const uint16_t id, const ThingCategory category) const { return category < ThingLastCategory && id >= 1 && id < m_thingTypes[category].size(); }
+
+#ifdef FRAMEWORK_EDITOR
+    void saveDat(const std::string& file);
+#endif
+
+    // protobuf assets
+    SpriteManagerPtr loadAppearances(const std::string& file);
+
+private:
+    explicit AssetResource(uint16_t resourceId) : m_resourceId(resourceId) {}
+
+    ThingTypeList m_thingTypes[ThingLastCategory];
+
+    uint32_t m_datSignature{ 0 };
+    uint16_t m_contentRevision{ 0 };
+    uint16_t m_clientVersion{ 0 };
+    uint16_t m_resourceId{ 0 };
+
+    bool m_datLoaded{ false };
+
+    friend class GarbageCollection;
+};

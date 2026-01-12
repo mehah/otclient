@@ -52,14 +52,14 @@ public:
     void sendTurnSouth();
     void sendTurnWest();
     void sendGmTeleport(const Position& pos);
-    void sendEquipItemWithTier(uint16_t itemId, uint8_t tierOrFluid);
-    void sendEquipItemWithCountOrSubType(uint16_t itemId, uint16_t tierOrFluid);
-    void sendMove(const Position& fromPos, uint16_t thingId, uint8_t stackpos, const Position& toPos, uint16_t count);
-    void sendInspectNpcTrade(uint16_t itemId, uint16_t count);
-    void sendBuyItem(uint16_t itemId, uint8_t subType, uint16_t amount, bool ignoreCapacity, bool buyWithBackpack);
-    void sendSellItem(uint16_t itemId, uint8_t subType, uint16_t amount, bool ignoreEquipped);
+    void sendEquipItemWithTier(uint16_t itemId, uint16_t resourceId, uint8_t tierOrFluid);
+    void sendEquipItemWithCountOrSubType(uint16_t itemId, uint16_t resourceId, uint16_t tierOrFluid);
+    void sendMove(const Position& fromPos, uint16_t thingId, uint16_t resourceId, uint8_t stackpos, const Position& toPos, uint16_t count);
+    void sendInspectNpcTrade(uint16_t itemId, uint16_t resourceId, uint16_t count);
+    void sendBuyItem(uint16_t itemId, uint16_t resourceId, uint8_t subType, uint16_t amount, bool ignoreCapacity, bool buyWithBackpack);
+    void sendSellItem(uint16_t itemId, uint16_t resourceId, uint8_t subType, uint16_t amount, bool ignoreEquipped);
     void sendCloseNpcTrade();
-    void sendRequestTrade(const Position& pos, uint16_t thingId, uint8_t stackpos, uint32_t creatureId);
+    void sendRequestTrade(const Position& pos, uint16_t thingId, uint16_t resourceId, uint8_t stackpos, uint32_t creatureId);
     void sendInspectTrade(bool counterOffer, uint8_t index);
     void sendAcceptTrade();
     void sendRejectTrade();
@@ -72,7 +72,7 @@ public:
     void sendUpContainer(uint8_t containerId);
     void sendEditText(uint32_t id, std::string_view text);
     void sendEditList(uint32_t id, uint8_t doorId, std::string_view text);
-    void sendLook(const Position& position, uint16_t itemId, uint8_t stackpos);
+    void sendLook(const Position& position, uint16_t itemId, uint16_t resourceId, uint8_t stackpos);
     void sendLookCreature(uint32_t creatureId);
     void sendTalk(Otc::MessageMode mode, uint16_t channelId, std::string_view receiver, std::string_view message);
     void sendRequestChannels();
@@ -114,7 +114,7 @@ public:
     void sendRequestQuestLog();
     void sendRequestQuestLine(uint16_t questId);
     void sendNewNewRuleViolation(uint8_t reason, uint8_t action, std::string_view characterName, std::string_view comment, std::string_view translation);
-    void sendRequestItemInfo(uint16_t itemId, uint8_t subType, uint8_t index);
+    void sendRequestItemInfo(uint16_t itemId, uint16_t resourceId, uint8_t subType, uint8_t index);
     void sendAnswerModalDialog(uint32_t dialog, uint8_t button, uint8_t choice);
     void sendBrowseField(const Position& position);
     void sendSeekInContainer(uint8_t containerId, uint16_t index);
@@ -130,14 +130,17 @@ public:
     void sendTransferCoins(std::string_view recipient, uint16_t amount);
     void sendOpenTransactionHistory(uint8_t entriesPerPage);
     void sendMarketLeave();
-    void sendMarketBrowse(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
-    void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
+    void sendMarketBrowse(uint8_t browseId, uint16_t browseType, uint8_t tier = 0, uint16_t resourceId = 0);
+    void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint16_t resourceId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
     void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void sendPreyRequest();
     void sendOpenPortableForge();
-    void sendForgeRequest(Otc::ForgeAction_t actionType, bool convergence = false, uint16_t firstItemid = 0, uint8_t firstItemTier = 0, uint16_t secondItemId = 0, bool improveChance = false, bool tierLoss = false);
+    void sendForgeRequest(
+        Otc::ForgeAction_t actionType, bool convergence = false, uint16_t firstItemid = 0, uint16_t firstItemResourceId = 0, uint8_t firstItemTier = 0,
+        uint16_t secondItemId = 0, uint16_t secondItemResourceId = 0, bool improveChance = false, bool tierLoss = false
+    );
     void sendForgeBrowseHistoryRequest(uint16_t page);
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
@@ -145,8 +148,8 @@ public:
     void sendOpenRewardWall();
     void sendOpenRewardHistory();
     void sendGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
-    void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
-    void sendStashStow(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action);
+    void sendStashWithdraw(uint16_t itemId, uint16_t resourceId, uint32_t count, uint8_t stackpos);
+    void sendStashStow(const Position& position, const uint16_t itemId, const uint16_t resourceId, const uint32_t count, const uint8_t stackpos, const uint8_t action);
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
     void sendRequestBestiary();
@@ -159,11 +162,11 @@ public:
     void sendRequestBossSlootInfo();
     void sendRequestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
-    void sendQuickLoot(const uint8_t variant, const Position& pos, const uint16_t itemId, const uint8_t stackpos);
+    void sendQuickLoot(const uint8_t variant, const Position& pos, const uint16_t itemId, const uint16_t resourceId, const uint8_t stackpos);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
-    void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
+    void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint16_t resourceId, uint8_t stackpos, bool useMainAsFallback);
     void sendInspectionNormalObject(const Position& position);
-    void sendInspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
+    void sendInspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint16_t resourceId, uint8_t itemCount);
 
     // otclient only
     void sendChangeMapAwareRange(uint8_t xrange, uint8_t yrange);
@@ -215,7 +218,7 @@ private:
     void parsePing(const InputMessagePtr& msg);
     void parsePingBack(const InputMessagePtr& msg);
     void parseLoginChallenge(const InputMessagePtr& msg);
-    void parseDeath(const InputMessagePtr& msg);
+    void parseDeathScreen(const InputMessagePtr& msg);
     void parseFloorDescription(const InputMessagePtr& msg);
     void parseMapDescription(const InputMessagePtr& msg);
     void parseCreatureTyping(const InputMessagePtr& msg);
@@ -388,8 +391,9 @@ public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);
     int setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip);
     int setTileDescription(const InputMessagePtr& msg, Position position);
+    bool setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType);
 
-    Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true) const;
+    Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true, bool forceReadMountColors = false) const;
     ThingPtr getThing(const InputMessagePtr& msg);
     ThingPtr getMappedThing(const InputMessagePtr& msg) const;
     CreaturePtr getCreature(const InputMessagePtr& msg, int type = 0) const;
@@ -398,6 +402,16 @@ public:
 
 private:
     PaperdollPtr getPaperdoll(const InputMessagePtr& msg) const;
+    void internalGetCreature(const InputMessagePtr& msg, CreaturePtr& creature, bool known) const;
+    void creatureFromPacket(const InputMessagePtr& msg, CreaturePtr& creature, uint32_t& creatureId, const bool known) const;
+    void makeCreature(CreaturePtr& creature, uint8_t creatureType) const;
+    void getImbuingIngredients(const InputMessagePtr& msg, std::vector<Imbuement>& imbuements, std::vector<ItemPtr>& neededItemsList);
+    void setExtendedCosmetics(const InputMessagePtr& msg, const CreaturePtr& creature) const;
+    void setCreatureIcons(const InputMessagePtr& msg, const CreaturePtr& creature, const uint32_t creatureId, const bool known) const;
+    ForgeItemInfo getForgeItem(const InputMessagePtr& msg, const bool multiSpr, const bool skipTier = false);
+    void getForgeTransfers(const InputMessagePtr& msg, std::vector<ForgeTransferData>& transfers, const bool multiSpr);
+    void getBosstiarySlot(const InputMessagePtr& msg, bool& unlocked, uint32_t& bossId, std::optional<BosstiarySlot>& slot);
+    void simpleEvent1520(uint8_t eventId);
 
     bool m_enableSendExtendedOpcode{ false };
     bool m_gameInitialized{ false };

@@ -57,14 +57,14 @@ void UIMissile::drawSelf(const DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIMissile::setMissileId(const int id)
+void UIMissile::setMissileId(const int id, uint16_t resourceId)
 {
     if (id == 0)
         m_missile = nullptr;
     else {
         if (!m_missile)
             m_missile = std::make_shared<Missile>();
-        m_missile->setId(id);
+        m_missile->setId(id, resourceId);
         m_missile->setDirection(Otc::South);
 
         if (m_missile)
@@ -83,18 +83,31 @@ void UIMissile::setMissile(const MissilePtr& e)
 
 void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
+    uint16_t missileId = 0;
+    uint16_t missileResourceId = 0;
+    bool needUpdate = false;
+
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "missile-id")
-            setMissileId(node->value<int>());
-        else if (node->tag() == "missile-visible")
+        const std::string tag = node->tag();
+        if (tag == "missile-id") {
+            missileId = node->value<int>();
+            needUpdate = true;
+        } else if (tag == "missile-resource-id") {
+            missileResourceId = node->value<int>();
+            needUpdate = true;
+        } else if (tag == "missile-visible")
             setMissileVisible(node->value<bool>());
-        else if (node->tag() == "virtual")
+        else if (tag == "virtual")
             setVirtual(node->value<bool>());
-        else if (node->tag() == "show-id")
+        else if (tag == "show-id")
             m_showId = node->value<bool>();
-        else if (node->tag() == "direction")
+        else if (tag == "direction")
             setDirection(static_cast<Otc::Direction>(node->value<int>()));
     }
+
+    if (needUpdate)
+        setMissileId(missileId, missileResourceId);
+
     UIWidget::onStyleApply(styleName, styleNode);
 }
 

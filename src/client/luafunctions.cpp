@@ -38,7 +38,6 @@
 #include "outfit.h"
 #include "player.h"
 #include "protocolgame.h"
-#include "spriteappearances.h"
 #include "spritemanager.h"
 #include "statictext.h"
 #include "thingtypemanager.h"
@@ -74,9 +73,12 @@ void Client::registerLuaFunctions()
     g_lua.registerSingletonClass("g_things");
     g_lua.bindSingletonFunction("g_things", "loadAppearances", &ThingTypeManager::loadAppearances, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadStaticData", &ThingTypeManager::loadStaticData, &g_things);
+    g_lua.bindSingletonFunction("g_things", "decodePackInfo", &ThingTypeManager::decodePackInfo, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadDat", &ThingTypeManager::loadDat, &g_things);
+    g_lua.bindSingletonFunction("g_things", "loadSpr", &ThingTypeManager::loadSpr, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadOtml", &ThingTypeManager::loadOtml, &g_things);
     g_lua.bindSingletonFunction("g_things", "isDatLoaded", &ThingTypeManager::isDatLoaded, &g_things);
+    g_lua.bindSingletonFunction("g_things", "getSprSignature", &ThingTypeManager::getSprSignature, &g_things);
     g_lua.bindSingletonFunction("g_things", "getDatSignature", &ThingTypeManager::getDatSignature, &g_things);
     g_lua.bindSingletonFunction("g_things", "getContentRevision", &ThingTypeManager::getContentRevision, &g_things);
     g_lua.bindSingletonFunction("g_things", "getThingType", &ThingTypeManager::getThingType, &g_things);
@@ -84,6 +86,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "findThingTypeByAttr", &ThingTypeManager::findThingTypeByAttr, &g_things);
     g_lua.bindSingletonFunction("g_things", "getRaceData", &ThingTypeManager::getRaceData, &g_things);
     g_lua.bindSingletonFunction("g_things", "getRacesByName", &ThingTypeManager::getRacesByName, &g_things);
+    g_lua.bindSingletonFunction("g_things", "isUsingProtobuf", &ThingTypeManager::isUsingProtobuf, &g_things);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindSingletonFunction("g_things", "getItemType", &ThingTypeManager::getItemType, &g_things);
@@ -96,6 +99,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "loadOtb", &ThingTypeManager::loadOtb, &g_things);
     g_lua.bindSingletonFunction("g_things", "loadXml", &ThingTypeManager::loadXml, &g_things);
     g_lua.bindSingletonFunction("g_things", "isOtbLoaded", &ThingTypeManager::isOtbLoaded, &g_things);
+    g_lua.bindSingletonFunction("g_things", "saveSpr", &ThingTypeManager::saveSpr, &g_things);
 
     g_lua.registerSingletonClass("g_houses");
     g_lua.bindSingletonFunction("g_houses", "clear", &HouseManager::clear, &g_houses);
@@ -117,22 +121,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_towns", "getTowns", &TownManager::getTowns, &g_towns);
     g_lua.bindSingletonFunction("g_towns", "sort", &TownManager::sort, &g_towns);
 #endif
-
-    g_lua.registerSingletonClass("g_sprites");
-    g_lua.bindSingletonFunction("g_sprites", "loadSpr", &SpriteManager::loadSpr, &g_sprites);
-
-    g_lua.bindSingletonFunction("g_sprites", "unload", &SpriteManager::unload, &g_sprites);
-    g_lua.bindSingletonFunction("g_sprites", "isLoaded", &SpriteManager::isLoaded, &g_sprites);
-    g_lua.bindSingletonFunction("g_sprites", "getSprSignature", &SpriteManager::getSignature, &g_sprites);
-    g_lua.bindSingletonFunction("g_sprites", "getSpritesCount", &SpriteManager::getSpritesCount, &g_sprites);
-
-#ifdef FRAMEWORK_EDITOR
-    g_lua.bindSingletonFunction("g_sprites", "saveSpr", &SpriteManager::saveSpr, &g_sprites);
-#endif
-
-    g_lua.registerSingletonClass("g_spriteAppearances");
-    g_lua.bindSingletonFunction("g_spriteAppearances", "saveSpriteToFile", &SpriteAppearances::saveSpriteToFile, &g_spriteAppearances);
-    g_lua.bindSingletonFunction("g_spriteAppearances", "saveSheetToFileBySprite", &SpriteAppearances::saveSheetToFileBySprite, &g_spriteAppearances);
 
     g_lua.registerSingletonClass("g_map");
     g_lua.bindSingletonFunction("g_map", "isLookPossible", &Map::isLookPossible, &g_map);
@@ -378,7 +366,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "applyImbuement", &Game::applyImbuement, &g_game);
     g_lua.bindSingletonFunction("g_game", "clearImbuement", &Game::clearImbuement, &g_game);
     g_lua.bindSingletonFunction("g_game", "closeImbuingWindow", &Game::closeImbuingWindow, &g_game);
-    g_lua.bindSingletonFunction("g_game", "isUsingProtobuf", &Game::isUsingProtobuf, &g_game);
     g_lua.bindSingletonFunction("g_game", "enableTileThingLuaCallback", &Game::enableTileThingLuaCallback, &g_game);
     g_lua.bindSingletonFunction("g_game", "isTileThingLuaCallbackEnabled", &Game::isTileThingLuaCallbackEnabled, &g_game);
     g_lua.bindSingletonFunction("g_game", "stashWithdraw", &Game::stashWithdraw, &g_game);
@@ -480,7 +467,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachableObject>("getAttachedWidgetById", &AttachableObject::getAttachedWidgetById);
 
     g_lua.registerClass<Thing, AttachableObject>();
-    g_lua.bindClassMemberFunction<Thing>("setId", &Thing::setId);
     g_lua.bindClassMemberFunction<Thing>("setShader", &Thing::setShader);
     g_lua.bindClassMemberFunction<Thing>("setPosition", &Thing::setPosition);
     g_lua.bindClassMemberFunction<Thing>("setMarked", &Thing::lua_setMarked);
@@ -687,7 +673,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("getNumPatternX", &ThingType::getNumPatternX);
     g_lua.bindClassMemberFunction<ThingType>("getNumPatternY", &ThingType::getNumPatternY);
     g_lua.bindClassMemberFunction<ThingType>("getNumPatternZ", &ThingType::getNumPatternZ);
-    g_lua.bindClassMemberFunction<ThingType>("getAnimationPhases", &ThingType::getAnimationPhases);
+    g_lua.bindClassMemberFunction<ThingType>("getAnimationPhases", &ThingType::getAnimationPhase);
     g_lua.bindClassMemberFunction<ThingType>("getGroundSpeed", &ThingType::getGroundSpeed);
     g_lua.bindClassMemberFunction<ThingType>("getMaxTextLength", &ThingType::getMaxTextLength);
     g_lua.bindClassMemberFunction<ThingType>("getLight", &ThingType::getLight);

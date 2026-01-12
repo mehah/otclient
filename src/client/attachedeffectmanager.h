@@ -27,7 +27,7 @@
 class AttachedEffectManager
 {
 public:
-    AttachedEffectPtr registerByThing(uint16_t id, std::string_view name, uint16_t thingId, ThingCategory category);
+    AttachedEffectPtr registerByThing(uint16_t id, std::string_view name, uint16_t thingId, ThingCategory category, uint16_t resourceId = 0);
     AttachedEffectPtr registerByImage(uint16_t id, std::string_view name, std::string_view path, bool smooth);
 
     AttachedEffectPtr getById(uint16_t id);

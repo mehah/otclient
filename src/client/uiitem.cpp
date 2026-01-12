@@ -44,8 +44,8 @@ void UIItem::drawSelf(const DrawPoolType drawPane)
     drawImage(m_rect);
 
     if (m_itemVisible && m_item) {
-        if (m_item->getClientId() != m_itemId) {
-            m_item->setId(m_itemId);
+        if (m_item->getClientId() != m_itemId || m_item->getResourceId() != m_resourceId) {
+            m_item->setId(m_itemId, m_resourceId);
         }
 
         const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_item->getExactSize());
@@ -73,16 +73,17 @@ void UIItem::drawSelf(const DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIItem::setItemId(const int id)
+void UIItem::setItemId(const int id, uint16_t resourceId)
 {
     m_itemId = id;
+    m_resourceId = resourceId;
 
     if (id == 0)
         m_item = nullptr;
     else if (m_item)
-        m_item->setId(id);
+        m_item->setId(id, resourceId);
     else
-        m_item = Item::create(id);
+        m_item = Item::create(id, resourceId);
 
     if (m_item)
         m_item->setShader(m_shaderName);
@@ -115,20 +116,32 @@ void UIItem::setItem(const ItemPtr& item)
 
 void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
+    uint16_t itemId = 0;
+    uint16_t resourceId = 0;
+    bool needUpdateItem = false;
+
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "item-id")
-            setItemId(node->value<int>());
-        else if (node->tag() == "item-count")
+        const std::string tag = node->tag();
+        if (tag == "item-id") {
+            itemId = node->value<int>();
+            needUpdateItem = true;
+        } else if (tag == "item-resource-id") {
+            resourceId = node->value<int>();
+            needUpdateItem = true;
+        } else if (tag == "item-count")
             setItemCount(node->value<int>());
-        else if (node->tag() == "item-visible")
+        else if (tag == "item-visible")
             setItemVisible(node->value<bool>());
-        else if (node->tag() == "virtual")
+        else if (tag == "virtual")
             setVirtual(node->value<bool>());
-        else if (node->tag() == "show-id")
+        else if (tag == "show-id")
             m_showId = node->value<bool>();
-        else if (node->tag() == "always-show-count")
+        else if (tag == "always-show-count")
             m_alwaysShowCount = node->value<bool>();
     }
+
+    if (needUpdateItem)
+        setItemId(itemId, resourceId);
 
     UIWidget::onStyleApply(styleName, styleNode);
 }

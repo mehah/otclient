@@ -22,6 +22,7 @@
 
 #include "tools/datdump.h"
 
+#ifdef FRAMEWORK_EDITOR
 #include "client/game.h"
 #include "client/thingtype.h"
 #include "client/thingtypemanager.h"
@@ -212,7 +213,7 @@ namespace datdump {
         if (version >= 1057)
             g_game.enableFeature(Otc::GameIdleAnimations);
 
-        if (!g_things.loadDat(request.datPath)) {
+        if (!g_things.loadDat(request.datPath, 0)) { // to do: multispr
             throw std::runtime_error("unable to load DAT file: " + request.datPath);
         }
 
@@ -260,3 +261,4 @@ namespace datdump {
         return success;
     }
 } // namespace datdump
+#endif

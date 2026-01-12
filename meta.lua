@@ -151,7 +151,7 @@ g_things = {}
 
 ---@param file string
 ---@return boolean
-function g_things.loadAppearances(file) end
+function g_things.loadAppearances(file, resourceId) end
 
 ---@param file string
 ---@return boolean
@@ -159,11 +159,11 @@ function g_things.loadStaticData(file) end
 
 ---@param file string
 ---@return boolean
-function g_things.loadDat(file) end
+function g_things.loadDat(file, resourceId) end
 
 ---@param file string
 ---@return boolean
-function g_things.loadOtml(file) end
+function g_things.loadOtml(file, resourceId) end
 
 ---@return boolean
 function g_things.isDatLoaded() end
@@ -181,7 +181,7 @@ function g_things.getThingType(id, category) end
 
 ---@param category integer
 ---@return ThingType[]
-function g_things.getThingTypes(category) end
+function g_things.getThingTypes(category, resourceId) end
 
 ---@param attr integer
 ---@param category integer
@@ -307,47 +307,6 @@ function g_towns.removeTown(townId) end
 function g_towns.getTowns() end
 
 function g_towns.sort() end
-
---------------------------------
----------- g_sprites -----------
---------------------------------
-
----@class g_sprites
-g_sprites = {}
-
----@param file string
----@return boolean
-function g_sprites.loadSpr(file) end
-
-function g_sprites.unload() end
-
----@return boolean
-function g_sprites.isLoaded() end
-
----@return number
-function g_sprites.getSprSignature() end
-
----@return integer
-function g_sprites.getSpritesCount() end
-
----* FRAMEWORK_EDITOR
----@param fileName string
-function g_sprites.saveSpr(fileName) end
-
---------------------------------
------- g_spriteAppearances -----
---------------------------------
-
----@class g_spriteAppearances
-g_spriteAppearances = {}
-
----@param id integer
----@param file string
-function g_spriteAppearances.saveSpriteToFile(id, file) end
-
----@param id integer
----@param file string
-function g_spriteAppearances.saveSheetToFileBySprite(id, file) end
 
 --------------------------------
 ------------ g_map -------------

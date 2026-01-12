@@ -39,17 +39,17 @@
 #include "itemtype.h"
 #endif
 
-ItemPtr Item::create(const int id)
+ItemPtr Item::create(const int id, uint16_t resourceId)
 {
     const auto& item = std::make_shared<Item>();
-    item->setId(id);
+    item->setId(id, resourceId);
 
     return item;
 }
 
 void Item::draw(const Point& dest, const bool drawThings, LightView* lightView)
 {
-    if (!canDraw(m_color) || isHided())
+    if (!canDraw(m_color) || isHidden())
         return;
 
     // determine animation phase
@@ -90,7 +90,11 @@ void Item::internalDraw(const int animationPhase, const Point& dest, const Color
 
 void Item::drawLight(const Point& dest, LightView* lightView) {
     if (!lightView) return;
-    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, 0, Color::white, false, lightView);
+
+    auto thingType = getThingType();
+    if (!thingType) return;
+
+    thingType->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, 0, Color::white, false, lightView);
     drawAttachedLightEffect(dest, lightView);
 }
 
@@ -264,9 +268,9 @@ int Item::calculateAnimationPhase()
     return m_phase;
 }
 
-void Item::setId(uint32_t id)
+void Item::setId(uint32_t id, uint16_t resourceId)
 {
-    if (!g_things.isValidDatId(id, ThingCategoryItem))
+    if (!g_things.isValidDatId(id, ThingCategoryItem, resourceId))
         id = 0;
 
 #ifdef FRAMEWORK_EDITOR
@@ -274,6 +278,7 @@ void Item::setId(uint32_t id)
 #endif
 
     m_clientId = id;
+    m_resourceId = resourceId;
 
     // Shader example on only items that can be marketed.
     /*
@@ -284,7 +289,7 @@ void Item::setId(uint32_t id)
 }
 
 ThingType* Item::getThingType() const {
-    return g_things.getRawThingType(m_clientId, ThingCategoryItem);
+    return g_things.getRawThingType(m_clientId, ThingCategoryItem, m_resourceId);
 }
 
 #ifdef FRAMEWORK_EDITOR
@@ -311,7 +316,7 @@ void Item::setOtbId(uint16_t id)
     m_serverId = id;
 
     id = itemType->getClientId();
-    if (!g_things.isValidDatId(id, ThingCategoryItem))
+    if (!g_things.isValidDatId(id, ThingCategoryItem, m_resourceId))
         id = 0;
 
     m_clientId = id;

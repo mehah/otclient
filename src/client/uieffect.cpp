@@ -56,14 +56,14 @@ void UIEffect::drawSelf(const DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIEffect::setEffectId(const int id)
+void UIEffect::setEffectId(const int id, uint16_t resourceId)
 {
     if (id == 0)
         m_effect = nullptr;
     else {
         if (!m_effect)
             m_effect = std::make_shared<Effect>();
-        m_effect->setId(id);
+        m_effect->setId(id, resourceId);
         if (m_effect)
             m_effect->setShader(m_shaderName);
     }
@@ -76,16 +76,28 @@ void UIEffect::setEffect(const EffectPtr& e)
 
 void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
+    uint16_t effectId = 0;
+    uint16_t effectResourceId = 0;
+    bool needUpdate = false;
+
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "effect-id")
-            setEffectId(node->value<int>());
-        else if (node->tag() == "effect-visible")
+        const std::string tag = node->tag();
+        if (tag == "effect-id") {
+            effectId = node->value<int>();
+            needUpdate = true;
+        } else if (tag == "effect-resource-id") {
+            effectResourceId = node->value<int>();
+            needUpdate = true;
+        } else if (tag == "effect-visible")
             setEffectVisible(node->value<bool>());
-        else if (node->tag() == "virtual")
+        else if (tag == "virtual")
             setVirtual(node->value<bool>());
-        else if (node->tag() == "show-id")
+        else if (tag == "show-id")
             m_showId = node->value<bool>();
     }
+
+    if (needUpdate)
+        setEffectId(effectId, effectResourceId);
 
     UIWidget::onStyleApply(styleName, styleNode);
 }

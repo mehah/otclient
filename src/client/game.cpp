@@ -423,7 +423,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     CreaturePtr virtualMountCreature;
     if (getFeature(Otc::GamePlayerMounts)) {
         Outfit mountOutfit;
-        mountOutfit.setId(currentOutfit.getMount());
+        mountOutfit.applyOutfit(currentOutfit.getMount());
         mountOutfit.setCategory(ThingCategoryCreature);
 
         virtualMountCreature = std::make_shared<Creature>();
@@ -433,7 +433,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
 
     if (getFeature(Otc::GamePlayerFamiliars)) {
         Outfit familiarOutfit;
-        familiarOutfit.setId(currentOutfit.getFamiliar());
+        familiarOutfit.applySimpleOutfit(currentOutfit.getFamiliar());
         familiarOutfit.setCategory(ThingCategoryCreature);
     }
 
@@ -470,9 +470,9 @@ void Game::processCloseTrade()
     g_lua.callGlobalField("g_game", "onCloseTrade");
 }
 
-void Game::processEditText(const uint32_t id, const uint32_t itemId, const uint16_t maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
+void Game::processEditText(const uint32_t id, const uint32_t itemId, const uint16_t resourceId, const uint16_t maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
 {
-    g_lua.callGlobalField("g_game", "onEditText", id, itemId, maxLength, text, writer, date);
+    g_lua.callGlobalField("g_game", "onEditText", id, itemId, maxLength, text, writer, date, resourceId);
 }
 
 void Game::processEditList(const uint32_t id, const uint8_t doorId, const std::string_view text)
@@ -784,7 +784,7 @@ void Game::look(const ThingPtr& thing, const bool isBattleList)
         m_protocolGame->sendLookCreature(thing->getId());
     else {
         const int thingId = thing->isCreature() ? static_cast<int>(Proto::Creature) : thing->getId();
-        m_protocolGame->sendLook(thing->getPosition(), thingId, thing->getStackPos());
+        m_protocolGame->sendLook(thing->getPosition(), thingId, thing->getResourceId(), thing->getStackPos());
     }
 }
 
@@ -797,7 +797,7 @@ void Game::move(const ThingPtr& thing, const Position& toPos, int count)
         return;
 
     const auto thingId = thing->isCreature() ? static_cast<int>(Proto::Creature) : thing->getId();
-    m_protocolGame->sendMove(thing->getPosition(), thingId, thing->getStackPos(), toPos, count);
+    m_protocolGame->sendMove(thing->getPosition(), thingId, thing->getResourceId(), thing->getStackPos(), toPos, count);
 }
 
 void Game::moveToParentContainer(const ThingPtr& thing, const int count)
@@ -841,9 +841,9 @@ void Game::use(const ThingPtr& thing)
     g_lua.callGlobalField("g_game", "onUse", pos, thing->getId(), thing->getStackPos(), 0);
 }
 
-void Game::useInventoryItem(const uint16_t itemId)
+void Game::useInventoryItem(const uint16_t itemId, const uint16_t resourceId)
 {
-    if (!canPerformGameAction() || !g_things.isValidDatId(itemId, ThingCategoryItem))
+    if (!canPerformGameAction() || !g_things.isValidDatId(itemId, ThingCategoryItem, resourceId))
         return;
 
     const auto& pos = Position(0xFFFF, 0, 0); // means that is a item in inventory
@@ -1331,7 +1331,7 @@ void Game::inspectNpcTrade(const ItemPtr& item)
     if (!canPerformGameAction() || !item)
         return;
 
-    m_protocolGame->sendInspectNpcTrade(item->getId(), item->getCount());
+    m_protocolGame->sendInspectNpcTrade(item->getId(), item->getResourceId(), item->getCount());
 }
 
 void Game::buyItem(const ItemPtr& item, const uint16_t amount, const bool ignoreCapacity, const bool buyWithBackpack)
@@ -1339,7 +1339,7 @@ void Game::buyItem(const ItemPtr& item, const uint16_t amount, const bool ignore
     if (!canPerformGameAction() || !item)
         return;
 
-    m_protocolGame->sendBuyItem(item->getId(), item->getCountOrSubType(), amount, ignoreCapacity, buyWithBackpack);
+    m_protocolGame->sendBuyItem(item->getId(), item->getResourceId(), item->getCountOrSubType(), amount, ignoreCapacity, buyWithBackpack);
 }
 
 void Game::sellItem(const ItemPtr& item, const uint16_t amount, const bool ignoreEquipped)
@@ -1347,7 +1347,7 @@ void Game::sellItem(const ItemPtr& item, const uint16_t amount, const bool ignor
     if (!canPerformGameAction() || !item)
         return;
 
-    m_protocolGame->sendSellItem(item->getId(), item->getSubType(), amount, ignoreEquipped);
+    m_protocolGame->sendSellItem(item->getId(), item->getResourceId(), item->getSubType(), amount, ignoreEquipped);
 }
 
 void Game::closeNpcTrade()
@@ -1363,7 +1363,7 @@ void Game::requestTrade(const ItemPtr& item, const CreaturePtr& creature)
     if (!canPerformGameAction() || !item || !creature)
         return;
 
-    m_protocolGame->sendRequestTrade(item->getPosition(), item->getId(), item->getStackPos(), creature->getId());
+    m_protocolGame->sendRequestTrade(item->getPosition(), item->getId(), item->getResourceId(), item->getStackPos(), creature->getId());
 }
 
 void Game::inspectTrade(const bool counterOffer, const uint8_t index)
@@ -1473,25 +1473,25 @@ void Game::equipItem(const ItemPtr& item)
         return;
 
     if (g_game.getFeature(Otc::GameThingUpgradeClassification) && item->getClassification() > 0) {
-        m_protocolGame->sendEquipItemWithTier(item->getId(), item->getTier());
+        m_protocolGame->sendEquipItemWithTier(item->getId(), item->getResourceId(), item->getTier());
     } else {
-        m_protocolGame->sendEquipItemWithCountOrSubType(item->getId(), item->getCountOrSubType());
+        m_protocolGame->sendEquipItemWithCountOrSubType(item->getId(), item->getResourceId(), item->getCountOrSubType());
     }
 }
 
-void Game::equipItemId(const uint16_t itemId, const uint8_t tier)
+void Game::equipItemId(const uint16_t itemId, const uint8_t tier, const uint16_t resourceId)
 {
     if (!canPerformGameAction())
         return;
 
     if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
-        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem, resourceId);
         if (thing && thing->getClassification() > 0) {
-            m_protocolGame->sendEquipItemWithTier(itemId, tier);
+            m_protocolGame->sendEquipItemWithTier(itemId, tier, resourceId);
             return;
         }
     }
-    m_protocolGame->sendEquipItemWithCountOrSubType(itemId, tier);
+    m_protocolGame->sendEquipItemWithCountOrSubType(itemId, tier, resourceId);
 }
 
 void Game::mount(const bool mount)
@@ -1507,7 +1507,7 @@ void Game::requestItemInfo(const ItemPtr& item, const uint8_t index)
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendRequestItemInfo(item->getId(), item->getSubType(), index);
+    m_protocolGame->sendRequestItemInfo(item->getId(), item->getResourceId(), item->getSubType(), index);
 }
 
 void Game::answerModalDialog(const uint32_t dialog, const uint8_t button, const uint8_t choice)
@@ -1766,21 +1766,21 @@ void Game::leaveMarket()
     g_lua.callGlobalField("g_game", "onMarketLeave");
 }
 
-void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier)
+void Game::browseMarket(const uint8_t browseId, const uint16_t browseType, const uint8_t tier, const uint16_t resourceId)
 {
     if (!canPerformGameAction()) {
         return;
     }
 
-    m_protocolGame->sendMarketBrowse(browseId, browseType, tier);
+    m_protocolGame->sendMarketBrowse(browseId, browseType, tier, resourceId);
 }
 
-void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
+void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint16_t resourceId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendMarketCreateOffer(type, itemId, itemTier, amount, price, anonymous);
+    m_protocolGame->sendMarketCreateOffer(type, itemId, resourceId, itemTier, amount, price, anonymous);
 }
 
 void Game::cancelMarketOffer(const uint32_t timestamp, const uint16_t counter)
@@ -1822,11 +1822,21 @@ void Game::openPortableForgeRequest()
     m_protocolGame->sendOpenPortableForge();
 }
 
-void Game::forgeRequest(Otc::ForgeAction_t actionType, bool convergence, uint16_t firstItemid, uint8_t firstItemTier, uint16_t secondItemId, bool improveChance, bool tierLoss)
+void Game::forgeRequest(
+    Otc::ForgeAction_t actionType,
+    bool convergence,
+    uint16_t firstItemid,
+    uint8_t firstItemTier,
+    uint16_t secondItemId,
+    bool improveChance,
+    bool tierLoss,
+    uint16_t firstItemResourceId,
+    uint16_t secondItemResourceId
+)
 {
     if (!canPerformGameAction())
         return;
-    m_protocolGame->sendForgeRequest(actionType, convergence, firstItemid, firstItemTier, secondItemId, improveChance, tierLoss);
+    m_protocolGame->sendForgeRequest(actionType, convergence, firstItemid, firstItemResourceId, firstItemTier, secondItemId, secondItemResourceId, improveChance, tierLoss);
 }
 
 void Game::sendForgeBrowseHistoryRequest(uint16_t page)
@@ -1868,20 +1878,20 @@ void Game::imbuementDurations(const bool isOpen)
     m_protocolGame->sendImbuementDurations(isOpen);
 }
 
-void Game::stashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos)
+void Game::stashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint16_t resourceId)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendStashWithdraw(itemId, count, stackpos);
+    m_protocolGame->sendStashWithdraw(itemId, resourceId, count, stackpos);
 }
 
-void Game::stashStowItem(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action)
+void Game::stashStowItem(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action, const uint16_t resourceId)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendStashStow(position, itemId, count, stackpos, action);
+    m_protocolGame->sendStashStow(position, itemId, resourceId, count, stackpos, action);
 }
 
 void Game::requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
@@ -1914,10 +1924,13 @@ void Game::sendQuickLoot(const uint8_t variant, const ItemPtr& item)
     if (!canPerformGameAction())
         return;
 
-    Position pos = (item && item->getPosition().isValid()) ? item->getPosition() : Position(0, 0, 0);
-    uint16_t itemId = item ? item->getId() : 0;
-    uint8_t stackPos = item ? item->getStackPos() : 0;
-    m_protocolGame->sendQuickLoot(variant, pos, itemId, stackPos);
+    if (!item) {
+        m_protocolGame->sendQuickLoot(variant, Position(0, 0, 0), 0, 0, 0);
+        return;
+    }
+
+    Position pos = item->getPosition().isValid() ? item->getPosition() : Position(0, 0, 0);
+    m_protocolGame->sendQuickLoot(variant, pos, item->getId(), item->getResourceId(), item->getStackPos());
 }
 
 void Game::requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems)
@@ -1928,11 +1941,11 @@ void Game::requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t s
     m_protocolGame->requestQuickLootBlackWhiteList(filter, size, listedItems);
 }
 
-void Game::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback)
+void Game::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback, const uint16_t resourceId)
 {
     if (!canPerformGameAction())
         return;
-    m_protocolGame->openContainerQuickLoot(action, category, pos, itemId, stackpos, useMainAsFallback);
+    m_protocolGame->openContainerQuickLoot(action, category, pos, itemId, resourceId, stackpos, useMainAsFallback);
 }
 
 void Game::sendGmTeleport(const Position& pos)
@@ -1951,12 +1964,12 @@ void Game::inspectionNormalObject(const Position& position)
     m_protocolGame->sendInspectionNormalObject(position);
 }
 
-void Game::inspectionObject(const Otc::InspectObjectTypes inspectionType, const uint16_t itemId, const uint8_t itemCount)
+void Game::inspectionObject(const Otc::InspectObjectTypes inspectionType, const uint16_t itemId, const uint8_t itemCount, const uint16_t resourceId)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendInspectionObject(inspectionType, itemId, itemCount);
+    m_protocolGame->sendInspectionObject(inspectionType, itemId, resourceId, itemCount);
 }
 
 void Game::requestBestiary()

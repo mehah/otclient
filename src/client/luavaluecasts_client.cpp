@@ -28,42 +28,140 @@
 
 int push_luavalue(const Outfit& outfit)
 {
-    g_lua.createTable(0, 8);
-    g_lua.pushInteger(outfit.getId());
-    g_lua.setField("type");
-    g_lua.pushInteger(outfit.getAuxId());
-    g_lua.setField("auxType");
+    bool advanced = g_game.getFeature(Otc::GameWingsAurasEffectsShader);
+
+    std::vector<std::pair<std::string_view, int>> outfitFields;
+
+    // base outfit
+    const auto base = outfit.getBaseOutfit();
+    outfitFields.push_back({ "type", base.type });
+    outfitFields.push_back({ "auxType", base.typeEx });
+    outfitFields.push_back({ "resourceId", base.resourceId });
+    outfitFields.push_back({ "head", base.head });
+    outfitFields.push_back({ "body", base.body });
+    outfitFields.push_back({ "legs", base.legs });
+    outfitFields.push_back({ "feet", base.feet });
+
+    // addons
     if (g_game.getFeature(Otc::GamePlayerAddons)) {
-        g_lua.pushInteger(outfit.getAddons());
-        g_lua.setField("addons");
+        outfitFields.push_back({ "addons", outfit.getAddons() });
     }
-    g_lua.pushInteger(outfit.getHead());
-    g_lua.setField("head");
-    g_lua.pushInteger(outfit.getBody());
-    g_lua.setField("body");
-    g_lua.pushInteger(outfit.getLegs());
-    g_lua.setField("legs");
-    g_lua.pushInteger(outfit.getFeet());
-    g_lua.setField("feet");
+
+    // mount
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
-        g_lua.pushInteger(outfit.getMount());
-        g_lua.setField("mount");
+        const auto mount = outfit.getMount();
+        outfitFields.push_back({ "mount", mount.type });
+        outfitFields.push_back({ "mountAux", mount.typeEx });
+        outfitFields.push_back({ "mountResourceId", mount.resourceId });
+        outfitFields.push_back({ "mountHead", mount.head });
+        outfitFields.push_back({ "mountBody", mount.body });
+        outfitFields.push_back({ "mountLegs", mount.legs });
+        outfitFields.push_back({ "mountFeet", mount.feet });
     }
+
+    // familiar
     if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
-        g_lua.pushInteger(outfit.getFamiliar());
-        g_lua.setField("familiar");
+        const auto familiar = outfit.getFamiliar();
+        outfitFields.push_back({ "familiar", familiar.type });
+        outfitFields.push_back({ "familiarAux", familiar.typeEx });
+        outfitFields.push_back({ "familiarResourceId", familiar.resourceId });
     }
-    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
-        g_lua.pushInteger(outfit.getWing());
-        g_lua.setField("wings");
-        g_lua.pushInteger(outfit.getEffect());
-        g_lua.setField("effects");
-        g_lua.pushInteger(outfit.getAura());
-        g_lua.setField("auras");
+
+    if (advanced) {
+        // wings
+        const auto wings = outfit.getWings();
+        outfitFields.push_back({ "wings", wings.type });
+        outfitFields.push_back({ "wingsAux", wings.typeEx });
+        outfitFields.push_back({ "wingsResourceId", wings.resourceId });
+
+        // aura
+        const auto aura = outfit.getAura();
+        outfitFields.push_back({ "aura", aura.type });
+        outfitFields.push_back({ "auraResourceId", aura.resourceId });
+        outfitFields.push_back({ "auraCategory", aura.category });
+
+        // effect
+        const auto effect = outfit.getEffect();
+        outfitFields.push_back({ "effect", effect.type });
+        outfitFields.push_back({ "effectResourceId", effect.resourceId });
+        outfitFields.push_back({ "effectCategory", effect.category });
+    }
+
+    size_t tableSize = outfitFields.size();
+    if (advanced) {
+        ++tableSize;
+    }
+
+    g_lua.createTable(0, tableSize);
+
+    for (auto& pair : outfitFields) {
+        g_lua.pushInteger(pair.second);
+        g_lua.setField(pair.first);
+    }
+
+    if (advanced) {
         g_lua.pushString(outfit.getShader());
         g_lua.setField("shaders");
     }
+
     return 1;
+}
+
+// helper for outfit cast
+SimpleOutfit lua_unserialize_simple_outfit(const int index, std::string_view type, std::string_view auxType, std::string_view resourceId)
+{
+    SimpleOutfit out;
+    g_lua.getField(type, index);
+    out.type = g_lua.popInteger();
+    g_lua.getField(auxType, index);
+    out.typeEx = g_lua.popInteger();
+    g_lua.getField(resourceId, index);
+    out.resourceId = g_lua.popInteger();
+    return out;
+}
+
+// helper for outfit cast
+ColorOutfit lua_unserialize_color_outfit(
+    const int index,
+    std::string_view type,
+    std::string_view auxType,
+    std::string_view resourceId,
+    std::string_view head,
+    std::string_view body,
+    std::string_view legs,
+    std::string_view feet
+)
+{
+    ColorOutfit out;
+    g_lua.getField(type, index);
+    out.type = g_lua.popInteger();
+    g_lua.getField(auxType, index);
+    out.typeEx = g_lua.popInteger();
+    g_lua.getField(resourceId, index);
+    out.resourceId = g_lua.popInteger();
+    g_lua.getField(head, index);
+    out.head = g_lua.popInteger();
+    g_lua.getField(body, index);
+    out.body = g_lua.popInteger();
+    g_lua.getField(legs, index);
+    out.legs = g_lua.popInteger();
+    g_lua.getField(feet, index);
+    out.feet = g_lua.popInteger();
+    out.applyColors();
+    return out;
+}
+
+// helper for aura/particles
+EffectOutfit lua_unserialize_effect_outfit(const int index, std::string_view type, std::string_view resourceId, std::string_view category)
+{
+    EffectOutfit out;
+    g_lua.getField(type, index);
+    out.type = g_lua.popInteger();
+    g_lua.getField(resourceId, index);
+    out.resourceId = g_lua.popInteger();
+    g_lua.getField(category, index);
+    out.category = static_cast<ThingCategory>(g_lua.popInteger());
+    return out;
 }
 
 bool luavalue_cast(const int index, Outfit& outfit)
@@ -71,37 +169,49 @@ bool luavalue_cast(const int index, Outfit& outfit)
     if (!g_lua.isTable(index))
         return false;
 
-    g_lua.getField("type", index);
-    outfit.setId(g_lua.popInteger());
-    g_lua.getField("auxType", index);
-    outfit.setAuxId(g_lua.popInteger());
+    // outfit
+    outfit.applyOutfit(
+        lua_unserialize_color_outfit(index, "type", "auxType", "resourceId", "head", "body", "legs", "feet")
+    );
+
+    // outfit addons
     if (g_game.getFeature(Otc::GamePlayerAddons)) {
         g_lua.getField("addons", index);
         outfit.setAddons(g_lua.popInteger());
     }
-    g_lua.getField("head", index);
-    outfit.setHead(g_lua.popInteger());
-    g_lua.getField("body", index);
-    outfit.setBody(g_lua.popInteger());
-    g_lua.getField("legs", index);
-    outfit.setLegs(g_lua.popInteger());
-    g_lua.getField("feet", index);
-    outfit.setFeet(g_lua.popInteger());
+
+    // mount
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
-        g_lua.getField("mount", index);
-        outfit.setMount(g_lua.popInteger());
+        outfit.applyMount(
+            lua_unserialize_color_outfit(index, "mount", "mountAux", "mountResourceId", "mountHead", "mountBody", "mountLegs", "mountFeet")
+        );
     }
+
+    // familiar
     if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
-        g_lua.getField("familiar", index);
-        outfit.setFamiliar(g_lua.popInteger());
+        outfit.applyFamiliar(
+            lua_unserialize_simple_outfit(index, "familiar", "familiarAux", "familiarResourceId")
+        );
     }
+
+    // advanced cosmetics
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
-        g_lua.getField("wings", index);
-        outfit.setWing(g_lua.popInteger());
-        g_lua.getField("effects", index);
-        outfit.setEffect(g_lua.popInteger());
-        g_lua.getField("auras", index);
-        outfit.setAura(g_lua.popInteger());
+        // outfit wings
+        outfit.applyWings(
+            lua_unserialize_simple_outfit(index, "wings", "wingsAux", "wingsResourceId")
+        );
+
+        // effect below outfit
+        outfit.applyAura(
+            lua_unserialize_effect_outfit(index, "aura", "auraResourceId", "auraCategory")
+        );
+
+        // effect above outfit
+        outfit.applyParticles(
+            lua_unserialize_effect_outfit(index, "effect", "effectResourceId", "effectCategory")
+        );
+
+        // shader
         g_lua.getField("shaders", index);
         outfit.setShader(g_lua.popString());
     }
@@ -1784,5 +1894,17 @@ int push_luavalue(const PartyMemberName& data) {
     g_lua.setField("memberID");
     g_lua.pushString(data.memberName);
     g_lua.setField("memberName");
+    return 1;
+}
+
+int push_luavalue(const AssetResourceInfo& data)
+{
+    g_lua.createTable(0, 3);
+    g_lua.pushInteger(data.resourceId);
+    g_lua.setField("id");
+    g_lua.pushInteger(data.clientVersionId);
+    g_lua.setField("version");
+    g_lua.pushString(data.dir);
+    g_lua.setField("dir");
     return 1;
 }

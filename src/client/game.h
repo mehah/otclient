@@ -119,7 +119,7 @@ protected:
     static void processCloseTrade();
 
     // edit text/list
-    static void processEditText(uint32_t id, uint32_t itemId, uint16_t maxLength, std::string_view text, std::string_view writer, std::string_view date);
+    static void processEditText(uint32_t id, uint32_t itemId, uint16_t resourceId, uint16_t maxLength, std::string_view text, std::string_view writer, std::string_view date);
     static void processEditList(uint32_t id, uint8_t doorId, std::string_view text);
 
     // questlog
@@ -181,7 +181,7 @@ public:
     void wrap(const ThingPtr& thing);
     void use(const ThingPtr& thing);
     void useWith(const ItemPtr& item, const ThingPtr& toThing);
-    void useInventoryItem(uint16_t itemId);
+    void useInventoryItem(uint16_t itemId, uint16_t resourceId = 0);
     void useInventoryItemWith(uint16_t itemId, const ThingPtr& toThing);
     ItemPtr findItemInContainers(uint32_t itemId, int subType, uint8_t tier);
 
@@ -284,7 +284,7 @@ public:
 
     // 870 only
     void equipItem(const ItemPtr& item);
-    void equipItemId(const uint16_t itemId, const uint8_t tier);
+    void equipItemId(const uint16_t itemId, const uint8_t tier, const uint16_t resourceId = 0);
     void mount(bool mount);
 
     // 910 only
@@ -325,8 +325,6 @@ public:
 
     void setProtocolVersion(uint16_t version);
     int getProtocolVersion() { return m_protocolVersion; }
-
-    bool isUsingProtobuf() { return getProtocolVersion() >= 1281 && !getFeature(Otc::GameLoadSprInsteadProtobuf); }
 
     void setClientVersion(uint16_t version);
     int getClientVersion() { return m_clientVersion; }
@@ -371,8 +369,9 @@ public:
 
     // market related
     void leaveMarket();
-    void browseMarket(uint8_t browseId, uint16_t browseType, uint8_t tier = 0);
-    void createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
+
+    void browseMarket(uint8_t browseId, uint16_t browseType, uint8_t tier = 0, uint16_t resourceId = 0);
+    void createMarketOffer(uint8_t type, uint16_t itemId, uint16_t resourceId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
     void cancelMarketOffer(uint32_t timestamp, uint16_t counter);
     void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
 
@@ -382,7 +381,17 @@ public:
 
     // forge related
     void openPortableForgeRequest();
-    void forgeRequest(Otc::ForgeAction_t actionType, bool convergence = false, uint16_t firstItemid = 0, uint8_t firstItemTier = 0, uint16_t secondItemId = 0, bool improveChance = false, bool tierLoss = false);
+    void forgeRequest(
+        Otc::ForgeAction_t actionType,
+        bool convergence = false,
+        uint16_t firstItemid = 0,
+        uint8_t firstItemTier = 0,
+        uint16_t secondItemId = 0,
+        bool improveChance = false,
+        bool tierLoss = false,
+        uint16_t firstItemResourceId = 0,
+        uint16_t secondItemResourceId = 0
+    );
     void sendForgeBrowseHistoryRequest(uint16_t page);
 
     // imbuing related
@@ -394,9 +403,9 @@ public:
     void enableTileThingLuaCallback(const bool value) { m_tileThingsLuaCallback = value; }
     bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
 
-    void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
+    void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos, uint16_t resourceId = 0);
 
-    void stashStowItem(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action);
+    void stashStowItem(const Position& position, const uint16_t itemId, const uint32_t count, const uint8_t stackpos, const uint8_t action, const uint16_t resourceId = 0);
 
     // highscore related
     void requestHighscore(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
@@ -411,13 +420,13 @@ public:
     // quickLoot related
     void sendQuickLoot(const uint8_t variant, const ItemPtr& item);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
-    void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
+    void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback, uint16_t resourceId = 0);
 
     void sendGmTeleport(const Position& pos);
 
     // cyclopedia related
     void inspectionNormalObject(const Position& position);
-    void inspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
+    void inspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount, uint16_t resourceId = 0);
     void requestBestiary();
     void requestBestiaryOverview(std::string_view catName, bool search = false, std::vector<uint16_t> raceIds = {});
     void requestBestiarySearch(uint16_t raceId);

@@ -230,7 +230,7 @@ int Thing::getNumPatternZ() const {
 }
 int Thing::getAnimationPhases() const {
     if (const auto t = getThingType(); t)
-        return t->getAnimationPhases();
+        return t->getAnimationPhase();
     return 0;
 }
 int Thing::getGroundSpeed() const {
@@ -543,7 +543,7 @@ bool Thing::hasExpireStop() const {
 }
 bool Thing::hasAnimationPhases() const {
     if (const auto t = getThingType(); t)
-        return t->getAnimationPhases() > 1;
+        return t->getAnimationPhase() > 1;
     return false;
 }
 bool Thing::isDecoKit() const {

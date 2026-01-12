@@ -397,7 +397,7 @@ return {
     asyncTxtLoading                   = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
-            if g_game.isUsingProtobuf() then
+            if true then --g_game.isUsingProtobuf() then -- deprecated
                 value = true
             elseif g_app.isEncrypted() then
                 local asyncWidget = panels.graphicsPanel:recursiveGetChildById('asyncTxtLoading')

@@ -36,7 +36,7 @@ AttachedEffectPtr AttachedEffectManager::getById(const uint16_t id) {
     }
 
     const auto& obj = it->second;
-    if (obj->m_thingId > 0 && !g_things.isValidDatId(obj->m_thingId, obj->m_thingCategory)) {
+    if (obj->m_thingId > 0 && !g_things.isValidDatId(obj->m_thingId, obj->m_thingCategory, obj->m_resourceId)) {
         g_logger.error("AttachedEffectManager::getById({}): invalid thing with id {}.", id, obj->m_thingId);
         return nullptr;
     }
@@ -44,7 +44,7 @@ AttachedEffectPtr AttachedEffectManager::getById(const uint16_t id) {
     return obj->clone();
 }
 
-AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std::string_view name, const uint16_t thingId, const ThingCategory category) {
+AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std::string_view name, const uint16_t thingId, const ThingCategory category, const uint16_t resourceId) {
     const auto it = m_effects.find(id);
     if (it != m_effects.end()) {
         g_logger.error("AttachedEffectManager::registerByThing({}, {}): has already been registered.", id, name);
@@ -54,6 +54,7 @@ AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std:
     const auto& obj = std::make_shared<AttachedEffect>();
     obj->m_id = id;
     obj->m_thingId = thingId;
+    obj->m_resourceId = resourceId;
     obj->m_thingCategory = category;
 
     obj->m_name = { name.data() };

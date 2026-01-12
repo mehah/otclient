@@ -31,7 +31,7 @@ public:
     UIEffect();
     void drawSelf(DrawPoolType drawPane) override;
 
-    void setEffectId(int id);
+    void setEffectId(int id, uint16_t resourceId = 0);
     void setEffectVisible(const bool visible) { m_effectVisible = visible; }
     void setEffect(const EffectPtr& effect);
     void setVirtual(const bool virt) { m_virtual = virt; }

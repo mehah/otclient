@@ -39,10 +39,10 @@ public:
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
     bool isThing() override { return true; }
 
-    virtual void setId(uint32_t /*id*/) {}
     virtual void setPosition(const Position& position, uint8_t stackPos = 0);
 
     virtual uint32_t getId() { return m_clientId; }
+    virtual uint16_t getResourceId() { return m_resourceId; }
     uint16_t getClientId() const { return m_clientId; }
 
     virtual Position getPosition() { return m_position; }
@@ -185,7 +185,7 @@ public:
     bool isHighlighted() { return m_highlightColor != Color::white; }
     void setHighlight(const Color& color) { if (m_highlightColor != color) m_highlightColor = color; }
 
-    bool isHided() { return isOwnerHidden(); }
+    bool isHidden() { return isOwnerHidden(); }
 
     uint8_t getPatternX()const { return m_numPatternX; }
     uint8_t getPatternY()const { return m_numPatternY; }
@@ -226,6 +226,7 @@ protected:
     Position m_position;
 
     uint16_t m_clientId{ 0 };
+    uint16_t m_resourceId{ 0 };
 
     int8_t m_stackPos{ -1 };
     uint8_t m_numPatternX{ 0 };

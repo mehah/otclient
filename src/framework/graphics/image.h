@@ -71,6 +71,7 @@ public:
     uint8_t* getPixel(const int x, const int y) { return &m_pixels[static_cast<size_t>(y * m_size.width() + x) * m_bpp]; }
 
     bool hasTransparentPixel() const { return m_transparentPixel; }
+    void checkTransparentPixels();
     void setTransparentPixel(const bool value) { m_transparentPixel = value; }
 
 private:

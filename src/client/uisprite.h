@@ -29,7 +29,7 @@ class UISprite final : public UIWidget
 public:
     void drawSelf(DrawPoolType drawPane) override;
 
-    void setSpriteId(int id);
+    void setSpriteId(int id, uint16_t resourceId = 0);
     int getSpriteId() { return m_spriteId; }
     void clearSprite() { setSpriteId(0); }
 
@@ -45,6 +45,7 @@ protected:
 
     TexturePtr m_sprite;
     uint16_t m_spriteId{ 0 };
+    uint16_t m_resourceId{ 0 };
     Color m_spriteColor{ Color::white };
 
     bool m_spriteVisible{ true };

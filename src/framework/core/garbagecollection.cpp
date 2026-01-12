@@ -23,7 +23,6 @@
 #include "garbagecollection.h"
 
 #include "client/const.h"
-#include "client/thingtype.h"
 #include "client/thingtypemanager.h"
 #include "framework/graphics/declarations.h"
 #include "framework/graphics/texture.h"
@@ -66,29 +65,74 @@ void GarbageCollection::texture() {
 }
 
 void GarbageCollection::thingType() {
-    static constexpr uint16_t
-        IDLE_TIME = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
-        AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
+    static constexpr uint16_t AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
 
-    static uint8_t category{ ThingLastCategory };
-    static size_t index = 0;
+    static uint8_t category{ 0 };
 
-    if (category == ThingLastCategory)
-        category = ThingCategoryItem;
+    static size_t thingId = 0;
+    static size_t resourceId = 0;
+    size_t scanned = 0;
 
-    const auto& thingTypes = g_things.m_thingTypes[category];
-    const size_t limit = std::min<size_t>(index + AMOUNT_PER_CHECK, thingTypes.size());
-
-    while (index < limit) {
-        auto& thing = thingTypes[index];
-        if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME) {
-            thing->unload();
+    while (scanned < AMOUNT_PER_CHECK) {
+        // no more resources to scan
+        // wrap around and finish
+        if (resourceId >= g_things.getResourcesCount()) {
+            resourceId = 0;
+            category = ThingCategoryItem;
+            thingId = 0;
+            break;
         }
-        ++index;
-    }
 
-    if (limit == thingTypes.size()) {
-        index = 0;
-        ++category;
+        // get resource by id
+        auto res = g_things.getResourceById(resourceId);
+        if (!res) {
+            // no resource found
+            // move to the next resource
+            ++resourceId;
+            category = ThingCategoryItem;
+            thingId = 0;
+            continue;
+        }
+
+        // this is unlikely to happen
+        // but it stops sonar from flagging this function as a "blocker"
+        if (category >= res->m_thingTypes->size()) {
+            throw std::out_of_range("GarbageCollection: resource category is out of range");
+        }
+
+        auto& things = res->m_thingTypes[category];
+        if (things.empty()) {
+            ++category;
+            thingId = 0;
+            if (category == ThingLastCategory) {
+                category = ThingCategoryItem;
+                ++resourceId;
+            }
+            continue;
+        }
+
+        processThingsInCategory(things, thingId, scanned, AMOUNT_PER_CHECK);
+
+        if (thingId == things.size() - 1) {
+            thingId = 0;
+            ++category;
+            if (category == ThingLastCategory) {
+                category = ThingCategoryItem;
+                ++resourceId;
+            }
+        }
+    }
+}
+
+void GarbageCollection::processThingsInCategory(ThingTypeList& things, size_t& thingId, size_t& scanned, size_t maxAmount) {
+    static constexpr uint16_t IDLE_TIME = 60 * 1000; // Maximum time it can be idle, default 60 seconds.
+
+    const size_t limit = std::min(thingId + (maxAmount - scanned), things.size() - 1);
+    for (; thingId < limit; ++thingId, ++scanned) {
+        const auto& thing = things[thingId];
+        if (!thing) continue;
+
+        if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME)
+            thing->unload();
     }
 }

@@ -566,6 +566,7 @@ struct OutfitColorStruct
 struct CharacterInfoOutfits
 {
     uint16_t lookType;
+    uint16_t resourceId;
     std::string name;
     uint8_t addons;
     uint8_t type;
@@ -575,6 +576,7 @@ struct CharacterInfoOutfits
 struct CharacterInfoMounts
 {
     uint16_t mountId;
+    uint16_t resourceId;
     std::string name;
     uint8_t type;
     uint32_t isCurrent;
@@ -583,6 +585,7 @@ struct CharacterInfoMounts
 struct CharacterInfoFamiliar
 {
     uint16_t lookType;
+    uint16_t resourceId;
     std::string name;
     uint8_t type;
     uint32_t isCurrent;
@@ -591,6 +594,7 @@ struct CharacterInfoFamiliar
 struct DailyRewardItem
 {
     uint16_t itemId;
+    uint16_t resourceId;
     std::string name;
     uint32_t weight;
 };
@@ -599,6 +603,7 @@ struct DailyRewardBundle
 {
     uint8_t bundleType;
     uint16_t itemId;
+    uint16_t resourceId;
     std::string name;
     uint8_t count;
 };
@@ -744,6 +749,7 @@ struct CyclopediaCharacterMiscStats
 struct ForgeItemInfo
 {
     uint16_t id{ 0 };
+    uint16_t resourceId{ 0 };
     uint8_t tier{ 0 };
     uint16_t count{ 0 };
 };
@@ -778,8 +784,10 @@ struct ForgeResultData
     bool convergence{ false };
     bool success{ false };
     uint16_t leftItemId{ 0 };
+    uint16_t leftItemResourceId{ 0 };
     uint8_t leftTier{ 0 };
     uint16_t rightItemId{ 0 };
+    uint16_t rightItemResourceId{ 0 };
     uint8_t rightTier{ 0 };
     uint8_t bonus{ 0 };
     uint8_t coreCount{ 0 };

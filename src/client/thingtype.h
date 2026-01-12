@@ -37,8 +37,8 @@ using namespace otclient::protobuf;
 class ThingType final : public LuaObject
 {
 public:
-    void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
-    void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
+    void unserializeAppearance(uint16_t clientId, uint16_t resourceId, ProtobufSpriteManagerPtr spriteManager, ThingCategory category, const appearances::Appearance& appearance);
+    void unserialize(uint16_t clientId, uint16_t resourceId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
     void applyAppearanceFlags(const appearances::AppearanceFlags& flags);
 
@@ -52,6 +52,7 @@ public:
     void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color);
 
     uint16_t getId() { return m_id; }
+    uint16_t getResourceId() { return m_resourceId; }
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }
     bool hasAttr(const ThingAttr attr) { return (m_flags & thingAttrToThingFlagAttr(attr)); }
@@ -64,7 +65,7 @@ public:
     int getNumPatternX() { return m_numPatternX; }
     int getNumPatternY() { return m_numPatternY; }
     int getNumPatternZ() { return m_numPatternZ; }
-    int getAnimationPhases();
+    int getAnimationPhase() const;
     Animator* getAnimator() const { return m_animator; }
     Animator* getIdleAnimator() const { return m_idleAnimator; }
 
@@ -93,56 +94,56 @@ public:
     bool isTall(bool useRealSize = false);
     bool isSingleDimension() { return m_size.area() == 1; }
 
-    bool isGround() { return (m_flags & ThingFlagAttrGround); }
-    bool isGroundBorder() { return (m_flags & ThingFlagAttrGroundBorder); }
-    bool isOnBottom() { return (m_flags & ThingFlagAttrOnBottom); }
-    bool isOnTop() { return (m_flags & ThingFlagAttrOnTop); }
+    bool isGround() const { return (m_flags & ThingFlagAttrGround); }
+    bool isGroundBorder() const { return (m_flags & ThingFlagAttrGroundBorder); }
+    bool isOnBottom() const { return (m_flags & ThingFlagAttrOnBottom); }
+    bool isOnTop() const { return (m_flags & ThingFlagAttrOnTop); }
     bool isContainer() const { return (m_flags & ThingFlagAttrContainer); }
-    bool isStackable() { return (m_flags & ThingFlagAttrStackable); }
-    bool isForceUse() { return (m_flags & ThingFlagAttrForceUse); }
-    bool isMultiUse() { return (m_flags & ThingFlagAttrMultiUse); }
-    bool isWritable() { return (m_flags & ThingFlagAttrWritable); }
-    bool isChargeable() { return (m_flags & ThingFlagAttrChargeable); }
-    bool isWritableOnce() { return (m_flags & ThingFlagAttrWritableOnce); }
-    bool isFluidContainer() { return (m_flags & ThingFlagAttrFluidContainer); }
-    bool isSplash() { return (m_flags & ThingFlagAttrSplash); }
-    bool isNotWalkable() { return (m_flags & ThingFlagAttrNotWalkable); }
-    bool isNotMoveable() { return (m_flags & ThingFlagAttrNotMoveable); }
-    bool blockProjectile() { return (m_flags & ThingFlagAttrBlockProjectile); }
-    bool isNotPathable() { return (m_flags & ThingFlagAttrNotPathable); }
-    bool isPickupable() { return (m_flags & ThingFlagAttrPickupable); }
-    bool isHangable() { return (m_flags & ThingFlagAttrHangable); }
-    bool isHookSouth() { return (m_flags & ThingFlagAttrHookSouth); }
-    bool isHookEast() { return (m_flags & ThingFlagAttrHookEast); }
-    bool isRotateable() { return (m_flags & ThingFlagAttrRotateable); }
-    bool hasLight() { return (m_flags & ThingFlagAttrLight); }
-    bool isDontHide() { return (m_flags & ThingFlagAttrDontHide); }
-    bool isTranslucent() { return (m_flags & ThingFlagAttrTranslucent); }
-    bool hasDisplacement() { return (m_flags & ThingFlagAttrDisplacement); }
-    bool hasElevation() { return (m_flags & ThingFlagAttrElevation); }
+    bool isStackable() const { return (m_flags & ThingFlagAttrStackable); }
+    bool isForceUse() const { return (m_flags & ThingFlagAttrForceUse); }
+    bool isMultiUse() const { return (m_flags & ThingFlagAttrMultiUse); }
+    bool isWritable() const { return (m_flags & ThingFlagAttrWritable); }
+    bool isChargeable() const { return (m_flags & ThingFlagAttrChargeable); }
+    bool isWritableOnce() const { return (m_flags & ThingFlagAttrWritableOnce); }
+    bool isFluidContainer() const { return (m_flags & ThingFlagAttrFluidContainer); }
+    bool isSplash() const { return (m_flags & ThingFlagAttrSplash); }
+    bool isNotWalkable() const { return (m_flags & ThingFlagAttrNotWalkable); }
+    bool isNotMoveable() const { return (m_flags & ThingFlagAttrNotMoveable); }
+    bool blockProjectile() const { return (m_flags & ThingFlagAttrBlockProjectile); }
+    bool isNotPathable() const { return (m_flags & ThingFlagAttrNotPathable); }
+    bool isPickupable() const { return (m_flags & ThingFlagAttrPickupable); }
+    bool isHangable() const { return (m_flags & ThingFlagAttrHangable); }
+    bool isHookSouth() const { return (m_flags & ThingFlagAttrHookSouth); }
+    bool isHookEast() const { return (m_flags & ThingFlagAttrHookEast); }
+    bool isRotateable() const { return (m_flags & ThingFlagAttrRotateable); }
+    bool hasLight() const { return (m_flags & ThingFlagAttrLight); }
+    bool isDontHide() const { return (m_flags & ThingFlagAttrDontHide); }
+    bool isTranslucent() const { return (m_flags & ThingFlagAttrTranslucent); }
+    bool hasDisplacement() const { return (m_flags & ThingFlagAttrDisplacement); }
+    bool hasElevation() const { return (m_flags & ThingFlagAttrElevation); }
     bool hasFloorChange() const { return (m_flags & ThingFlagAttrFloorChange); }
-    bool isLyingCorpse() { return (m_flags & ThingFlagAttrLyingCorpse); }
-    bool isAnimateAlways() { return (m_flags & ThingFlagAttrAnimateAlways); }
-    bool hasMiniMapColor() { return (m_flags & ThingFlagAttrMinimapColor); }
-    bool hasLensHelp() { return (m_flags & ThingFlagAttrLensHelp); }
-    bool isFullGround() { return (m_flags & ThingFlagAttrFullGround); }
-    bool isIgnoreLook() { return (m_flags & ThingFlagAttrLook); }
-    bool isCloth() { return (m_flags & ThingFlagAttrCloth); }
-    bool isMarketable() { return (m_flags & ThingFlagAttrMarket); }
-    bool isUsable() { return (m_flags & ThingFlagAttrUsable); }
-    bool isWrapable() { return (m_flags & ThingFlagAttrWrapable); }
-    bool isUnwrapable() { return (m_flags & ThingFlagAttrUnwrapable); }
-    bool hasWearOut() { return (m_flags & ThingFlagAttrWearOut); }
-    bool hasClockExpire() { return (m_flags & ThingFlagAttrClockExpire); }
-    bool hasExpire() { return (m_flags & ThingFlagAttrExpire); }
-    bool hasExpireStop() { return (m_flags & ThingFlagAttrExpireStop); }
-    bool isPodium() { return (m_flags & ThingFlagAttrPodium); }
-    bool isTopEffect() { return (m_flags & ThingFlagAttrTopEffect); }
-    bool hasAction() { return (m_flags & ThingFlagAttrDefaultAction); }
-    bool isOpaque() { return m_opaque == 1; }
-    bool isDecoKit() { return (m_flags & ThingFlagAttrDecoKit); }
+    bool isLyingCorpse() const { return (m_flags & ThingFlagAttrLyingCorpse); }
+    bool isAnimateAlways() const { return (m_flags & ThingFlagAttrAnimateAlways); }
+    bool hasMiniMapColor() const { return (m_flags & ThingFlagAttrMinimapColor); }
+    bool hasLensHelp() const { return (m_flags & ThingFlagAttrLensHelp); }
+    bool isFullGround() const { return (m_flags & ThingFlagAttrFullGround); }
+    bool isIgnoreLook() const { return (m_flags & ThingFlagAttrLook); }
+    bool isCloth() const { return (m_flags & ThingFlagAttrCloth); }
+    bool isMarketable() const { return (m_flags & ThingFlagAttrMarket); }
+    bool isUsable() const { return (m_flags & ThingFlagAttrUsable); }
+    bool isWrapable() const { return (m_flags & ThingFlagAttrWrapable); }
+    bool isUnwrapable() const { return (m_flags & ThingFlagAttrUnwrapable); }
+    bool hasWearOut() const { return (m_flags & ThingFlagAttrWearOut); }
+    bool hasClockExpire() const { return (m_flags & ThingFlagAttrClockExpire); }
+    bool hasExpire() const { return (m_flags & ThingFlagAttrExpire); }
+    bool hasExpireStop() const { return (m_flags & ThingFlagAttrExpireStop); }
+    bool isPodium() const { return (m_flags & ThingFlagAttrPodium); }
+    bool isTopEffect() const { return (m_flags & ThingFlagAttrTopEffect); }
+    bool hasAction() const { return (m_flags & ThingFlagAttrDefaultAction); }
+    bool isOpaque() const { return m_opaque == 1; }
+    bool isDecoKit() const { return (m_flags & ThingFlagAttrDecoKit); }
     bool isLoading() const { return m_loading.load(std::memory_order_acquire); }
-    bool isAmmo() { return (m_flags & ThingFlagAttrAmmo); }
+    bool isAmmo() const { return (m_flags & ThingFlagAttrAmmo); }
 
     bool isItem() const { return m_category == ThingCategoryItem; }
     bool isEffect() const { return m_category == ThingCategoryEffect; }
@@ -175,6 +176,16 @@ public:
 private:
     static ThingFlagAttr thingAttrToThingFlagAttr(ThingAttr attr);
     static Size getBestTextureDimension(int w, int h, int count);
+    static void translateFlagId(const int version, int& flagId);
+    static void translateFlagId740(int& flagId);
+    static void translateFlagId755(int& flagId);
+    static void translateFlagId780(int& flagId);
+    static void translateFlagId1000(int& flagId);
+    void unserializeAttribute(int attr, const FileStreamPtr& fin);
+    void unserializeSpriteInfo(const FileStreamPtr& fin);
+    void unserializeFrameGroup(const FileStreamPtr& fin, const bool hasFrameGroups, std::vector<Size>& sizes, std::vector<int>& total_sprites, int& totalSpritesCount);
+    void adjustSpriteSizes(const std::vector<Size>& sizes, const std::vector<int>& total_sprites);
+    void adjustSpriteFrame(const std::vector<Size>& sizes, const std::vector<uint32_t>& sprites, const size_t frameId, size_t& spriteIndex);
 
     void loadTexture(int animationPhase);
 
@@ -220,6 +231,7 @@ private:
     PLAYER_ACTION m_defaultAction{ 0 };
 
     uint16_t m_id{ 0 };
+    uint16_t m_resourceId{ 0 };
     uint16_t m_groundSpeed{ 0 };
     uint16_t m_maxTextLength{ 0 };
     uint16_t m_upgradeClassification{ 0 };

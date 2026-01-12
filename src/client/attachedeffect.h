@@ -29,7 +29,7 @@
 class AttachedEffect final : public LuaObject
 {
 public:
-    static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
+    static AttachedEffectPtr create(const uint16_t thingId, const ThingCategory category, const uint16_t resourceId = 0);
 
     void draw(const Point& /*dest*/, bool /*isOnTop*/, LightView* = nullptr, bool drawThing = true);
     void drawLight(const Point& /*dest*/, LightView*);
@@ -47,7 +47,7 @@ public:
     Size getSize() { return m_size; }
     void setSize(const Size& s) { m_size = s; }
 
-    bool isHidedOwner() { return m_hideOwner; }
+    bool isOwnerHidden() { return m_hideOwner; }
     void setHideOwner(const bool v) { m_hideOwner = v; }
 
     bool isTransform() { return m_transform; }
@@ -122,7 +122,7 @@ private:
     uint8_t m_lastAnimation{ 0 };
     DrawOrder m_drawOrder{ THIRD };
 
-    uint16_t m_id{ 0 };
+    uint16_t m_id{ 0 }; // slot number
     uint16_t m_duration{ 0 };
 
     uint32_t m_frame{ 0 };
@@ -138,7 +138,8 @@ private:
     Outfit m_outfitOwner;
     Light m_light;
 
-    uint16_t m_thingId{ 0 };
+    uint16_t m_thingId{ 0 }; // effect clientId
+    uint16_t m_resourceId{ 0 }; // effect resourceId
     ThingCategory m_thingCategory{ ThingInvalidCategory };
 
     Size m_size;

@@ -35,7 +35,7 @@
 
 void Effect::draw(const Point& dest, const bool drawThings, LightView* lightView)
 {
-    if (!canDraw() || isHided())
+    if (!canDraw() || isHidden())
         return;
 
     // It only starts to draw when the first effect as it is about to end.
@@ -132,9 +132,9 @@ bool Effect::waitFor(const EffectPtr& effect)
     return true;
 }
 
-void Effect::setId(const uint32_t id)
+void Effect::setId(const uint32_t id, const uint16_t resourceId)
 {
-    if (!g_things.isValidDatId(id, ThingCategoryEffect))
+    if (!g_things.isValidDatId(id, ThingCategoryEffect, resourceId))
         return;
 
     m_clientId = id;
@@ -158,5 +158,5 @@ void Effect::setPosition(const Position& position, const uint8_t stackPos)
 }
 
 ThingType* Effect::getThingType() const {
-    return g_things.getRawThingType(m_clientId, ThingCategoryEffect);
+    return g_things.getRawThingType(m_clientId, ThingCategoryEffect, m_resourceId);
 }

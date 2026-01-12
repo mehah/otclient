@@ -114,8 +114,8 @@ int Paperdoll::getCurrentAnimationPhase()
         return animator->getPhaseAt(m_animationTimer, getSpeed());
 
     if (m_thingType->isCreature() && m_thingType->isAnimateAlways()) {
-        const int ticksPerFrame = std::round(1000 / m_thingType->getAnimationPhases()) / getSpeed();
-        return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * m_thingType->getAnimationPhases())) / ticksPerFrame;
+        const int ticksPerFrame = std::round(1000 / m_thingType->getAnimationPhase()) / getSpeed();
+        return (g_clock.millis() % (static_cast<long long>(ticksPerFrame) * m_thingType->getAnimationPhase())) / ticksPerFrame;
     }
 
     return 0;

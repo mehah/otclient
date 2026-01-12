@@ -98,10 +98,11 @@ public:
     uint8_t getFeetColor() { return m_feet; }
 
     void setColorByOutfit(const Outfit& outfit) {
-        m_head = outfit.getHead();
-        m_body = outfit.getBody();
-        m_legs = outfit.getLegs();
-        m_feet = outfit.getFeet();
+        const auto colors = outfit.getBaseOutfit();
+        m_head = colors.head;
+        m_body = colors.body;
+        m_legs = colors.legs;
+        m_feet = colors.feet;
     }
 
     void reset();
@@ -122,6 +123,7 @@ private:
     uint8_t m_opacity{ 100 };
     uint16_t m_id{ 0 };
     uint16_t m_thingId{ 0 };
+    uint16_t m_thingResourceId{ 0 };
     uint32_t m_addons{ 0 };
 
     Timer m_timer;

@@ -21,7 +21,7 @@
  */
 
 #include "uisprite.h"
-#include <client/spritemanager.h>
+#include <client/thingtypemanager.h>
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/otml/otmlnode.h"
 
@@ -48,9 +48,9 @@ void UISprite::drawSelf(const DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UISprite::setSpriteId(const int id)
+void UISprite::setSpriteId(const int id, const uint16_t resourceId)
 {
-    if (!g_sprites.isLoaded())
+    if (!g_things.isSprLoaded(resourceId))
         return;
 
     m_spriteId = id;
@@ -60,7 +60,8 @@ void UISprite::setSpriteId(const int id)
     }
 
     m_sprite = nullptr;
-    if (const auto& image = g_sprites.getSpriteImage(id)) {
+    bool isLoading = false;
+    if (const auto& image = g_things.getSpriteImage(id, resourceId, isLoading)) {
         m_sprite = std::make_shared<Texture>(image);
         m_sprite->allowAtlasCache();
     }
@@ -70,12 +71,24 @@ void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
 {
     UIWidget::onStyleApply(styleName, styleNode);
 
+    uint16_t spriteId = 0;
+    uint16_t spriteResourceId = 0;
+    bool needUpdate = false;
+
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "sprite-id")
-            setSpriteId(node->value<int>());
-        else if (node->tag() == "sprite-visible")
+        const std::string tag = node->tag();
+        if (tag == "sprite-id") {
+            spriteId = node->value<int>();
+            needUpdate = true;
+        } else if (tag == "sprite-resource-id") {
+            spriteResourceId = node->value<int>();
+            needUpdate = true;
+        } else if (tag == "sprite-visible")
             setSpriteVisible(node->value<bool>());
-        else if (node->tag() == "sprite-color")
+        else if (tag == "sprite-color")
             setSpriteColor(node->value<Color>());
     }
+
+    if (needUpdate)
+        setSpriteId(spriteId, spriteResourceId);
 }
