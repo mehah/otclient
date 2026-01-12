@@ -252,7 +252,7 @@ https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e
 ---
 
 ### 🔗 Compatibility & Protocols
-- Client **12.85 ~ 12.92**, **13.00 ~ 15.11** support *(protobuf)*  
+- Client **7.6 ~ 12.85 ~ 12.92**, **13.00 ~ 15.11** support *(protobuf)*  
 - Market rewritten (compatible with TFS and Canary)  
 - Async Texture Loading *(engine-level feature)*  
 - Supports sequenced packages and compression  
@@ -566,12 +566,11 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 | TO-DO list | Status | PR |
 |---|---|---|
 | wheel of destiny | ![](https://geps.dev/progress/10) | [#1311](https://github.com/mehah/otclient/pull/1311) |
-| Forge | ![](https://geps.dev/progress/1) | None |
 | Sound tibia 13 | ![](https://geps.dev/progress/80) | [#1098](https://github.com/mehah/otclient/pull/1098) |
 | Prey and tasks | ![](https://geps.dev/progress/0) | None |
 | compendium | ![](https://geps.dev/progress/0) | None |
 | Party List | ![](https://geps.dev/progress/0) | None |
-
+https://github.com/mehah/otclient/issues/1582
 ---
 
 ## <a id="support-protocol"></a>💯 Support Protocol
