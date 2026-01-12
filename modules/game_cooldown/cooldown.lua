@@ -105,12 +105,18 @@ function online()
         return
     end
     local children = contentsPanel:getChildren()
-    local version = g_game.getClientVersion() >= 1100
-    for i = 9, #children - 2 do -- Groups Crippling to virtue
+    local oldProtocol = g_game.getClientVersion() > 1100
+    local monkFeature = g_game.getFeature(GameVocationMonk)
+    for i = 9, #children - 2 do -- hide group icons old protocol
         local widget = children[i]
         if widget then
-            widget:setVisible(version)
-            widget:setWidth(version and 22 or 0)
+            local id = widget:getId()
+            local visible = oldProtocol
+            if id and string.find(id, 'Virtue') then
+                visible = monkFeature
+            end
+            widget:setVisible(visible)
+            widget:setWidth(visible and 22 or 0)
         end
     end
 
