@@ -218,7 +218,7 @@ private:
     void parsePing(const InputMessagePtr& msg);
     void parsePingBack(const InputMessagePtr& msg);
     void parseLoginChallenge(const InputMessagePtr& msg);
-    void parseDeath(const InputMessagePtr& msg);
+    void parseDeathScreen(const InputMessagePtr& msg);
     void parseFloorDescription(const InputMessagePtr& msg);
     void parseMapDescription(const InputMessagePtr& msg);
     void parseCreatureTyping(const InputMessagePtr& msg);
@@ -393,7 +393,7 @@ public:
     int setTileDescription(const InputMessagePtr& msg, Position position);
     bool setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType);
 
-    Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true) const;
+    Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true, bool forceReadMountColors = false) const;
     ThingPtr getThing(const InputMessagePtr& msg);
     ThingPtr getMappedThing(const InputMessagePtr& msg) const;
     CreaturePtr getCreature(const InputMessagePtr& msg, int type = 0) const;
@@ -408,6 +408,10 @@ private:
     void getImbuingIngredients(const InputMessagePtr& msg, std::vector<Imbuement>& imbuements, std::vector<ItemPtr>& neededItemsList);
     void setExtendedCosmetics(const InputMessagePtr& msg, const CreaturePtr& creature) const;
     void setCreatureIcons(const InputMessagePtr& msg, const CreaturePtr& creature, const uint32_t creatureId, const bool known) const;
+    ForgeItemInfo getForgeItem(const InputMessagePtr& msg, const bool multiSpr, const bool skipTier = false);
+    void getForgeTransfers(const InputMessagePtr& msg, std::vector<ForgeTransferData>& transfers, const bool multiSpr);
+    void getBosstiarySlot(const InputMessagePtr& msg, bool& unlocked, uint32_t& bossId, std::optional<BosstiarySlot>& slot);
+    void simpleEvent1520(uint8_t eventId);
 
     bool m_enableSendExtendedOpcode{ false };
     bool m_gameInitialized{ false };

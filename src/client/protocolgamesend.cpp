@@ -1709,7 +1709,7 @@ void ProtocolGame::requestQuickLootBlackWhiteList(const uint8_t filter, const ui
     send(msg);
 }
 
-void ProtocolGame::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, uint16_t resourceId, const uint8_t stackpos, const bool useMainAsFallback)
+void ProtocolGame::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint16_t resourceId, const uint8_t stackpos, const bool useMainAsFallback)
 {
     const auto msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientLootContainer);

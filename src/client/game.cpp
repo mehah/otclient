@@ -470,9 +470,9 @@ void Game::processCloseTrade()
     g_lua.callGlobalField("g_game", "onCloseTrade");
 }
 
-void Game::processEditText(const uint32_t id, const uint32_t itemId, const uint16_t maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
+void Game::processEditText(const uint32_t id, const uint32_t itemId, const uint16_t resourceId, const uint16_t maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
 {
-    g_lua.callGlobalField("g_game", "onEditText", id, itemId, maxLength, text, writer, date);
+    g_lua.callGlobalField("g_game", "onEditText", id, itemId, maxLength, text, writer, date, resourceId);
 }
 
 void Game::processEditList(const uint32_t id, const uint8_t doorId, const std::string_view text)
