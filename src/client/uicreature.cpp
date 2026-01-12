@@ -82,6 +82,7 @@ Outfit UICreature::getOutfit() { if (!m_creature) setOutfit({}); return m_creatu
 void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
     ColorOutfit base;
+    bool needUpdateOutfit = false;
 
     auto outfit = getOutfit();
     for (const auto& node : styleNode->children()) {
@@ -93,24 +94,33 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
         } else if (tag == "outfit-id") {
             outfit.setCategory(ThingCategoryCreature);
             base.type = node->value<int>();
+            needUpdateOutfit = true;
         } else if (tag == "outfit-resource-id") {
             base.resourceId = node->value<int>();
+            needUpdateOutfit = true;
         } else if (tag == "outfit-head") {
             base.head = node->value<int>();
+            needUpdateOutfit = true;
         } else if (tag == "outfit-body") {
             base.body = node->value<int>();
+            needUpdateOutfit = true;
         } else if (tag == "outfit-legs") {
             base.legs = node->value<int>();
+            needUpdateOutfit = true;
         } else if (tag == "outfit-feet") {
             base.feet = node->value<int>();
+            needUpdateOutfit = true;
         } else if (tag == "outfit-direction") {
             m_direction = static_cast<Otc::Direction>(node->value<int>());
+            needUpdateOutfit = true;
         }
     }
 
-    base.applyColors();
-    outfit.applyOutfit(base);
-    setOutfit(outfit);
+    if (needUpdateOutfit) {
+        base.applyColors();
+        outfit.applyOutfit(base);
+        setOutfit(outfit);
+    }
 
     UIWidget::onStyleApply(styleName, styleNode);
 }

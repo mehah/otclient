@@ -85,14 +85,17 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
 {
     uint16_t missileId = 0;
     uint16_t missileResourceId = 0;
+    bool needUpdate = false;
 
     for (const auto& node : styleNode->children()) {
         const std::string tag = node->tag();
-        if (tag == "missile-id")
+        if (tag == "missile-id") {
             missileId = node->value<int>();
-        else if (tag == "missile-resource-id")
+            needUpdate = true;
+        } else if (tag == "missile-resource-id") {
             missileResourceId = node->value<int>();
-        else if (tag == "missile-visible")
+            needUpdate = true;
+        } else if (tag == "missile-visible")
             setMissileVisible(node->value<bool>());
         else if (tag == "virtual")
             setVirtual(node->value<bool>());
@@ -102,7 +105,8 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
             setDirection(static_cast<Otc::Direction>(node->value<int>()));
     }
 
-    setMissileId(missileId, missileResourceId);
+    if (needUpdate)
+        setMissileId(missileId, missileResourceId);
 
     UIWidget::onStyleApply(styleName, styleNode);
 }

@@ -73,18 +73,22 @@ void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
 
     uint16_t spriteId = 0;
     uint16_t spriteResourceId = 0;
+    bool needUpdate = false;
 
     for (const auto& node : styleNode->children()) {
         const std::string tag = node->tag();
-        if (tag == "sprite-id")
+        if (tag == "sprite-id") {
             spriteId = node->value<int>();
-        else if (tag == "sprite-resource-id")
+            needUpdate = true;
+        } else if (tag == "sprite-resource-id") {
             spriteResourceId = node->value<int>();
-        else if (tag == "sprite-visible")
+            needUpdate = true;
+        } else if (tag == "sprite-visible")
             setSpriteVisible(node->value<bool>());
         else if (tag == "sprite-color")
             setSpriteColor(node->value<Color>());
     }
 
-    setSpriteId(spriteId, spriteResourceId);
+    if (needUpdate)
+        setSpriteId(spriteId, spriteResourceId);
 }

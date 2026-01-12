@@ -118,14 +118,17 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
 {
     uint16_t itemId = 0;
     uint16_t resourceId = 0;
+    bool needUpdateItem = false;
 
     for (const auto& node : styleNode->children()) {
         const std::string tag = node->tag();
-        if (tag == "item-id")
+        if (tag == "item-id") {
             itemId = node->value<int>();
-        else if (tag == "item-resource-id")
+            needUpdateItem = true;
+        } else if (tag == "item-resource-id") {
             resourceId = node->value<int>();
-        else if (tag == "item-count")
+            needUpdateItem = true;
+        } else if (tag == "item-count")
             setItemCount(node->value<int>());
         else if (tag == "item-visible")
             setItemVisible(node->value<bool>());
@@ -137,7 +140,8 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
             m_alwaysShowCount = node->value<bool>();
     }
 
-    setItemId(itemId, resourceId);
+    if (needUpdateItem)
+        setItemId(itemId, resourceId);
 
     UIWidget::onStyleApply(styleName, styleNode);
 }

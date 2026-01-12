@@ -78,14 +78,17 @@ void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
 {
     uint16_t effectId = 0;
     uint16_t effectResourceId = 0;
+    bool needUpdate = false;
 
     for (const auto& node : styleNode->children()) {
         const std::string tag = node->tag();
-        if (tag == "effect-id")
+        if (tag == "effect-id") {
             effectId = node->value<int>();
-        else if (tag == "effect-resource-id")
+            needUpdate = true;
+        } else if (tag == "effect-resource-id") {
             effectResourceId = node->value<int>();
-        else if (tag == "effect-visible")
+            needUpdate = true;
+        } else if (tag == "effect-visible")
             setEffectVisible(node->value<bool>());
         else if (tag == "virtual")
             setVirtual(node->value<bool>());
@@ -93,7 +96,8 @@ void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
             m_showId = node->value<bool>();
     }
 
-    setEffectId(effectId, effectResourceId);
+    if (needUpdate)
+        setEffectId(effectId, effectResourceId);
 
     UIWidget::onStyleApply(styleName, styleNode);
 }
