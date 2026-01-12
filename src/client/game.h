@@ -119,7 +119,7 @@ protected:
     static void processCloseTrade();
 
     // edit text/list
-    static void processEditText(uint32_t id, uint32_t itemId, uint16_t maxLength, std::string_view text, std::string_view writer, std::string_view date);
+    static void processEditText(uint32_t id, uint32_t itemId, uint16_t resourceId, uint16_t maxLength, std::string_view text, std::string_view writer, std::string_view date);
     static void processEditList(uint32_t id, uint8_t doorId, std::string_view text);
 
     // questlog

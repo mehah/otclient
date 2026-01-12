@@ -4919,7 +4919,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 msg->getU32(); // timestamp - unlockedAt
 
                 // bool: isSecret
-                if (bool secret = msg->getU8(); secret > 0) {
+                if (uint8_t secret = msg->getU8(); secret > 0) {
                     msg->getString(); // achievement title
                     msg->getString(); // achievement description
                     msg->getU8(); // grade
@@ -5143,7 +5143,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
         {
             // based on protocol 13.20, the structure may differ in other versions
             const uint8_t inventorySize = msg->getU8();
-            for (int i = 0; i < inventorySize; ++i) {
+            for (int inventorySlot = 0; inventorySlot < inventorySize; ++inventorySlot) {
                 msg->getU8(); // slotId (CONST_SLOT_...)
                 msg->getString(); // item name
                 getItem(msg);
@@ -5153,7 +5153,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
                 // item information (key-value pairs)
                 const uint8_t inspectAttrCount = msg->getU8();
-                for (int attr; attr < inspectAttrCount; ++attr) {
+                for (int attr = 0; attr < inspectAttrCount; ++attr) {
                     msg->getString(); // key
                     msg->getString(); // value
                 }
@@ -5164,7 +5164,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             // player information (key-value pairs)
             const uint8_t inspectAttrCount = msg->getU8();
-            for (int attr; attr < inspectAttrCount; ++attr) {
+            for (int attr = 0; attr < inspectAttrCount; ++attr) {
                 msg->getString(); // key
                 msg->getString(); // value
             }
