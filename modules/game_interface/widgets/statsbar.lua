@@ -791,7 +791,7 @@ function StatsBar.terminate()
     disconnect(LocalPlayer, statsBarDeepInfo)
     disconnect(g_game, {
         onGameStart = StatsBar.OnGameStart,
-        OnGameEnd = StatsBar.OnGameEnd
+        onGameEnd = StatsBar.OnGameEnd
     })
 
     StatsBar.destroyAllBars()
