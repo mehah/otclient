@@ -570,7 +570,6 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 | Prey and tasks | ![](https://geps.dev/progress/0) | None |
 | compendium | ![](https://geps.dev/progress/0) | None |
 | Party List | ![](https://geps.dev/progress/0) | None |
-https://github.com/mehah/otclient/issues/1582
 ---
 
 ## <a id="support-protocol"></a>💯 Support Protocol
