@@ -297,6 +297,7 @@ struct StoreOffer
     uint16_t mountId;
     uint16_t itemId;
     uint16_t outfitId;
+    uint16_t resourceId;
     uint8_t outfitHead, outfitBody, outfitLegs, outfitFeet;
     uint8_t sex;
     uint16_t maleOutfitId, femaleOutfitId;
@@ -305,30 +306,6 @@ struct StoreOffer
     uint16_t popularityScore;
     uint32_t stateNewUntil;
     bool configurable;
-    uint16_t productsCapacity;
-};
-
-struct HomeOffer
-{
-    std::string name;
-    uint8_t unknownByte;
-    uint32_t id;
-    uint16_t unknownU16;
-    uint32_t price;
-    uint8_t coinType;
-    uint16_t disabledReasonIndex;
-    uint8_t unknownByte2;
-    uint8_t type;
-    std::string icon;
-    uint16_t mountClientId;
-    uint16_t itemType;
-    uint16_t sexId;
-    struct { uint8_t lookHead, lookBody, lookLegs, lookFeet; } outfit;
-    uint8_t tryOnType;
-    uint16_t collection;
-    uint16_t popularityScore;
-    uint32_t stateNewUntil;
-    uint8_t userConfiguration;
     uint16_t productsCapacity;
 };
 
@@ -345,7 +322,7 @@ struct StoreData
     std::string categoryName;
     uint32_t redirectId;
     std::vector<std::string> disableReasons;
-    std::vector<HomeOffer> homeOffers;
+    std::vector<StoreOffer> homeOffers;
     std::vector<StoreOffer> storeOffers;
     std::vector<Banner> banners;
     uint8_t bannerDelay;

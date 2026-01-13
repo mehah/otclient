@@ -799,7 +799,8 @@ void ProtocolGame::parseSetStoreDeepLink(const InputMessagePtr& msg)
             // 1 - xp boost
             msg->getU8();
             break;
-        case 2: // category request
+        case 2:
+            // category request
             msg->getString(); // primaryText
             msg->getString(); // secondaryText
             break;
@@ -896,23 +897,29 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
 
     for (auto i = 0; i < categoryCount; ++i) {
         StoreCategory category;
+
+        // category name
         category.name = msg->getString();
 
         if (g_game.getClientVersion() < 1291) {
             msg->getString();
         }
 
+        // category state (present but unused in 13.20)
+        // 0 - normal, 1 - new, 2 - sale, 3 - limited time offer
         if (g_game.getFeature(Otc::GameIngameStoreHighlights)) {
             category.state = msg->getU8();
         } else {
             category.state = 0;
         }
 
+        // category images
         const uint8_t iconCount = msg->getU8();
         for (auto j = 0; j < iconCount; ++j) {
             category.icons.push_back(msg->getString());
         }
 
+        // category parent
         category.parent = msg->getString();
         categories.push_back(category);
     }
@@ -950,20 +957,22 @@ void ProtocolGame::parseCoinBalance(const InputMessagePtr& msg) const
 {
     const bool update = static_cast<bool>(msg->getU8());
     if (update) {
-        // amount of coins that can be used to buy prodcuts
-        // in the ingame store
+        // TOTAL STORE COINS
+        // transferable + non-transferable amount (+ reserved?)
         const uint32_t coins = msg->getU32(); // coins
         m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_NORMAL, coins);
 
-        // amount of coins that can be sold in market
-        // or be transfered to another player
-        const uint32_t transferrableCoins = msg->getU32(); // transferableCoins
+        // TRANSFERABLE STORE COINS
+        // coins that can be passed to another player
+        const uint32_t transferrableCoins = msg->getU32();
         m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_TRANSFERRABLE, transferrableCoins);
 
         if (g_game.getClientVersion() >= 1281) {
+            // STORE COINS RESERVED FOR CHARACTER AUCTIONS
             const uint32_t auctionCoins = msg->getU32();
             m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_AUCTION, auctionCoins);
             if (g_game.getFeature(Otc::GameTournamentPackets)) {
+                // TOURNAMENT COINS
                 const uint32_t tournamentCoins = msg->getU32();
                 m_localPlayer->setResourceBalance(Otc::RESOURE_COIN_TOURNAMENT, tournamentCoins);
             }
@@ -998,13 +1007,12 @@ void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg) const
 {
+    msg->getU8(); // 0, 1 - success, other values - packet ignored
+
     if (g_game.getClientVersion() >= 1291) {
-        msg->getU8();
         const auto& purchaseStatus = msg->getString();
         g_lua.callGlobalField("g_game", "onParseStoreGetPurchaseStatus", purchaseStatus);
     } else {
-        msg->getU8(); // not used
-
         const auto& message = msg->getString();
         const uint32_t coins = msg->getU32();
         const uint32_t transferableCoins = msg->getU32();
@@ -1059,22 +1067,33 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 {
     if (g_game.getClientVersion() >= 1291) {
         StoreData storeData;
+
+        // current category
         storeData.categoryName = msg->getString();
+
+        // current offer id
         storeData.redirectId = msg->getU32();
 
-        msg->getU8(); //  -- sort by 0 - most popular, 1 - alphabetically, 2 - newest
+        // sort mode
+        // 0 - popular, 1 - alphabetically, 2 - newest
+        msg->getU8();
+
+        // middle section - dropdown menu available options
+        // (eg. bronze mounts, silver mounts, etc.)
         const uint8_t dropMenuShowAll = msg->getU8();
         for (auto i = 0; i < dropMenuShowAll; ++i) {
             const auto& menu = msg->getString();
             storeData.menuFilter.push_back(menu);
         }
 
-        // dropdown menu choice (eg. bronze mounts, silver mounts, etc)
+        // middle section - dropdown menu current choice
+        // (eg. bronze mounts, silver mounts, etc)
         msg->getString();
 
+        // full list of possible reasons why offers may be unavailable
+        // when the buy button is inactive, individual offers provide selected errors from this list
         if (g_game.getClientVersion() >= 1310) {
             const uint16_t disableReasonsSize = msg->getU16();
-
             for (auto i = 0; i < disableReasonsSize; ++i) {
                 const auto& reason = msg->getString();
                 storeData.disableReasons.push_back(reason);
@@ -1085,49 +1104,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
         const uint16_t offersCount = msg->getU16();
         if (storeData.categoryName == "Home") {
             for (auto i = 0; i < offersCount; ++i) {
-                HomeOffer offer;
-                offer.name = msg->getString();
-                offer.unknownByte = msg->getU8();
-                offer.id = msg->getU32();
-                offer.unknownU16 = msg->getU16();
-                offer.price = msg->getU32();
-                offer.coinType = msg->getU8();
-
-                const uint8_t hasDisabledReason = msg->getU8();
-                if (hasDisabledReason == 1) {
-                    msg->skipBytes(1);
-                    if (g_game.getClientVersion() >= 1300) {
-                        offer.disabledReasonIndex = msg->getU16();
-                    } else {
-                        msg->getString();
-                    }
-                }
-
-                offer.unknownByte2 = msg->getU8();
-                offer.type = msg->getU8();
-
-                if (offer.type == Otc::GameStoreInfoType_t::SHOW_NONE) {
-                    offer.icon = msg->getString();
-                } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
-                    offer.mountClientId = msg->getU16();
-                } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
-                    offer.itemType = msg->getU16();
-                } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
-                    offer.sexId = msg->getU16();
-                    offer.outfit.lookHead = msg->getU8();
-                    offer.outfit.lookBody = msg->getU8();
-                    offer.outfit.lookLegs = msg->getU8();
-                    offer.outfit.lookFeet = msg->getU8();
-                }
-
-                offer.tryOnType = msg->getU8();
-                offer.collection = msg->getU16();
-                offer.popularityScore = msg->getU16();
-                offer.stateNewUntil = msg->getU32();
-                offer.userConfiguration = msg->getU8();
-                offer.productsCapacity = msg->getU16();
-
-                storeData.homeOffers.push_back(offer);
+                storeData.homeOffers.push_back(getStoreOffer(msg));
             }
 
             const uint8_t bannerCount = msg->getU8();
@@ -1146,80 +1123,10 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 
             g_lua.callGlobalField("g_game", "onParseStoreCreateHome", storeData);
             return;
-        }
-
-        for (auto i = 0; i < offersCount; ++i) {
-            StoreOffer offer;
-            offer.name = msg->getString();
-
-            const uint8_t subOffersCount = msg->getU8();
-            for (auto j = 0; j < subOffersCount; ++j) {
-                SubOffer subOffer{};
-                subOffer.id = msg->getU32();
-                subOffer.count = msg->getU16();
-                subOffer.price = msg->getU32();
-                subOffer.coinType = msg->getU8();
-                subOffer.disabled = msg->getU8() == 1;
-                if (subOffer.disabled) {
-                    const uint8_t reason = msg->getU8();
-                    for (auto k = 0; k < reason; ++k) {
-                        if (g_game.getClientVersion() >= 1300) {
-                            subOffer.reasonIdDisable = msg->getU16();
-                        } else {
-                            msg->getString();
-                        }
-                    }
-                }
-                subOffer.state = msg->getU8();
-
-                if (subOffer.state == Otc::GameStoreInfoStatesType_t::STATE_SALE) {
-                    subOffer.validUntil = msg->getU32();
-                    subOffer.basePrice = msg->getU32();
-                }
-                offer.subOffers.push_back(subOffer);
+        } else {
+            for (auto i = 0; i < offersCount; ++i) {
+                storeData.storeOffers.push_back(getStoreOffer(msg));
             }
-
-            offer.type = msg->getU8();
-            if (offer.type == Otc::GameStoreInfoType_t::SHOW_NONE) {
-                offer.icon = msg->getString();
-            } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
-                offer.mountId = msg->getU16();
-            } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
-                offer.itemId = msg->getU16();
-            } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
-                offer.outfitId = msg->getU16();
-                offer.outfitHead = msg->getU8();
-                offer.outfitBody = msg->getU8();
-                offer.outfitLegs = msg->getU8();
-                offer.outfitFeet = msg->getU8();
-            } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_HIRELING) {
-                offer.sex = msg->getU8();
-                offer.maleOutfitId = msg->getU16();
-                offer.femaleOutfitId = msg->getU16();
-                offer.outfitHead = msg->getU8();
-                offer.outfitBody = msg->getU8();
-                offer.outfitLegs = msg->getU8();
-                offer.outfitFeet = msg->getU8();
-            }
-
-            offer.tryOnType = msg->getU8();
-
-            if (g_game.getClientVersion() <= 1310) {
-                auto test = msg->getString();
-            } else {
-                offer.collection = msg->getU16();
-            }
-
-            offer.popularityScore = msg->getU16();
-            offer.stateNewUntil = msg->getU32();
-            offer.configurable = msg->getU8() == 1;
-            offer.productsCapacity = msg->getU16();
-            for (auto j = 0; j < offer.productsCapacity; ++j) {
-                msg->getString();
-                msg->getU8(); // info in description?
-                msg->getU16();
-            }
-            storeData.storeOffers.push_back(offer);
         }
 
         if (storeData.categoryName == "Search") {
@@ -6862,6 +6769,154 @@ void ProtocolGame::getBosstiarySlot(const InputMessagePtr& msg, bool& unlocked, 
     slot.bossRaceRepeat = msg->getU8();
     slot.removePrice = msg->getU32();
     slot.inactive = msg->getU8();
+}
+
+StoreOffer ProtocolGame::getStoreOffer(const InputMessagePtr& msg)
+{
+    StoreOffer offer;
+
+    // offer name
+    offer.name = msg->getString();
+
+    // offer variants
+    // example use case: 1 potion -> 5 tc, 5 potions -> 25tc
+    const uint8_t subOffersCount = msg->getU8();
+    for (auto j = 0; j < subOffersCount; ++j) {
+        offer.subOffers.push_back(getStoreSubOffer(msg));
+    }
+
+    // picture of the offer (image, item, outfit)
+    getStoreOfferImage(msg, offer);
+
+    // try on mode
+    // 0 - unavailable, 1 - mount, 2 - outfit
+    offer.tryOnType = msg->getU8();
+
+    // parent name (menu or dropdown menu)
+    // to do: offer.collection as a string
+    msg->getString();
+
+    offer.popularityScore = msg->getU16();
+    offer.stateNewUntil = msg->getU32(); // published at
+    offer.configurable = msg->getU8() != 0; // show "configure" button instead of "buy"
+
+    // bundle size (eg. furniture set, beds)
+    offer.productsCapacity = msg->getU16();
+    for (auto j = 0; j < offer.productsCapacity; ++j) {
+        getStorePackageItem(msg);
+    }
+
+    return offer;
+}
+
+void ProtocolGame::getStoreOfferImage(const InputMessagePtr& msg, StoreOffer& offer)
+{
+    //offer type - default (image), mount, outfit, item, hireling
+    offer.type = msg->getU8();
+    if (offer.type == Otc::GameStoreInfoType_t::SHOW_NONE) {
+        offer.icon = msg->getString(); // offer image
+    } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
+        offer.mountId = msg->getU16();
+        offer.resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+    } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
+        offer.itemId = msg->getU16();
+        offer.resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+    } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
+        offer.outfitId = msg->getU16();
+        offer.resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+        offer.outfitHead = msg->getU8();
+        offer.outfitBody = msg->getU8();
+        offer.outfitLegs = msg->getU8();
+        offer.outfitFeet = msg->getU8();
+    } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_HIRELING) {
+        offer.sex = msg->getU8(); // current selection - 1 - male, 2 - female
+        offer.maleOutfitId = msg->getU16();
+        offer.femaleOutfitId = msg->getU16();
+        offer.resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
+        offer.outfitHead = msg->getU8();
+        offer.outfitBody = msg->getU8();
+        offer.outfitLegs = msg->getU8();
+        offer.outfitFeet = msg->getU8();
+    } else {
+        // 13.20: vanilla client falls back to reading a string when invalid enum is provided
+        offer.icon = msg->getString(); // offer image
+    }
+}
+
+SubOffer ProtocolGame::getStoreSubOffer(const InputMessagePtr& msg)
+{
+    SubOffer subOffer{};
+    subOffer.id = msg->getU32();
+    subOffer.count = msg->getU16();
+    subOffer.price = msg->getU32();
+    subOffer.coinType = msg->getU8();
+
+    // offer error codes
+    // the list of codes is sent in ProtocolGame::parseStoreOffers
+    subOffer.disabled = msg->getU8() != 0;
+    if (subOffer.disabled) {
+        const uint8_t reasonCount = msg->getU8();
+        for (auto reason = 0; reason < reasonCount; ++reason) {
+            if (g_game.getClientVersion() >= 1300) {
+                subOffer.reasonIdDisable = msg->getU16();
+            } else {
+                msg->getString();
+            }
+        }
+    }
+
+    // 0 - normal, 1 - new, 2 - discount, 3 - limited time offer
+    subOffer.state = msg->getU8();
+    if (subOffer.state == Otc::GameStoreInfoStatesType_t::STATE_SALE) {
+        subOffer.validUntil = msg->getU32(); // valid until - unix timestamp in seconds
+        subOffer.basePrice = msg->getU32(); // price before discount (must be higher than subOffer.price)
+    }
+
+    return subOffer;
+}
+
+void ProtocolGame::getStorePackageItem(const InputMessagePtr& msg)
+{
+    msg->getString(); // bundle item name
+
+    // bundle item image
+    const uint8_t offerType = msg->getU8(); // offer type
+    switch (offerType) {
+        case 0:
+            // web image
+            msg->getString(); // offer image
+            break;
+        case 1:
+        case 3:
+            // item
+            msg->getU16(); // item clientId
+            g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0; // resourceId
+            break;
+        case 2:
+            // full outfit
+            msg->getU16(); // lookType
+            g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0; // resourceId
+            msg->getU8(); // head
+            msg->getU8(); // body
+            msg->getU8(); // legs
+            msg->getU8(); // feet
+            break;
+        case 4:
+            // full outfit (hireling-style packet)
+            msg->getU8(); // supported enums: 1 - male, 2 - female
+            msg->getU16(); // male outfit id
+            msg->getU16(); // female outfit id
+            g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0; // resourceId
+            msg->getU8(); // head
+            msg->getU8(); // body
+            msg->getU8(); // legs
+            msg->getU8(); // feet
+            break;
+        default:
+            // vanilla client throws invalid enum
+            g_logger.warning("gamestore: invalid offer package item image type {}", static_cast<int>(offerType));
+            break;
+    }
 }
 
 void ProtocolGame::simpleEvent1520(uint8_t eventId)

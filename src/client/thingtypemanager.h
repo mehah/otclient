@@ -30,8 +30,8 @@ static const RaceType emptyRaceType{};
 
 struct AssetResourceInfo
 {
-    uint16_t resourceId = 0;
-    int clientVersionId = 0;
+    uint16_t resourceId{ 0 };
+    int clientVersionId{ 0 };
     std::string dir;
 };
 

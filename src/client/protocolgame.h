@@ -411,6 +411,10 @@ private:
     ForgeItemInfo getForgeItem(const InputMessagePtr& msg, const bool multiSpr, const bool skipTier = false);
     void getForgeTransfers(const InputMessagePtr& msg, std::vector<ForgeTransferData>& transfers, const bool multiSpr);
     void getBosstiarySlot(const InputMessagePtr& msg, bool& unlocked, uint32_t& bossId, std::optional<BosstiarySlot>& slot);
+    StoreOffer getStoreOffer(const InputMessagePtr& msg);
+    void getStoreOfferImage(const InputMessagePtr& msg, StoreOffer& offer);
+    SubOffer getStoreSubOffer(const InputMessagePtr& msg);
+    void getStorePackageItem(const InputMessagePtr& msg);
     void simpleEvent1520(uint8_t eventId);
 
     bool m_enableSendExtendedOpcode{ false };

@@ -62,7 +62,6 @@ int push_luavalue(const BlessDialogData& data);
 int push_luavalue(const StoreCategory& category);
 int push_luavalue(const SubOffer& subOffer);
 int push_luavalue(const StoreOffer& offer);
-int push_luavalue(const HomeOffer& homeOffer);
 int push_luavalue(const Banner& banner);
 int push_luavalue(const StoreData& storeData);
 

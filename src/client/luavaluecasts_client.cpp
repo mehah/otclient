@@ -657,12 +657,16 @@ int push_luavalue(const StoreOffer& offer) {
     } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
         g_lua.pushInteger(offer.mountId);
         g_lua.setField("mountId");
+        g_lua.pushInteger(offer.resourceId);
+        g_lua.setField("resourceId");
     } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
         g_lua.pushInteger(offer.itemId);
         g_lua.setField("itemId");
     } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
         g_lua.pushInteger(offer.outfitId);
         g_lua.setField("outfitId");
+        g_lua.pushInteger(offer.resourceId);
+        g_lua.setField("resourceId");
         g_lua.pushInteger(offer.outfitHead);
         g_lua.setField("outfitHead");
         g_lua.pushInteger(offer.outfitBody);
@@ -678,6 +682,8 @@ int push_luavalue(const StoreOffer& offer) {
         g_lua.setField("maleOutfitId");
         g_lua.pushInteger(offer.femaleOutfitId);
         g_lua.setField("femaleOutfitId");
+        g_lua.pushInteger(offer.resourceId);
+        g_lua.setField("resourceId");
         g_lua.pushInteger(offer.outfitHead);
         g_lua.setField("outfitHead");
         g_lua.pushInteger(offer.outfitBody);
@@ -697,67 +703,6 @@ int push_luavalue(const StoreOffer& offer) {
     g_lua.pushInteger(offer.stateNewUntil);
     g_lua.setField("stateNewUntil");
     g_lua.pushInteger(offer.productsCapacity);
-    g_lua.setField("productsCapacity");
-
-    return 1;
-}
-
-int push_luavalue(const HomeOffer& homeOffer) {
-    g_lua.createTable(0, 16);
-    g_lua.pushString(homeOffer.name);
-    g_lua.setField("name");
-    g_lua.pushInteger(homeOffer.unknownByte);
-    g_lua.setField("unknownByte");
-    g_lua.pushInteger(homeOffer.id);
-    g_lua.setField("id");
-    g_lua.pushInteger(homeOffer.unknownU16);
-    g_lua.setField("unknownU16");
-    g_lua.pushInteger(homeOffer.price);
-    g_lua.setField("price");
-    g_lua.pushInteger(homeOffer.coinType);
-    g_lua.setField("coinType");
-    g_lua.pushInteger(homeOffer.disabledReasonIndex);
-    g_lua.setField("disabledReasonIndex");
-    g_lua.pushInteger(homeOffer.unknownByte2);
-    g_lua.setField("unknownByte2");
-    g_lua.pushInteger(homeOffer.type);
-    g_lua.setField("type");
-
-    if (homeOffer.type == Otc::GameStoreInfoType_t::SHOW_NONE) {
-        g_lua.pushString(homeOffer.icon);
-        g_lua.setField("icon");
-    } else if (homeOffer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
-        g_lua.pushInteger(homeOffer.mountClientId);
-        g_lua.setField("mountClientId");
-    } else if (homeOffer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
-        g_lua.pushInteger(homeOffer.itemType);
-        g_lua.setField("itemType");
-    } else if (homeOffer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
-        g_lua.pushInteger(homeOffer.sexId);
-        g_lua.setField("sexId");
-        g_lua.createTable(0, 4);
-        g_lua.pushInteger(homeOffer.outfit.lookHead);
-        g_lua.setField("lookHead");
-        g_lua.pushInteger(homeOffer.outfit.lookBody);
-        g_lua.setField("lookBody");
-        g_lua.pushInteger(homeOffer.outfit.lookLegs);
-        g_lua.setField("lookLegs");
-        g_lua.pushInteger(homeOffer.outfit.lookFeet);
-        g_lua.setField("lookFeet");
-        g_lua.setField("outfit");
-    }
-
-    g_lua.pushInteger(homeOffer.tryOnType);
-    g_lua.setField("tryOnType");
-    g_lua.pushInteger(homeOffer.collection);
-    g_lua.setField("collection");
-    g_lua.pushInteger(homeOffer.popularityScore);
-    g_lua.setField("popularityScore");
-    g_lua.pushInteger(homeOffer.stateNewUntil);
-    g_lua.setField("stateNewUntil");
-    g_lua.pushInteger(homeOffer.userConfiguration);
-    g_lua.setField("userConfiguration");
-    g_lua.pushInteger(homeOffer.productsCapacity);
     g_lua.setField("productsCapacity");
 
     return 1;
