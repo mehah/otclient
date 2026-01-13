@@ -430,7 +430,8 @@ end
 function StatsBar.onHarmonyChange(localPlayer, harmony, oldHarmony)
     local statsBars = StatsBar.getAllStatsBarWithPosition()
     for _, barElement in ipairs(statsBars) do
-        if barElement.harmonies then
+        local harmonies = barElement:recursiveGetChildById('harmonies')
+        if harmonies then
             for i = 1, 5 do
                 local tooltip = string.format(
                     "%d/5 Harmony\n\n" ..
@@ -438,7 +439,7 @@ function StatsBar.onHarmonyChange(localPlayer, harmony, oldHarmony)
                     "The more Harmony you have, the more bonuses you may gain from certain effects.",
                     harmony
                 )
-                local child = barElement.harmonies:getChildByIndex(i)
+                local child = harmonies:getChildByIndex(i)
                 if child then
                     child:setTooltip(tooltip)
                     child:setOn(i <= harmony)
@@ -451,7 +452,8 @@ end
 function StatsBar.onSereneChange(localPlayer, serene, oldSerene)
     local statsBars = StatsBar.getAllStatsBarWithPosition()
     for _, barElement in ipairs(statsBars) do
-        if barElement.serene then
+        local sereneIcon = barElement:recursiveGetChildById('serene')
+        if sereneIcon then
             local tooltip
             if serene then
                 tooltip = "You are serene.\n\n" ..
@@ -462,8 +464,8 @@ function StatsBar.onSereneChange(localPlayer, serene, oldSerene)
                           "You lose serenity if more than 5 monsters or characters are directly beside you,\n" ..
                           "or if any party members are visible."
             end
-            barElement.serene:setTooltip(tooltip)
-            barElement.serene:setOn(serene)
+            sereneIcon:setTooltip(tooltip)
+            sereneIcon:setOn(serene)
         end
     end
 end
@@ -472,15 +474,12 @@ function StatsBar.onVocationChange(localPlayer, vocation, oldVocation)
     local statsBars = StatsBar.getAllStatsBarWithPosition()
     local isMonk = localPlayer:isMonk() and g_game.getFeature(GameVocationMonk)
     for _, barElement in ipairs(statsBars) do
-        if barElement.harmonies and barElement.serene and barElement.separatorHarmoniesSerene then
+        local monkStats = barElement:recursiveGetChildById('monkStats')
+        if monkStats then
             if isMonk then
-                barElement.harmonies:enable()
-                barElement.separatorHarmoniesSerene:enable()
-                barElement.serene:enable()
+                monkStats:enable()
             else
-                barElement.harmonies:disable()
-                barElement.separatorHarmoniesSerene:disable()
-                barElement.serene:disable()
+                monkStats:disable()
             end
         end
     end
@@ -791,7 +790,7 @@ function StatsBar.terminate()
     disconnect(LocalPlayer, statsBarDeepInfo)
     disconnect(g_game, {
         onGameStart = StatsBar.OnGameStart,
-        OnGameEnd = StatsBar.OnGameEnd
+        onGameEnd = StatsBar.OnGameEnd
     })
 
     StatsBar.destroyAllBars()
