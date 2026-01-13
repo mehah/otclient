@@ -175,7 +175,7 @@ namespace Proto
         GameServerFloorChangeUp = 190,
         GameServerFloorChangeDown = 191,
         GameServerLootContainers = 192,
-        GameServerVirtue = 193,
+        GameServerMonkData = 193,
         GameServerCyclopediaHouseAuctionMessage = 195,
         GameServerWeaponProficiencyInfo = 196,
         GameServerCyclopediaHousesInfo = 198,

@@ -466,8 +466,8 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerLootContainers:
                     parseLootContainers(msg);
                     break;
-                case Proto::GameServerVirtue:
-                    parseVirtue(msg);
+                case Proto::GameServerMonkData:
+                    parseMonkData(msg);
                     break;
                 case Proto::GameServerCyclopediaHouseAuctionMessage:
                     parseCyclopediaHouseAuctionMessage(msg);
@@ -1702,7 +1702,6 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
     if (g_game.getClientVersion() >= 1281) {
         money = m_localPlayer->getTotalMoney();
     } else {
-        uint64_t money;
         if (g_game.getFeature(Otc::GameDoublePlayerGoodsMoney))
             money = msg->getU64();
         else
@@ -4363,27 +4362,25 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     g_lua.callGlobalField("g_game", "onQuickLootContainers", quickLootFallbackToMainContainer, lootList);
 }
 
-void ProtocolGame::parseVirtue(const InputMessagePtr& msg) { // @note: improve name
-    const uint8_t subtype = msg->getU8();
-
+void ProtocolGame::parseMonkData(const InputMessagePtr& msg) {
+    const auto subtype = static_cast<Otc::VocationMonkTypes_t>(msg->getU8());
     switch (subtype) {
-        case 0x00: { // Harmony
+        case Otc::TYPES_HARMONY: {
             const uint8_t harmonyValue = msg->getU8();
-            g_lua.callGlobalField("g_game", "onHarmonyProtocol", harmonyValue);
+            m_localPlayer->setHarmony(harmonyValue);
             break;
         }
-        case 0x01: { // Serene
-            const bool isSerene = msg->getU8() == 0x01;
-            g_lua.callGlobalField("g_game", "onSereneProtocol", isSerene);
+        case Otc::TYPES_SERENE: {
+            const bool hasSerene = static_cast<bool>(msg->getU8());
+            m_localPlayer->setSerene(hasSerene);
             break;
         }
-        case 0x02: { // Virtue
+        case Otc::TYPES_VIRTUE: {
             const uint8_t virtueValue = msg->getU8();
-            g_lua.callGlobalField("g_game", "onVirtueProtocol", virtueValue);
             break;
         }
         default:
-            g_logger.error("Unknown virtue subtype: {}", subtype);
+            g_logger.error("Unknown MonkData subtype: {}", static_cast<int>(subtype));
             break;
     }
 }
