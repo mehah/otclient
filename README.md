@@ -252,7 +252,7 @@ https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e
 ---
 
 ### 🔗 Compatibility & Protocols
-- Client **12.85 ~ 12.92**, **13.00 ~ 15.11** support *(protobuf)*  
+- Client **7.6 ~ 12.85 ~ 12.92**, **13.00 ~ 15.11** support *(protobuf)*  
 - Market rewritten (compatible with TFS and Canary)  
 - Async Texture Loading *(engine-level feature)*  
 - Supports sequenced packages and compression  
@@ -566,7 +566,6 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 | TO-DO list | Status | PR |
 |---|---|---|
 | wheel of destiny | ![](https://geps.dev/progress/10) | [#1311](https://github.com/mehah/otclient/pull/1311) |
-| Forge | ![](https://geps.dev/progress/1) | None |
 | Sound tibia 13 | ![](https://geps.dev/progress/80) | [#1098](https://github.com/mehah/otclient/pull/1098) |
 | Prey and tasks | ![](https://geps.dev/progress/0) | None |
 | compendium | ![](https://geps.dev/progress/0) | None |
@@ -585,7 +584,7 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 | TFS 1.6 (13.10) | Main repo otland (2024) | [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) | ✅ |
 | Canary (13.21 / 13.32 / 13.40) | OpenTibiaBr | [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption) | ✅ |
 | Canary (14.00 ~ 14.12) | OpenTibiaBr | [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption) | ✅ |
-| Canary (15.00 ~ 15.11) | OpenTibiaBr | [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption) | ❌ |
+| Canary (15.00 ~ 15.11) | OpenTibiaBr | [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption) | ✅ |
 
 ---
 

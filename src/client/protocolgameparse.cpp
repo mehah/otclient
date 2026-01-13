@@ -4365,22 +4365,22 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
 void ProtocolGame::parseMonkData(const InputMessagePtr& msg) {
     const auto subtype = static_cast<Otc::VocationMonkTypes_t>(msg->getU8());
     switch (subtype) {
-        case Otc::TYPES_HARMONY: {
+        case Otc::TYPES_MONK_HARMONY: {
             const uint8_t harmonyValue = msg->getU8();
             m_localPlayer->setHarmony(harmonyValue);
             break;
         }
-        case Otc::TYPES_SERENE: {
-            const bool hasSerene = static_cast<bool>(msg->getU8());
+        case Otc::TYPES_MONK_SERENE: {
+            const auto hasSerene = static_cast<bool>(msg->getU8());
             m_localPlayer->setSerene(hasSerene);
             break;
         }
-        case Otc::TYPES_VIRTUE: {
+        case Otc::TYPES_MONK_VIRTUE: {
             const uint8_t virtueValue = msg->getU8();
+            g_logger.debug("unused {} TO-DO L4381", virtueValue);
             break;
         }
         default:
-            g_logger.error("Unknown MonkData subtype: {}", static_cast<int>(subtype));
             break;
     }
 }
