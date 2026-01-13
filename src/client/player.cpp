@@ -33,6 +33,15 @@ bool Player::isMage() const {
     }
 }
 
+bool Player::isMonk() const {
+    switch (m_vocation) {
+        case Otc::Vocations_t::MONK:
+        case Otc::Vocations_t::EXALTED_MONK:
+            return true;
+        default: return false;
+    }
+}
+
 void Player::setVocation(const uint8_t vocation)
 {
     if (m_vocation == vocation)

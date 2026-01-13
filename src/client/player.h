@@ -34,6 +34,7 @@ public:
     PlayerPtr asPlayer() { return static_self_cast<Player>(); }
     bool isPlayer() const override { return true; }
     bool isMage() const;
+    bool isMonk() const;
     void setVocation(uint8_t vocation);
     uint8_t getVocation() { return m_vocation; }
 

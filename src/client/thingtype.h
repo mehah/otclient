@@ -37,6 +37,13 @@ using namespace otclient::protobuf;
 class ThingType final : public LuaObject
 {
 public:
+    struct SkillWheelGem {
+        uint32_t gem_quality_id = 0;
+        uint32_t vocation_id = 0;
+
+        uint32_t getGemQualityId() { return gem_quality_id; }
+        uint32_t getVocationId() { return vocation_id; }
+    };
     void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
     void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
@@ -140,9 +147,16 @@ public:
     bool isTopEffect() { return (m_flags & ThingFlagAttrTopEffect); }
     bool hasAction() { return (m_flags & ThingFlagAttrDefaultAction); }
     bool isOpaque() { return m_opaque == 1; }
+    
+    uint32_t getSkillWheelGemQualityId() { return m_skillWheelGem.gem_quality_id; }
+    uint32_t getSkillWheelGemVocationId() { return m_skillWheelGem.vocation_id; }
+
     bool isDecoKit() { return (m_flags & ThingFlagAttrDecoKit); }
     bool isLoading() const { return m_loading.load(std::memory_order_acquire); }
     bool isAmmo() { return (m_flags & ThingFlagAttrAmmo); }
+    bool isDualWield() { return (m_flags & ThingFlagAttrDualWield); }
+    bool hasSkillWheelGem() { return (m_flags & ThingFlagAttrSkillWheelGem); }
+    SkillWheelGem getSkillWheelGem() { return m_skillWheelGem; }
 
     bool isItem() const { return m_category == ThingCategoryItem; }
     bool isEffect() const { return m_category == ThingCategoryEffect; }
@@ -244,4 +258,5 @@ private:
 
     std::string m_name;
     std::string m_description;
+    SkillWheelGem m_skillWheelGem;
 };

@@ -557,6 +557,12 @@ bool Thing::isAmmo() {
     return false;
 }
 
+bool Thing::isDualWield() {
+    if (const auto t = getThingType(); t)
+        return t->isDualWield();
+    return false;
+}
+
 PLAYER_ACTION Thing::getDefaultAction() {
     if (const auto t = getThingType(); t)
         return t->getDefaultAction();

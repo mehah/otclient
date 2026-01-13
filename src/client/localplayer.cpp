@@ -718,3 +718,19 @@ void LocalPlayer::setStoreExpBoostTime(uint16_t value)
 
     m_storeExpBoostTime = value;
 }
+
+void LocalPlayer::setHarmony(const uint8_t harmony)
+{
+    const uint8_t oldHarmony = m_harmony;
+    m_harmony = harmony;
+
+    callLuaField("onHarmonyChange", harmony, oldHarmony);
+}
+
+void LocalPlayer::setSerene(const bool serene)
+{
+    const bool oldSerene = m_serene;
+    m_serene = serene;
+
+    callLuaField("onSereneChange", serene, oldSerene);
+}
