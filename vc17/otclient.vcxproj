@@ -666,7 +666,6 @@
     <ClInclude Include="..\src\framework\stdext\compiler.h" />
     <ClInclude Include="..\src\framework\stdext\demangle.h" />
     <ClInclude Include="..\src\framework\stdext\exception.h" />
-    <ClInclude Include="..\src\framework\stdext\format.h" />
     <ClInclude Include="..\src\framework\stdext\hash.h" />
     <ClInclude Include="..\src\framework\stdext\math.h" />
     <ClInclude Include="..\src\framework\stdext\net.h" />

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -193,6 +193,25 @@ enum class OverflowType : uint8_t
     Clip
 };
 
+enum WidgetEvents : int
+{
+    EVENT_TEXT_CLICK = 1,
+    EVENT_TEXT_HOVER = 2
+};
+
+const std::unordered_map<std::string, WidgetEvents> eventMap = {
+    {"text-click", EVENT_TEXT_CLICK},
+    {"text-hover", EVENT_TEXT_HOVER}
+};
+
+struct TextEvent
+{
+    std::string word;
+    size_t startPos;
+    size_t endPos;
+    bool noUnderline = false;
+};
+
 struct SizeUnit
 {
     bool needsUpdate(Unit _unit) const {
@@ -309,6 +328,7 @@ protected:
 
     std::string m_source;
     int16_t m_childIndex{ -1 };
+    int8_t m_events{ 0 };
 
     Rect m_rect;
     Point m_virtualOffset;
@@ -537,6 +557,7 @@ public:
     UIWidgetList recursiveGetChildrenByState(Fw::WidgetState state);
     UIWidgetList recursiveGetChildrenByStyleName(std::string_view styleName);
     UIWidgetPtr backwardsGetWidgetById(std::string_view id);
+    bool hasEventListener(WidgetEvents event) { return (m_events & event) != 0; }
 
     std::vector<UIWidgetPtr> querySelectorAll(const std::string& selector);
     UIWidgetPtr querySelector(const std::string& selector);
@@ -550,6 +571,9 @@ public:
     void disableUpdateTemporarily();
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
+
+    void setEventListener(WidgetEvents event);
+    void removeEventListener(WidgetEvents event);
 
     void setBackgroundDrawOrder(const uint8_t order) { m_backgroundDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
     void setImageDrawOrder(const uint8_t order) { m_imageDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
@@ -613,6 +637,7 @@ protected:
     virtual bool onMouseWheel(const Point& mousePos, Fw::MouseWheelDirection direction);
     virtual bool onClick(const Point& mousePos);
     virtual bool onDoubleClick(const Point& mousePos);
+    virtual void onTextHoverChange(const std::string& text, bool hovered);
 
     friend class UILayout;
 
@@ -753,7 +778,7 @@ public:
     void setMinSize(const Size& minSize) { m_minSize = minSize; setRect(m_rect); }
     void setMaxSize(const Size& maxSize) { m_maxSize = maxSize; setRect(m_rect); }
     void setPosition(const Point& pos) { move(pos.x, pos.y); }
-    void setColor(const Color& color) { m_color = color; repaint(); }
+    void setColor(const Color& color);
     void setBackgroundColor(const Color& color) { m_backgroundColor = color; repaint(); }
     void setBackgroundOffsetX(const int x) { m_backgroundRect.setX(x); repaint(); }
     void setBackgroundOffsetY(const int y) { m_backgroundRect.setX(y); repaint(); }
@@ -946,6 +971,9 @@ protected:
     void drawText(const Rect& screenCoords);
     void computeHtmlTextIntrinsicSize();
     void applyWhiteSpace();
+    void processCodeTags();
+    void cacheRectToWord();
+    void updateRectToWord(const std::vector<Rect>& glypsCoords);
 
     virtual void onTextChange(std::string_view text, std::string_view oldText);
     virtual void onFontChange(std::string_view font);
@@ -954,20 +982,28 @@ protected:
 
     WrapOptions m_textWrapOptions;
     std::vector<Point> m_glyphsPositionsCache;
+    std::vector<Rect> m_glyphsCoordsCache;
 
     std::string m_text;
     std::string m_drawText;
     Fw::AlignmentFlag m_textAlign;
     Point m_textOffset;
+    std::string m_textOverflowCharacter;
 
     BitmapFontPtr m_font;
     std::vector<std::pair<int, Color>> m_textColors;
     std::vector<std::pair<int, Color>> m_drawTextColors;
+    Color m_baseTextColor{ Color::white };
 
     CoordsBufferPtr m_coordsBuffer;
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
+    std::vector<std::pair<Rect, std::string>> m_rectToWord;
+    std::vector<TextEvent> m_textEvents;
 
     float m_fontScale{ 1.f };
+
+    uint16_t m_textOverflowLength{ 0 };
+    CoordsBufferPtr m_textUnderline = std::make_shared<CoordsBuffer>();
 
     const AtlasRegion* m_atlasRegion = nullptr;
 
@@ -1028,6 +1064,8 @@ public:
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(std::string_view fontName);
     void setFontScale(const float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }
+    void setTextOverflowLength(uint16_t length) { m_textOverflowLength = length; updateText(); }
+    void setTextOverflowCharacter(std::string character) { m_textOverflowCharacter = character; updateText(); }
     void setLineHeight(std::string height);
     const auto& getLineHeight() { return m_lineHeight; }
 
@@ -1038,6 +1076,7 @@ public:
     bool isTextWrap() { return hasProp(PropTextWrap); }
     std::string getFont();
     Size getTextSize() { return m_textSize; }
+    std::string getTextByPos(const Point& mousePos);
 
     // custom style
 protected:

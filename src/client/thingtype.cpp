@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -113,10 +113,6 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
 
 void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 {
-    if (flags.floorchange()) {
-        m_flags |= ThingFlagAttrFloorChange;
-    }
-
     if (flags.has_bank()) {
         m_groundSpeed = flags.bank().waypoints();
         m_flags |= ThingFlagAttrGround;
@@ -368,6 +364,16 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 
     if (flags.has_deco_kit() && flags.deco_kit()) {
         m_flags |= ThingFlagAttrExpireStop;
+    }
+
+    if (flags.has_skillwheel_gem()) {
+        m_skillWheelGem.gem_quality_id = flags.skillwheel_gem().gem_quality_id();
+        m_skillWheelGem.vocation_id = flags.skillwheel_gem().vocation_id();
+        m_flags |= ThingFlagAttrSkillWheelGem;
+    }
+
+    if (flags.has_dual_wielding() && flags.dual_wielding()) {
+        m_flags |= ThingFlagAttrDualWield;
     }
 }
 
@@ -792,10 +798,6 @@ void ThingType::loadTexture(const int animationPhase)
                                 for (int w = 0; w < m_size.width(); ++w) {
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     auto spriteId = m_spritesIndex[spriteIndex];
-
-                                    if (spriteId == 0)
-                                        continue;
-
                                     bool isLoading = false;
                                     const auto& spriteImage = g_sprites.getSpriteImage(spriteId, isLoading);
 
@@ -803,8 +805,8 @@ void ThingType::loadTexture(const int animationPhase)
                                         return;
 
                                     if (!spriteImage) {
-                                        g_logger.error("Failed to fetch sprite id {} for thing {} ({}, {}), layer {}, pattern {}x{}x{}, frame {}, offset {}x{}", spriteId, m_name, m_id, categoryName(m_category), l, x, y, z, framePos, w, h);
-                                        return;
+                                        // Skip blank sprites silently (clients converted with Assets Editor have blank sprites with non-zero IDs)
+                                        continue;
                                     }
 
                                     // verifies that the first block in the lower right corner is transparent.

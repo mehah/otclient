@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -750,6 +750,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("getName", &ThingType::getName);
     g_lua.bindClassMemberFunction<ThingType>("getDescription", &ThingType::getDescription);
     g_lua.bindClassMemberFunction<ThingType>("isAmmo", &ThingType::isAmmo);
+    g_lua.bindClassMemberFunction<ThingType>("isDualWield", &ThingType::isDualWield);
+    g_lua.bindClassMemberFunction<ThingType>("hasSkillWheelGem", &ThingType::hasSkillWheelGem);
+    g_lua.bindClassMemberFunction<ThingType>("getSkillWheelGemQualityId", &ThingType::getSkillWheelGemQualityId);
+    g_lua.bindClassMemberFunction<ThingType>("getSkillWheelGemVocationId", &ThingType::getSkillWheelGemVocationId);
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindClassMemberFunction<ThingType>("exportImage", &ThingType::exportImage);
 #endif
@@ -782,6 +786,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("hasClockExpire", &Item::hasClockExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpire", &Item::hasExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpireStop", &Item::hasExpireStop);
+    g_lua.bindClassMemberFunction<Item>("isDualWield", &Item::isDualWield);
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindClassMemberFunction<Item>("getName", &Item::getName);
     g_lua.bindClassMemberFunction<Item>("getServerId", &Item::getServerId);
@@ -1146,6 +1151,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIMap>("setAntiAliasingMode", &UIMap::setAntiAliasingMode);
     g_lua.bindClassMemberFunction<UIMap>("setFloorFading", &UIMap::setFloorFading);
     g_lua.bindClassMemberFunction<UIMap>("clearTiles", &UIMap::clearTiles);
+    g_lua.bindClassMemberFunction<UIMap>("setDrawHarmony", &UIMap::setDrawHarmony);
 
     g_lua.registerClass<UIMinimap, UIWidget>();
     g_lua.bindClassStaticFunction<UIMinimap>("create", [] { return std::make_shared<UIMinimap>(); });

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -201,7 +201,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         p.scale(g_app.getCreatureInformationScale());
     }
 
-    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 27, 4);
+    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 31, 4);
     auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
 
     if (!isScaled) {
@@ -255,6 +255,37 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         }
 
         backgroundRect = barsRect;
+    }
+
+    if (drawFlags & Otc::DrawHarmony && isLocalPlayer() && g_game.getFeature(Otc::GameVocationMonk)) {
+        if (const auto& player = g_game.getLocalPlayer()) {
+            if (player->isMonk()) {
+                // Harmony
+                backgroundRect.moveTop(backgroundRect.bottom());
+                g_drawPool.addFilledRect(backgroundRect, Color::black);
+                for (int i = 0; i < 5; i++) {
+                    Rect subBarRect = backgroundRect.expanded(-1);
+                    subBarRect.setX(backgroundRect.x() + 1 + i * (5 + 1));
+                    subBarRect.setWidth(5);
+                    Color subBarColor;
+                    if (i < player->getHarmony()) {
+                        subBarColor = Color(0xFF, 0x98, 0x54);
+                    } else {
+                        subBarColor = Color(64, 64, 64);
+                    }
+                    g_drawPool.addFilledRect(subBarRect, subBarColor);
+                }
+                // Serene
+                backgroundRect.moveTop(backgroundRect.bottom());
+                Rect sereneBackgroundRect(backgroundRect.center().x - (11 / 2) - 1, backgroundRect.y(), 11 + 2, backgroundRect.height() - 2 + 2);
+                g_drawPool.addFilledRect(sereneBackgroundRect, Color::black);
+                Color sereneColor = player->isSerene() ? Color(0xD4, 0x37, 0xFF) : Color(64, 64, 64);
+                Rect sereneSubBarRect = sereneBackgroundRect.expanded(-1);
+                sereneSubBarRect.setWidth(11);
+                sereneSubBarRect.setHeight(backgroundRect.height() - 2);
+                g_drawPool.addFilledRect(sereneSubBarRect, sereneColor);
+            }
+        }
     }
 
     g_drawPool.setDrawOrder(DrawOrder::SECOND);

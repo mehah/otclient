@@ -130,6 +130,10 @@ function ForgeController:hide()
     if ForgeButton then
         ForgeButton:setOn(false)
     end
+    if self.ui and not self.ui:isDestroyed() then
+        self.ui:destroy()
+    end
+    self.ui = nil
 end
 
 function ForgeController:toggle()
