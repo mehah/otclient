@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -731,6 +731,15 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                         throw OTMLException(node, "invalid anchor target edge");
 
                     addAnchor(anchoredEdge, hookedWidgetId, hookedEdge);
+                }
+            }
+        }
+        else if (node->tag() == "events") {
+            auto split = stdext::split(node->value(), " ");
+            for (const auto& event : split) {
+                auto it = eventMap.find(event);
+                if (it != eventMap.end()) {
+                    setEventListener(it->second);
                 }
             }
         }

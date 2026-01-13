@@ -54,8 +54,10 @@ UIWidget
     anchors.left: gameLeftActionPanel.right
     anchors.right: gameRightActionPanel.left
     anchors.top: gameTopPanel.bottom
-    anchors.bottom: bottomSplitter.bottom
+    anchors.bottom: bottomSplitter.top
     focusable: false
+    margin-top: 1
+    margin-bottom: 1
 
     Button
       id: showTopMenuButton

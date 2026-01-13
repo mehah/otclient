@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include "protocolgame.h"
 #include "staticdata.h"
 
 #include "framework/core/declarations.h"
@@ -345,6 +346,8 @@ public:
     void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 
     int getPing() { return m_ping; }
+    int getRecivedPacketsCount() { return m_protocolGame ? m_protocolGame->getRecivedPacketsCount() : 0; }
+    int getRecivedPacketsSize() { return m_protocolGame ? m_protocolGame->getRecivedPacketsSize() : 0; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
     stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
     stdext::map<int, Vip> getVips() { return m_vips; }
@@ -376,6 +379,11 @@ public:
     // prey related
     void preyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void preyRequest();
+
+    // forge related
+    void openPortableForgeRequest();
+    void forgeRequest(Otc::ForgeAction_t actionType, bool convergence = false, uint16_t firstItemid = 0, uint8_t firstItemTier = 0, uint16_t secondItemId = 0, bool improveChance = false, bool tierLoss = false);
+    void sendForgeBrowseHistoryRequest(uint16_t page);
 
     // imbuing related
     void applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);

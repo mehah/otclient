@@ -95,14 +95,6 @@ function loadIcon(iconId)
     return icon, spellName
 end
 
-function onMiniWindowOpen()
-    modules.client_options.setOption('showSpellGroupCooldowns', true)
-end
-
-function onMiniWindowClose()
-    modules.client_options.setOption('showSpellGroupCooldowns', false)
-end
-
 function online()
     local console = modules.game_console.consolePanel
     if console then
@@ -111,6 +103,21 @@ function online()
     if not g_game.getFeature(GameSpellList) then
         modules.client_options.setOption('showSpellGroupCooldowns', false)
         return
+    end
+    local children = contentsPanel:getChildren()
+    local oldProtocol = g_game.getClientVersion() > 1100
+    local monkFeature = g_game.getFeature(GameVocationMonk)
+    for i = 9, #children - 2 do -- hide group icons old protocol
+        local widget = children[i]
+        if widget then
+            local id = widget:getId()
+            local visible = oldProtocol
+            if id and string.find(id, 'Virtue') then
+                visible = monkFeature
+            end
+            widget:setVisible(visible)
+            widget:setWidth(visible and 22 or 0)
+        end
     end
 
     if not lastPlayer or lastPlayer ~= g_game.getCharacterName() then

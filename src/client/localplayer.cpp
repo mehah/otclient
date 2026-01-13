@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -717,4 +717,26 @@ void LocalPlayer::setStoreExpBoostTime(uint16_t value)
         return;
 
     m_storeExpBoostTime = value;
+}
+
+void LocalPlayer::setHarmony(const uint8_t harmony)
+{
+    if (m_harmony == harmony)
+        return;
+
+    const uint8_t oldHarmony = m_harmony;
+    m_harmony = harmony;
+
+    callLuaField("onHarmonyChange", harmony, oldHarmony);
+}
+
+void LocalPlayer::setSerene(const bool serene)
+{
+    if (m_serene == serene)
+        return;
+
+    const bool oldSerene = m_serene;
+    m_serene = serene;
+
+    callLuaField("onSereneChange", serene, oldSerene);
 }

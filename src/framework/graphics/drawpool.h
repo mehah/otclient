@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@
 #include "framework/core/timer.h"
 
 #include "../stdext/storage.h"
+#include <framework/util/spinlock.h>
 
 struct DrawHashController
 {
@@ -120,10 +121,12 @@ public:
     }
 
     bool shouldRepaint() const {
-        return m_shouldRepaint.load(std::memory_order_acquire);
+        return m_shouldRepaint.load(std::memory_order_relaxed);
     }
 
     void release();
+
+    auto& getThreadLock() { return m_threadLock; }
 
 protected:
 
@@ -343,6 +346,8 @@ private:
 
     TextureAtlasPtr m_atlas;
     std::atomic_bool m_shouldRepaint{ false };
+
+    SpinLock m_threadLock;
 
     friend class DrawPoolManager;
 };

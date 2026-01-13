@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -268,6 +268,8 @@ void DrawPool::release() {
 
     m_refreshTimer.restart();
 
+    SpinLock::Guard guard(m_threadLock);
+
     m_objectsDraw[0].clear();
 
     if (!m_objectsFlushed.empty()) {
@@ -308,7 +310,7 @@ void DrawPool::release() {
         }
     }
 
-    m_shouldRepaint.store(true, std::memory_order_release);
+    m_shouldRepaint.store(true, std::memory_order_relaxed);
 }
 
 void DrawPool::flush()
