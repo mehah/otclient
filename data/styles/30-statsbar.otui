@@ -1,4 +1,3 @@
-
 StatsBarDarkBackground < UIWidget
   UIWidget
     anchors.fill: parent
