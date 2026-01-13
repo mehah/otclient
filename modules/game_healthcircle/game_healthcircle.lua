@@ -152,10 +152,10 @@ function initOnHpAndMpChange()
         onManaShieldChange = whenManaShieldChange,
         onMagicLevelChange = whenSkillsChange,
         onLevelChange = whenSkillsChange,
-        -- @ MONK
-        onHarmonyChange = whenMonkHarmonyChange,
-        onSereneChange = whenMonkSereneChange,
-        onVocationChange = function() checkMonkVocation() end
+        -- @ MONK in modules\game_interface\widgets\statsbar.lua
+        -- onHarmonyChange = whenMonkHarmonyChange,
+        -- onSereneChange = whenMonkSereneChange,
+        -- onVocationChange = function() checkMonkVocation() end
         -- @
     })
 end
@@ -168,10 +168,10 @@ function terminateOnHpAndMpChange()
         onManaShieldChange = whenManaShieldChange,
         onMagicLevelChange = whenSkillsChange,
         onLevelChange = whenSkillsChange,
-        -- @ MONK
-        onHarmonyChange = whenMonkHarmonyChange,
-        onSereneChange = whenMonkSereneChange,
-        onVocationChange = function() checkMonkVocation() end
+        -- @ MONK in modules\game_interface\widgets\statsbar.lua
+        -- onHarmonyChange = whenMonkHarmonyChange,
+        -- onSereneChange = whenMonkSereneChange,
+        -- onVocationChange = function() checkMonkVocation() end
         -- @
     })
 end

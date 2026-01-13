@@ -1,9 +1,3 @@
-HarmonyIcon < UIWidget
-  size: 13 13
-  !tooltip: 'Harmoney'
-  image-source: /images/game/vocations/monk/icon-combopoint-empty
-  $on:
-    image-source: /images/game/vocations/monk/icon-combopoint-filled
 
 StatsBarDarkBackground < UIWidget
   UIWidget
