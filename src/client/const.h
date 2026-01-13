@@ -900,10 +900,10 @@ namespace Otc
 
     enum VocationMonkTypes_t : uint8_t
     {
-        TYPES_HARMONY = 0,
-        TYPES_SERENE = 1,
-        TYPES_VIRTUE = 2,
-        TYPES_LAST
+        TYPES_MONK_HARMONY = 0,
+        TYPES_MONK_SERENE = 1,
+        TYPES_MONK_VIRTUE = 2,
+        TYPES_MONK_LAST
     };
 
     enum FloorViewMode
