@@ -35,23 +35,6 @@ function math.cround(value, rd)
     return _round * rd
 end
 
-function table.isIn(tbl, val)
-  for _, v in ipairs(tbl) do
-    if v == val then
-      return true
-    end
-  end
-  return false
-end
-
-function table.reserve(count, default)
-  local t = {}
-  for i = 1, count do
-    t[i] = default
-  end
-  return t
-end
-
 function formatMoney(amount, separator)
   local patternSeparator = string.format("%%1%s%%2", separator)
   local formatted = amount
