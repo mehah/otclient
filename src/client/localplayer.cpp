@@ -260,11 +260,11 @@ void LocalPlayer::setStates(const uint64_t states)
     const uint64_t oldStates = m_states;
     m_states = states;
 
-    if (isParalyzed())
+    if (isParalyzed()){
         m_walkTimer.update(getStepDuration());
         // force immediate walk update to keep animation and camera offsets synchronized
         updateWalk();
-
+    }
     callLuaField("onStatesChange", states, oldStates);
 }
 
