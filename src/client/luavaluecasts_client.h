@@ -29,6 +29,14 @@
 int push_luavalue(const Outfit& outfit);
 bool luavalue_cast(int index, Outfit& outfit);
 
+// outfit window cosmetic
+int push_luavalue(const OutfitWindowThing& item);
+bool luavalue_cast(int index, OutfitWindowThing& item);
+
+// loot containers
+int push_luavalue(const LootContainerConf& conf);
+bool luavalue_cast(int index, LootContainerConf& conf);
+
 // position
 int push_luavalue(const Position& pos);
 bool luavalue_cast(int index, Position& pos);

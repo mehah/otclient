@@ -391,7 +391,7 @@ public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);
     int setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip);
     int setTileDescription(const InputMessagePtr& msg, Position position);
-    bool setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType);
+    bool setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType, uint8_t& delay);
 
     Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true, bool forceReadMountColors = false) const;
     ThingPtr getThing(const InputMessagePtr& msg);
@@ -415,6 +415,15 @@ private:
     void getStoreOfferImage(const InputMessagePtr& msg, StoreOffer& offer);
     SubOffer getStoreSubOffer(const InputMessagePtr& msg);
     void getStorePackageItem(const InputMessagePtr& msg);
+    OutfitWindowThing getOutfitWindowThing(const InputMessagePtr& msg, const bool addons, const bool multiSpr, const bool thingCategories = false) const;
+    void getOutfitWindowCosmeticsList(
+        const InputMessagePtr& msg,
+        std::vector<OutfitWindowThing>& thingList,
+        const bool listInU16,
+        const bool addons,
+        const bool multiSpr,
+        const bool thingCategories = false
+    ) const;
     void simpleEvent1520(uint8_t eventId);
 
     bool m_enableSendExtendedOpcode{ false };

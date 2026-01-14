@@ -1100,7 +1100,6 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
             }
         }
 
-        // to do: this needs a rework
         const uint16_t offersCount = msg->getU16();
         if (storeData.categoryName == "Home") {
             for (auto i = 0; i < offersCount; ++i) {
@@ -1135,6 +1134,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 
         g_lua.callGlobalField("g_game", "onParseStoreCreateProducts", storeData);
     } else {
+        // old protocol
         StoreData storeData;
         storeData.categoryName = msg->getString(); // categoryName
 
@@ -1615,7 +1615,7 @@ void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
         descriptions.emplace_back(firstDescription, secondDescription);
     }
 
-    g_game.processItemDetail(item->getId(), descriptions);
+    g_game.processItemDetail(item->getId(), descriptions, item->getResourceId());
 }
 
 void ProtocolGame::parseAddInventoryItem(const InputMessagePtr& msg)
@@ -1754,7 +1754,8 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
     auto pos = getPosition(msg);
     if (g_game.getProtocolVersion() >= 1203) {    
         // read all magic/sound effects
-        while (setMagicEffect(msg, pos, msg->getU8()));
+        uint8_t delay = 0;
+        while (setMagicEffect(msg, pos, msg->getU8(), delay));
         return;
     }
 
@@ -1815,11 +1816,7 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
     const auto& toPos = getPosition(msg);
 
     const uint16_t shotId = g_game.getFeature(Otc::GameDistanceEffectU16) ? msg->getU16() : msg->getU8();
-    uint16_t resourceId = 0;
-    if (g_game.getFeature(Otc::GameMultiSpr)) {
-        resourceId = msg->getU16();
-    }
-
+    const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
     if (!g_things.isValidDatId(shotId, ThingCategoryMissile, resourceId)) {
         g_logger.traceError("invalid missile id {}", shotId);
         return;
@@ -1853,20 +1850,29 @@ void ProtocolGame::parseForgeResult(const InputMessagePtr& msg)
     forgeResult.bonus = 0;
     forgeResult.coreCount = 0;
 
-    if (forgeResult.actionType == 1) {
-        msg->getU8(); // Bonus type always none for transfer
-    } else {
-        forgeResult.bonus = msg->getU8();// Roll fusion bonus
-        // Core kept
-        if (forgeResult.bonus == 2) {
-            forgeResult.coreCount = msg->getU8();
-        } else if (forgeResult.bonus >= 4 && forgeResult.bonus <= 8) {
-            forgeResult.leftItemId = msg->getU16();
-            if (multiSpr) {
-                forgeResult.leftItemResourceId = msg->getU16();
-            }
-            forgeResult.leftTier = msg->getU8();
+    /*
+        random event that can trigger during fusion:
+        0 - nothing (normal fusion result)
+        1 - dust not consumed
+        2 - cores not consumed (u8 how many)
+        3 - gold not consumed
+        4 - item not consumed, lost 1 tier only (u16 item id to display)
+        5 - second item kept, no tier loss (u16 item id to display)
+        6 - both items upgraded (u16 item id to display)
+        7 - item gained two tiers (u16 item id to display)
+        8 - second item did not lose a tier (u16 item id to display)
+    */
+    forgeResult.bonus = msg->getU8();
+    if (forgeResult.bonus == 2) {
+        // cores not consumed
+        forgeResult.coreCount = msg->getU8();
+    } else if (forgeResult.bonus >= 4 && forgeResult.bonus <= 8) {
+        // item related events (4-8)
+        forgeResult.outcomeItemId = msg->getU16();
+        if (multiSpr) {
+            forgeResult.outcomeResourceId = msg->getU16();
         }
+        forgeResult.leftTier = msg->getU8();
     }
 
     g_lua.callGlobalField("g_game", "forgeResultData", forgeResult);
@@ -2017,7 +2023,14 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
     const uint16_t fusionCount = msg->getU16();
     data.fusionItems.reserve(fusionCount);
     for (auto i = 0; i < fusionCount; ++i) {
-        msg->getU8(); // unknown count of friend items
+        // unused list of items (follows the same structure as convergance)
+        // read without doing anything
+        const uint8_t items = msg->getU8();
+        for (auto j = 0; j < items; ++j) {
+            getForgeItem(msg, multiSpr);
+        }
+
+        // items for fusion
         data.fusionItems.emplace_back(getForgeItem(msg, multiSpr));
     }
 
@@ -2027,6 +2040,7 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
         const uint8_t items = msg->getU8();
         std::vector<ForgeItemInfo> slotItems;
         slotItems.reserve(items);
+
         for (auto j = 0; j < items; ++j) {
             slotItems.emplace_back(getForgeItem(msg, multiSpr));
         }
@@ -2610,7 +2624,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
     const auto& name = g_game.formatCreatureName(msg->getString());
 
     if (statement > 0 && g_game.getClientVersion() >= 1281) {
-        msg->getU8(); // suffix
+        msg->getU8(); // "traded" suffix
     }
 
     const uint16_t level = g_game.getFeature(Otc::GameMessageLevel) ? msg->getU16() : 0;
@@ -2899,37 +2913,45 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             this window requires reworking to accommodate resource ids for multiSpr feature
     */
 
+    // multi resource system
     const bool multiSpr = g_game.getFeature(Otc::GameMultiSpr);
 
-    const auto& currentOutfit = getOutfit(msg, true, true);
+    // at some point the amount of obtainable mounts in game exceeded 256
+    // this was when the list size got increased to u16
+    const bool cosmeticsU16 = g_game.getClientVersion() >= 1281;
 
-    // familiar
-    if (g_game.getClientVersion() >= 1281) {
-        msg->getU16(); // current familiar looktype
+    // outfit addons
+    const bool addons = g_game.getFeature(Otc::GamePlayerAddons);
+
+    // currenrly selected cosmetics (except for familiar)
+    auto currentOutfit = getOutfit(msg, true, true);
+
+    // currently selected familiar
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
+        SimpleOutfit familiar;
+        familiar.type = msg->getU16(); // current familiar looktype
         if (multiSpr) {
-            msg->getU16(); // resourceId
+            familiar.resourceId = msg->getU16(); // resourceId
         }
+
+        currentOutfit.applyFamiliar(familiar);
     }
 
-    std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>> outfitList;
+    // lists
+    std::vector<OutfitWindowThing> outfitList;
+    std::vector<OutfitWindowThing> mountList;
+    std::vector<OutfitWindowThing> familiarList;
+    std::vector<OutfitWindowThing> wingList;
+    std::vector<OutfitWindowThing> auraList;
+    std::vector<OutfitWindowThing> effectList;
+    std::vector<OutfitWindowThing> shaderList;
 
+    // outfits
     if (g_game.getFeature(Otc::GameNewOutfitProtocol)) {
-        const uint16_t outfitCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
-        for (auto i = 0; i < outfitCount; ++i) {
-            const uint16_t outfitId = msg->getU16();
-            const auto& outfitName = msg->getString();
-            const uint8_t outfitAddons = msg->getU8();
-            uint8_t outfitMode = 0;
-            if (g_game.getClientVersion() >= 1281) {
-                outfitMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
-                if (outfitMode == 1) {
-                    msg->getU32();
-                }
-            }
-
-            outfitList.emplace_back(outfitId, outfitName, outfitAddons, outfitMode);
-        }
+        // 10.98+ outfit window
+        getOutfitWindowCosmeticsList(msg, outfitList, cosmeticsU16, addons, multiSpr);
     } else {
+        // 7.x outfit window
         uint16_t outfitStart;
         uint16_t outfitEnd;
         if (g_game.getFeature(Otc::GameLooktypeU16)) {
@@ -2941,85 +2963,55 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
 
         for (auto i = outfitStart; i <= outfitEnd; ++i) {
-            outfitList.emplace_back(i, "", 0, 0);
+            OutfitWindowThing o;
+            o.id = i;
+            outfitList.emplace_back(o);
         }
     }
 
-    std::vector<std::tuple<uint16_t, std::string, uint8_t>> mountList;
-
+    // mounts
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
-        const uint16_t mountCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
-        for (auto i = 0; i < mountCount; ++i) {
-            const uint16_t mountId = msg->getU16(); // mount type
-            const auto& mountName = msg->getString(); // mount name
-            uint8_t mountMode = 0;
-            if (g_game.getClientVersion() >= 1281) {
-                mountMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
-                if (mountMode == 1) {
-                    msg->getU32();
-                }
-            }
-
-            mountList.emplace_back(mountId, mountName, mountMode);
-        }
+        getOutfitWindowCosmeticsList(msg, mountList, cosmeticsU16, false, multiSpr);
     }
 
-    std::vector<std::tuple<uint16_t, std::string> > familiarList;
+    // familiars
     if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
-        const uint16_t familiarCount = msg->getU16();
-        for (auto i = 0; i < familiarCount; ++i) {
-            const uint16_t familiarLookType = msg->getU16(); // familiar lookType
-            const auto& familiarName = msg->getString(); // familiar name
-            const uint8_t familiarMode = msg->getU8(); // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
-            if (familiarMode == 1) {
-                msg->getU32();
-            }
-            familiarList.emplace_back(familiarLookType, familiarName);
-        }
+        getOutfitWindowCosmeticsList(msg, familiarList, cosmeticsU16, false, multiSpr);
     }
 
-    if (g_game.getClientVersion() >= 1281) {
-        msg->getU8(); // Try outfit mode (?)
-        msg->getU8(); // (bool) mounted
-        msg->getU8(); // (bool) randomize mount
-    }
-
-    std::vector<std::tuple<uint16_t, std::string>> wingList;
-    std::vector<std::tuple<uint16_t, std::string>> auraList;
-    std::vector<std::tuple<uint16_t, std::string>> effectList;
-    std::vector<std::tuple<uint16_t, std::string>> shaderList;
-
+    // extended cosmetics
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
-        const uint8_t wingCount = msg->getU8();
-        for (auto i = 0; i < wingCount; ++i) {
-            const uint16_t wingId = msg->getU16();
-            const auto& wingName = msg->getString();
-            wingList.emplace_back(wingId, wingName);
-        }
+        // bool visible in outfit window
+        // if visible: read full list
+        if (msg->getU8() != 0)
+            getOutfitWindowCosmeticsList(msg, wingList, cosmeticsU16, false, multiSpr);
 
-        const uint8_t auraCount = msg->getU8();
-        for (auto i = 0; i < auraCount; ++i) {
-            const uint16_t auraId = msg->getU16();
-            const auto& auraName = msg->getString();
-            auraList.emplace_back(auraId, auraName);
-        }
+        if (msg->getU8() != 0)
+            getOutfitWindowCosmeticsList(msg, auraList, cosmeticsU16, false, multiSpr);
 
-        const uint8_t effectCount = msg->getU8();
-        for (auto i = 0; i < effectCount; ++i) {
-            const uint16_t effectId = msg->getU16();
-            const auto& effectName = msg->getString();
-            effectList.emplace_back(effectId, effectName);
-        }
+        if (msg->getU8() != 0)
+            getOutfitWindowCosmeticsList(msg, effectList, cosmeticsU16, false, multiSpr, true);
 
-        const uint8_t shaderCount = msg->getU8();
-        for (auto i = 0; i < shaderCount; ++i) {
-            const uint16_t shaderId = msg->getU16();
-            const auto& shaderName = msg->getString();
-            shaderList.emplace_back(shaderId, shaderName);
+        if (msg->getU8() != 0)
+            getOutfitWindowCosmeticsList(msg, shaderList, cosmeticsU16, false, multiSpr, true);
+    }
+
+    // window mode
+    // 0 - set outfit, 1 - try outfit, 2 - try mount
+    uint8_t windowMode = 0;
+    bool mounted = false;
+    bool randomizeMount = false;
+    if (g_game.getClientVersion() >= 1281) {
+        windowMode = msg->getU8();
+        mounted = msg->getU8() != 0;
+
+        // randomize mount boolean is only present in the packet when the window type is 0
+        if (windowMode != 0) {
+            randomizeMount = msg->getU8() != 0;
         }
     }
 
-    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, familiarList, wingList, auraList, effectList, shaderList);
+    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, familiarList, wingList, auraList, effectList, shaderList, windowMode, mounted, randomizeMount);
 }
 
 void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
@@ -3441,26 +3433,17 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
         return;
     }
 
-    std::map<std::pair<uint16_t, uint8_t>, uint32_t> inventoryCounts;
-
+    std::vector<ActionBarItem> inventoryCounts;
+    inventoryCounts.reserve(size);
+    const bool multiSpr = g_game.getFeature(Otc::GameMultiSpr);
+    const bool simple = g_game.getProtocolVersion() < 1500;
     for (uint16_t i = 0; std::cmp_less(i, size); ++i) {
-        const uint16_t itemId = msg->getU16();
-        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
-        const uint8_t attribute = msg->getU8();
-
-        const uint32_t amount = g_game.getProtocolVersion() < 1500 ? msg->getU16() : readPackedCount1500(msg);
-
-        uint8_t tier = 0;
-        if (const auto& thingType = g_things.getThingType(itemId, ThingCategoryItem, resourceId)) {
-            if (std::cmp_greater(thingType->getClassification(), 0)) {
-                tier = attribute;
-            }
-        }
-
-        const auto key = std::make_pair(itemId, tier);
-        auto& entry = inventoryCounts[key];
-        const uint64_t sum = static_cast<uint64_t>(entry) + amount;
-        entry = static_cast<uint32_t>(std::min<uint64_t>(sum, (std::numeric_limits<uint32_t>::max)()));
+        ActionBarItem item;
+        item.id = msg->getU16();
+        item.resourceId = multiSpr ? msg->getU16() : 0;
+        item.subType = msg->getU8();
+        item.count = simple ? msg->getU16() : readPackedCount1500(msg);
+        inventoryCounts.emplace_back(std::move(item));
     }
 
     if (const auto& localPlayer = g_game.getLocalPlayer()) {
@@ -3650,7 +3633,7 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
     return 0;
 }
 
-bool ProtocolGame::setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType)
+bool ProtocolGame::setMagicEffect(const InputMessagePtr& msg, Position& pos, uint8_t effectType, uint8_t& delay)
 {
     uint16_t resourceId = 0;
     switch (effectType) {
@@ -3658,8 +3641,11 @@ bool ProtocolGame::setMagicEffect(const InputMessagePtr& msg, Position& pos, uin
             // returning false ends the "while" loop
             return false;
         case Otc::MAGIC_EFFECTS_DELAY:
+            delay = msg->getU8();
+            break;
         case Otc::MAGIC_EFFECTS_DELTA: {
-            msg->getU8(); // horizontal offset to the next effect (not implemented)
+            // packed magic effect offset
+            pos.offsetByDelta(m_localPlayer->getPosition(), msg->getU8());
             break;
         }
 
@@ -3678,16 +3664,18 @@ bool ProtocolGame::setMagicEffect(const InputMessagePtr& msg, Position& pos, uin
                 return false;
             }
 
-            const auto& missile = std::make_shared<Missile>();
-            missile->setId(shotId, resourceId);
+            g_dispatcher.scheduleEvent([posCopy = Position(pos), shotId, resourceId, offsetX, offsetY, effectType] {
+                const auto& missile = std::make_shared<Missile>();
+                missile->setId(shotId, resourceId);
 
-            if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
-                missile->setPath(pos, Position(pos.x + offsetX, pos.y + offsetY, pos.z));
-            } else {
-                missile->setPath(Position(pos.x + offsetX, pos.y + offsetY, pos.z), pos);
-            }
+                if (effectType == Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT) {
+                    missile->setPath(posCopy, Position(posCopy.x + offsetX, posCopy.y + offsetY, posCopy.z));
+                } else {
+                    missile->setPath(Position(posCopy.x + offsetX, posCopy.y + offsetY, posCopy.z), posCopy);
+                }
 
-            g_map.addThing(missile, pos);
+                g_map.addThing(missile, posCopy);
+            }, delay);
             break;
         }
 
@@ -3705,9 +3693,11 @@ bool ProtocolGame::setMagicEffect(const InputMessagePtr& msg, Position& pos, uin
                 break;
             }
 
-            const auto& effect = std::make_shared<Effect>();
-            effect->setId(effectId, resourceId);
-            g_map.addThing(effect, pos);
+            g_dispatcher.scheduleEvent([posCopy = Position(pos), effectId, resourceId, effectType] {
+                const auto& effect = std::make_shared<Effect>();
+                effect->setId(effectId, resourceId);
+                g_map.addThing(effect, posCopy);
+            }, delay);
             break;
         }
 
@@ -4108,12 +4098,12 @@ void ProtocolGame::parseTaskHuntingBasicData(const InputMessagePtr& msg)
     const uint16_t preys = msg->getU16();
     for (auto i = 0; i < preys; ++i) {
         msg->getU16(); // RaceID
-        msg->getU8(); // Difficult
+        msg->getU8(); // Difficulty
     }
 
     const uint8_t options = msg->getU8();
     for (auto i = 0; i < options; ++i) {
-        msg->getU8(); // Difficult
+        msg->getU8(); // Difficulty
         msg->getU8(); // Stars
         msg->getU16(); // First kill
         msg->getU16(); // First reward
@@ -4186,30 +4176,30 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     // checkbox: fallback to main container
     const bool quickLootFallbackToMainContainer = static_cast<bool>(msg->getU8());
 
-    // to do: rework this to support resource ids
+    // list of configured loot containers [category, quickloot bp, retrieve bp]
     const bool multiSpr = g_game.getFeature(Otc::GameMultiSpr);
     const uint8_t containersCount = msg->getU8();
-    std::vector<std::tuple<uint8_t, uint16_t, uint16_t>> lootList;
-
+    std::vector<LootContainerConf> lootList;
+    lootList.reserve(containersCount);
     for (auto i = 0; i < containersCount; ++i) {
-        const uint8_t categoryType = msg->getU8();
+        LootContainerConf conf;
+        conf.categoryType = msg->getU8();
 
         // container for monster loot
-        const uint16_t lootContainerId = msg->getU16();
+        conf.lootId = msg->getU16();
         if (multiSpr) {
-            msg->getU16(); // to do: resource id
+            conf.lootResourceId = msg->getU16();
         }
 
         // container for npc products (and stash retrieve?)
-        uint16_t obtainerContainerId = 0;
         if (g_game.getClientVersion() >= 1332) {
-            obtainerContainerId = msg->getU16();
+            conf.retrieveId = msg->getU16();
             if (multiSpr) {
-                msg->getU16(); // to do: resource id
+                conf.retrieveResourceId = msg->getU16();
             }
         }
 
-        lootList.emplace_back(categoryType, lootContainerId, obtainerContainerId);
+        lootList.emplace_back(conf);
     }
 
     g_lua.callGlobalField("g_game", "onQuickLootContainers", quickLootFallbackToMainContainer, lootList);
@@ -4357,16 +4347,14 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
 void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)
 {
     const uint16_t itemsCount = msg->getU16();
-    std::vector<std::vector<uint32_t>> stashItems;
+    std::vector<std::tuple<uint16_t, uint32_t, uint16_t>> stashItems;
 
     const bool multiSpr = g_game.getFeature(Otc::GameMultiSpr);
     for (auto i = 0; i < itemsCount; ++i) {
         uint16_t itemId = msg->getU16();
-        if (multiSpr) {
-            msg->getU16(); // to do: resource id
-        }
+        uint16_t resourceId = multiSpr ? msg->getU16() : 0;
         uint32_t amount = msg->getU32();
-        stashItems.push_back({ itemId, amount });
+        stashItems.push_back({ itemId, amount, resourceId });
     }
     if (g_game.getProtocolVersion() < 1410) {
         msg->getU16(); // free slots
@@ -4765,16 +4753,14 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             }
 
             const uint8_t concoctionsCount = msg->getU8();
-            std::vector<std::tuple<uint16_t, uint16_t>> concoctionsArray;
+            std::vector<std::tuple<uint16_t, uint16_t, uint16_t>> concoctionsArray;
 
             const bool multiSpr = g_game.getFeature(Otc::GameMultiSpr);
             for (auto i = 0; i < concoctionsCount; ++i) {
                 const uint16_t potionItemId = msg->getU16(); // item id
-                if (multiSpr) {
-                    msg->getU16(); // to do: resource id
-                }
+                const uint16_t resourceId = multiSpr ? msg->getU16() : 0;
                 const uint16_t potionDuration = msg->getU16(); // item duration [s]
-                concoctionsArray.emplace_back(potionItemId, potionDuration);
+                concoctionsArray.emplace_back(potionItemId, potionDuration, resourceId);
             }
 
             g_game.processCyclopediaCharacterCombatStats(data, mitigation, additionalSkillsArray, forgeSkillsArray, perfectShotDamageRangesArray, combatsArray, concoctionsArray);
@@ -5689,12 +5675,10 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         return;
     } else if (windowType == Otc::IMBUEMENT_WINDOW_CHOICE) {
         const uint16_t itemId = msg->getU16();
-        if (g_game.getFeature(Otc::GameMultiSpr)) {
-            msg->getU16(); // to do: resourceId
-        }
+        const uint16_t resourceId = g_game.getFeature(Otc::GameMultiSpr) ? msg->getU16() : 0;
         const uint32_t unknown = msg->getU32(); // new imbuement duration?
 
-        g_lua.callGlobalField("g_game", "onOpenImbuementWindow", itemId, unknown);
+        g_lua.callGlobalField("g_game", "onOpenImbuementWindow", itemId, unknown, resourceId);
         return;
     }
 
@@ -5785,7 +5769,7 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
         const uint16_t resourceId = multiSpr ? msg->getU16() : 0;
         const uint8_t itemTier = readMarketItemTier(msg, itemId, resourceId, version);
         const uint16_t count = msg->getU16();
-        depotItems.push_back({ itemId, itemTier, count });
+        depotItems.push_back({ itemId, itemTier, count, resourceId });
     }
 
     g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, -1, -1);
@@ -5804,11 +5788,9 @@ void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
     std::vector<std::vector<uint16_t>> depotItems;
     for (auto i = 0; i < itemsSent; ++i) {
         const uint16_t itemId = msg->getU16();
-        if (multiSpr) {
-            msg->getU16(); // to do: resource id
-        }
+        const uint16_t resourceId = multiSpr ? msg->getU16() : 0;
         const uint16_t count = msg->getU16();
-        depotItems.push_back({ itemId, count });
+        depotItems.push_back({ itemId, 0, count, resourceId });
     }
 
     g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, balance, vocation);
@@ -6877,9 +6859,12 @@ SubOffer ProtocolGame::getStoreSubOffer(const InputMessagePtr& msg)
 
 void ProtocolGame::getStorePackageItem(const InputMessagePtr& msg)
 {
-    msg->getString(); // bundle item name
+    // "package contains" list item
 
-    // bundle item image
+    // item name
+    msg->getString();
+
+    // item image
     const uint8_t offerType = msg->getU8(); // offer type
     switch (offerType) {
         case 0:
@@ -6916,6 +6901,43 @@ void ProtocolGame::getStorePackageItem(const InputMessagePtr& msg)
             // vanilla client throws invalid enum
             g_logger.warning("gamestore: invalid offer package item image type {}", static_cast<int>(offerType));
             break;
+    }
+}
+
+OutfitWindowThing ProtocolGame::getOutfitWindowThing(const InputMessagePtr& msg, const bool addons, const bool multiSpr, const bool thingCategories) const
+{
+    OutfitWindowThing o;
+    o.id = msg->getU16();
+    if (multiSpr) {
+        o.resourceId = msg->getU16();
+    }
+
+    o.name = msg->getString();
+
+    if (addons) {
+        o.addons = msg->getU8();
+    }
+
+    if (thingCategories) {
+        o.category = static_cast<ThingCategory>(msg->getU8());
+    }
+
+    if (g_game.getClientVersion() >= 1281) {
+        // 0 - ok, 1 - store (u32 offerId), 2 - golden outfit tooltip, 3 - crown set outfit tooltip
+        o.lockReason = msg->getU8();
+        if (o.lockReason == 1) {
+            o.offerId = msg->getU32();
+        }
+    }
+    return o;
+}
+
+void ProtocolGame::getOutfitWindowCosmeticsList(const InputMessagePtr& msg, std::vector<OutfitWindowThing>& thingList, const bool listInU16, const bool addons, const bool multiSpr, const bool thingCategories) const
+{
+    const uint16_t thingCount = listInU16 ? msg->getU16() : msg->getU8();
+    thingList.reserve(thingCount);
+    for (auto i = 0; i < thingCount; ++i) {
+        thingList.emplace_back(getOutfitWindowThing(msg, addons, multiSpr, thingCategories));
     }
 }
 

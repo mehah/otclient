@@ -219,6 +219,83 @@ bool luavalue_cast(const int index, Outfit& outfit)
     return true;
 }
 
+int push_luavalue(const OutfitWindowThing& item)
+{
+    g_lua.createTable(0, 7);
+    g_lua.pushInteger(item.id);
+    g_lua.setField("id");
+    g_lua.pushInteger(item.resourceId);
+    g_lua.setField("resourceId");
+    g_lua.pushString(item.name);
+    g_lua.setField("name");
+    g_lua.pushInteger(item.addons);
+    g_lua.setField("addons");
+    g_lua.pushInteger(item.lockReason);
+    g_lua.setField("lockReason");
+    g_lua.pushInteger(item.offerId);
+    g_lua.setField("offerId");
+    g_lua.pushInteger(static_cast<int>(item.category));
+    g_lua.setField("category");
+    return 1;
+}
+
+bool luavalue_cast(const int index, OutfitWindowThing& item)
+{
+    if (!g_lua.isTable(index))
+        return false;
+
+    g_lua.getField("id", index);
+    item.id = g_lua.popInteger();
+    g_lua.getField("resourceId", index);
+    item.resourceId = g_lua.popInteger();
+    g_lua.getField("name", index);
+    item.name = g_lua.popString();
+    g_lua.getField("addons", index);
+    item.addons = g_lua.popInteger();
+    g_lua.getField("lockReason", index);
+    item.lockReason = g_lua.popInteger();
+    g_lua.getField("offerId", index);
+    item.offerId = g_lua.popInteger();
+    g_lua.getField("category", index);
+    item.category = static_cast<ThingCategory>(g_lua.popInteger());
+
+    return true;
+}
+
+int push_luavalue(const LootContainerConf& conf)
+{
+    g_lua.createTable(0, 5);
+    g_lua.pushInteger(conf.categoryType);
+    g_lua.setField("categoryType");
+    g_lua.pushInteger(conf.lootId);
+    g_lua.setField("lootId");
+    g_lua.pushInteger(conf.lootResourceId);
+    g_lua.setField("lootResourceId");
+    g_lua.pushInteger(conf.retrieveId);
+    g_lua.setField("retrieveId");
+    g_lua.pushInteger(conf.retrieveResourceId);
+    g_lua.setField("retrieveResourceId");
+    return 1;
+}
+
+bool luavalue_cast(int index, LootContainerConf& conf)
+{
+    if (!g_lua.isTable(index))
+        return false;
+
+    g_lua.getField("categoryType", index);
+    conf.categoryType = g_lua.popInteger();
+    g_lua.getField("lootId", index);
+    conf.lootId = g_lua.popInteger();
+    g_lua.getField("lootResourceId", index);
+    conf.lootResourceId = g_lua.popInteger();
+    g_lua.getField("retrieveId", index);
+    conf.retrieveId = g_lua.popInteger();
+    g_lua.getField("retrieveResourceId", index);
+    conf.retrieveResourceId = g_lua.popInteger();
+    return true;
+}
+
 int push_luavalue(const Position& pos)
 {
     if (pos.isValid()) {
@@ -1604,9 +1681,11 @@ int push_luavalue(const ForgeHistory& item) {
 }
 
 int push_luavalue(const ForgeItemInfo& item) {
-    g_lua.createTable(0, 3);
+    g_lua.createTable(0, 4);
     g_lua.pushInteger(item.id);
     g_lua.setField("id");
+    g_lua.pushInteger(item.resourceId);
+    g_lua.setField("resourceId");
     g_lua.pushInteger(item.tier);
     g_lua.setField("tier");
     g_lua.pushInteger(item.count);
@@ -1705,7 +1784,7 @@ int push_luavalue(const ForgeOpenData& data) {
 }
 
 int push_luavalue(const ForgeResultData& data) {
-    g_lua.createTable(0, 8);
+    g_lua.createTable(0, 13);
     g_lua.pushInteger(data.actionType);
     g_lua.setField("actionType");
     g_lua.pushBoolean(data.convergence);
@@ -1715,10 +1794,18 @@ int push_luavalue(const ForgeResultData& data) {
     g_lua.pushInteger(data.leftItemId);
     g_lua.setField("leftItemId");
     g_lua.pushInteger(data.leftTier);
+    g_lua.setField("leftItemResourceId");
+    g_lua.pushInteger(data.leftItemResourceId);
     g_lua.setField("leftTier");
     g_lua.pushInteger(data.rightItemId);
     g_lua.setField("rightItemId");
     g_lua.pushInteger(data.rightTier);
+    g_lua.setField("rightItemResourceId");
+    g_lua.pushInteger(data.rightItemResourceId);
+    g_lua.setField("outcomeItemId");
+    g_lua.pushInteger(data.outcomeItemId);
+    g_lua.setField("outcomeItemResourceId");
+    g_lua.pushInteger(data.outcomeResourceId);
     g_lua.setField("rightTier");
     g_lua.pushInteger(data.bonus);
     g_lua.setField("bonus");

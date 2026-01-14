@@ -100,13 +100,19 @@ protected:
     static void processRemoveAutomapFlag(const Position& pos, uint8_t icon, std::string_view message);
 
     // outfit
-    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>>& outfitList,
-                                const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& mountList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& familiarList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& effectsList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& shaderList);
+    void processOpenOutfitWindow(
+        const Outfit& currentOutfit,
+        const std::vector<OutfitWindowThing>& outfitList,
+        const std::vector<OutfitWindowThing>& mountList,
+        const std::vector<OutfitWindowThing>& familiarList,
+        const std::vector<OutfitWindowThing>& wingsList,
+        const std::vector<OutfitWindowThing>& aurasList,
+        const std::vector<OutfitWindowThing>& effectsList,
+        const std::vector<OutfitWindowThing>& shaderList,
+        const uint8_t windowType,
+        const bool mounted,
+        const bool randomizeMount
+    );
 
     // npc trade
     static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items);
@@ -132,14 +138,14 @@ protected:
                                    & choiceList, bool priority);
 
     // cyclopedia
-    static void processItemDetail(uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions);
+    static void processItemDetail(uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions, uint16_t resourceId);
     static void processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
                                                     const std::vector<std::tuple<uint8_t, uint16_t>>& combats);
     static void processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, double mitigation,
                                                     const std::vector<std::vector<uint16_t>>& additionalSkillsArray,
                                                     const std::vector<std::vector<uint16_t>>& forgeSkillsArray, const std::vector<uint16_t>& perfectShotDamageRangesArray,
                                                     const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray,
-                                                    const std::vector<std::tuple<uint16_t, uint16_t>>& concoctionsArray);
+                                                    const std::vector<std::tuple<uint16_t, uint16_t, uint16_t>>& concoctionsArray);
     static void processCyclopediaCharacterGeneralStatsBadge(uint8_t showAccountInformation, uint8_t playerOnline, uint8_t playerPremium,
                                                             std::string_view loyaltyTitle,
                                                             const std::vector<std::tuple<uint32_t, std::string>>& badgesVector);

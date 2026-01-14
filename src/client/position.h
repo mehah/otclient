@@ -127,6 +127,8 @@ public:
         return positions;
     }
 
+    void offsetByDelta(const Position& origin, const uint8_t delta);
+
     static bool isDiagonal(const Otc::Direction dir) { return dir == Otc::NorthWest || dir == Otc::NorthEast || dir == Otc::SouthWest || dir == Otc::SouthEast; };
 
     static double getAngleFromPositions(const Position& fromPos, const Position& toPos)

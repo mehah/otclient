@@ -125,7 +125,7 @@ public:
 
     // thing related
     ThingPtr getThing(const Position& pos, int16_t stackPos);
-    void addThing(const ThingPtr& thing, const Position& pos, int16_t stackPos = -1);
+    void addThing(const ThingPtr& thing, const Position& pos, const int16_t stackPos = -1);
     bool removeThing(const ThingPtr& thing);
     bool removeThingByPos(const Position& pos, int16_t stackPos);
 

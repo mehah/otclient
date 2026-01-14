@@ -578,11 +578,11 @@ struct DailyRewardItem
 
 struct DailyRewardBundle
 {
-    uint8_t bundleType;
-    uint16_t itemId;
-    uint16_t resourceId;
+    uint8_t bundleType{ 0 };
+    uint16_t itemId{ 0 };
+    uint16_t resourceId{ 0 };
     std::string name;
-    uint8_t count;
+    uint8_t count{ 0 };
 };
 
 struct DailyRewardDay
@@ -765,6 +765,8 @@ struct ForgeResultData
     uint8_t leftTier{ 0 };
     uint16_t rightItemId{ 0 };
     uint16_t rightItemResourceId{ 0 };
+    uint16_t outcomeItemId{ 0 };
+    uint16_t outcomeResourceId{ 0 };
     uint8_t rightTier{ 0 };
     uint8_t bonus{ 0 };
     uint8_t coreCount{ 0 };
@@ -807,4 +809,32 @@ struct ForgeHistory
     uint8_t actionType;
     std::string description;
     uint8_t bonus;
+};
+
+struct OutfitWindowThing
+{
+    uint16_t id{ 0 };
+    uint16_t resourceId{ 0 };
+    std::string name;
+    uint8_t addons{ 0 };
+    uint8_t lockReason{ 0 };
+    uint32_t offerId{ 0 };
+    ThingCategory category{ ThingCategoryCreature };
+};
+
+struct ActionBarItem
+{
+    uint16_t id{ 0 };
+    uint16_t resourceId{ 0 };
+    uint8_t subType{ 0 }; // fluid/tier
+    uint32_t count{ 0 };
+};
+
+struct LootContainerConf
+{
+    uint16_t lootId{ 0 };
+    uint16_t lootResourceId{ 0 };
+    uint16_t retrieveId{ 0 };
+    uint16_t retrieveResourceId{ 0 };
+    uint8_t categoryType{ 0 };
 };

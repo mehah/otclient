@@ -404,13 +404,19 @@ void Game::processRemoveAutomapFlag(const Position& pos, const uint8_t icon, con
     g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message);
 }
 
-void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>>& outfitList,
-                                   const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& mountList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& familiarList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& effectList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& shaderList)
+void Game::processOpenOutfitWindow(
+    const Outfit& currentOutfit,
+    const std::vector<OutfitWindowThing>& outfitList,
+    const std::vector<OutfitWindowThing>& mountList,
+    const std::vector<OutfitWindowThing>& familiarList,
+    const std::vector<OutfitWindowThing>& wingsList,
+    const std::vector<OutfitWindowThing>& aurasList,
+    const std::vector<OutfitWindowThing>& effectsList,
+    const std::vector<OutfitWindowThing>& shaderList,
+    const uint8_t windowType,
+    const bool mounted,
+    const bool randomizeMount
+)
 {
     // create virtual creature outfit
     const auto& virtualOutfitCreature = std::make_shared<Creature>();
@@ -431,13 +437,23 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
         virtualMountCreature->setOutfit(mountOutfit);
     }
 
+    // create virtual familiar outfit
+    CreaturePtr virtualFamiliarCreature;
     if (getFeature(Otc::GamePlayerFamiliars)) {
         Outfit familiarOutfit;
         familiarOutfit.applySimpleOutfit(currentOutfit.getFamiliar());
         familiarOutfit.setCategory(ThingCategoryCreature);
+
+        virtualFamiliarCreature = std::make_shared<Creature>();
+        virtualFamiliarCreature->setDirection(Otc::South);
+        virtualFamiliarCreature->setOutfit(familiarOutfit);
     }
 
-    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, familiarList, wingsList, aurasList, effectList, shaderList);
+    g_lua.callGlobalField("g_game", "onOpenOutfitWindow",
+                          virtualOutfitCreature, virtualMountCreature, virtualFamiliarCreature,
+                          outfitList, mountList, familiarList, wingsList, aurasList, effectsList, shaderList,
+                          windowType, mounted, randomizeMount
+    );
 }
 
 void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items)
@@ -497,9 +513,9 @@ void Game::processModalDialog(const uint32_t id, const std::string_view title, c
     g_lua.callGlobalField("g_game", "onModalDialog", id, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
 }
 
-void Game::processItemDetail(const uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions)
+void Game::processItemDetail(const uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions, const uint16_t resourceId)
 {
-    g_lua.callGlobalField("g_game", "onParseItemDetail", itemId, descriptions);
+    g_lua.callGlobalField("g_game", "onParseItemDetail", itemId, descriptions, resourceId);
 }
 
 void Game::processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
@@ -510,7 +526,7 @@ void Game::processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGener
 
 void Game::processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, const double mitigation, const std::vector<std::vector<uint16_t>>& additionalSkillsArray,
                                                 const std::vector<std::vector<uint16_t>>& forgeSkillsArray, const std::vector<uint16_t>& perfectShotDamageRangesArray,
-                                                const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray, const std::vector<std::tuple<uint16_t, uint16_t>>& concoctionsArray)
+                                                const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray, const std::vector<std::tuple<uint16_t, uint16_t, uint16_t>>& concoctionsArray)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterCombatStats", data, mitigation, additionalSkillsArray, forgeSkillsArray, perfectShotDamageRangesArray, combatsArray, concoctionsArray);
 }

@@ -22,6 +22,24 @@
 
 #include "gameconfig.h"
 #include "position.h"
+#include "map.h"
+
+void Position::offsetByDelta(const Position& origin, const uint8_t delta)
+{
+    // this is for MAGIC_EFFECT_DELTA, for packed area effects
+
+    // horizontal viewport size (tiles)
+    const uint8_t tileCount = g_map.getAwareRange().horizontal();
+    for (uint8_t i = 1; i <= delta; ++i) {
+        x++;
+        if ((x - origin.x) == tileCount) { // wrap row
+            y++;
+            x = origin.x;
+        } else {
+            x += delta; // continue within the same row
+        }
+    }
+}
 
 bool Position::isMapPosition() const { return ((x >= 0) && (y >= 0) && (x < UINT16_MAX) && (y < UINT16_MAX) && (z <= g_gameConfig.getMapMaxZ())); }
 
