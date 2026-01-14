@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -554,6 +554,12 @@ bool Thing::isDecoKit() const {
 bool Thing::isAmmo() {
     if (const auto t = getThingType(); t)
         return t->isAmmo();
+    return false;
+}
+
+bool Thing::isDualWield() {
+    if (const auto t = getThingType(); t)
+        return t->isDualWield();
     return false;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -96,6 +96,9 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         }
         g_drawPool.resetDrawOrder();
     }
+
+    if (m_textUnderline && m_textUnderline->getVertexCount() > 0)
+        g_drawPool.addTexturedCoordsBuffer(nullptr, m_textUnderline, m_color);
 
     if (hasSelection()) {
         const int textLengthSel = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
@@ -250,6 +253,8 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     recacheGlyphs();
 
     m_drawText = getDisplayedText();
+    if ((hasEventListener(EVENT_TEXT_CLICK) || hasEventListener(EVENT_TEXT_HOVER)) && m_textEvents.empty())
+        processCodeTags();
     const int textLength = static_cast<int>(m_drawText.length());
 
     Size textBoxSize;
@@ -603,6 +608,15 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 
     for (auto& [rgba, crds] : colorCoordsMap)
         m_colorCoordsBuffer.emplace_back(Color(rgba), crds);
+
+    std::vector<Rect> glyphRects;
+    glyphRects.reserve(m_glyphsCoords.size());
+    for (const auto& pair : m_glyphsCoords) {
+        glyphRects.push_back(pair.first);
+    }
+
+    if (hasEventListener(EVENT_TEXT_CLICK) || hasEventListener(EVENT_TEXT_HOVER))
+        updateRectToWord(glyphRects);
 
     if (!disableAreaUpdate && fireAreaUpdate)
         onTextAreaUpdate(m_textVirtualOffset, m_textVirtualSize, m_textTotalSize);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -85,6 +85,9 @@ public:
 
     void setDrawManaBar(const bool enable) { m_drawManaBar = enable; }
     bool isDrawingManaBar() const { return m_drawManaBar; }
+
+    void setDrawHarmony(const bool enable) { m_drawHarmony = enable; }
+    bool isDrawingHarmony() const { return m_drawHarmony; }
 
     void move(int32_t x, int32_t y);
 
@@ -259,6 +262,7 @@ private:
     bool m_smooth{ true };
     bool m_follow{ true };
     bool m_drawingLight{ true };
+    bool m_drawHarmony{ true };
 
     bool m_fadeFinish{ false };
     bool m_autoViewMode{ false };

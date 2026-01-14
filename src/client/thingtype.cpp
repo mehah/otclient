@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -113,10 +113,6 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
 
 void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 {
-    if (flags.floorchange()) {
-        m_flags |= ThingFlagAttrFloorChange;
-    }
-
     if (flags.has_bank()) {
         m_groundSpeed = flags.bank().waypoints();
         m_flags |= ThingFlagAttrGround;
@@ -368,6 +364,16 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
 
     if (flags.has_deco_kit() && flags.deco_kit()) {
         m_flags |= ThingFlagAttrExpireStop;
+    }
+
+    if (flags.has_skillwheel_gem()) {
+        m_skillWheelGem.gem_quality_id = flags.skillwheel_gem().gem_quality_id();
+        m_skillWheelGem.vocation_id = flags.skillwheel_gem().vocation_id();
+        m_flags |= ThingFlagAttrSkillWheelGem;
+    }
+
+    if (flags.has_dual_wielding() && flags.dual_wielding()) {
+        m_flags |= ThingFlagAttrDualWield;
     }
 }
 

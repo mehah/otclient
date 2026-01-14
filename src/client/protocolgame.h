@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2026 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -319,7 +319,7 @@ private:
     void parseTaskHuntingData(const InputMessagePtr& msg);
     void parseExperienceTracker(const InputMessagePtr& msg);
     void parseLootContainers(const InputMessagePtr& msg);
-    void parseVirtue(const InputMessagePtr& msg);
+    void parseMonkData(const InputMessagePtr& msg);
     void parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg);
     void parseCyclopediaHousesInfo(const InputMessagePtr& msg);
     void parseCyclopediaHouseList(const InputMessagePtr& msg);
