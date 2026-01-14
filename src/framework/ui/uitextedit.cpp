@@ -97,7 +97,7 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         g_drawPool.resetDrawOrder();
     }
 
-    if (m_textUnderline->getVertexCount() > 0)
+    if (m_textUnderline && m_textUnderline->getVertexCount() > 0)
         g_drawPool.addTexturedCoordsBuffer(nullptr, m_textUnderline, m_color);
 
     if (hasSelection()) {

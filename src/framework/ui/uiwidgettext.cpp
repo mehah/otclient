@@ -250,7 +250,8 @@ void UIWidget::drawText(const Rect& screenCoords)
     }
     g_drawPool.resetDrawOrder();
     g_drawPool.scale(1.f); // reset scale
-    if (m_textUnderline->getVertexCount() > 0)
+
+    if (m_textUnderline && m_textUnderline->getVertexCount() > 0)
         g_drawPool.addTexturedCoordsBuffer(nullptr, m_textUnderline, m_color);
 }
 
@@ -480,24 +481,24 @@ void UIWidget::processCodeTags() {
     std::regex regex(R"(\[text-event\](.*?)\[/text-event\])");
     std::smatch match;
 
-        while (std::regex_search(tempText, match, regex)) {
-            m_text += tempText.substr(0, match.position());
+    while (std::regex_search(tempText, match, regex)) {
+        m_text += tempText.substr(0, match.position());
 
-            std::string word = match[1];
-            size_t startPos = m_text.length();
-            size_t endPos = startPos + word.length();
+        std::string word = match[1];
+        size_t startPos = m_text.length();
+        size_t endPos = startPos + word.length();
 
-            // detect special marker prefix (\x01) which indicates "no underline"
-            bool noUnderline = false;
-            if (!word.empty() && word[0] == '\x01') {
-                noUnderline = true;
-                word = word.substr(1);
-            }
-
-            m_textEvents.push_back({ word, startPos, endPos, noUnderline });
-            m_text += word;
-            tempText = tempText.substr(match.position() + match.length());
+        // detect special marker prefix (\x01) which indicates "no underline"
+        bool noUnderline = false;
+        if (!word.empty() && word[0] == '\x01') {
+            noUnderline = true;
+            word = word.substr(1);
         }
+
+        m_textEvents.push_back({ word, startPos, endPos, noUnderline });
+        m_text += word;
+        tempText = tempText.substr(match.position() + match.length());
+    }
 
     m_text += tempText;
 }
@@ -518,10 +519,14 @@ static void buildTextUnderline(Rect& wordRect, CoordsBuffer& textUnderlineCoords
 void UIWidget::updateRectToWord(const std::vector<Rect>& glypsCoords)
 {
     m_rectToWord.clear();
-    m_textUnderline->clear();
+    if (m_textUnderline)
+        m_textUnderline->clear();
 
     if (glypsCoords.empty() || m_textEvents.empty())
         return;
+
+    if (!m_textUnderline)
+        m_textUnderline = std::make_shared<CoordsBuffer>();
 
     const size_t glyphCount = glypsCoords.size();
 
