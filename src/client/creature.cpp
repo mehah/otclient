@@ -201,7 +201,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         p.scale(g_app.getCreatureInformationScale());
     }
 
-    auto backgroundRect = Rect(p.x - (13.5), p.y - cropSizeBackGround, 31, 4);
+    auto backgroundRect = Rect(p.x - (15.5), p.y - cropSizeBackGround, 31, 4);
     auto textRect = Rect(p.x - nameSize.width() / 2.0, p.y - cropSizeText, nameSize);
 
     if (!isScaled) {
@@ -222,7 +222,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
 
     // health rect is based on background rect, so no worries
     Rect healthRect = backgroundRect.expanded(-1);
-    healthRect.setWidth((m_healthPercent / 100.0) * 25);
+    healthRect.setWidth((m_healthPercent / 100.0) * 29);
 
     Rect barsRect = backgroundRect;
 
@@ -238,7 +238,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
 
                     Rect manaShieldRect = barsRect.expanded(-1);
                     const double maxManaShield = player->getMaxManaShield();
-                    manaShieldRect.setWidth((maxManaShield ? player->getManaShield() / maxManaShield : 1) * 25);
+                    manaShieldRect.setWidth((maxManaShield ? player->getManaShield() / maxManaShield : 1) * 29);
 
                     g_drawPool.addFilledRect(manaShieldRect, Color::darkPink);
                 }
@@ -248,7 +248,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
 
                 Rect manaRect = barsRect.expanded(-1);
                 const double maxMana = player->getMaxMana();
-                manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
+                manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 29);
 
                 g_drawPool.addFilledRect(manaRect, Color::blue);
             }
@@ -301,19 +301,19 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     }
 
     if (m_skull != Otc::SkullNone && m_skullTexture)
-        g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+        g_drawPool.addTexturedPos(m_skullTexture, backgroundRect.x() + 15.5 + 12, backgroundRect.y() + 5);
 
     if (m_shield != Otc::ShieldNone && m_shieldTexture && m_showShieldTexture)
-        g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 13.5, backgroundRect.y() + 5);
+        g_drawPool.addTexturedPos(m_shieldTexture, backgroundRect.x() + 15.5, backgroundRect.y() + 5);
 
     if (m_emblem != Otc::EmblemNone && m_emblemTexture)
-        g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 16);
+        g_drawPool.addTexturedPos(m_emblemTexture, backgroundRect.x() + 15.5 + 12, backgroundRect.y() + 16);
 
     if (m_type != Proto::CreatureTypeUnknown && m_typeTexture)
-        g_drawPool.addTexturedPos(m_typeTexture, backgroundRect.x() + 13.5 + 12 + 12, backgroundRect.y() + 16);
+        g_drawPool.addTexturedPos(m_typeTexture, backgroundRect.x() + 15.5 + 12 + 12, backgroundRect.y() + 16);
 
     if (m_icon != Otc::NpcIconNone && m_iconTexture)
-        g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5);
+        g_drawPool.addTexturedPos(m_iconTexture, backgroundRect.x() + 15.5 + 12, backgroundRect.y() + 5);
 
     if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
         g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
@@ -322,7 +322,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         int iconOffset = 0;
         for (const auto& iconTex : m_icons->atlasGroups) {
             if (!iconTex.texture) continue;
-            const Rect dest(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5 + iconOffset * 14, iconTex.clip.size());
+            const Rect dest(backgroundRect.x() + 15.5 + 12, backgroundRect.y() + 5 + iconOffset * 14, iconTex.clip.size());
             g_drawPool.addTexturedRect(dest, iconTex.texture, iconTex.clip);
             m_icons->numberText.setText(std::to_string(iconTex.count));
             const auto textSize = m_icons->numberText.getTextSize();
