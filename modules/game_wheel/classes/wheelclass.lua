@@ -646,8 +646,6 @@ end
 
 function WheelOfDestiny.onDestinyWheel(playerId, canView, changeState, vocationId, points, scrollPoints, pointInvested, usedPromotionScrolls, equipedGems, atelierGems, basicUpgraded, supremeUpgraded, earnedFromAchievements)
   if not table.isIn({1, 2, 3, 4, 5}, vocationId) then
-    wheelWindow:ungrabMouse()
-    wheelWindow:ungrabKeyboard()
     local cancelFunc = function()
       if openWheel then
         openWheel:destroy()
@@ -659,24 +657,13 @@ function WheelOfDestiny.onDestinyWheel(playerId, canView, changeState, vocationI
       openWheel = displayGeneralBox(tr('Info'), tr("To be able to use the Wheel of Destiny, a character must be at leat level 51, be promoted and have active\nPremium Time."),
       { { text=tr('Ok'), callback=cancelFunc }}, cancelFunc)
       wheelWindow:hide()
-      wheelWindow:ungrabMouse()
-      wheelWindow:ungrabKeyboard()
     end
-    return
-  end
-
-  if not canView then
-    wheelWindow:hide()
-    wheelWindow:ungrabMouse()
-    wheelWindow:ungrabKeyboard()
     return
   end
 
   if not wheelWindow:isVisible() then
     wheelWindow:show()
     WheelOfDestiny.resetPassiveFocus()
-    wheelWindow:grabMouse()
-    wheelWindow:grabKeyboard()
   end
 
   -- reset a config anterior

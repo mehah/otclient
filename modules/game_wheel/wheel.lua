@@ -81,10 +81,6 @@ function init()
     onRmvOne()
   end, 500, nil)
 
-  wheelButton = modules.game_mainpanel.addToggleButton('wheelButton', tr('Wheel of Destiny'),   
-    '/images/options/button_skillwheeldialog', toggle, false, 10)  
-  wheelButton:setOn(false)
-
   loadMenu('wheelMenu')
   toggleTabBarButtons('informationButton')
   hide()
@@ -95,6 +91,12 @@ function init()
     --onUnlockGem = GemAtelier.onUnlockGem, --desabilitado pois está em Todo
     onResourceBalance = onResourceBalance,
   })
+  
+  if modules.game_mainpanel then
+    wheelButton = modules.game_mainpanel.addToggleButton('wheelButton', tr('Wheel of Destiny'),   
+      '/images/options/button_skillwheeldialog', toggle, false, 10)  
+    wheelButton:setOn(false)
+  end
 end
 
 function terminate()

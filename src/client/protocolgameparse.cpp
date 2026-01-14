@@ -6377,7 +6377,7 @@ void ProtocolGame::parseOpenWheelWindow(const InputMessagePtr& msg)
     // Se não pode visualizar, encerra e dispara callback "vazio"
     if (!canView) {
         g_logger.debug("[Wheel C++ Parse] Player não pode abrir a Wheel of Destiny.");
-        g_lua.callGlobalField("WheelOfDestiny", "onDestinyWheel",
+        g_lua.callGlobalField("g_game", "onDestinyWheel",
             playerId, canView, 0, 0, 0, 0,
             std::vector<uint16_t>(), std::vector<uint16_t>(),
             std::vector<uint16_t>(), std::vector<GemData>(),
