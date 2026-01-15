@@ -3,8 +3,8 @@ NewMainWindow
   !text: tr('Wheel Of Destiny')
   anchors.horizontalCenter: parent.horizontalCenter
   size: 1000 645
-  @onEscape: modules.game_wheel.hide()
-  @onEnter: modules.game_wheel.onWheelOfDestinyApply(true)
+  @onEscape: hide()
+  @onEnter: onWheelOfDestinyApply(true)
 
   Panel
     id: optionsTabBar
@@ -112,8 +112,8 @@ NewMainWindow
       margin-right: 5
       margin-top: 3
       text-auto-resize: true
-      font: Verdana Bold-11px
-      color: #c0c0c0
+      font: verdana-11px-antialised
+      color: #dfdfdf
 
   Panel
     id: lesserFragmentPanel
@@ -141,8 +141,8 @@ NewMainWindow
       margin-right: 5
       margin-top: 3
       text-auto-resize: true
-      font: Verdana Bold-11px
-      color: #c0c0c0
+      font: verdana-11px-antialised
+      color: #dfdfdf
 
   Panel
     id: greaterFragmentPanel
@@ -170,8 +170,8 @@ NewMainWindow
       margin-right: 5
       margin-top: 3
       text-auto-resize: true
-      font: Verdana Bold-11px
-      color: #c0c0c0
+      font: verdana-11px-antialised
+      color: #dfdfdf
 
   Button
     id: hotCopy
@@ -196,8 +196,8 @@ NewMainWindow
     margin-left: 6
     !text: tr('Current Preset: Default-Preset')
     text-auto-resize: true
-    font: Verdana Bold-11px
-    color: #c0c0c0
+    font: verdana-11px-antialised
+    color: #dfdfdf
 
   Button
     id: close
@@ -207,7 +207,7 @@ NewMainWindow
     size: 43 20
     margin-bottom: 12
     margin-right: 12
-    @onClick: modules.game_wheel.hide()
+    @onClick: hide()
 
   Button
     id: reset
@@ -217,7 +217,7 @@ NewMainWindow
     size: 43 20
     margin-bottom: 12
     margin-right: 5
-    @onClick: modules.game_wheel.resetWheel()
+    @onClick: resetWheel()
 
   Button
     id: apply
@@ -227,7 +227,7 @@ NewMainWindow
     size: 43 20
     margin-bottom: 12
     margin-right: 5
-    @onClick: modules.game_wheel.onWheelOfDestinyApply(false)
+    @onClick: onWheelOfDestinyApply(false)
 
   Button
     id: ok
@@ -237,4 +237,4 @@ NewMainWindow
     size: 43 20
     margin-bottom: 12
     margin-right: 5
-    @onClick: modules.game_wheel.onWheelOfDestinyApply(true)
+    @onClick: onWheelOfDestinyApply(true)
