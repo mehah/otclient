@@ -248,6 +248,13 @@ function GemAtelier.showGems(selectFirst, lastIndex)
 				gemList:focusChild(children[targetIndex])
 			else
 				g_logger.warning(string.format("[GemAtelier] gemID %d não encontrada entre os children exibidos.", lastSelectedGem.gemID or -1))
+				if #children > 0 then
+					gemList:focusChild(children[1])
+				end
+			end
+		else
+			if #children > 0 then
+				gemList:focusChild(children[1])
 			end
 		end
 	end
