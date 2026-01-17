@@ -3573,9 +3573,10 @@ function LoginHttp.create() end
 ---@param port integer
 ---@param email string
 ---@param password string
+---@param token string
 ---@param requestId integer
 ---@param httpLogin boolean
-function LoginHttp:httpLogin(host, path, port, email, password, requestId, httpLogin) end
+function LoginHttp:httpLogin(host, path, port, email, password, token, requestId, httpLogin) end
 
 --------------------------------
 ------------ g_http ------------
