@@ -241,6 +241,7 @@ end
 
 function WheelOfDestiny.onWheelClick(position)
   local index = WheelOfDestiny.getSliceIndex(position)
+  g_logger.info("WheelOfDestiny: Clicked index: " .. index)
   if index == 0 then
     return
   end
@@ -2291,6 +2292,12 @@ function WheelOfDestiny.onImportConfig(base64Data)
     return {}
   end
 
+  base64Data = base64Data:gsub("-", "+"):gsub("_", "/")
+  local remainder = #base64Data % 4
+  if remainder > 0 then
+    base64Data = base64Data .. string.rep("=", 4 - remainder)
+  end
+
   -- Avoid invalid base64 code
   if not base64.isValidBase64(base64Data) then
     g_logger.error(string.format("[WheelOfDestiny.onImportConfig]: Invalid base64 string: %s", base64Data))
@@ -2308,6 +2315,18 @@ function WheelOfDestiny.onImportConfig(base64Data)
 
   local totalPoints = WheelOfDestiny.points
 
+  local importMap = {
+    -- TL (Green) - (Top -> Bot)
+    15, 14, 9, 13, 8, 3, 7, 2, 1,
+    -- TR (Red) - (Right -> Top)
+    16, 17, 10, 18, 11, 4, 12, 5, 6,
+    -- BR (Purple) - (Right -> Bot)
+    22, 23, 28, 24, 29, 34, 30, 35, 36,
+    -- BL (Blue) - (Left -> Bot)
+    21, 20, 27, 19, 26, 33, 32, 25, 31
+  }
+
+  local unsortedPoints = {}
   while index <= #decodedData do
     local value = string.unpack_custom("I1", decodedData:sub(index, index))
 
@@ -2320,7 +2339,7 @@ function WheelOfDestiny.onImportConfig(base64Data)
       end
     end
 
-    table.insert(pointInvested, value)
+    table.insert(unsortedPoints, value)
     usedPoints = usedPoints + value 
     index = index + 1
 
@@ -2329,17 +2348,31 @@ function WheelOfDestiny.onImportConfig(base64Data)
     end
   end
 
-	while index <= #decodedData do
-		local value = string.unpack_custom("I1", decodedData:sub(index, index))
-		table.insert(equipedGems, value)
-		index = index + 1
-	end
+  for i = 1, 36 do
+    pointInvested[i] = 0
+  end
 
-	if usedPoints > points or #pointInvested ~= 36 or #equipedGems ~= 4 then
-		return {}
-	end
+  for i, value in ipairs(unsortedPoints) do
+    if importMap[i] then
+      pointInvested[importMap[i]] = value
+    end
+  end
 
-	return { maxPoints = points, usedPoints = usedPoints, pointInvested = pointInvested, equipedGems = equipedGems }
+  while index <= #decodedData do
+    local value = string.unpack_custom("I1", decodedData:sub(index, index))
+    table.insert(equipedGems, value)
+    index = index + 1
+  end
+
+  while #equipedGems < 4 do
+    table.insert(equipedGems, 0)
+  end
+
+  if usedPoints > points then
+    return {}
+  end
+
+  return { maxPoints = points, usedPoints = usedPoints, pointInvested = pointInvested, equipedGems = equipedGems }
 end
 
 function WheelOfDestiny.doExportCode()
@@ -2468,15 +2501,14 @@ function WheelOfDestiny.validadeImportCode(code)
 		return "Export code does not match a valid Wheel of Destiny."
 	end
 
-	local vocationId = tonumber(code:sub(1, 2)) or 0
+	local vocationString = code:sub(1, 2)
 	local base64Data = code:sub(3)
 
-	local currentVocation = getVocationSt(vocationId)
-	if currentVocation ~= getVocationSt(vocation) then
+	if vocationString ~= getVocationSt(WheelOfDestiny.vocationId) then
 		return "Export code does not match the character's vocation."
 	end
 
-	if not base64.isValidBase64(base64Data) or table.empty(WheelOfDestiny.onImportConfig(base64Data)) then
+	if table.empty(WheelOfDestiny.onImportConfig(base64Data)) then
 		return "Export code does not match a valid Wheel of Destiny."
 	end
 	return ""
@@ -2544,9 +2576,8 @@ function WheelOfDestiny.onConfirmCreatePreset()
 
   if selectedOption == newPresetWindow.contentPanel.import then
     local presetCode = newPresetWindow.contentPanel.presetCode:getText()
-    local vocationId = tonumber(presetCode:sub(1, 2)) or 0
-    local currentVocation = getVocationSt(vocationId)
-    if currentVocation ~= getVocationSt(vocation) then return end
+    local vocationString = presetCode:sub(1, 2)
+    if vocationString ~= getVocationSt(WheelOfDestiny.vocationId) then return end
 
     local base64Data = presetCode:sub(3)
     local loadedResult = WheelOfDestiny.onImportConfig(base64Data)
@@ -2781,7 +2812,7 @@ function WheelOfDestiny.onPresetClick(list, selection, oldSelection)
 	end
 
   local player = g_game.getLocalPlayer()
-  if player and not player:isInProtectionZone() then
+  if player and not player:hasState(PlayerStates.Pz) then
     local managePresetsButton = wheelWindow.mainPanel.wheelMenu.info.presetTabBar:getChildById('managePresetsButton')
     toggleTabBarButtons('informationButton')
     managePresetsButton:setEnabled(false)
@@ -2917,15 +2948,15 @@ function WheelOfDestiny.loadWheelPresets()
 end
 
 function WheelOfDestiny.generateInternalPreset()
+  local playerVocation = translateWheelVocation(LoadedPlayer:getVocation())
 	for k, v in pairs(WheelOfDestiny.externalPreset.presets) do
 		local codeString = v["exportString"]
-		local vocationId = tonumber(codeString:sub(1, 2)) or 0
-		local currentVocation = getVocationSt(vocationId)
+		local vocationString = codeString:sub(1, 2)
 		local base64Data = codeString:sub(3)
 		local data = WheelOfDestiny.onImportConfig(base64Data)
 
 		-- Invalid data
-		if table.empty(data) or currentVocation ~= getVocationSt(vocation) then
+		if table.empty(data) or vocationString ~= getVocationSt(playerVocation) then
 			table.remove(WheelOfDestiny.externalPreset.presets, k)
       goto continue
 		end
