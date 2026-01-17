@@ -36,12 +36,6 @@ gameLeftLockPanel = nil
 hookedMenuOptions = {}
 focusReason = {}
 local lastStopAction = 0
-local mobileConfig = {
-    mobileWidthJoystick = 0,
-    mobileWidthShortcuts = 0,
-    mobileHeightJoystick = 0,
-    mobileHeightShortcuts = 0
-}
 
 function init()
     g_ui.importStyle('styles/countwindow')
@@ -103,20 +97,11 @@ function init()
     gameLeftLockPanel = gameRootPanel:recursiveGetChildById('leftLock')
 
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
-    if g_platform.isMobile() then
-        leftDecreaseSidePanels:setEnabled(false)
-    else
-        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
-        modules.client_options.getOption('showLeftExtraPanel')
-        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
-    end
+    local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
+    modules.client_options.getOption('showLeftExtraPanel')
+    leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
-
-    if g_platform.isMobile() then
-        gameRightPanel:setMarginBottom(mobileConfig.mobileHeightShortcuts)
-        gameLeftPanel:setMarginBottom(mobileConfig.mobileHeightJoystick)
-    end
 
     panelsList = { {
         panel = gameRightPanel,
@@ -251,20 +236,11 @@ function onGameStart()
     show()
 
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
-    if g_platform.isMobile() then
-        leftDecreaseSidePanels:setEnabled(false)
-    else
-        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
-        modules.client_options.getOption('showLeftExtraPanel')
-        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
-    end
+    local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
+    modules.client_options.getOption('showLeftExtraPanel')
+    leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
-
-    if g_platform.isMobile() then
-        gameRightPanel:setMarginBottom(mobileConfig.mobileHeightShortcuts)
-        gameLeftPanel:setMarginBottom(mobileConfig.mobileHeightJoystick)
-    end
 end
 
 function onGameEnd()
@@ -284,14 +260,6 @@ function show()
     logoutButton:setTooltip(tr('Logout'))
 
     setupViewMode(0)
-    if g_platform.isMobile() then
-        mobileConfig.mobileWidthJoystick = modules.game_joystick.getPanel():getWidth()
-        mobileConfig.mobileWidthShortcuts = modules.game_shortcuts.getPanel():getWidth()
-        mobileConfig.mobileHeightJoystick = modules.game_joystick.getPanel():getHeight()
-        mobileConfig.mobileHeightShortcuts = modules.game_shortcuts.getPanel():getHeight()
-        setupViewMode(1)
-        setupViewMode(2)
-    end
 
     addEvent(function()
         if not limitedZoom or g_game.isGM() then
@@ -599,10 +567,9 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
 
     local classic = modules.client_options.getOption('classicControl')
     local smartLeftClick = modules.client_options.getOption('smartLeftClick')
-    local mobile = g_platform.isMobile()
     local shortcut = nil
 
-    if not classic and not mobile and not smartLeftClick then
+    if not classic and not smartLeftClick then
         shortcut = '(Shift)'
     else
         shortcut = nil
@@ -613,7 +580,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end, shortcut)
     end
 
-    if not classic and not mobile then
+    if not classic then
         shortcut = '(Ctrl)'
     else
         shortcut = nil
@@ -733,7 +700,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             end
         else
             local localPosition = localPlayer:getPosition()
-            if not classic and not mobile then
+            if not classic then
                 shortcut = '(Alt)'
             else
                 shortcut = nil
@@ -914,65 +881,7 @@ end
 function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, useThing, creatureThing, attackCreature)
     local keyboardModifiers = g_keyboard.getModifiers()
 
-    if g_platform.isMobile() then
-        if mouseButton == MouseRightButton then
-            createThingMenu(menuPosition, lookThing, useThing, creatureThing)
-            return true
-        end
-        local shortcut = modules.game_shortcuts.getShortcut()
-        if shortcut == "look" then
-            if lookThing then
-                modules.game_shortcuts.resetShortcuts()
-                g_game.look(lookThing)
-                return true
-            end
-            return true
-        elseif shortcut == "use" then
-            if useThing then
-                modules.game_shortcuts.resetShortcuts()
-                if useThing:isContainer() then
-                    if useThing:getParentContainer() then
-                        g_game.open(useThing, useThing:getParentContainer())
-                    else
-                        g_game.open(useThing)
-                    end
-                    return true
-                elseif useThing:isMultiUse() then
-                    startUseWith(useThing)
-                    return true
-                else
-                    g_game.use(useThing)
-                    return true
-                end
-            end
-            return true
-        elseif shortcut == "attack" then
-            if attackCreature and attackCreature ~= player then
-                modules.game_shortcuts.resetShortcuts()
-                g_game.attack(attackCreature)
-                return true
-            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
-                modules.game_shortcuts.resetShortcuts()
-                g_game.attack(creatureThing)
-                return true
-            end
-            return true
-        elseif shortcut == "follow" then
-            if attackCreature and attackCreature ~= player then
-                modules.game_shortcuts.resetShortcuts()
-                g_game.follow(attackCreature)
-                return true
-            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
-                modules.game_shortcuts.resetShortcuts()
-                g_game.follow(creatureThing)
-                return true
-            end
-            return true
-        elseif not autoWalkPos and useThing then
-            createThingMenu(menuPosition, lookThing, useThing, creatureThing)
-            return true
-        end
-    elseif not modules.client_options.getOption('classicControl') then
+    if not modules.client_options.getOption('classicControl') then
         local smartLeftClick = modules.client_options.getOption('smartLeftClick')
 
         if smartLeftClick and mouseButton == MouseLeftButton and keyboardModifiers == KeyboardNoModifier then
@@ -1617,20 +1526,11 @@ function setupViewMode(mode)
     end
 
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
-    if g_platform.isMobile() then
-        leftDecreaseSidePanels:setEnabled(false)
-    else
-        local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
-        modules.client_options.getOption('showLeftExtraPanel')
-        leftDecreaseSidePanels:setEnabled(hasLeftPanels)
-    end
+    local hasLeftPanels = modules.client_options.getOption('showLeftPanel') or
+    modules.client_options.getOption('showLeftExtraPanel')
+    leftDecreaseSidePanels:setEnabled(hasLeftPanels)
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
-
-    if g_platform.isMobile() then
-        gameRightPanel:setMarginBottom(mobileConfig.mobileHeightShortcuts)
-        gameLeftPanel:setMarginBottom(mobileConfig.mobileHeightJoystick)
-    end
 
     if currentViewMode == 2 then
         gameMapPanel:addAnchor(AnchorLeft, 'gameLeftPanel', AnchorRight)
@@ -1650,10 +1550,6 @@ function setupViewMode(mode)
         gameRightExtraPanel:setMarginTop(0)
         gameLeftExtraPanel:setMarginTop(0)
         gameBottomPanel:setImageColor('white')
-        if g_platform.isMobile() then
-            gameRightPanel:setMarginBottom(mobileConfig.mobileHeightShortcuts)
-            gameLeftPanel:setMarginBottom(mobileConfig.mobileHeightJoystick)
-        end
     end
 
     if mode == 0 then
@@ -1664,10 +1560,6 @@ function setupViewMode(mode)
             width = 15,
             height = 11
         })
-        if g_platform.isMobile() then
-            gameRightPanel:setMarginBottom(mobileConfig.mobileHeightShortcuts)
-            gameLeftPanel:setMarginBottom(mobileConfig.mobileHeightJoystick)
-        end
     elseif mode == 1 then
         gameMapPanel:setKeepAspectRatio(false)
         gameMapPanel:setLimitVisibleRange(true)
@@ -1676,10 +1568,6 @@ function setupViewMode(mode)
             width = 15,
             height = 11
         })
-        if g_platform.isMobile() then
-            gameRightPanel:setMarginBottom(mobileConfig.mobileHeightShortcuts)
-            gameLeftPanel:setMarginBottom(mobileConfig.mobileHeightJoystick)
-        end
     elseif mode == 2 then
         local limit = limitedZoom and not g_game.isGM()
         gameMapPanel:setLimitVisibleRange(limit)
@@ -1703,10 +1591,6 @@ function setupViewMode(mode)
         gameLeftExtraPanel:setVisible(false)
         gameMapPanel:setOn(true)
         gameBottomPanel:setImageColor('#ffffff88')
-        if g_platform.isMobile() then
-            gameRightPanel:setMarginBottom(mobileConfig.mobileHeightShortcuts)
-            gameLeftPanel:setMarginBottom(mobileConfig.mobileHeightJoystick)
-        end
     end
 
     currentViewMode = mode
@@ -1771,9 +1655,6 @@ function onDecreaseLeftPanels()
     if modules.client_options.getOption('showLeftExtraPanel') then
         modules.client_options.setOption('showLeftExtraPanel', false)
         movePanel(gameLeftExtraPanel)
-        if g_platform.isMobile() then
-            leftDecreaseSidePanels:setEnabled(false)
-        end
         -- Update action bars when left extra panel is hidden
         if modules.game_actionbar and modules.game_actionbar.updateVisibleWidgetsExternal then
             addEvent(function()
@@ -1783,19 +1664,17 @@ function onDecreaseLeftPanels()
         return
     end
 
-    if not g_platform.isMobile() then
-        if modules.client_options.getOption('showLeftPanel') then
-            modules.client_options.setOption('showLeftPanel', false)
-            movePanel(gameLeftPanel)
-            leftDecreaseSidePanels:setEnabled(false)
-            -- Update action bars when left panel is hidden
-            if modules.game_actionbar and modules.game_actionbar.updateVisibleWidgetsExternal then
-                addEvent(function()
-                    modules.game_actionbar.updateVisibleWidgetsExternal()
-                end)
-            end
-            return
+    if modules.client_options.getOption('showLeftPanel') then
+        modules.client_options.setOption('showLeftPanel', false)
+        movePanel(gameLeftPanel)
+        leftDecreaseSidePanels:setEnabled(false)
+        -- Update action bars when left panel is hidden
+        if modules.game_actionbar and modules.game_actionbar.updateVisibleWidgetsExternal then
+            addEvent(function()
+                modules.game_actionbar.updateVisibleWidgetsExternal()
+            end)
         end
+        return
     end
 end
 
@@ -1851,18 +1730,9 @@ function testExtendedView(mode)
             button:hide()
         end
 
-        if not g_platform.isMobile() then
-            gameBottomPanel:breakAnchors()
-            gameBottomPanel:bindRectToParent()
-            gameBottomPanel:setDraggable(true)
-        else
-            gameBottomPanel:setWidth(g_window.getWidth() - mobileConfig.mobileWidthJoystick -
-                mobileConfig.mobileWidthShortcuts)
-            gameBottomPanel:setPosition({
-                x = mobileConfig.mobileWidthJoystick,
-                y = gameBottomPanel:getY()
-            })
-        end
+        gameBottomPanel:breakAnchors()
+        gameBottomPanel:bindRectToParent()
+        gameBottomPanel:setDraggable(true)
         gameBottomPanel:getChildById('rightResizeBorder'):setMaximum(gameBottomPanel:getWidth())
         gameBottomPanel:getChildById('bottomResizeBorder'):enable()
         gameBottomPanel:getChildById('rightResizeBorder'):enable()
@@ -1895,13 +1765,11 @@ function testExtendedView(mode)
         gameBottomPanel:setDraggable(false)
 
         -- Set anchors
-        if not g_platform.isMobile() then
-            gameBottomPanel:breakAnchors()
-            gameBottomPanel:addAnchor(AnchorLeft, 'gameLeftExtraPanel', AnchorRight)
-            gameBottomPanel:addAnchor(AnchorRight, 'gameRightExtraPanel', AnchorLeft)
-            gameBottomPanel:addAnchor(AnchorTop, 'gameBottomCooldownPanel', AnchorBottom)
-            gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
-        end
+        gameBottomPanel:breakAnchors()
+        gameBottomPanel:addAnchor(AnchorLeft, 'gameLeftExtraPanel', AnchorRight)
+        gameBottomPanel:addAnchor(AnchorRight, 'gameRightExtraPanel', AnchorLeft)
+        gameBottomPanel:addAnchor(AnchorTop, 'gameBottomCooldownPanel', AnchorBottom)
+        gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
         gameBottomPanel:getChildById('bottomResizeBorder'):disable()
         gameBottomPanel:getChildById('rightResizeBorder'):disable()
 

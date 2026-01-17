@@ -2,7 +2,6 @@
 /.github/
 /.idea/
 /.vs/
-/android/
 /build/
 /cmake-build*
 /vc17/

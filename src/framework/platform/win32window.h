@@ -22,11 +22,12 @@
 
 #pragma once
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include "platformwindow.h"
 
-#ifdef OPENGL_ES
-#include <EGL/egl.h>
-#endif
 
 struct WindowProcProxy;
 
@@ -93,12 +94,5 @@ private:
     HCURSOR m_defaultCursor;
     bool m_hidden;
 
-#ifdef OPENGL_ES
-    EGLConfig m_eglConfig;
-    EGLContext m_eglContext;
-    EGLDisplay m_eglDisplay;
-    EGLSurface m_eglSurface;
-#else
     HGLRC m_wglContext;
-#endif
 };

@@ -23,11 +23,8 @@
 #include "luainterface.h"
 #include "luaobject.h"
 
-#ifdef __EMSCRIPTEN__
-#include <bitlib/lbitlib.c>
-#endif
-
 #include <framework/core/resourcemanager.h>
+#include <string>
 
 LuaInterface g_lua;
 
@@ -774,10 +771,6 @@ void LuaInterface::createLuaState()
 
     // load lua standard libraries
     luaL_openlibs(L);
-
-#ifdef __EMSCRIPTEN__
-    luaopen_bit(L);
-#endif
 
 #ifndef LUAJIT_VERSION
     // load Bit lib for bitwise operations

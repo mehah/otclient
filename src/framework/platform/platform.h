@@ -27,10 +27,6 @@
 
 #include "staticdata.h"
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten/emscripten.h>
-#endif
-
 class Platform
 {
 public:
@@ -56,17 +52,6 @@ public:
     Device getDevice() { return m_device; }
     void setDevice(const Device device) { m_device = device; }
     bool isDesktop() { return m_device.type == Desktop; }
-    bool isMobile() {
-#ifndef __EMSCRIPTEN__
-        return m_device.type == Mobile;
-#else
-        return MAIN_THREAD_EM_ASM_INT({
-            return (/iphone|ipod|ipad|android/i).test(navigator.userAgent);
-        }) == 1;
-#endif
-    }
-    bool isBrowser() { return m_device.type == Browser; }
-    bool isConsole() { return m_device.type == Console; }
     std::string getDeviceShortName(DeviceType type = DeviceUnknown);
     std::string getOsShortName(OperatingSystem os = OsUnknown);
     std::string traceback(std::string_view where, int level = 1, int maxDepth = 32);

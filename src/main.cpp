@@ -30,20 +30,16 @@
 #include "tools/datdump.h"
 #endif
 
-#ifndef ANDROID
+#include <memory>
+
 #if ENABLE_DISCORD_RPC == 1
 #include "client/game.h"
 #include "client/localplayer.h"
 #include <framework/discord/discord.h>
 #endif
-#endif
 
 #ifdef FRAMEWORK_NET
 #include <framework/net/protocolhttp.h>
-#endif
-
-#ifdef ANDROID
-extern "C" {
 #endif
 
 namespace {
@@ -79,13 +75,7 @@ void printHelp(const std::string& executableName)
         g_platform.init(args);
 
         // initialize resources
-#ifdef ANDROID
-    // Unzip Android assets/data.zip
-        g_androidManager.unZipAssetData();
-        g_resources.init(nullptr);
-#else
         g_resources.init(args[0].data());
-#endif
 
 #if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
         if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
@@ -119,10 +109,9 @@ void printHelp(const std::string& executableName)
 #endif
 
         // initialize application framework and otclient
-        const auto drawEvents = ApplicationDrawEventsPtr(&g_client, [](ApplicationDrawEvents*) {});
+        std::shared_ptr<ApplicationDrawEvents> drawEvents(static_cast<ApplicationDrawEvents*>(&g_client), [](ApplicationDrawEvents*) {});
         g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), drawEvents));
 
-#ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
         std::function<bool()> canUpdate = []() -> bool { return g_game.isOnline(); };
         std::function<void(std::string&)> onUpdate = [](std::string& info) {
@@ -139,7 +128,6 @@ void printHelp(const std::string& executableName)
 #endif
         };
         g_discord.init(canUpdate, onUpdate);
-#endif
 #endif
 
         g_client.init(args);
@@ -164,6 +152,3 @@ void printHelp(const std::string& executableName)
 #endif
         return 0;
     }
-#ifdef ANDROID
-}
-#endif

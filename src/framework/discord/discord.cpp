@@ -22,7 +22,6 @@
 
 #include "discord.h"
 
-#ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
 #include <framework/core/eventdispatcher.h>
 
@@ -63,5 +62,4 @@ void Discord::update()
     Discord_UpdatePresence(&discordPresence);
     g_dispatcher.scheduleEvent([this] { update(); }, 30000);
 }
-#endif
 #endif

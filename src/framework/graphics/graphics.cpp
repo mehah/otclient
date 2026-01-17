@@ -22,6 +22,13 @@
 
 #include "graphics.h"
 
+#include <GL/glew.h>
+
+#include "../util/stats.h"
+#include "../core/eventdispatcher.h"
+#include "../core/application.h"
+#include "drawpool.h"
+
 #include "fontmanager.h"
 #include "painter.h"
 #include "texturemanager.h"
@@ -50,7 +57,6 @@ void Graphics::init()
     g_logger.info("GPU {}", glString(GL_RENDERER));
     g_logger.info("OpenGL {}", glString(GL_VERSION));
 
-#ifndef OPENGL_ES
     // init GL extensions
     const GLenum err = glewInit();
     if (err != GLEW_OK)
@@ -65,7 +71,6 @@ void Graphics::init()
         glCheckFramebufferStatus = glCheckFramebufferStatusEXT;
         glGenerateMipmap = glGenerateMipmapEXT;
     }
-#endif
 
     // blending is always enabled
     glEnable(GL_BLEND);

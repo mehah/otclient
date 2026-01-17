@@ -3,13 +3,9 @@ OsUnknown                    = 0
 OsWindows                    = 1
 OsLinux                      = 2
 OsMacOS                      = 3
-OsAndroid                    = 4
-OsiOS                        = 5
 
 DeviceUnknown                = 0
 DeviceDesktop                = 1
-DeviceMobile                 = 2
-DeviceConsole                = 3
 
 AnchorNone                   = 0
 AnchorTop                    = 1

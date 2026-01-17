@@ -33,17 +33,6 @@ StaticMainWindow
     margin-bottom: 5
     margin-top: 5
     visible: false
-          
-  Button
-    id: changeUrlButton
-    margin-left: 50
-    margin-right: 50
-    margin-top: 5
-    margin-bottom: 10
-    !text: tr('Change updater URL')
-    @onClick: Updater.changeUrl()
-    $!mobile:
-      visible: false
 
   Button
     margin-left: 90

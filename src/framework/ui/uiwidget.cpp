@@ -30,6 +30,7 @@
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
+#include "framework/graphics/bitmapfont.h"
 #include "framework/html/htmlmanager.h"
 #include "framework/html/htmlnode.h"
 #include "framework/otml/otmlnode.h"
@@ -1713,11 +1714,6 @@ void UIWidget::updateState(const Fw::WidgetState state, bool newState)
             } while ((widget = widget->getParent()));
             newStatus = !visible;
             updateChildren = newStatus != oldStatus;
-            break;
-        }
-        case Fw::MobileState:
-        {
-            newStatus = g_platform.isMobile();
             break;
         }
 

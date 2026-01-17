@@ -132,8 +132,6 @@ MainWindow
     image-border-bottom: 2
   @onEnter: modules.client_options.hide()
   @onEscape: modules.client_options.hide()
-  $mobile:
-    size: 500 380
 
   HorizontalSeparator
     id: separator

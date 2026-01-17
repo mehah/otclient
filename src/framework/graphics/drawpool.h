@@ -116,7 +116,7 @@ public:
         return m_hashCtrl;
     }
 
-    const auto getAtlas() const {
+    auto getAtlas() const {
         return m_atlas.get();
     }
 

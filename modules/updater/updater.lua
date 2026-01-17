@@ -209,7 +209,7 @@ function Updater.check(args)
     if value == 100 then
       return Updater.error(tr("Timeout"))
     end
-    if updateData and (value > 60 or (not g_platform.isMobile() or not ALLOW_CUSTOM_SERVERS or not loadModulesFunc)) then -- gives 3s to set custom updater for mobile version
+    if updateData and value > 60 then
       return updateFiles(updateData)
     end
     scheduledEvent = scheduleEvent(function() progressUpdater(value + 1) end, 100)

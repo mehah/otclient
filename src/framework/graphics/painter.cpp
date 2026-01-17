@@ -20,12 +20,15 @@
  * THE SOFTWARE.
  */
 
+#include <string>
+#include <vector>
+#include "texture.h"
+#include "glutil.h"
 #include "painter.h"
-
-#include "framework/graphics/texture.h"
-#include "framework/graphics/texturemanager.h"
-#include "shader/shadersources.h"
-#include <framework/platform/platformwindow.h>
+#include "graphics.h"
+#include "texturemanager.h"
+#include "framework/graphics/shader/shadersources.h"
+#include "../platform/platformwindow.h"
 
 std::unique_ptr<Painter> g_painter = nullptr;
 
@@ -102,16 +105,14 @@ void Painter::drawCoords(const CoordsBuffer& coordsBuffer, DrawMode drawMode)
         PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
 }
 
-void Painter::drawLine(const std::vector<float>& vertex, const int size, const int width) const
+void Painter::drawLine(const std::vector<float>& vertex, int size, int width) const
 {
     m_drawLineProgram->bind();
     m_drawLineProgram->setTransformMatrix(m_transformMatrix);
     m_drawLineProgram->setProjectionMatrix(m_projectionMatrix);
     m_drawLineProgram->setTextureMatrix(m_textureMatrix);
     m_drawLineProgram->setColor(m_color);
-#ifndef OPENGL_ES
     glEnable(GL_LINE_SMOOTH);
-#endif
     glLineWidth(width);
 
     PainterShaderProgram::disableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
@@ -120,9 +121,7 @@ void Painter::drawLine(const std::vector<float>& vertex, const int size, const i
     glDrawArrays(GL_LINE_STRIP, 0, size);
 
     PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
-#ifndef OPENGL_ES
     glDisable(GL_LINE_SMOOTH);
-#endif
 }
 
 void Painter::resetState()
@@ -280,6 +279,7 @@ void Painter::updateGlClipRect() const
         glScissor(0, 0, m_resolution.width(), m_resolution.height());
         glDisable(GL_SCISSOR_TEST);
     }
+    glBindTexture(GL_TEXTURE_2D, m_glTextureId);
 }
 void Painter::updateGlTexture() const { if (m_glTextureId != 0) glBindTexture(GL_TEXTURE_2D, m_glTextureId); }
 void Painter::updateGlBlendEquation() const { glBlendEquation(static_cast<GLenum>(m_blendEquation)); }

@@ -5,16 +5,11 @@ enum OperatingSystem
     OsUnknown,
     Windows,
     Linux,
-    macOS,
-    Android,
-    iOS
+    macOS
 };
 
 enum DeviceType
 {
     DeviceUnknown,
-    Desktop,
-    Mobile,
-    Browser,
-    Console
+    Desktop
 };

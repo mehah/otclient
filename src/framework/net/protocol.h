@@ -24,6 +24,11 @@
 
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
+#include <zlib.h>
+#include <system_error>
+#include <array>
+#include <vector>
+#include <random>
 
  // @bindclass
 class Protocol : public LuaObject
@@ -32,11 +37,7 @@ public:
     Protocol();
     ~Protocol() override;
 
-#ifndef __EMSCRIPTEN__
     void connect(std::string_view host, uint16_t port);
-#else
-    void connect(const std::string_view host, uint16_t port, bool gameWorld = false);
-#endif
     void disconnect();
 
     void setRecorder(PacketRecorderPtr recorder);
@@ -45,16 +46,8 @@ public:
     bool isConnected();
     bool isConnecting();
     ticks_t getElapsedTicksSinceLastRead() const;
-#ifdef __EMSCRIPTEN__
-    WebConnectionPtr getConnection() { return m_connection; }
-#else
     ConnectionPtr getConnection() { return m_connection; }
-#endif
-#ifdef __EMSCRIPTEN__
-    void setConnection(const WebConnectionPtr& connection) { m_connection = connection; }
-#else
     void setConnection(const ConnectionPtr& connection) { m_connection = connection; }
-#endif
 
     void generateXteaKey();
     void setXteaKey(const uint32_t a, const uint32_t b, const uint32_t c, const uint32_t d) { m_xteaKey = { a, b, c, d }; }
@@ -96,11 +89,7 @@ private:
     bool m_checksumEnabled{ false };
     bool m_sequencedPackets{ false };
     bool m_xteaEncryptionEnabled{ false };
-#ifdef __EMSCRIPTEN__
-    WebConnectionPtr m_connection;
-#else
     ConnectionPtr m_connection;
-#endif
     InputMessagePtr m_inputMessage;
 
     z_stream m_zstream{};

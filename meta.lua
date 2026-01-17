@@ -3290,15 +3290,6 @@ function g_platform.getDeviceShortName(deviceType) end
 ---@return string
 function g_platform.getOsShortName(os) end
 
----@return boolean
-function g_platform.isDesktop() end
-
----@return boolean
-function g_platform.isMobile() end
-
----@return boolean
-function g_platform.isConsole() end
-
 ---@param path string
 ---@param now? boolean false
 ---@return boolean

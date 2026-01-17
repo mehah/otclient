@@ -22,18 +22,12 @@
 
 #pragma once
 
-#if defined(OPENGL_ES) || defined(__EMSCRIPTEN__) || defined(__ANDROID__)
- // for static linking
-#define GL_APICALL
-#define EGLAPI
-#include <GLES3/gl3.h>
-#elif defined(__APPLE__)
+#ifndef GLEW_STATIC
 #define GLEW_STATIC
+#endif
+
+#ifdef __APPLE__
 #define GLEW_NO_GLU
-#include <GL/glew.h>
-#else
-#ifndef _MSC_VER
-#define GLEW_STATIC
 #endif
+
 #include <GL/glew.h>
-#endif

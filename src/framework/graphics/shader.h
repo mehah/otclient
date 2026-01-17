@@ -23,6 +23,8 @@
 #pragma once
 
 #include "declarations.h"
+#include <string>
+#include <string_view>
 
 class Shader
 {

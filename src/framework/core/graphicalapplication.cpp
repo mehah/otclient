@@ -22,6 +22,8 @@
 
 #include "graphicalapplication.h"
 
+#include <array>
+
 #include "asyncdispatcher.h"
 #include "clock.h"
 #include "eventdispatcher.h"
@@ -39,9 +41,6 @@
 #include <framework/sound/soundmanager.h>
 #endif
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten/emscripten.h>
-#endif
 #include <framework/html/htmlmanager.h>
 #include <framework/platform/platformwindow.h>
 
@@ -129,38 +128,6 @@ void GraphicalApplication::terminate()
     m_terminated = true;
 }
 
-#ifdef __EMSCRIPTEN__
-void GraphicalApplication::mainLoop() {
-    if (m_stopping) {
-        emscripten_cancel_main_loop();
-        MAIN_THREAD_EM_ASM({ window.location.reload(); });
-        return;
-    }
-    mainPoll();
-
-    if (!g_window.isVisible()) {
-        stdext::millisleep(10);
-        return;
-    }
-
-    const auto FPS = [this] {
-        m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
-        return m_graphicFrameCounter.getFps();
-    };
-
-    {
-        AutoStat s(STATS_RENDER, "DrawPool");
-        g_drawPool.draw();
-    }
-
-    if (m_graphicFrameCounter.update()) {
-        g_dispatcher.addEvent([this, fps = FPS()] {
-            g_lua.callGlobalField("g_app", "onFps", fps);
-        });
-    }
-}
-#endif
-
 bool GraphicalApplication::canDrawMap() const {
     using enum DrawPoolType;
 
@@ -191,12 +158,11 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-#ifndef __EMSCRIPTEN__
     const auto FPS = [this] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
-#endif
+
     // THREAD - POOL & MAP
     const auto& mapThread = g_asyncDispatcher->submit_task([this] {
         BS::multi_future<void> tasks;
@@ -250,10 +216,6 @@ void GraphicalApplication::run()
         }
     });
 
-#ifdef __EMSCRIPTEN__
-    m_running = true;
-    emscripten_set_main_loop(([] { g_app.mainLoop(); }), 0, 1);
-#else
     m_running = true;
     while (!m_stopping) {
         mainPoll();
@@ -280,7 +242,7 @@ void GraphicalApplication::run()
             });
         }
     }
-#endif
+
     mapThread.wait();
 
     m_running = false;

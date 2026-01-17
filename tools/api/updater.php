@@ -11,9 +11,7 @@ $binaries = array(
     "WIN32-WGL-GCC" => "otclient_x64.exe",
     "WIN32-EGL-GCC" => "otclient_x64.exe",
     "X11-GLX" => "otclient_linux",
-    "X11-EGL" => "otclient_linux",
-    "ANDROID-EGL" => "", // we can't update android binary
-    "ANDROID64-EGL" => "" // we can't update android binary
+    "X11-EGL" => "otclient_linux"
 );
 // CONFIG END
 
@@ -29,8 +27,8 @@ $data = json_decode(file_get_contents("php://input"));
 
 $version = $data->version ?: 0; // APP_VERSION from init.lua
 $build = $data->build ?: ""; // 2.4, 2.4.1, 2.5, etc
-$os = $data->os ?: "unknown"; // android, windows, mac, linux, unknown
-$platform = $data->platform ?: ""; // WIN32-WGL, X11-GLX, ANDROID-EGL, etc
+$os = $data->os ?: "unknown"; // windows, mac, linux, unknown
+$platform = $data->platform ?: ""; // WIN32-WGL, X11-GLX, etc
 $args = $data->args; // custom args when calling Updater.check()
 $binary = $binaries[$platform] ?: "";
 

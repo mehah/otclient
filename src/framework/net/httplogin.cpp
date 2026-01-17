@@ -25,10 +25,6 @@
 #include <framework/core/eventdispatcher.h>
 #include <nlohmann/json.hpp>
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten/fetch.h>
-#endif
-
 using json = nlohmann::json;
 
 LoginHttp::LoginHttp() {
@@ -101,7 +97,6 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
                           uint16_t port, const std::string& email,
                           const std::string& password, int request_id,
                           bool httpLogin) {
-#ifndef __EMSCRIPTEN__
     g_asyncDispatcher->detach_task(
         [this, host, path, port, email, password, request_id, httpLogin] {
         if (cancelled.load()) return;
@@ -147,72 +142,6 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
             });
         }
     });
-#else
-    g_asyncDispatcher->detach_task(
-        [this, host, path, port, email, password, request_id, httpLogin] {
-        if (cancelled.load()) return;
-        emscripten_fetch_attr_t attr;
-        emscripten_fetch_attr_init(&attr);
-        strcpy(attr.requestMethod, "POST");
-        static const char* const headers[] = {
-            "Content-Type", "application/json; charset=utf-8",
-            0,
-        };
-        attr.requestHeaders = headers;
-        attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS;
-        json body = json{ {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
-        std::string bodyStr = body.dump(1);
-        attr.requestData = bodyStr.data();
-        attr.requestDataSize = bodyStr.length();
-
-        std::string url = "https://" + (host.length() > 0 ? host : "127.0.0.1") + ":" + std::to_string(port) + path;
-        emscripten_fetch_t* fetch = emscripten_fetch(&attr, url.c_str());
-
-        if (fetch->status != 200 && httpLogin) {
-            std::string url = "http://" + (host.length() > 0 ? host : "127.0.0.1") + ":" + std::to_string(port) + path;
-            fetch = emscripten_fetch(&attr, url.c_str());
-        }
-
-        if (cancelled.load()) {
-            emscripten_fetch_close(fetch);
-            return;
-        }
-        if (fetch && fetch->status == 200 &&
-               !parseJsonResponse(std::string(fetch->data, fetch->numBytes))) {
-            fetch->status = -1;
-        }
-
-        emscripten_fetch_close(fetch);
-        if (cancelled.load()) return;
-        if (fetch && fetch->status == 200) {
-            g_dispatcher.addEvent([this, request_id] {
-                if (cancelled.load()) return;
-                g_lua.callGlobalField("EnterGame", "loginSuccess", request_id,
-                this->getSession(), this->getWorldList(),
-                this->getCharacterList());
-            });
-        } else {
-            int status = 0;
-            std::string msg = "";
-            if (fetch) {
-                status = fetch->status;
-            } else {
-                status = -1;
-            }
-            if (this->errorMessage.length() == 0) {
-                msg = "Unknown error";
-            } else {
-                msg = this->errorMessage;
-            }
-
-            g_dispatcher.addEvent([this, request_id, status, msg] {
-                if (cancelled.load()) return;
-                g_lua.callGlobalField("EnterGame", "loginFailed", request_id, msg,
-                status);
-            });
-        }
-    });
-#endif
 }
 
 httplib::Result LoginHttp::loginHttpsJson(const std::string& host,

@@ -46,8 +46,6 @@ void ResourceManager::init(const char* argv0)
     char fileName[255];
     GetModuleFileNameA(nullptr, fileName, sizeof(fileName));
     m_binaryPath = std::filesystem::absolute(fileName);
-#elif defined(ANDROID)
-    // nothing
 #else
     m_binaryPath = std::filesystem::absolute(argv0);
 #endif
@@ -450,25 +448,15 @@ std::string ResourceManager::getRealPath(const std::string& path)
 
 std::string ResourceManager::getBaseDir()
 {
-#ifdef ANDROID
-    return g_androidManager.getAppBaseDir();
-#else
     return PHYSFS_getBaseDir();
-#endif
 }
 
 std::string ResourceManager::getUserDir()
 {
-#ifdef ANDROID
-    return getBaseDir() + "/";
-#elif defined(__EMSCRIPTEN__)
-    return "/user/";
-#else
     static const char* orgName = g_app.getOrganizationName().data();
     static const char* appName = g_app.getCompactName().data();
 
     return PHYSFS_getPrefDir(orgName, appName);
-#endif
 }
 
 std::string ResourceManager::guessFilePath(const std::string& filename, const std::string& type)
@@ -635,9 +623,6 @@ std::unordered_map<std::string, std::string> ResourceManager::filesChecksums()
 }
 
 std::string ResourceManager::selfChecksum() {
-#ifdef ANDROID
-    return "";
-#else
     static std::string checksum;
     if (!checksum.empty())
         return checksum;
@@ -651,7 +636,6 @@ std::string ResourceManager::selfChecksum() {
 
     checksum = g_crypt.crc32(buffer, false);
     return checksum;
-#endif
 }
 
 void ResourceManager::updateFiles(const std::set<std::string>& files) {
@@ -684,9 +668,6 @@ void ResourceManager::updateFiles(const std::set<std::string>& files) {
 
 void ResourceManager::updateExecutable(std::string fileName)
 {
-#if defined(ANDROID) || defined(FREE_VERSION)
-    g_logger.fatal("Executable cannot be updated on android or in free version");
-#else
     if (fileName.size() <= 2) {
         g_logger.fatal("Invalid executable name");
     }
@@ -717,13 +698,9 @@ void ResourceManager::updateExecutable(std::string fileName)
     setWriteDir(oldWriteDir);
 
     std::filesystem::path newBinaryPath(std::filesystem::u8path(PHYSFS_getWriteDir()));
-#endif
 }
 
 bool ResourceManager::launchCorrect(const std::vector<std::string>& args) { // curently works only on windows
-#if (defined(ANDROID) || defined(FREE_VERSION))
-    return false;
-#else
     auto fileName2 = m_binaryPath.stem().string();
     fileName2 = stdext::split(fileName2, "-")[0];
     stdext::tolower(fileName2);
@@ -775,7 +752,6 @@ bool ResourceManager::launchCorrect(const std::vector<std::string>& args) { // c
 
     g_platform.spawnProcess(binary.string(), args);
     return true;
-#endif
 }
 
 std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& /*files*/) { return ""; }

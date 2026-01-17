@@ -90,7 +90,7 @@ public:
     float getScaleFactor() const { return getCurrentPool()->getScaleFactor(); }
     bool isScaled() const { return getCurrentPool()->isScaled(); }
     uint16_t getScaledSpriteSize() const { return m_spriteSize * getScaleFactor(); }
-    const auto getAtlas() const { return getCurrentPool()->getAtlas(); }
+    auto getAtlas() const { return getCurrentPool()->getAtlas(); }
     bool isValid() const;
     auto getDrawOrder() const { return getCurrentPool()->getDrawOrder(); }
 

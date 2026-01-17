@@ -28,12 +28,6 @@
 #ifdef WIN32
 #include "win32window.h"
 WIN32Window window;
-#elif defined ANDROID
-#include "androidwindow.h"
-AndroidWindow window;
-#elif defined __EMSCRIPTEN__
-#include "browserwindow.h"
-BrowserWindow window;
 #elif defined __APPLE__
 #include "cocoawindow.h"
 CocoaWindow window;

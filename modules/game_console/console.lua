@@ -2256,24 +2256,14 @@ function createButtonChat()
         return
     end
     local mapPanel = modules.game_interface.getMapPanel()
-    local stringNameMobileOrPc = g_platform.isMobile() and "GameAction" or "MainToggleButton"
+    local stringNameMobileOrPc = "MainToggleButton"
     extendedViewButtonToggleChat = g_ui.createWidget(stringNameMobileOrPc, mapPanel)
     extendedViewButtonToggleChat:setId("test")
     local hightMobileWidget = 0
-    if g_platform.isMobile() then
-        hightMobileWidget = modules.game_joystick.getPanel():getHeight()
-        extendedViewButtonToggleChat.image:setImageSource("/images/game/mobile/chat")
-        extendedViewButtonToggleChat:addAnchor(AnchorRight, "parent", AnchorRight)
-        extendedViewButtonToggleChat:setMarginBottom(hightMobileWidget)
-        extendedViewButtonToggleChat:setMarginRight(15)
-        extendedViewButtonToggleChat:setMarginBottom(hightMobileWidget)
-        extendedViewButtonToggleChat:setSize("60 60")
-    else
-        extendedViewButtonToggleChat:setIcon("/images/game/npcicons/icon_chat")
-        extendedViewButtonToggleChat:setMarginBottom(10)
-        extendedViewButtonToggleChat:setSize("30 23")
-        extendedViewButtonToggleChat:addAnchor(AnchorLeft, "parent", AnchorLeft)
-    end
+    extendedViewButtonToggleChat:setIcon("/images/game/npcicons/icon_chat")
+    extendedViewButtonToggleChat:setMarginBottom(10)
+    extendedViewButtonToggleChat:setSize("30 23")
+    extendedViewButtonToggleChat:addAnchor(AnchorLeft, "parent", AnchorLeft)
     extendedViewButtonToggleChat:addAnchor(AnchorBottom, "parent", AnchorBottom)
     extendedViewButtonToggleChat.onClick = function(a, b)
         extendedViewHide(modules.game_interface.currentViewMode ~= 2)
@@ -2281,15 +2271,9 @@ function createButtonChat()
     extendedViewButtonShowAlphaChat = g_ui.createWidget(stringNameMobileOrPc, mapPanel)
     extendedViewButtonShowAlphaChat:setIcon("/images/game/npcicons/icon_chat")
     extendedViewButtonShowAlphaChat:addAnchor(AnchorBottom, "parent", AnchorBottom)
-    if g_platform.isMobile() then
-        extendedViewButtonShowAlphaChat:setMarginBottom(hightMobileWidget)
-        extendedViewButtonShowAlphaChat:setSize("60 60")
-        extendedViewButtonShowAlphaChat:addAnchor(AnchorRight, "test", AnchorLeft)
-    else
-        extendedViewButtonShowAlphaChat:setSize("30 23")
-        extendedViewButtonShowAlphaChat:addAnchor(AnchorLeft, "test", AnchorRight)
-        extendedViewButtonShowAlphaChat:setMarginBottom(10)
-    end
+    extendedViewButtonShowAlphaChat:setSize("30 23")
+    extendedViewButtonShowAlphaChat:addAnchor(AnchorLeft, "test", AnchorRight)
+    extendedViewButtonShowAlphaChat:setMarginBottom(10)
     extendedViewButtonShowAlphaChat:setMarginLeft(5)
     extendedViewButtonShowAlphaChat.onClick = function(a, b)
         if extendedViewButtonShowAlphaChat:isOn() then

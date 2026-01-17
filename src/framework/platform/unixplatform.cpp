@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-#if !defined(WIN32) && !defined(__EMSCRIPTEN__)
+#if !defined(WIN32)
 
 #include "platform.h"
 #include <cstring>
@@ -31,25 +31,14 @@
 
 #include <sys/stat.h>
 
-#ifdef ANDROID
-#include <errno.h>
-#else
 #include <execinfo.h>
-#endif
 
 void Platform::init(std::vector<std::string>& args)
 {
     processArgs(args);
 
 #ifdef __APPLE__
-    #include "TargetConditionals.h"
-    #if (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE) || (defined(TARGET_OS_SIMULATOR) && TARGET_OS_SIMULATOR)
-        setDevice({ Mobile, iOS });
-    #else
-        setDevice({ Desktop, macOS });
-    #endif
-#elifdef ANDROID
-    setDevice({ Mobile, Android });
+    setDevice({ Desktop, macOS });
 #else
     setDevice({ Desktop, Linux });
 #endif
@@ -230,7 +219,6 @@ std::string Platform::getOSName()
 
 std::string Platform::traceback(const std::string_view where, int level, int maxDepth)
 {
-#ifndef ANDROID
     std::stringstream ss;
 
     ss << "\nC++ stack traceback:";
@@ -260,12 +248,6 @@ std::string Platform::traceback(const std::string_view where, int level, int max
     }
 
     return ss.str();
-#else
-    std::stringstream ss;
-    ss << "\nat:";
-    ss << "\n\t[C++]: " << where;
-    return ss.str();
-#endif
 }
 
 

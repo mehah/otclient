@@ -24,6 +24,11 @@
 
 #include <framework/global.h>
 
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
+
 class ApplicationContext
 {
 public:

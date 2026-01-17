@@ -24,7 +24,7 @@ return {
         end
     },
     classicControl                    = {
-        value = g_platform.isMobile() and true or false,
+        value = false,
         action = function(value, options, controller, panels, extraWidgets)
             -- Update the mouseControlMode based on this option
             -- 0 = Regular Controls, 1 = Classic Controls, 2 = Left Smart-Click
@@ -411,7 +411,7 @@ return {
     },
     hudScale                          = {
         event = nil,
-        value = g_platform.isMobile() and 2 or 0,
+        value = 0,
         action = function(value, options, controller, panels, extraWidgets)
             value = value / 2
 
@@ -429,7 +429,7 @@ return {
         end
     },
     creatureInformationScale          = {
-        value = g_platform.isMobile() and 2 or 0,
+        value = 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
                 value = g_window.getDisplayDensity() - 0.5
@@ -442,7 +442,7 @@ return {
         end
     },
     staticTextScale                   = {
-        value = g_platform.isMobile() and 2 or 0,
+        value = 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
                 value = g_window.getDisplayDensity() - 0.5
@@ -455,7 +455,7 @@ return {
         end
     },
     animatedTextScale                 = {
-        value = g_platform.isMobile() and 2 or 0,
+        value = 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
                 value = g_window.getDisplayDensity() - 0.5
@@ -551,29 +551,6 @@ return {
     },
     profile                           = {
         value = 1,
-    },
-    rightJoystick                     = {
-        value = false,
-        action = function(value, options, controller, panels, extraWidgets)
-            if not g_platform.isMobile() then return end
-            if value == true then
-                modules.game_shortcuts.getPanel():breakAnchors()
-                modules.game_shortcuts.getPanel():addAnchor(AnchorBottom, "parent", AnchorBottom)
-                modules.game_shortcuts.getPanel():addAnchor(AnchorLeft, "parent", AnchorLeft)
-
-                modules.game_joystick.getPanel():breakAnchors()
-                modules.game_joystick.getPanel():addAnchor(AnchorBottom, "parent", AnchorBottom)
-                modules.game_joystick.getPanel():addAnchor(AnchorRight, "parent", AnchorRight)
-            else
-                modules.game_joystick.getPanel():breakAnchors()
-                modules.game_joystick.getPanel():addAnchor(AnchorBottom, "parent", AnchorBottom)
-                modules.game_joystick.getPanel():addAnchor(AnchorLeft, "parent", AnchorLeft)
-
-                modules.game_shortcuts.getPanel():breakAnchors()
-                modules.game_shortcuts.getPanel():addAnchor(AnchorBottom, "parent", AnchorBottom)
-                modules.game_shortcuts.getPanel():addAnchor(AnchorRight, "parent", AnchorRight)
-            end
-        end
     },
     showExpiryInInvetory              = {
         value = true,

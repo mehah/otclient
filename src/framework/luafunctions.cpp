@@ -33,6 +33,9 @@
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
 #include <framework/util/stats.h>
+#include <string>
+#include <vector>
+#include <regex>
 
 #ifdef FRAMEWORK_GRAPHICS
 #include "framework/graphics/fontmanager.h"
@@ -62,13 +65,7 @@
 #include <framework/net/protocol.h>
 #include <framework/net/protocolhttp.h>
 #include <framework/net/server.h>
-
-#ifdef __EMSCRIPTEN__
-#include <framework/net/webconnection.h>
-#else
 #include <framework/net/connection.h>
-#endif
-
 #endif
 
 #include "core/clock.h"
@@ -79,18 +76,18 @@
 void Application::registerLuaFunctions()
 {
     // conversion globals
-    g_lua.bindGlobalFunction("torect", [](const std::string_view v) { return stdext::from_string<Rect>(v); });
-    g_lua.bindGlobalFunction("topoint", [](const std::string_view v) { return stdext::from_string<Point>(v); });
-    g_lua.bindGlobalFunction("tocolor", [](const std::string_view v) { return stdext::from_string<Color>(v); });
-    g_lua.bindGlobalFunction("tosize", [](const std::string_view v) { return stdext::from_string<Size>(v); });
+    g_lua.bindGlobalFunction("torect", [](const std::string& v) { return stdext::from_string<Rect>(v); });
+    g_lua.bindGlobalFunction("topoint", [](const std::string& v) { return stdext::from_string<Point>(v); });
+    g_lua.bindGlobalFunction("tocolor", [](const std::string& v) { return stdext::from_string<Color>(v); });
+    g_lua.bindGlobalFunction("tosize", [](const std::string& v) { return stdext::from_string<Size>(v); });
     g_lua.bindGlobalFunction("recttostring", [](const Rect& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("pointtostring", [](const Point& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("colortostring", [](const Color& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("sizetostring", [](const Size& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("iptostring", [](const uint32_t v) { return stdext::ip_to_string(v); });
-    g_lua.bindGlobalFunction("stringtoip", [](const std::string_view v) { return stdext::string_to_ip(v); });
+    g_lua.bindGlobalFunction("stringtoip", [](const std::string& v) { return stdext::string_to_ip(v); });
     g_lua.bindGlobalFunction("listSubnetAddresses", [](const uint32_t a, const uint8_t b) { return stdext::listSubnetAddresses(a, b); });
-    g_lua.bindGlobalFunction("ucwords", [](std::string s) { return stdext::ucwords(s); });
+    g_lua.bindGlobalFunction("ucwords", [](std::string s) { stdext::ucwords(s); return s; });
     g_lua.bindGlobalFunction("regexMatch", [](std::string s, const std::string& exp) {
         int limit = 10000;
         std::vector<std::vector<std::string>> ret;
@@ -131,10 +128,6 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_platform", "getDevice", &Platform::getDevice, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getDeviceShortName", &Platform::getDeviceShortName, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "getOsShortName", &Platform::getOsShortName, &g_platform);
-    g_lua.bindSingletonFunction("g_platform", "isDesktop", &Platform::isDesktop, &g_platform);
-    g_lua.bindSingletonFunction("g_platform", "isMobile", &Platform::isMobile, &g_platform);
-    g_lua.bindSingletonFunction("g_platform", "isBrowser", &Platform::isBrowser, &g_platform);
-    g_lua.bindSingletonFunction("g_platform", "isConsole", &Platform::isConsole, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "openDir", &Platform::openDir, &g_platform);
 
     // Application
@@ -188,15 +181,15 @@ void Application::registerLuaFunctions()
 
     // Logger
     g_lua.registerSingletonClass("g_logger");
-    g_lua.bindSingletonFunction("g_logger", "log", static_cast<void(Logger::*)(Fw::LogLevel, const std::string_view)>(&Logger::log), &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "log", static_cast<void(Logger::*)(Fw::LogLevel, std::string_view)>(&Logger::log), &g_logger);
     g_lua.bindSingletonFunction("g_logger", "fireOldMessages", &Logger::fireOldMessages, &g_logger);
-    g_lua.bindSingletonFunction("g_logger", "setLogFile", &Logger::setLogFile, &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "setLogFile", static_cast<void(Logger::*)(std::string_view)>(&Logger::setLogFile), &g_logger);
     g_lua.bindSingletonFunction("g_logger", "setOnLog", &Logger::setOnLog, &g_logger);
-    g_lua.bindSingletonFunction("g_logger", "debug", static_cast<void(Logger::*)(const std::string_view)>(&Logger::debug), &g_logger);
-    g_lua.bindSingletonFunction("g_logger", "info", static_cast<void(Logger::*)(const std::string_view)>(&Logger::info), &g_logger);
-    g_lua.bindSingletonFunction("g_logger", "warning", static_cast<void(Logger::*)(const std::string_view)>(&Logger::warning), &g_logger);
-    g_lua.bindSingletonFunction("g_logger", "error", static_cast<void(Logger::*)(const std::string_view)>(&Logger::error), &g_logger);
-    g_lua.bindSingletonFunction("g_logger", "fatal", static_cast<void(Logger::*)(const std::string_view)>(&Logger::fatal), &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "debug", static_cast<void(Logger::*)(std::string_view)>(&Logger::debug), &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "info", static_cast<void(Logger::*)(std::string_view)>(&Logger::info), &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "warning", static_cast<void(Logger::*)(std::string_view)>(&Logger::warning), &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "error", static_cast<void(Logger::*)(std::string_view)>(&Logger::error), &g_logger);
+    g_lua.bindSingletonFunction("g_logger", "fatal", static_cast<void(Logger::*)(std::string_view)>(&Logger::fatal), &g_logger);
     g_lua.bindSingletonFunction("g_logger", "setLevel", &Logger::setLevel, &g_logger);
     g_lua.bindSingletonFunction("g_logger", "getLevel", &Logger::getLevel, &g_logger);
 
@@ -987,23 +980,16 @@ void Application::registerLuaFunctions()
 #endif
 
 #ifdef FRAMEWORK_NET
-#ifndef __EMSCRIPTEN__
     // Server
     g_lua.registerClass<Server>();
     g_lua.bindClassStaticFunction<Server>("create", &Server::create);
     g_lua.bindClassMemberFunction<Server>("close", &Server::close);
     g_lua.bindClassMemberFunction<Server>("isOpen", &Server::isOpen);
     g_lua.bindClassMemberFunction<Server>("acceptNext", &Server::acceptNext);
-#endif
 
     // Connection
-#ifdef __EMSCRIPTEN__
-    g_lua.registerClass<WebConnection>();
-    g_lua.bindClassMemberFunction<WebConnection>("getIp", &WebConnection::getIp);
-#else
     g_lua.registerClass<Connection>();
     g_lua.bindClassMemberFunction<Connection>("getIp", &Connection::getIp);
-#endif
 
     // Protocol
     g_lua.registerClass<Protocol>();

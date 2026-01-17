@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-#if !defined WIN32 && !defined ANDROID && !defined __EMSCRIPTEN__
 
 #include "x11window.h"
 #include <framework/core/resourcemanager.h>
@@ -47,15 +46,8 @@ X11Window::X11Window()
     m_minimumSize = Size(600, 480);
     m_size = Size(600, 480);
 
-#ifdef OPENGL_ES
-    m_eglConfig = 0;
-    m_eglContext = 0;
-    m_eglDisplay = 0;
-    m_eglSurface = 0;
-#else
     m_fbConfig = nullptr;
     m_glxContext = nullptr;
-#endif
 
     m_keyMap[XK_Escape] = Fw::KeyEscape;
     m_keyMap[XK_Tab] = Fw::KeyTab;
@@ -304,10 +296,6 @@ void X11Window::internalCreateWindow()
     depth = m_visual->depth;
     attrsMask = CWEventMask | CWBorderPixel | CWColormap;
 
-#ifdef OPENGL_ES
-    attrs.override_redirect = False;
-    attrsMask |= CWOverrideRedirect;
-#endif
 
     updateUnmaximizedCoords();
     m_window = XCreateWindow(m_display, m_rootWindow,
@@ -367,57 +355,12 @@ bool X11Window::internalSetupWindowInput()
 
 void X11Window::internalCheckGL()
 {
-#ifdef OPENGL_ES
-    m_eglDisplay = eglGetDisplay((EGLNativeDisplayType)m_display);
-    if (m_eglDisplay == EGL_NO_DISPLAY)
-        g_logger.fatal("EGL not supported");
-
-    if (!eglInitialize(m_eglDisplay, NULL, NULL))
-        g_logger.fatal("Unable to initialize EGL");
-#else
     if (!glXQueryExtension(m_display, nullptr, nullptr))
         g_logger.fatal("GLX not supported");
-#endif
 }
 
 void X11Window::internalChooseGLVisual()
 {
-#ifdef OPENGL_ES
-    static int attrList[] = {
-#if OPENGL_ES==2
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-#else
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-#endif
-        EGL_RED_SIZE, 4,
-        EGL_GREEN_SIZE, 4,
-        EGL_BLUE_SIZE, 4,
-        EGL_ALPHA_SIZE, 4,
-        EGL_NONE
-    };
-
-    EGLint numConfig;
-    XVisualInfo visTemplate;
-    int numVisuals;
-
-    if (!eglChooseConfig(m_eglDisplay, attrList, &m_eglConfig, 1, &numConfig))
-        g_logger.fatal("Failed to choose EGL config");
-
-    if (numConfig != 1)
-        g_logger.warning("Didn't got the exact EGL config");
-
-    EGLint vid;
-    if (!eglGetConfigAttrib(m_eglDisplay, m_eglConfig, EGL_NATIVE_VISUAL_ID, &vid))
-        g_logger.fatal("Unable to get visual EGL visual id");
-
-    memset(&visTemplate, 0, sizeof(visTemplate));
-    visTemplate.visualid = vid;
-    m_visual = XGetVisualInfo(m_display, VisualIDMask, &visTemplate, &numVisuals);
-    if (!m_visual)
-        g_logger.fatal("Couldn't choose RGBA, double buffered visual");
-
-    m_rootWindow = DefaultRootWindow(m_display);
-#else
     static int attrList[] = {
         GLX_RENDER_TYPE, GLX_RGBA_BIT,
         GLX_DOUBLEBUFFER, True,
@@ -438,25 +381,10 @@ void X11Window::internalChooseGLVisual()
         g_logger.fatal("Couldn't choose RGBA, double buffered visual");
 
     m_rootWindow = RootWindow(m_display, m_visual->screen);
-#endif
 }
 
 void X11Window::internalCreateGLContext()
 {
-#ifdef OPENGL_ES
-    EGLint attrList[] = {
-#if OPENGL_ES==2
-        EGL_CONTEXT_CLIENT_VERSION, 2,
-#else
-        EGL_CONTEXT_CLIENT_VERSION, 1,
-#endif
-        EGL_NONE
-    };
-
-    m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, EGL_NO_CONTEXT, attrList);
-    if (m_eglContext == EGL_NO_CONTEXT)
-        g_logger.fatal("Unable to create EGL context: {}", eglGetError());
-#else
     m_glxContext = glXCreateContext(m_display, m_visual, nullptr, True);
 
     if (!m_glxContext)
@@ -464,67 +392,33 @@ void X11Window::internalCreateGLContext()
 
     if (!glXIsDirect(m_display, m_glxContext))
         g_logger.warning("GL direct rendering is not possible");
-#endif
 }
 
 void X11Window::internalDestroyGLContext()
 {
-#ifdef OPENGL_ES
-    if (m_eglDisplay) {
-        if (m_eglContext) {
-            eglDestroyContext(m_eglDisplay, m_eglContext);
-            m_eglContext = 0;
-        }
-        if (m_eglSurface) {
-            eglDestroySurface(m_eglDisplay, m_eglSurface);
-            m_eglSurface = 0;
-        }
-        eglTerminate(m_eglDisplay);
-        m_eglDisplay = 0;
-    }
-#else
     if (m_glxContext) {
         glXMakeCurrent(m_display, X11None, nullptr);
         glXDestroyContext(m_display, m_glxContext);
         m_glxContext = nullptr;
     }
-#endif
 }
 
 void X11Window::internalConnectGLContext()
 {
-#ifdef OPENGL_ES
-    m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_window, NULL);
-    if (m_eglSurface == EGL_NO_SURFACE)
-        g_logger.fatal("Unable to create EGL surface: {}", eglGetError());
-    if (!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext))
-        g_logger.fatal("Unable to connect EGL context into X11 window");
-#else
     if (!glXMakeCurrent(m_display, m_window, m_glxContext))
         g_logger.fatal("Unable to set GLX context on X11 window");
-#endif
 }
 
 void* X11Window::getExtensionProcAddress(const char* ext)
 {
-#ifdef OPENGL_ES
-    //TODO
-    return NULL;
-#else
     return (void*)glXGetProcAddressARB((const GLubyte*)ext);
-#endif
 }
 
 bool X11Window::isExtensionSupported(const char* ext)
 {
-#ifdef OPENGL_ES
-    //TODO
-    return false;
-#else
     const char* exts = glXQueryExtensionsString(m_display, m_screen);
     if (strstr(exts, ext))
         return true;
-#endif
     return false;
 }
 
@@ -863,11 +757,7 @@ void X11Window::poll()
 
 void X11Window::swapBuffers()
 {
-#ifdef OPENGL_ES
-    eglSwapBuffers(m_eglDisplay, m_eglSurface);
-#else
     glXSwapBuffers(m_display, m_window);
-#endif
 }
 
 void X11Window::showMouse()
@@ -1005,9 +895,6 @@ void X11Window::setVerticalSync(bool enable)
 {
     g_mainDispatcher.addEvent([&, enable] {
         m_vsync = enable;
-#ifdef OPENGL_ES
-        //TODO
-#else
         typedef GLint(*glSwapIntervalProc)(GLint);
         glSwapIntervalProc glSwapInterval = nullptr;
 
@@ -1018,7 +905,6 @@ void X11Window::setVerticalSync(bool enable)
 
         if (glSwapInterval)
             glSwapInterval(enable ? 1 : 0);
-#endif
         });
 }
 
@@ -1109,11 +995,5 @@ std::string X11Window::getClipboardText()
 
 std::string X11Window::getPlatformType()
 {
-#ifndef OPENGL_ES
     return "X11-GLX";
-#else
-    return "X11-EGL";
-#endif
 }
-
-#endif

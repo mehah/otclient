@@ -24,8 +24,6 @@ MainWindow
   margin: 0 0 0 0
   padding: 25 3 3 3
   opacity: 0.9
-  $mobile:
-    size: 550 300
   @onEnter: modules.client_debug_info.toggle()
   @onEscape: modules.client_debug_info.toggle()
 

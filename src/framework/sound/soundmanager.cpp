@@ -46,11 +46,6 @@ SoundManager g_sounds;
 
 void SoundManager::init()
 {
-#ifdef ANDROID
-    // The alcOpenDevice call needs to be executed on Android main thread
-    g_androidManager.attachToAppMainThread();
-#endif
-
     m_device = alcOpenDevice(nullptr);
     if (!m_device) {
         g_logger.error("unable to open audio device");
@@ -256,7 +251,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& name)
             source = std::make_shared<SoundSource>();
             source->setBuffer(it->second);
         } else {
-#if defined __linux && !defined OPENGL_ES
+#if defined __linux
             // due to OpenAL implementation bug, stereo buffers are always downmixed to mono on linux systems
             // this is hack to work around the issue
             // solution taken from http://opensource.creative.com/pipermail/openal/2007-April/010355.html

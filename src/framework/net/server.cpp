@@ -20,8 +20,6 @@
  * THE SOFTWARE.
  */
 
-#ifndef __EMSCRIPTEN__
-
 #include "connection.h"
 #include "server.h"
 
@@ -63,5 +61,3 @@ void Server::acceptNext()
         self->callLuaField("onAccept", connection, error.message(), error.value());
     });
 }
-
-#endif

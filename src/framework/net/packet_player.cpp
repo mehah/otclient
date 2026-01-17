@@ -33,11 +33,7 @@ PacketPlayer::~PacketPlayer()
 
 PacketPlayer::PacketPlayer(const std::string_view& file)
 {
-#ifdef ANDROID
-    std::ifstream f(std::string("records/") + std::string(file));
-#else
     std::ifstream f(std::filesystem::path("records") / file);
-#endif
     if (!f.is_open())
         return;
     std::string type, packetHex;

@@ -26,16 +26,12 @@ Platform g_platform;
 
 std::unordered_map<DeviceType, std::string> Platform::m_deviceShortNames = {
     {Desktop, "desktop"},
-    {Mobile,  "mobile"},
-    {Console, "console"},
 };
 
 std::unordered_map<OperatingSystem, std::string> Platform::m_osShortNames = {
     {Windows, "windows"},
     {Linux,   "linux"},
     {macOS,   "macos"},
-    {Android, "android"},
-    {iOS,     "ios"},
 };
 
 std::string Platform::getDeviceShortName(DeviceType type)

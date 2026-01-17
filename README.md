@@ -14,15 +14,14 @@
 ## <a id="table-of-contents"></a>📋 Table of Contents
 1. ![Logo](https://raw.githubusercontent.com/mehah/otclient/main/src/otcicon.ico)  [What is OTClient?](#what-is-otclient)
 2. 🚀 [Features](#features)
-3. <img height="16" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png"/> [The Mobile Project](#the-mobile-project)
-4. 🔨 [Compiling](#compiling)
-5. 🐳 [Docker](#docker)
-6. 🩺 [Need Help?](#need-help)
-7. 📑 [Bugs](#bugs)
-8. ❤️ [Roadmap](#roadmap)
-9. 💯 [Support Protocol](#support-protocol)
-10. ©️ [License](#license)
-11. ❤️ [Contributors](#contributors)
+3. 🔨 [Compiling](#compiling)
+4. 🐳 [Docker](#docker)
+5. 🩺 [Need Help?](#need-help)
+6. 📑 [Bugs](#bugs)
+7. ❤️ [Roadmap](#roadmap)
+8. 💯 [Support Protocol](#support-protocol)
+9. ©️ [License](#license)
+10. ❤️ [Contributors](#contributors)
 
 ---
 
@@ -44,7 +43,7 @@ For a server to connect to, you can build your own with **theforgottenserver** o
 
 ## <a id="features"></a>🚀 Features
 
-Beyond its flexibility with scripts, OTClient comes with many features that enable client-side innovation in OTServ: **sound system**, **graphics effects with shaders**, **modules/addons**, **animated textures**, **styleable UI**, **transparency**, **multi-language**, **in-game LUA terminal**, and an **OpenGL 2.0 ES engine** that allows porting to mobile platforms. It is also flexible enough to create Tibia tools like map editors using scripts—OTClient is a **framework + Tibia APIs**.
+Beyond its flexibility with scripts, OTClient comes with many features that enable client-side innovation in OTServ: **sound system**, **graphics effects with shaders**, **modules/addons**, **animated textures**, **styleable UI**, **transparency**, **multi-language**, **in-game LUA terminal**, and an **OpenGL 2.0 ES engine**. It is also flexible enough to create Tibia tools like map editors using scripts—OTClient is a **framework + Tibia APIs**.
 
 ### ⚡ Performance & Engine
 <details>
@@ -401,34 +400,9 @@ If it doesn't work, enable **curl**:
 - Highscores  
 - Store *(compatible with 1098, 12.91 ~ 13.40)*  
 - QuickLoot  
-- Groups Vip  
+- Groups Vip
 - Reward Wall *(Daily Rewards)*
 </details>
-
-<details>
-  <summary>🌐 Browser Client — @OTArchive</summary>
-
-- by [@OTArchive](https://github.com/OTArchive)  
-- Wiki: https://github.com/OTArchive/otclient-web/wiki/Guia-%E2%80%90-OTClient-Redemption-Web  
-- Video: https://github.com/user-attachments/assets/e8ab58c7-1be3-4c76-bc6d-bd831e846826
-</details>
-
-- Mobile Support — by [@tuliomagalhaes](https://github.com/tuliomagalhaes) • [@BenDol](https://github.com/BenDol) • [@SkullzOTS](https://github.com/SkullzOTS)
-
-<p align="center">
-<table>
-<tr>
-<td><img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/001_ingame.png?raw=true" width="200"></td>
-<td><img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/001_interface.png?raw=true" width="200"></td>
-<td><img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/003_patrikq.jpg?raw=true" width="270"></td>
-</tr>
-<tr>
-<td align="center">Interface</td>
-<td align="center">Density Pixel</td>
-<td align="center">Joystick</td>
-</tr>
-</table>
-</p>
 
 - Support **HTTP/HTTPS/WS/WSS** — by [@alfuveam](https://github.com/alfuveam)
 - Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
@@ -494,21 +468,8 @@ If it doesn't work, enable **curl**:
 - Module Outfit  
 - Placeholder  
 - UIGraph  
-- Keybinds  
+- Keybinds
 - Cam system
-
----
-
-## <a id="the-mobile-project"></a><img height="20" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png"/> The Mobile Project
-This is a fork of edubart's OTClient. The objective of this fork is to develop a runnable OTClient on mobile devices.
-
-**Tasks**
-- [x] Compile on Android devices
-- [ ] Compile on Apple devices
-- [ ] Adapt the UI reusing the existing LUA code
-
-**Current compiling tutorials**
-- [Compiling for Android](https://github.com/mehah/otclient/wiki/Compiling-on-Android)
 
 ---
 

@@ -19,12 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __EMSCRIPTEN__
 
 #include "connection.h"
 
-#include "framework/util/stats.h"
-#include "framework/core/graphicalapplication.h"
+#include <framework/core/graphicalapplication.h>
+#include <framework/util/stats.h>
+#include <iostream>
 
 asio::io_service g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> Connection::m_outputStreams;
@@ -152,7 +152,7 @@ void Connection::internal_write()
     std::shared_ptr<asio::streambuf> outputStream = m_outputStream;
     m_outputStream = nullptr;
 
-    async_write(m_socket,
+    asio::async_write(m_socket,
                 *outputStream,
                 [capture0 = asConnection(), outputStream](auto&& PH1, auto&& PH2) {
         capture0->onWrite(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2), outputStream);
@@ -172,7 +172,7 @@ void Connection::read(const uint16_t bytes, const RecvCallback& callback)
 
     m_recvCallback = callback;
 
-    async_read(m_socket,
+    asio::async_read(m_socket,
                m_inputStream.prepare(bytes),
                [capture0 = asConnection()](auto&& PH1, auto&& PH2) {
         capture0->onRecv(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
@@ -192,7 +192,7 @@ void Connection::read_until(const std::string_view what, const RecvCallback& cal
 
     m_recvCallback = callback;
 
-    async_read_until(m_socket,
+    asio::async_read_until(m_socket,
                      m_inputStream,
                      what,
                      [capture0 = asConnection()](auto&& PH1, auto&& PH2) {
@@ -341,5 +341,3 @@ int Connection::getIp()
     g_logger.error("Getting remote ip");
     return 0;
 }
-
-#endif

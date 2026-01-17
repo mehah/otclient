@@ -153,7 +153,7 @@ private:
     int m_cursorPreferredX{ -1 };
 
     std::vector<int> m_srcToVis;
-    std::vector<int> m_visToSrc;;
+    std::vector<int> m_visToSrc;
 
     Color m_selectionColor{ Color::white };
     Color m_selectionBackgroundColor{ Color::black };

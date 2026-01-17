@@ -39,8 +39,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # *****************************************************************************
 if (MSVC)
   add_executable(${PROJECT_NAME} "" ../cmake/icon/otcicon.rc)
-elseif(ANDROID)
-  add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 else()
   add_executable(${PROJECT_NAME} "")
 endif()
@@ -66,9 +64,6 @@ endif()
 
 if (TOGGLE_FRAMEWORK_EDITOR)
   set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_EDITOR)
-endif()
-if (ANDROID OR WASM)
-  set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DOPENGL_ES=2)
 endif()
 
 set(VERSION "1.0.0")
@@ -141,10 +136,10 @@ if(APPLE)
   find_library(FOUNDATION Foundation REQUIRED)
   find_library(IOKIT IOKit REQUIRED)
 endif()
-if(UNIX AND NOT APPLE AND NOT ANDROID AND NOT WASM)
+if(UNIX AND NOT APPLE)
   find_package(X11 REQUIRED)
 endif()
-if(APPLE AND NOT ANDROID AND NOT WASM)
+if(APPLE)
   find_library(COCOA_LIBRARY Cocoa REQUIRED)
   find_library(COREVIDEO_LIBRARY CoreVideo REQUIRED)
   find_library(QUARTZCORE_LIBRARY QuartzCore REQUIRED)
@@ -156,7 +151,7 @@ endif(WIN32)
 if(NOT OPENSSL_FOUND)
   find_package(GMP REQUIRED)
 endif()
-if(ENABLE_DISCORD_RPC AND NOT ANDROID)
+if(ENABLE_DISCORD_RPC)
         find_package(DiscordRPC REQUIRED)
         set(OTCLIENT_ENABLE_DISCORD_RPC 1)
         log_option_enabled("Discord Rich Presence")
@@ -168,32 +163,14 @@ if(TOGGLE_DIRECTX)
   find_package(DirectX REQUIRED)
 endif()
 if(TOGGLE_FRAMEWORK_SOUND)
-  if(NOT WASM)
-    find_package(OpenAL CONFIG REQUIRED)
-  endif()
+  find_package(OpenAL CONFIG REQUIRED)
   find_package(VorbisFile REQUIRED)
   find_package(Vorbis CONFIG REQUIRED)
   find_package(Ogg CONFIG REQUIRED)
 endif()
-if(ANDROID)
-  set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
-  set(LUAJIT_INCLUDE_DIR ${LUAJIT_LIBRARY} ${Android_INCLUDES}/luajit)
-  set(LUAJIT_LIBRARY ${LUAJIT_LIBRARY} ${Android_LIBRARIES}/libluajit.a)
-  set(OpenAL_LIBRARY ${OpenAL_LIBRARY} ${Android_LIBRARIES}/libopenal.a)
-  set(MINIZIP_INCLUDE_DIR ${MINIZIP_INCLUDE_DIR} ${Android_INCLUDES}/minizip)
-  set(MINIZIP_LIBRARY ${MINIZIP_LIBRARY} ${Android_LIBRARIES}/libminizip.a)
-  find_package(game-activity REQUIRED CONFIG)
-  find_package(EGL REQUIRED)
-else()
-  if(NOT WASM)
-    find_package(OpenGL REQUIRED)
-    find_package(GLEW REQUIRED)
-    find_package(LuaJIT REQUIRED)
-  else()
-    set(LUA_LIBRARY ${LUA_LIBRARY} ${CMAKE_SOURCE_DIR}/browser/include/lua51/liblua.a)
-    set(BROWSER_INCLUDE_DIR ${BROWSER_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/browser/include)
-  endif()
-endif()
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(LuaJIT REQUIRED)
 
 # *****************************************************************************
 # OTClient source files configuration
@@ -239,11 +216,6 @@ set(SOURCE_FILES
         framework/otml/otmlexception.cpp
         framework/otml/otmlnode.cpp
         framework/otml/otmlparser.cpp
-        framework/platform/androidgameactivity.cpp
-        framework/platform/androidmanager.cpp
-        framework/platform/androidmanager.h
-        framework/platform/androidwindow.cpp
-        framework/platform/androidwindow.h
         framework/platform/platform.cpp
         framework/platform/platformwindow.cpp
         framework/platform/unixcrashhandler.cpp
@@ -385,17 +357,9 @@ if (TOGGLE_FRAMEWORK_SOUND)
   )
 endif()
 
-if (WASM)
-  set(SOURCE_FILES ${SOURCE_FILES}
-          framework/platform/browserplatform.cpp
-          framework/platform/browserwindow.cpp
-          framework/net/webconnection.cpp
-  )
-endif()
-
 if(WIN32)
   set(SOURCE_FILES ${SOURCE_FILES} framework/platform/win32window.cpp)
-elseif(APPLE AND NOT ANDROID AND NOT WASM)
+elseif(APPLE)
   set(SOURCE_FILES ${SOURCE_FILES}
           framework/platform/cocoawindow.mm
           framework/platform/cocoaview.mm
@@ -407,7 +371,7 @@ elseif(APPLE AND NOT ANDROID AND NOT WASM)
     SKIP_UNITY_BUILD_INCLUSION ON
     SKIP_PRECOMPILE_HEADERS ON
   )
-elseif(UNIX AND NOT ANDROID AND NOT WASM)
+elseif(UNIX)
   set(SOURCE_FILES ${SOURCE_FILES} framework/platform/x11window.cpp)
 endif()
 
@@ -432,11 +396,7 @@ if(SPEED_UP_BUILD_UNITY)
   log_option_enabled("Build unity for speed up compilation")
 endif(SPEED_UP_BUILD_UNITY)
 
-if(ANDROID)
-  target_sources(${PROJECT_NAME} PRIVATE androidmain.cpp main.cpp)
-else()
-  target_sources(${PROJECT_NAME} PRIVATE main.cpp)
-endif()
+target_sources(${PROJECT_NAME} PRIVATE main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE otclient_core)
 
@@ -517,9 +477,6 @@ if(MSVC)
     log_option_enabled("STATIC_LIBRARY")
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
     find_package(Vorbis REQUIRED)
-    if(ANDROID)
-      find_package(Vorbis CONFIG REQUIRED)
-    endif()
     foreach(msvc_target IN ITEMS otclient_core ${PROJECT_NAME})
       if(TARGET ${msvc_target})
         set_property(TARGET ${msvc_target} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -580,185 +537,8 @@ if(MSVC)
           fmt::fmt-header-only
           utf8cpp::utf8cpp
   )
-elseif(ANDROID)
-  target_include_directories(otclient_core
-          PUBLIC
-          $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
-          $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-          ${LUAJIT_INCLUDE_DIR}
-          ${CMAKE_THREAD_LIBS_INIT}
-          ${Protobuf_INCLUDE_DIRS}
-          ${GMP_INCLUDE_DIR}
-          ${OPENSSL_INCLUDE_DIR}
-          ${PHYSFS_INCLUDE_DIR}
-          ${EGL_INCLUDE_DIR}
-          ${PARALLEL_HASHMAP_INCLUDE_DIRS}
-          ${NLOHMANN_JSON_INCLUDE_DIR}
-          ${MINIZIP_INCLUDE_DIR}
-          ${CPPCODEC_INCLUDE_DIRS}
-  )
-  target_link_libraries(otclient_core
-          PUBLIC
-          ${LUA_LIBRARY}
-          ${LUAJIT_LIBRARY}
-          ${PHYSFS_LIBRARY}
-          ${ZLIB_LIBRARY}
-          ${NLOHMANN_JSON_LIBRARY}
-          ${EGL_LIBRARY}
-          ${OGG_LIBRARY}
-          ${VORBISFILE_LIBRARY}
-          ${VORBIS_LIBRARY}
-          ${GMP_LIBRARY}
-          ${OpenAL_LIBRARY}
-          ${OPENSSL_LIBRARIES}
-          ${STDUUID}
-          ${MINIZIP_LIBRARY}
 
-          protobuf::libprotobuf protobuf
-          absl::log_internal_check_op
-          Threads::Threads
-          asio::asio
-          OpenSLES
-          Vorbis::vorbis
-          Vorbis::vorbisfile
-          LibLZMA::LibLZMA
-          game-activity::game-activity
-          GLESv3
-          android
-          log
-          pugixml::pugixml
-          fmt::fmt-header-only
-          utf8cpp::utf8cpp
-  )
-
-elseif(WASM)
-  option(WASM_USE_WASM_EXCEPTIONS "Use native WebAssembly exception handling" ON)
-
-  set(_WASM_LONGJMP_MODE "emscripten")
-  set(_WASM_EXPORTED_FUNCTIONS "_main,_paste_return")
-  set(_WASM_CXX_FLAGS "-O3 -ffast-math -frtti -pthread -fexceptions")
-  if(WASM_USE_WASM_EXCEPTIONS)
-    set(_WASM_LONGJMP_MODE "wasm")
-    set(_WASM_EXPORTED_FUNCTIONS "${_WASM_EXPORTED_FUNCTIONS},_emscripten_longjmp")
-    string(APPEND _WASM_CXX_FLAGS " -fwasm-exceptions")
-  endif()
-
-  target_include_directories(otclient_core
-          PUBLIC
-          ${CMAKE_SOURCE_DIR}/src
-          ${CMAKE_THREAD_LIBS_INIT}
-          ${Protobuf_INCLUDE_DIRS}
-          ${GMP_INCLUDE_DIR}
-          ${PHYSFS_INCLUDE_DIR}
-          ${GLEW_INCLUDE_DIR}
-          ${PARALLEL_HASHMAP_INCLUDE_DIRS}
-          ${NLOHMANN_JSON_INCLUDE_DIR}
-          ${OPENSSL_INCLUDE_DIR}
-          ${BROWSER_INCLUDE_DIR}
-          ${CPPCODEC_INCLUDE_DIRS}
-  )
-  target_link_libraries(otclient_core
-          PUBLIC
-          ${LUA_LIBRARY}
-          ${PHYSFS_LIBRARY}
-          ${ZLIB_LIBRARY}
-          ${PROTOBUF_LIBRARY}
-          ${NLOHMANN_JSON_LIBRARY}
-          ${GLEW_LIBRARY}
-          ${OPENGL_LIBRARIES}
-          ${DirectX_LIBRARY}
-          ${DirectX_LIBRARIES}
-          ${OGG_LIBRARY}
-          ${VORBISFILE_LIBRARY}
-          ${VORBIS_LIBRARY}
-          ${GMP_LIBRARY}
-          ${STDUUID}
-          ${FOUNDATION}
-          ${IOKIT}
-          ${OPENSSL_LIBRARY}
-          ${OPENSSL_CRYPTO_LIBRARY}
-          ${HTTPLIB_LIBRARY}
-
-          protobuf::libprotobuf protobuf
-          absl::log_internal_check_op
-
-          Threads::Threads
-          asio::asio
-          # OpenAL::OpenAL (using emscripten openal api)
-          LibLZMA::LibLZMA
-          pugixml::pugixml
-          ZLIB::ZLIB
-          OpenSSL::SSL
-          OpenSSL::Crypto
-          httplib::httplib
-          fmt::fmt
-          utf8cpp::utf8cpp
-          Ogg::ogg
-          Vorbis::vorbisfile
-          Vorbis::vorbis
-  )
-
-
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(otclient_core
-            PRIVATE
-            -Wall -Wextra -Wpedantic
-    )
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-  endif()
-
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_WASM_CXX_FLAGS}")
-
-  set(WASM_LINK_OPTIONS
-          -sINVOKE_RUN=0
-          -sEXIT_RUNTIME=1
-          -sTEXTDECODER=2
-          -sCASE_INSENSITIVE_FS=1
-          -lopenal
-          -lidbfs.js
-          -lwebsocket.js
-          -sEXPORTED_RUNTIME_METHODS=ccall
-          "-sEXPORTED_FUNCTIONS=${_WASM_EXPORTED_FUNCTIONS}"
-          -sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
-          -sFORCE_FILESYSTEM
-          -sMALLOC=dlmalloc
-          "-sSUPPORT_LONGJMP=${_WASM_LONGJMP_MODE}"
-          -sWEBSOCKET_SUBPROTOCOL=binary
-          -sOFFSCREENCANVAS_SUPPORT=1
-          -sOFFSCREEN_FRAMEBUFFER
-          -sENVIRONMENT=web,worker
-          -sPROXY_TO_PTHREAD
-          -sFULL_ES2=1
-          -sMIN_WEBGL_VERSION=2
-          -sMAX_WEBGL_VERSION=2
-          -sUSE_PTHREADS=1
-          -sFETCH=1
-          -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency
-          -sALLOW_MEMORY_GROWTH=1
-          --preload-file=../otclientrc.lua@otclientrc.lua
-          --preload-file=../init.lua@init.lua
-          --preload-file=../data@data
-          --preload-file=../mods@mods
-          --preload-file=../modules@modules
-          --shell-file=../browser/shell.html
-          --use-preload-cache
-  )
-
-  if(WASM_USE_WASM_EXCEPTIONS)
-    list(APPEND WASM_LINK_OPTIONS "-sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=['emscripten_longjmp']")
-  endif()
-
-  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    list(APPEND WASM_LINK_OPTIONS -sASSERTIONS=1)
-  endif()
-
-  target_link_options(${PROJECT_NAME} PRIVATE ${WASM_LINK_OPTIONS})
-  string(REPLACE ";" " " _WASM_LINK_LOG "${WASM_LINK_OPTIONS}")
-  message(STATUS "WASM link options: ${_WASM_LINK_LOG}")
-  set(CMAKE_EXECUTABLE_SUFFIX ".html")
-  set(VCPKG_TARGET_TRIPLET "wasm32-emscripten" CACHE STRING "")
-
-else() # Linux
+else() # Linux/macOS
   target_include_directories(otclient_core
           PUBLIC
           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
@@ -768,7 +548,6 @@ else() # Linux
           ${Protobuf_INCLUDE_DIRS}
           ${GMP_INCLUDE_DIR}
           ${PHYSFS_INCLUDE_DIR}
-          ${GLEW_INCLUDE_DIR}
           ${PARALLEL_HASHMAP_INCLUDE_DIRS}
           ${NLOHMANN_JSON_INCLUDE_DIR}
           ${OPENSSL_INCLUDE_DIR}
@@ -780,7 +559,7 @@ else() # Linux
           ${PHYSFS_LIBRARY}
           ${ZLIB_LIBRARY}
           ${NLOHMANN_JSON_LIBRARY}
-          ${GLEW_LIBRARY}
+          GLEW::GLEW
           ${OPENGL_LIBRARIES}
           ${DirectX_LIBRARY}
           ${DirectX_LIBRARIES}
@@ -798,7 +577,7 @@ else() # Linux
           protobuf::libprotobuf protobuf
           absl::log_internal_check_op
           Threads::Threads
-          $<$<AND:$<PLATFORM_ID:Linux>,$<NOT:$<BOOL:${ANDROID}>>>:X11::X11>
+          $<$<PLATFORM_ID:Linux>:X11::X11>
           asio::asio
           OpenAL::OpenAL
           LibLZMA::LibLZMA
@@ -814,7 +593,7 @@ else() # Linux
           Vorbis::vorbis
   )
 
-  if(APPLE AND NOT ANDROID AND NOT WASM)
+  if(APPLE)
     target_link_libraries(otclient_core
             PUBLIC
             ${COCOA_LIBRARY}
@@ -832,7 +611,7 @@ else() # Linux
   endif()
 
 endif()
-if(ENABLE_DISCORD_RPC AND NOT ANDROID)
+if(ENABLE_DISCORD_RPC)
         target_link_libraries(otclient_core PUBLIC ${DISCORDRPC_LIBRARY})
 endif()
 
@@ -848,11 +627,6 @@ if(WIN32)
           LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
   )
 endif(WIN32)
-
-if(ANDROID)
-  set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=lld")
-  set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
-endif()
 
 # *****************************************************************************
 # Link compilation files folder

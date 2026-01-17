@@ -25,10 +25,7 @@
     "utfcpp",
     "gtest",	
     { "name": "inih", "features": ["cpp"] },
-    {
-      "name": "luajit",
-      "platform": "!android & !wasm32"
-    },
+    "luajit",
     {
       "name": "opengl",
       "platform": "windows | linux"

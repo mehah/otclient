@@ -27,6 +27,10 @@
 #include <framework/core/inputevent.h>
 #include <framework/graphics/declarations.h>
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "adaptativeframecounter.h"
 
 class ApplicationDrawEvents
@@ -133,9 +137,6 @@ public:
     void setDrawEvents(const ApplicationDrawEventsPtr& drawEvents) { m_drawEvents = drawEvents; }
     void doScreenshot(std::string file);
     void doMapScreenshot(std::string file);
-#ifdef __EMSCRIPTEN__
-    void mainLoop();
-#endif
 
 protected:
     void resize(const Size& size);

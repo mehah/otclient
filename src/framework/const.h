@@ -22,6 +22,13 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <cmath>
+#include <numbers>
+#include <algorithm>
+
 #define DEG_TO_RAD (std::acos(-1.f)/180.f)
 #define RAD_TO_DEC (180.f/std::acos(-1.f))
 
@@ -36,8 +43,6 @@
 #define BUILD_ARCH "x86"
 #elif defined(__arm__)
 #define BUILD_ARCH "ARM"
-#elif defined(__EMSCRIPTEN__)
-#define BUILD_ARCH "WASM32"
 #else
 #define BUILD_ARCH "unknown"
 #endif
@@ -322,7 +327,6 @@ namespace Fw
         AlternateState = 1 << 10,
         DraggingState = 1 << 11,
         HiddenState = 1 << 12,
-        MobileState = 1 << 13,
-        LastWidgetState = 1 << 14
+        LastWidgetState = 1 << 13
     };
 }

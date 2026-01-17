@@ -714,9 +714,6 @@ function init_binds()
     presetWindow.onEscape = cancelPresetWindow
     presetWindow.buttons.ok.onClick = okPresetWindow
     presetWindow.buttons.cancel.onClick = cancelPresetWindow
-    if g_platform.isMobile() then
-        panels.keybindsPanel.tablePanel:hide()
-    end
 end
 
 function terminate_binds()

@@ -7,8 +7,6 @@ Module
   scripts: [ widgets/uigamemap, widgets/uiitem, widgets/statsbar, gameinterface ]
   load-later:
     - game_walk
-    - game_joystick
-    - game_shortcuts
     - game_minimap
     - game_healthinfo
     - game_inventory

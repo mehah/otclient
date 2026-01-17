@@ -24,10 +24,12 @@
 
 #include <gitinfo.h>
 
+#include <csignal>
+#include <iomanip>
+#include <sstream>
+
 #define ADD_QUOTES_HELPER(s) #s
 #define ADD_QUOTES(s) ADD_QUOTES_HELPER(s)
-
-#include <csignal>
 
 #include "clock.h"
 #include "configmanager.h"
@@ -40,11 +42,7 @@
 #include "framework/proxy/proxy.h"
 
 #ifdef FRAMEWORK_NET
-#ifdef __EMSCRIPTEN__
-#include <framework/net/webconnection.h>
-#else
 #include <framework/net/connection.h>
-#endif
 #endif
 
 void exitSignalHandler(const int sig)
@@ -92,11 +90,6 @@ void Application::init(std::vector<std::string>& args, ApplicationContext* conte
     m_startupOptions = startupOptions;
     m_startupArgs = args;
 
-    // mobile testing
-    if (startupOptions.find("-mobile") != std::string::npos) {
-        g_platform.setDevice({ Mobile, Android });
-    }
-
     // initialize configs
     g_configs.init();
 
@@ -132,11 +125,7 @@ void Application::deinit()
 void Application::terminate()
 {
 #ifdef FRAMEWORK_NET
-#ifdef __EMSCRIPTEN__
-    WebConnection::terminate();
-#else
     Connection::terminate();
-#endif
 #endif
 
     // release configs
@@ -162,22 +151,14 @@ void Application::poll()
     g_clock.update();
 
 #ifdef FRAMEWORK_NET
-#ifdef __EMSCRIPTEN__
-    WebConnection::poll();
-#else
     Connection::poll();
-#endif
 #endif
 
     g_dispatcher.poll();
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET
-#ifdef __EMSCRIPTEN__
-    WebConnection::poll();
-#else
     Connection::poll();
-#endif
 #endif
 
     g_clock.update();
@@ -210,10 +191,6 @@ std::string Application::getOs()
     return "mac";
 #elif __linux
     return "linux";
-#elif ANDROID
-    return "android";
-#elif __EMSCRIPTEN__
-    return "browser";
 #else
     return "unknown";
 #endif

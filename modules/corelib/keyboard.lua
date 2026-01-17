@@ -355,51 +355,27 @@ function g_keyboard.isInUse()
 end
 
 function g_keyboard.isCtrlPressed()
-    if (g_platform.isMobile()) then
-        return false
-    else
-        return bit.band(g_window.getKeyboardModifiers(), KeyboardPrimaryModifier) ~= 0
-    end
+    return bit.band(g_window.getKeyboardModifiers(), KeyboardPrimaryModifier) ~= 0
 end
 
 function g_keyboard.isPrimaryPressed()
-    if (g_platform.isMobile()) then
-        return false
-    else
-        return bit.band(g_window.getKeyboardModifiers(), KeyboardPrimaryModifier) ~= 0
-    end
+    return bit.band(g_window.getKeyboardModifiers(), KeyboardPrimaryModifier) ~= 0
 end
 
 function g_keyboard.isAltPressed()
-    if (g_platform.isMobile()) then
-        return false
-    else
-        return bit.band(g_window.getKeyboardModifiers(), KeyboardAltModifier) ~= 0
-    end
+    return bit.band(g_window.getKeyboardModifiers(), KeyboardAltModifier) ~= 0
 end
 
 function g_keyboard.isShiftPressed()
-    if (g_platform.isMobile()) then
-        return false
-    else
-        return bit.band(g_window.getKeyboardModifiers(), KeyboardShiftModifier) ~= 0
-    end
+    return bit.band(g_window.getKeyboardModifiers(), KeyboardShiftModifier) ~= 0
 end
 
 function g_keyboard.isControlPressed()
-    if (g_platform.isMobile()) then
-        return false
-    else
-        return bit.band(g_window.getKeyboardModifiers(), KeyboardCtrlModifier) ~= 0
-    end
+    return bit.band(g_window.getKeyboardModifiers(), KeyboardCtrlModifier) ~= 0
 end
 
 function g_keyboard.isMetaPressed()
-    if (g_platform.isMobile()) then
-        return false
-    else
-        return bit.band(g_window.getKeyboardModifiers(), KeyboardMetaModifier) ~= 0
-    end
+    return bit.band(g_window.getKeyboardModifiers(), KeyboardMetaModifier) ~= 0
 end
 
 local function hasOnlyModifiers(modifiers, requiredMask, allowedMask)
@@ -415,17 +391,11 @@ local function primaryAllowedMask()
 end
 
 function g_keyboard.isPrimaryModifierOnly(keyboardModifiers)
-    if (g_platform.isMobile()) then
-        return false
-    end
     local allowedMask = primaryAllowedMask()
     return hasOnlyModifiers(keyboardModifiers, KeyboardPrimaryModifier, allowedMask)
 end
 
 function g_keyboard.isPrimaryShiftModifierOnly(keyboardModifiers)
-    if (g_platform.isMobile()) then
-        return false
-    end
     local requiredMask = bit.bor(KeyboardPrimaryModifier, KeyboardShiftModifier)
     local allowedMask = requiredMask
     local _, primaryIsCtrl = getPlatformFlags()

@@ -24,6 +24,9 @@
 
 #include "declarations.h"
 #include <framework/core/timer.h>
+#include <string>
+#include <memory>
+#include <array>
 
 class Texture
 {

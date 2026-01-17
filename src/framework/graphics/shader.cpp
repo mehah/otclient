@@ -20,12 +20,17 @@
  * THE SOFTWARE.
  */
 
+#include <string>
+#include <vector>
+#include <memory>
+#include <atomic>
+#include <string_view>
+#include "glutil.h"
 #include "shader.h"
-
 #include "graphics.h"
-#include "framework/core/eventdispatcher.h"
-#include "framework/core/graphicalapplication.h"
-#include "framework/core/resourcemanager.h"
+#include "../core/eventdispatcher.h"
+#include "../core/resourcemanager.h"
+#include "../core/graphicalapplication.h"
 
 Shader::Shader(ShaderType shaderType) : m_shaderId(glCreateShader(static_cast<GLenum>(shaderType))), m_shaderType(shaderType)
 {
@@ -47,18 +52,10 @@ Shader::~Shader()
 
 bool Shader::compileSourceCode(const std::string_view sourceCode) const
 {
-#ifdef OPENGL_ES
-    static constexpr std::string_view qualifierDefines =
-        "#ifndef GL_FRAGMENT_PRECISION_HIGH\n"
-        "#define highp mediump\n"
-        "#endif\n"
-        "precision highp float;\n";
-#else
     static constexpr std::string_view qualifierDefines =
         "#define lowp\n"
         "#define mediump\n"
         "#define highp\n";
-#endif
 
     auto code = std::string{ qualifierDefines };
     code.append(sourceCode);
@@ -74,7 +71,7 @@ bool Shader::compileSourceCode(const std::string_view sourceCode) const
 bool Shader::compileSourceFile(const std::string_view sourceFile) const
 {
     try {
-        const auto& sourceCode = g_resources.readFileContents(sourceFile.data());
+        const auto& sourceCode = g_resources.readFileContents(std::string{ sourceFile });
         return compileSourceCode(sourceCode);
     } catch (const stdext::exception& e) {
         g_logger.error("unable to load shader source form file '{}': {}", sourceFile, e.what());

@@ -20,16 +20,20 @@
  * THE SOFTWARE.
  */
 
+#include <string>
+#include <memory>
+#include <atomic>
+#include <string_view>
+#include <algorithm>
+#include "glutil.h"
 #include "texture.h"
-
-#include "drawpoolmanager.h"
-#include "graphics.h"
 #include "image.h"
 #include "textureatlas.h"
+#include "graphics.h"
+#include "drawpoolmanager.h"
 #include "texturemanager.h"
-#include "framework/core/eventdispatcher.h"
-#include <framework/core/graphicalapplication.h>
-#include <framework/util/stats.h>
+#include "../core/eventdispatcher.h"
+#include "../util/stats.h"
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
@@ -116,10 +120,8 @@ void Texture::buildHardwareMipmaps()
     if (getProp(hasMipMaps))
         return;
 
-#ifndef OPENGL_ES
     if (!glGenerateMipmap)
         return;
-#endif
 
     setProp(hasMipMaps, true);
 
@@ -246,37 +248,31 @@ const AtlasRegion* Texture::getAtlasRegion() const {
     return nullptr;
 }
 
-void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixels, const int channels, const bool
-#ifndef OPENGL_ES
-                          compress
-#endif
-) const
+void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixels, const int channels, const bool compress) const
 {
     GLenum format = 0;
-    GLenum internalFormat = GL_R8;
+    GLenum internalFormat = 0;
     switch (channels) {
         case 4:
             format = GL_RGBA;
-            internalFormat = GL_RGBA;
+            internalFormat = compress ? GL_COMPRESSED_RGBA : GL_RGBA;
             break;
         case 3:
             format = GL_RGB;
-            internalFormat = GL_RGB;
+            internalFormat = compress ? GL_COMPRESSED_RGB : GL_RGB;
             break;
         case 2:
             format = GL_LUMINANCE_ALPHA;
+            internalFormat = GL_LUMINANCE_ALPHA;
             break;
         case 1:
             format = GL_LUMINANCE;
+            internalFormat = GL_LUMINANCE;
             break;
+        default:
+            g_logger.error("Texture::setupPixels: invalid channels count {}", channels);
+            return;
     }
-
-#ifdef OPENGL_ES
-    //TODO
-#else
-    if (compress)
-        internalFormat = GL_COMPRESSED_RGBA;
-#endif
 
     glTexImage2D(GL_TEXTURE_2D, level, internalFormat, size.width(), size.height(), 0, format, GL_UNSIGNED_BYTE, pixels);
 }

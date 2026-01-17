@@ -21,10 +21,14 @@
  */
 
 #pragma once
-#ifndef __EMSCRIPTEN__
+
 #include "declarations.h"
 
 #include <framework/luaengine/luaobject.h>
+#include <asio.hpp>
+#include <functional>
+#include <list>
+#include <chrono>
 
 class Connection final : public LuaObject
 {
@@ -96,4 +100,3 @@ protected:
 
     friend class Server;
 };
-#endif
