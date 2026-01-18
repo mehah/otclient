@@ -223,6 +223,8 @@ GameForgeSkillStats = 126
 GameCharacterSkillStats = 127
 GameCreaturePaperdoll = 128
 GameVocationMonk = 130 -- GameMultiSpr is 129
+GameLevelPercentU16 = 131
+GameEffectSource = 132
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'

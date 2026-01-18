@@ -1,0 +1,9 @@
+Module
+  name: game_npctrader_html
+  description: game_npctrader_html
+  author: game_npctrader_html
+  website: https://github.com/mehah/otclient
+  sandboxed: true
+  scripts: [ game_npctrader ]
+  @onLoad: controllerNpcTrader:init()
+  @onUnload: controllerNpcTrader:terminate()

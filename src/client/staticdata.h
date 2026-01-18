@@ -148,6 +148,33 @@ struct NPCData
     std::string currencyQuestFlagDisplayName;
 };
 
+enum KeywordButtonIcon : uint16_t
+{
+    KEYWORDBUTTONICON_GENERALTRADE = 0,
+    KEYWORDBUTTONICON_POTIONTRADE = 1,
+    KEYWORDBUTTONICON_EQUIPMENTTRADE = 2,
+    KEYWORDBUTTONICON_SAIL = 3,
+    KEYWORDBUTTONICON_DEPOSITALL = 4,
+    KEYWORDBUTTONICON_WITHDRAW = 5,
+    KEYWORDBUTTONICON_BALANCE = 6,
+    KEYWORDBUTTONICON_YES = 7,
+    KEYWORDBUTTONICON_NO = 8,
+    KEYWORDBUTTONICON_BYE = 9,
+    KEYWORDBUTTONICON_LAST
+};
+
+struct NpcButton
+{
+    uint16_t id;
+    std::string text;
+};
+
+struct NpcChatWindowData
+{
+    std::vector<uint32_t> npcIds;
+    std::vector<NpcButton> buttons;
+};
+
 struct MarketOffer
 {
     uint32_t timestamp = 0;

@@ -107,6 +107,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerBugReport:
                     parseBugReport(msg);
                     break;
+                case Proto::GameServerNpcChatWindow:
+                    parseNpcChatWindow(msg);
+                    break;
                 case Proto::GameServerPingBack:
                 case Proto::GameServerPing:
                     if (((opcode == Proto::GameServerPing) && (g_game.getFeature(Otc::GameClientPing))) ||
@@ -749,6 +752,30 @@ void ProtocolGame::parseBugReport(const InputMessagePtr& msg)
     const bool canReportBugs = msg->getU8() > 0;
     g_game.setCanReportBugs(canReportBugs);
 }
+
+void ProtocolGame::parseNpcChatWindow(const InputMessagePtr& msg)
+{
+    const uint8_t status = msg->getU8();
+    NpcChatWindowData data;
+
+    const uint8_t npcCount = msg->getU8();
+    data.npcIds.reserve(npcCount);
+    for (uint8_t i = 0; i < npcCount; ++i) {
+        data.npcIds.push_back(msg->getU32());
+    }
+
+    const uint8_t buttonCount = msg->getU8();
+    data.buttons.reserve(buttonCount);
+    for (uint8_t i = 0; i < buttonCount; ++i) {
+        NpcButton button;
+        button.id = msg->getU8();
+        button.text = msg->getString();
+        data.buttons.push_back(button);
+    }
+
+    g_lua.callGlobalField("g_game", "onNpcChatWindow", data);
+}
+
 
 void ProtocolGame::parsePendingGame(const InputMessagePtr&)
 {
@@ -1811,6 +1838,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                         g_logger.traceError("invalid effect id {}", effectId);
                         continue;
                     }
+                    const uint16_t effectSource = g_game.getFeature(Otc::GameEffectSource) ? msg->getU8() : 0;
 
                     const auto& effect = std::make_shared<Effect>();
                     effect->setId(effectId);
@@ -2438,7 +2466,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
 
     const uint64_t experience = g_game.getFeature(Otc::GameDoubleExperience) ? msg->getU64() : msg->getU32();
     const uint16_t level = g_game.getFeature(Otc::GameLevelU16) ? msg->getU16() : msg->getU8();
-    const uint8_t levelPercent = msg->getU8();
+    const uint8_t levelPercent = g_game.getFeature(Otc::GameLevelPercentU16) ? msg->getU16() : msg->getU8();
 
     if (g_game.getFeature(Otc::GameExperienceBonus)) {
         if (g_game.getClientVersion() <= 1096) {
@@ -5146,6 +5174,10 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemName = msg->getString();
                 const uint8_t count = msg->getU8();
                 houseItems.emplace_back(itemId, itemName, count);
+            }
+
+            if (g_game.getClientVersion() >= 1521) {
+                msg->getU8();
             }
             g_lua.callGlobalField("g_game", "onParseCyclopediaStoreSummary", xpBoostTime, dailyRewardXpBoostTime, blessings, preySlotsUnlocked, preyWildcards, instantRewards, hasCharmExpansion, hirelingsObtained, hirelingSkills, houseItems);
             break;

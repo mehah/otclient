@@ -229,6 +229,26 @@ bool luavalue_cast(const int index, MarketData& data)
     return true;
 }
 
+int push_luavalue(const NpcButton& button)
+{
+    g_lua.createTable(0, 2);
+    g_lua.pushInteger(button.id);
+    g_lua.setField("id");
+    g_lua.pushString(button.text);
+    g_lua.setField("text");
+    return 1;
+}
+
+int push_luavalue(const NpcChatWindowData& data)
+{
+    g_lua.createTable(0, 2);
+    g_lua.polymorphicPush(data.npcIds);
+    g_lua.setField("npcIds");
+    g_lua.polymorphicPush(data.buttons);
+    g_lua.setField("buttons");
+    return 1;
+}
+
 int push_luavalue(const Light& light)
 {
     g_lua.createTable(0, 2);
