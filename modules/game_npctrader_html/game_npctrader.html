@@ -1,372 +1,63 @@
 <!-- todo
  not work always-show-count: false in html 
  placeholder="Type to search" no sirve en html
- 
- 
- 
- 
- 
  -->
 
 <style>
-    .modal-message {
-        width: 400px;
-        height: 400px;
-        display: block;
-        --image-source: /images/ui/window_new;
-        --image-border: 6;
-        --image-border-top: 27
-    }
-
-    .img {
-        width: 186px;
-        height: 27px;
-    }
-
-    .title {
-        margin-left: 90px;
-        margin-top: 8px;
-        display: block;
-        width: 20%;
-    }
-
-    .podium {
-        width: 65px;
-        height: 67px;
-        margin-left: 10px;
-    }
-
-    .panelConsole {
-        width: 360px;
-        height: 288px;
-        --border: 1 red;
-        display: block;
-        margin-top: -35px;
-        margin-left: 15px;
-    }
-
-    .panelBotons {
-        width: 360px;
-        height: 35px;
-        --border: 1 red;
-        display: block;
-        margin-top: 8px;
-        margin-left: 15px;
-    }
-
-    .npc-button {
-        width: 19px;
-        height: 19px;
-        --icon-source: /game_npctrader_html/images/icons-npcdialog;
-        margin-right: 2px;
-    }
-
-    .creature-display {
-        width: 64px;
-        height: 64px;
-        margin-left: 10px;
-        margin-top: 10px;
-    }
-
-    .inputConsole {
-        display: inline-block;
-        width: 288px;
-        margin-left: 15px;
-        margin-top: 5px;
-    }
-
-    .bottonChat {
-        display: inline;
-        margin-left: 2px;
-        font: cipsoftFont;
-    }
-
-    .leftPanel {
-        width: 395px;
-        height: 400px;
-        float: left;
-    }
-
-    .rightPanel {
-        width: 195px;
-        height: 368px;
-        margin-top: 27px;
-        margin-left: 2px;
-        float: left;
-    }
-
-    .verticalSep {
-        height: 340px;
-        margin-top: 25px;
-        float: left;
-    }
-
-    .bottonTrade {
-        width: 12px;
-        height: 12px;
-        --image-source: /images/ui/miniwindow_buttons;
-        --image-size: 14 14;
-        --image-clip: 28 0 14 14;
-        margin-top: 7px;
-        margin-right: 40px;
-    }
-
-    .bottonTrade:hover {
-        --image-clip: 28 14 14 14;
-    }
-
-    .bottonTrade:active {
-        --image-clip: 28 28 14 14;
-    }
-
-    .bottonOptions {
-        width: 12px;
-        height: 12px;
-        --image-source: /images/ui/miniwindow_buttons;
-        --image-size: 14 14;
-        --image-clip: 112 0 14 14;
-        margin-top: 7px;
-        margin-right: 25px;
-    }
-
-    .bottonOptions:hover {
-        --image-clip: 112 14 14 14;
-    }
-
-    .bottonOptions:active {
-        --image-clip: 112 28 14 14;
-    }
-
-    .closeButton {
-        width: 12px;
-        height: 12px;
-        --image-source: /images/ui/miniwindow_buttons;
-        --image-size: 14 14;
-        --image-clip: 28 0 14 14;
-        margin-top: 7px;
-        margin-right: 10px;
-    }
-
-    .closeButton:hover {
-        --image-clip: 28 14 14 14;
-    }
-
-    .closeButton:active {
-        --image-clip: 28 28 14 14;
-    }
-
-    /* Trade Panel Styles */
-    .tradeHeader {
-        padding: 5px;
-        height: 50px;
-    }
-
-    .tradeCurrencyLabel {
-        color: #cccccc;
-        font: verdana-11px-antialised;
-    }
-
-    .tradeCurrencyName {
-        color: #ffffff;
-        font: verdana-11px-antialised;
-        margin-top: 2px;
-    }
-
-    .tradeCurrencyIcon {
-        width: 40px;
-        height: 40px;
-        margin-right: 5px;
-        --border-width-top: 1;
-        --border-color-top: #141414;
-        --border-width-left: 1;
-        --border-color-left: #141414;
-        --border-width-bottom: 1;
-        --border-color-bottom: #747474;
-        --border-width-right: 1;
-        --border-color-right: #747474;
-    }
-
-    .tradeTabs {
-        width: 50px;
-        height: 34px;
-    }
-
-    .tradeTab {
-        width: 50px;
-        height: -5px;
-        /* WTF       height: -5px; */
-        margin-bottom: 2px;
-        font: verdana-11px-rounded;
-
-    }
-
-    .tradeSearchRow {
-        height: 21px;
-        margin: 2px 5px;
-        border: 1 #444444;
-        background: #222222;
-    }
-
-    .tradeSearchInput {
-        width: 160px;
-        color: #aaaaaa;
-        margin-left: 5px;
-        font: verdana-11px-antialised;
-        --placeholder: Type to search;
-        --placeholder-color: #6E706F;
-    }
-
-    .tradeSearchClear {
-        --image-source: /game_cyclopedia/images/button_clear_search;
-
-    }
-
-    .tradeListScroll {
-        width: 100%;
-        height: 220;
-        border: 1 #444444;
-        margin: 2 0;
-        background-color: #404040;
-        --border-width-top: 1;
-        --border-color-top: #141414;
-        --border-width-left: 1;
-        --border-color-left: #141414;
-        --border-width-bottom: 1;
-        --border-color-bottom: #747474;
-        --border-width-right: 1;
-        --border-color-right: #747474;
-        overflow: scroll;
-    }
-
-    .tradeScrollBar {
-        width: 15px;
-        height: 215px;
-        margin-right: 2px;
-        background-color: #222222;
-    }
-
-    .itemListContainer {
-        width: 175px;
-        height: 215px;
-
-    }
-
-    .tradeListItem {
-        width: 100%;
-        height: 48;
-        padding: 4 8;
-        border: 1 transparent;
-        margin-left: 2px;
-        margin-top: 2px;
-    }
-
-    .tradeListItem:nth-child(odd) {
-        background-color: #383838;
-    }
-
-    .tradeListItem:hover {
-        background-color: #505050;
-    }
-
-    .tradeListItem:focus {
-        background-color: #d10000;
-    }
-
-    .tradeListItemSelected {
-        background-color: #224466;
-        border: 1 #336699;
-    }
-
-    .tradeItemIcon {
-        width: 40px;
-        height: 40px;
-    }
-
-    .tradeItemName {
-        color: #c0c0c0;
-        font: verdana-11px-antialised;
-        width: 120px;
-        --text-offset: 0 2;
-    }
-
-    .tradeItemInfo {
-        color: #c0c0c0;
-        width: 120px;
-    }
-
-    .tradeFooter {
-        height: 60px;
-        padding: 4px;
-        position: relative;
-    }
-
-    .tradeTopRow {
-        padding-right: 56px;
-        height: 14px;
-    }
-
-    #amountScrollBar {
-        width: 130px;
-    }
-
-    .tradePreviewBox {
-        width: 40px;
-        height: 40px;
-        border: 1 #444444;
-        background: #1a1a1a;
-        position: absolute;
-        right: 4px;
-        top: 4px;
-    }
-
-    .tradeBuyButton {
-        width: 29px;
-        height: -15px;
-        font: verdana-11px-rounded;
-        position: absolute;
-        right: 2px;
-        bottom: 0px;
-    }
-
-    .tradeRows {
-        margin-top: 2px;
-        padding-right: 56px;
-    }
-
-    .tradeRow {
-        height: 14px;
-    }
-
-    .tradeFooterLabel {
-        color: #cccccc;
-        font: verdana-11px-antialised;
-        width: 55px;
-
-        display: inline-block;
-    }
-
-    .tradeFooterValue {
-        color: #ffffff;
-        font: verdana-11px-antialised;
-
-        display: inline-block;
-        width: 70px;
-        text-align: right;
-    }
-
-    .tradeFooterAmountInput {
-        width: 68px;
-        height: 16px;
-        background: #222222;
-        border: 1 #444444;
-        color: #ffffff;
-        text-align: right;
-        font: verdana-11px-antialised;
-        padding-right: 2px;
-
-        display: inline-block;
-    }
+    .modal-message { width: 400px; height: 400px; display: block; --image-source: /images/ui/window_new; --image-border: 6; --image-border-top: 27; }
+    .img { width: 186px; height: 27px; }
+    .title { margin-left: 90px; margin-top: 8px; display: block; width: 20%; }
+    .podium { width: 65px; height: 67px; margin-left: 10px; }
+    .panelConsole { width: 360px; height: 288px; --border: 1 red; display: block; margin-top: -35px; margin-left: 15px; }
+    .panelBotons { width: 360px; height: 35px; --border: 1 red; display: block; margin-top: 8px; margin-left: 15px; }
+    .npc-button { width: 19px; height: 19px; --icon-source: /game_npctrader_html/images/icons-npcdialog; margin-right: 2px; }
+    .creature-display { width: 64px; height: 64px; margin-left: 10px; margin-top: 10px; }
+    .inputConsole { display: inline-block; width: 288px; margin-left: 15px; margin-top: 5px; }
+    .bottonChat { display: inline; margin-left: 2px; font: cipsoftFont; }
+    .leftPanel { width: 395px; height: 400px; float: left; }
+    .rightPanel { width: 195px; height: 368px; margin-top: 27px; margin-left: 2px; float: left; }
+    .verticalSep { height: 340px; margin-top: 25px; float: left; }
+    .bottonTrade { width: 12px; height: 12px; --image-source: /images/ui/miniwindow_buttons; --image-size: 14 14; --image-clip: 28 0 14 14; margin-top: 7px; margin-right: 40px; }
+    .bottonTrade:hover { --image-clip: 28 14 14 14; }
+    .bottonTrade:active { --image-clip: 28 28 14 14; }
+    .bottonOptions { width: 12px; height: 12px; --image-source: /images/ui/miniwindow_buttons; --image-size: 14 14; --image-clip: 112 0 14 14; margin-top: 7px; margin-right: 25px; }
+    .bottonOptions:hover { --image-clip: 112 14 14 14; }
+    .bottonOptions:active { --image-clip: 112 28 14 14; }
+    .closeButton { width: 12px; height: 12px; --image-source: /images/ui/miniwindow_buttons; --image-size: 14 14; --image-clip: 28 0 14 14; margin-top: 7px; margin-right: 10px; }
+    .closeButton:hover { --image-clip: 28 14 14 14; }
+    .closeButton:active { --image-clip: 28 28 14 14; }
+    .tradeHeader { padding: 5px; height: 50px; }
+    .tradeCurrencyLabel { color: #cccccc; font: verdana-11px-antialised; }
+    .tradeCurrencyName { color: #ffffff; font: verdana-11px-antialised; margin-top: 2px; }
+    .tradeCurrencyIcon { width: 40px; height: 40px; margin-right: 5px; --border-width-top: 1; --border-color-top: #141414; --border-width-left: 1; --border-color-left: #141414; --border-width-bottom: 1; --border-color-bottom: #747474; --border-width-right: 1; --border-color-right: #747474; }
+    .tradeTabs { width: 50px; height: 34px; }
+    .tradeTab { width: 50px; height: -5px; margin-bottom: 2px; font: verdana-11px-rounded; }
+    .tradeSearchRow { height: 21px; margin: 2px 5px; border: 1 #444444; background: #222222; }
+    .tradeSearchInput { width: 160px; color: #aaaaaa; margin-left: 5px; font: verdana-11px-antialised; --placeholder: Type to search; --placeholder-color: #6E706F; }
+    .tradeSearchClear { --image-source: /game_cyclopedia/images/button_clear_search; }
+    .tradeListScroll { width: 100%; height: 220; border: 1 #444444; margin: 2 0; background-color: #404040; --border-width-top: 1; --border-color-top: #141414; --border-width-left: 1; --border-color-left: #141414; --border-width-bottom: 1; --border-color-bottom: #747474; --border-width-right: 1; --border-color-right: #747474; overflow: scroll; }
+    .tradeScrollBar { width: 15px; height: 215px; margin-right: 2px; background-color: #222222; }
+    .itemListContainer { width: 175px; height: 215px; }
+    .tradeListItem { width: 100%; height: 48; padding: 4 8; border: 1 transparent; margin-left: 2px; margin-top: 2px; }
+    .tradeListItem:nth-child(odd) { background-color: #383838; }
+    .tradeListItem:hover { background-color: #505050; }
+    .tradeListItem:focus { background-color: #d10000; }
+    .tradeListItemSelected { background-color: #224466; border: 1 #336699; }
+    .tradeItemIcon { width: 40px; height: 40px; }
+    .tradeItemName { color: #c0c0c0; font: verdana-11px-antialised; width: 120px; --text-offset: 0 2; }
+    .tradeItemInfo { color: #c0c0c0; width: 120px; }
+    .tradeFooter { height: 60px; padding: 4px; position: relative; }
+    .tradeTopRow { padding-right: 56px; height: 14px; }
+    #amountScrollBar { width: 130px; }
+    .tradePreviewBox { width: 40px; height: 40px; border: 1 #444444; background: #1a1a1a; position: absolute; right: 4px; top: 4px; }
+    .tradeBuyButton { width: 29px; height: -15px; font: verdana-11px-rounded; position: absolute; right: 2px; bottom: 0px; }
+    .tradeRows { margin-top: 2px; padding-right: 56px; }
+    .tradeRow { height: 14px; }
+    .tradeFooterLabel { color: #cccccc; font: verdana-11px-antialised; width: 55px; display: inline-block; }
+    .tradeFooterValue { color: #ffffff; font: verdana-11px-antialised; display: inline-block; width: 70px; text-align: right; }
+    .tradeFooterAmountInput { width: 68px; height: 16px; background: #222222; border: 1 #444444; color: #ffffff; text-align: right; font: verdana-11px-antialised; padding-right: 2px; display: inline-block; }
 </style>
+
 
 <script type="text">
     self.isTradeOpen = false;
@@ -391,7 +82,8 @@
 
         <div id="panelBotons" class="panelBotons" style="display: flex;">
             <button *for="local buttonData in self.buttons" class="npc-button" *tooltip="buttonData.text"
-                *icon-clip="buttonData.id * 32 .. ' 0 32 32'" onclick="g_game.talk(buttonData.text)">
+                *icon-clip="self:getIconClip(buttonData.id)" onclick="g_game.talk(buttonData.text)">
+
             </button>
         </div>
         <input class="inputConsole" />
@@ -419,7 +111,7 @@
 
         <!-- List Container -->
         <div id="tradeListScroll" class="tradeListScroll">
-            <div *for="local item in self.tradeItems" class="tradeListItem"
+            <div *for="local item in self.tradeItems" *for-finished="self:onTradeListRendered()" class="tradeListItem"
                 *class-tradeListItemSelected="self.selectedItem == item" onclick="self:selectTradeItem(item, this)"
                 style="display: flex;">
                 <UIItem class="tradeItemIcon item" *item="item.ptr" />
@@ -428,7 +120,6 @@
                     <label class="tradeItemInfo" *text="'Price ' .. item.price .. ', ' .. item.weight .. ' oz'"></label>
                 </div>
             </div>
-            <label *if="#self.tradeItems > 0" *oninit="self:onTradeListRendered()" />
         </div>
 
         <!-- Search -->
@@ -443,7 +134,7 @@
             <!-- scrollbar (arriba izquierda) -->
             <div class="tradeTopRow">
                 <HorizontalScrollBar id="amountScrollBar" minimum="1" maximum="100" step="1" *value="self.amount"
-                    onchange="self:onQuantityValueChange(event.value)" disabled/>
+                    onchange="self:onQuantityValueChange(event.value)" disabled />
             </div>
 
             <!-- preview (derecha) -->
@@ -461,7 +152,7 @@
 
                 <div class="tradeRow">
                     <div class="tradeFooterLabel">Price:</div>
-                    <label class="tradeFooterValue" >{{self.totalPrice}}</label>
+                    <label class="tradeFooterValue">{{self.totalPrice}}</label>
                 </div>
 
                 <div class="tradeRow">

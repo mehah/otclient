@@ -7,6 +7,38 @@ controllerNpcTrader.buttons = {}
 controllerNpcTrader.isTradeOpen = false
 
 local testMode = true
+-- LuaFormatter off
+local KeywordButtonIcon = {
+  KEYWORDBUTTONICON_GENERALTRADE   = 0,
+  KEYWORDBUTTONICON_POTIONTRADE    = 1,
+  KEYWORDBUTTONICON_EQUIPMENTTRADE = 2,
+  KEYWORDBUTTONICON_SAIL           = 3,
+  KEYWORDBUTTONICON_DEPOSITALL     = 4,
+  KEYWORDBUTTONICON_WITHDRAW       = 5,
+  KEYWORDBUTTONICON_BALANCE        = 6,
+  KEYWORDBUTTONICON_YES            = 7,
+  KEYWORDBUTTONICON_NO             = 8,
+  KEYWORDBUTTONICON_BYE            = 9,
+}
+
+local IconSpriteIndex = {
+  [KeywordButtonIcon.KEYWORDBUTTONICON_GENERALTRADE]   = 1,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_POTIONTRADE]    = 2,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_EQUIPMENTTRADE] = 3,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_SAIL]           = 0,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_DEPOSITALL]     = 5,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_WITHDRAW]       = 6,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_BALANCE]        = 4,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_YES]            = 7,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_NO]             = 8,
+  [KeywordButtonIcon.KEYWORDBUTTONICON_BYE]            = 9,
+}
+-- LuaFormatter on
+function controllerNpcTrader:getIconClip(id)
+    local index = IconSpriteIndex[id] or 0
+    local x = index * 32
+    return x .. " 0 32 32"
+end
 
 function controllerNpcTrader:onInit()
     if testMode then
@@ -17,9 +49,10 @@ end
 function controllerNpcTrader:onGameStart()
     controllerNpcTrader:registerEvents(g_game, {
         onNpcChatWindow = onNpcChatWindow,
-        onOpenNpcTrade = onOpenNpcTrade,
+        onOpenNpcTrade = onOpenNpcTrade
     })
     if testMode then
+-- LuaFormatter off
         local mockTradeItems = {
             { Item.create(3031), "Gold Coin", 10, 1, 100 },
             { Item.create(3357), "Plate Armor", 120000, 400, 100 },
@@ -28,14 +61,17 @@ function controllerNpcTrader:onGameStart()
         }
         onNpcChatWindow({ 
             ["buttons"] = { 
-                [1] = { ["id"] = 7, ["text"] = "yes" },
-                [2] = { ["id"] = 8, ["text"] = "no" },
-                [3] = { ["id"] = 9, ["text"] = "bye" },
-                [4] = { ["id"] = 0, ["text"] = "trade" }
+                [1] = { ["id"] = KeywordButtonIcon.KEYWORDBUTTONICON_YES, ["text"] = "yes" },
+                [2] = { ["id"] = KeywordButtonIcon.KEYWORDBUTTONICON_NO, ["text"] = "no" },
+                [3] = { ["id"] = KeywordButtonIcon.KEYWORDBUTTONICON_BYE, ["text"] = "bye" },
+                [4] = { ["id"] = KeywordButtonIcon.KEYWORDBUTTONICON_GENERALTRADE, ["text"] = "trade" },
             },
             ["npcIds"] = { [1] = 2147484212 }
         })
-        controllerNpcTrader:scheduleEvent(function() onOpenNpcTrade(mockTradeItems) end, 1500, "controllertest")
+-- LuaFormatter on
+        controllerNpcTrader:scheduleEvent(function()
+            onOpenNpcTrade(mockTradeItems)
+        end, 1500, "controllertest")
     end
 end
 
@@ -55,8 +91,8 @@ end
 
 function onNpcChatWindow(data)
     local creature = g_map.getCreatureById(data.npcIds[1])
-    if not creature then 
-        return 
+    if not creature then
+        return
     end
 
     controllerNpcTrader.widthConsole = 395
@@ -96,8 +132,7 @@ function onOpenNpcTrade(items)
 
 end
 function controllerNpcTrader:onTradeListRendered()
-
-    print(1111111111)
+    print("onTradeListRendered")
     local list = self:findWidget("#tradeListScroll")
     if list then
         local firstChild = list:getChildByIndex(1)
@@ -128,4 +163,16 @@ function controllerNpcTrader:onQuantityValueChange(quantity)
         self.totalPrice = 0
         self.totalWeight = "0.00"
     end
+end
+
+function test_reactive_loop()
+-- LuaFormatter off
+        local mockTradeItems = {
+            { Item.create(4444), "Gold Coin", 10, 1, 100 },
+            { Item.create(444), "Plate Armor", 120000, 400, 100 },
+            { Item.create(4444), "Steel Helmet", 46000, 190, 100 },
+            { Item.create(5555), "Health Potion", 500, 45, 100 }
+        }
+-- LuaFormatter on
+        onOpenNpcTrade(mockTradeItems)
 end
