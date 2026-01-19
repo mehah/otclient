@@ -1,6 +1,54 @@
 -- LuaFormatter off
-BUY = 1
-SELL = 2
+
+-- ==============================================================================================
+-- TRADE MODE CONSTANTS
+-- ==============================================================================================
+controllerNpcTrader.BUY = 1
+controllerNpcTrader.SELL = 2
+
+-- ==============================================================================================
+-- UI LAYOUT CONSTANTS
+-- ==============================================================================================
+controllerNpcTrader.DEFAULT_CONSOLE_WIDTH = 395
+controllerNpcTrader.TRADE_CONSOLE_WIDTH = 600
+
+-- ==============================================================================================
+-- VIRTUAL SCROLLING CONSTANTS
+-- ==============================================================================================
+controllerNpcTrader.ITEM_BATCH_SIZE = 30
+controllerNpcTrader.ITEM_ROW_HEIGHT = 48
+controllerNpcTrader.SCROLL_THRESHOLD = 50
+
+-- ==============================================================================================
+-- DEFAULT CURRENCY
+-- ==============================================================================================
+controllerNpcTrader.DEFAULT_CURRENCY_ID = 3031
+controllerNpcTrader.DEFAULT_CURRENCY_NAME = "Gold Coin"
+
+-- ==============================================================================================
+-- DEFAULT SETTINGS
+-- ==============================================================================================
+controllerNpcTrader.DEFAULT_SORT_BY = 'name'
+controllerNpcTrader.DEFAULT_IGNORE_CAPACITY = false
+controllerNpcTrader.DEFAULT_BUY_WITH_BACKPACK = false
+controllerNpcTrader.DEFAULT_IGNORE_EQUIPPED = true
+
+-- ==============================================================================================
+-- ITEM DISPLAY LIMITS
+-- ==============================================================================================
+controllerNpcTrader.MAX_ITEM_NAME_LENGTH = 18
+controllerNpcTrader.MAX_ITEM_INFO_LENGTH = 22
+
+-- ==============================================================================================
+-- AMOUNT LIMITS
+-- ==============================================================================================
+controllerNpcTrader.MIN_AMOUNT = 1
+controllerNpcTrader.MAX_AMOUNT_NORMAL = 100
+controllerNpcTrader.MAX_AMOUNT_STACKABLE = 10000
+
+-- ==============================================================================================
+-- KEYWORD BUTTON ICONS
+-- ==============================================================================================
 
 KeywordButtonIcon = {
   KEYWORDBUTTONICON_GENERALTRADE   = 0,

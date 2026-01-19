@@ -1,14 +1,29 @@
-
 function onOpenNpcTrade(items, currencyId, currencyName)
     local ui = controllerNpcTrader.ui
     if not ui or not ui:isVisible() then
         controllerNpcTrader:loadHtml('templates/game_npctrader.html')
+        controllerNpcTrader:cloneConsoleMessages()
     end
-    controllerNpcTrader.isTradeOpen = true
-    controllerNpcTrader.widthConsole = 600
-    controllerNpcTrader.buyItems = {}
-    controllerNpcTrader.sellItems = {}
-    if items then
+
+    local isNewSession = not controllerNpcTrader.isTradeOpen
+
+    if isNewSession then
+        controllerNpcTrader.isTradeOpen = true
+        controllerNpcTrader.widthConsole = controllerNpcTrader.TRADE_CONSOLE_WIDTH
+        controllerNpcTrader.buyItems = {}
+        controllerNpcTrader.sellItems = {}
+        controllerNpcTrader.currencyId = currencyId or controllerNpcTrader.DEFAULT_CURRENCY_ID
+        controllerNpcTrader.currencyName = currencyName or controllerNpcTrader.DEFAULT_CURRENCY_NAME
+    else
+        if currencyId then
+            controllerNpcTrader.currencyId = currencyId
+        end
+        if currencyName then
+            controllerNpcTrader.currencyName = currencyName
+        end
+    end
+
+    if items and type(items) == "table" then
         for _, itemData in ipairs(items) do
             local ptr = itemData[1]
             local name = itemData[2]
@@ -35,8 +50,7 @@ function onOpenNpcTrade(items, currencyId, currencyName)
             end
         end
     end
-    controllerNpcTrader.currencyId = currencyId or 3031
-    controllerNpcTrader.currencyName = currencyName or "Gold Coin"
+
     local currencyLabel = controllerNpcTrader:findWidget(".tradeCurrencyName")
     if currencyLabel then
         currencyLabel:setText(controllerNpcTrader.currencyName)
@@ -51,20 +65,34 @@ function onOpenNpcTrade(items, currencyId, currencyName)
         end
     end
 
-    -- Initial State
-    controllerNpcTrader.tradeMode = BUY
-    controllerNpcTrader.searchText = ""
-    controllerNpcTrader.itemBatchSize = 30
-    controllerNpcTrader.loadedItems = 0
-    controllerNpcTrader.currentList = {}
+    if isNewSession then
+        -- Initial State
+        local initialMode = controllerNpcTrader.BUY
+        if #controllerNpcTrader.buyItems > 0 then
+            initialMode = controllerNpcTrader.BUY
+        elseif #controllerNpcTrader.sellItems > 0 then
+            initialMode = controllerNpcTrader.SELL
+        end
 
-    -- Settings & Sorting
-    controllerNpcTrader.sortBy = 'name'
-    controllerNpcTrader.ignoreCapacity = false
-    controllerNpcTrader.buyWithBackpack = false
-    controllerNpcTrader.ignoreEquipped = true
+        controllerNpcTrader.tradeMode = initialMode
+        controllerNpcTrader.searchText = ""
+        controllerNpcTrader.itemBatchSize = controllerNpcTrader.ITEM_BATCH_SIZE
+        controllerNpcTrader.loadedItems = 0
+        controllerNpcTrader.currentList = {}
 
-    controllerNpcTrader:setTradeMode(BUY)
+        -- Settings & Sorting
+        controllerNpcTrader.sortBy = controllerNpcTrader.DEFAULT_SORT_BY
+        controllerNpcTrader.ignoreCapacity = controllerNpcTrader.DEFAULT_IGNORE_CAPACITY
+        controllerNpcTrader.buyWithBackpack = controllerNpcTrader.DEFAULT_BUY_WITH_BACKPACK
+        controllerNpcTrader.ignoreEquipped = controllerNpcTrader.DEFAULT_IGNORE_EQUIPPED
+
+        controllerNpcTrader:setTradeMode(initialMode)
+    else
+        controllerNpcTrader.allTradeItems = (controllerNpcTrader.tradeMode == controllerNpcTrader.BUY) and
+                                                controllerNpcTrader.buyItems or controllerNpcTrader.sellItems
+        controllerNpcTrader:filterTradeList(controllerNpcTrader.searchText or "")
+        controllerNpcTrader:refreshPlayerGoods()
+    end
 end
 
 function controllerNpcTrader:setTradeMode(mode)
@@ -75,13 +103,15 @@ function controllerNpcTrader:setTradeMode(mode)
     local sellTab = self:findWidget("#tabSell")
 
     if buyTab then
-        buyTab:setEnabled(mode ~= BUY)
+        buyTab:setEnabled(mode ~= controllerNpcTrader.BUY)
     end
     if sellTab then
-        sellTab:setEnabled(mode ~= SELL)
+        sellTab:setEnabled(mode ~= controllerNpcTrader.SELL)
     end
-
-    self:findWidget(".tradeBuyButton"):setText(mode == BUY and "Buy" or "Sell")
+    local toggleButton = self:findWidget("#toggleButton")
+    if toggleButton then
+        toggleButton:setText(mode == controllerNpcTrader.BUY and "Buy" or "Sell")
+    end
 
     self.shouldFocusFirst = true
     self:updateListSource()
@@ -89,7 +119,7 @@ function controllerNpcTrader:setTradeMode(mode)
 end
 
 function controllerNpcTrader:updateListSource()
-    if self.tradeMode == BUY then
+    if self.tradeMode == controllerNpcTrader.BUY then
         self.allTradeItems = self.buyItems
     else
         self.allTradeItems = self.sellItems
@@ -123,14 +153,12 @@ function controllerNpcTrader:onTradeScroll(widget, offset)
     if self.loadedItems >= #self.currentList then
         return
     end
-
-    local rowHeight = 48
+    local rowHeight = controllerNpcTrader.ITEM_ROW_HEIGHT
     local contentHeight = self.loadedItems * rowHeight
     local viewportHeight = widget:getHeight()
     local maxScroll = math.max(0, contentHeight - viewportHeight)
-
     local value = offset.y
-    if value >= maxScroll - 50 then
+    if value >= maxScroll - controllerNpcTrader.SCROLL_THRESHOLD then
         self:loadNextBatch()
     end
 end
@@ -207,28 +235,30 @@ end
 function controllerNpcTrader:updateAmount(amount)
     amount = tonumber(amount) or 1
     if self.selectedItem then
-        local maxAmount = 100
-        if self.tradeMode == BUY then
+        local maxAmount = controllerNpcTrader.MAX_AMOUNT_NORMAL
+        if self.tradeMode == controllerNpcTrader.BUY then
             local playerMoney = self:getPlayerMoney()
             local maxByMoney = math.floor(playerMoney / self.selectedItem.price)
-            maxAmount = math.max(1, math.min(100, maxByMoney))
+            maxAmount = math.max(controllerNpcTrader.MIN_AMOUNT,
+                math.min(controllerNpcTrader.MAX_AMOUNT_NORMAL, maxByMoney))
             if self.selectedItem.ptr and self.selectedItem.ptr:isStackable() then
-                maxAmount = math.max(1, math.min(10000, maxByMoney))
+                maxAmount = math.max(controllerNpcTrader.MIN_AMOUNT,
+                    math.min(controllerNpcTrader.MAX_AMOUNT_STACKABLE, maxByMoney))
             end
         else
             local sellable = self:getSellQuantity(self.selectedItem.ptr)
-            maxAmount = math.max(1, sellable)
+            maxAmount = math.max(controllerNpcTrader.MIN_AMOUNT, sellable)
         end
         if amount > maxAmount then
             amount = maxAmount
         end
-        if amount < 1 then
-            amount = 1
+        if amount < controllerNpcTrader.MIN_AMOUNT then
+            amount = controllerNpcTrader.MIN_AMOUNT
         end
         local scroll = self:findWidget("#amountScrollBar")
         if scroll then
             scroll:setMaximum(maxAmount)
-            scroll:setMinimum(1)
+            scroll:setMinimum(controllerNpcTrader.MIN_AMOUNT)
             if scroll:getValue() ~= amount then
                 scroll:setValue(amount)
             end
@@ -273,8 +303,8 @@ function controllerNpcTrader:getPlayerMoney()
         return 0
     end
     local money = player:getResourceBalance(ResourceBank) + player:getResourceBalance(ResourceInventary)
-    local currencyId = self.currencyId or 3031
-    if currencyId ~= 3031 and currencyId > 0 then
+    local currencyId = self.currencyId or controllerNpcTrader.DEFAULT_CURRENCY_ID
+    if currencyId ~= controllerNpcTrader.DEFAULT_CURRENCY_ID and currencyId > 0 then
         money = player:getResourceBalance(ResourceNpcTrade)
     elseif currencyId == 0 then
         money = player:getResourceBalance(ResourceNpcStorageTrade)
@@ -305,16 +335,10 @@ function controllerNpcTrader:getSellQuantity(itemPtr)
 end
 
 function controllerNpcTrader:onPlayerGoods(items)
-    if not self.playerItems then
-        self.playerItems = {}
+    if not items or type(items) ~= "table" then
+        return
     end
-    for id, amount in pairs(items) do
-        if not self.playerItems[id] then
-            self.playerItems[id] = amount
-        else
-            self.playerItems[id] = self.playerItems[id] + amount
-        end
-    end
+    self.playerItems = items
     self:refreshPlayerGoods()
 end
 
@@ -324,7 +348,7 @@ function controllerNpcTrader:refreshPlayerGoods()
     if display then
         display:setText(tostring(money))
     end
-    if self.tradeMode == SELL then
+    if self.tradeMode == controllerNpcTrader.SELL then
         if self.selectedItem then
             self:updateAmount(self.amount)
         end
@@ -335,7 +359,7 @@ function controllerNpcTrader:executeTrade()
     if not self.selectedItem then
         return
     end
-    if self.tradeMode == BUY then
+    if self.tradeMode == controllerNpcTrader.BUY then
         g_game.buyItem(self.selectedItem.ptr, self.amount, self.ignoreCapacity, self.buyWithBackpack)
     else
         g_game.sellItem(self.selectedItem.ptr, self.amount, self.ignoreEquipped)
@@ -364,9 +388,7 @@ function controllerNpcTrader:filterTradeList(searchText)
     local filteredItems = {}
 
     if searchText == "" then
-        for _, v in ipairs(self.allTradeItems) do
-            table.insert(filteredItems, v)
-        end
+        filteredItems = self.allTradeItems
     else
         for _, item in ipairs(self.allTradeItems) do
             if item.name:lower():find(lowerSearch, 1, true) then
@@ -386,12 +408,5 @@ function controllerNpcTrader:filterTradeList(searchText)
         if not self.selectedItem then
             self:selectTradeItem(self.tradeItems[1])
         end
-    end
-end
-
-function onCloseNpcTrade()
-    controllerNpcTrader.isTradeOpen = false
-    if controllerNpcTrader.ui and controllerNpcTrader.ui:isVisible() then
-        controllerNpcTrader:unloadHtml()
     end
 end

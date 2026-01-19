@@ -11,26 +11,17 @@ function controllerNpcTrader:onOptionsClick()
         self:setSortBy('weight')
     end)
     menu:addSeparator()
-    if self.tradeMode == BUY then
-        if self.currencyId == 3031 then
-            local backpackOption = menu:addOption("Buy with Backpack", function()
-                self:toggleBuyWithBackpack()
-            end)
-            if self.buyWithBackpack then
-                backpackOption:setIcon('/images/ui/console/checked')
-            end
-        end
-        local capText = "Ignore Capacity" .. (self.ignoreCapacity and " [x]" or "")
-        menu:addOption(capText, function()
+    if self.tradeMode == controllerNpcTrader.BUY then
+        menu:addCheckBox("Ignore Capacity", self.ignoreCapacity, function(widget, checked)
             self:toggleIgnoreCapacity()
         end)
-        local bagText = "Buy with Backpack" .. (self.buyWithBackpack and " [x]" or "")
-        menu:addOption(bagText, function()
-            self:toggleBuyWithBackpack()
-        end)
+        if self.currencyId == controllerNpcTrader.DEFAULT_CURRENCY_ID then
+            menu:addCheckBox("Buy with Backpack", self.buyWithBackpack, function(widget, checked)
+                self:toggleBuyWithBackpack()
+            end)
+        end
     else
-        local equipText = "Sell Equipped" .. (self.ignoreEquipped and " [x]" or " [ ]")
-        menu:addOption("Sell Equipped" .. (not self.ignoreEquipped and " [x]" or ""), function()
+        menu:addCheckBox("Sell Equipped", not self.ignoreEquipped, function(widget, checked)
             self:toggleIgnoreEquipped()
         end)
     end

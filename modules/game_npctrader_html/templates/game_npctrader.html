@@ -28,15 +28,15 @@
     .iconBox { width: 40px; height: 40px; flex-shrink: 0; min-width: 40px; --virtual: true}
     .borderGrey { border: 1 #444444; }
     .sunkenBorder { --border-width-top: 1; --border-color-top: #141414; --border-width-left: 1; --border-color-left: #141414; --border-width-bottom: 1; --border-color-bottom: #747474; --border-width-right: 1; --border-color-right: #747474; }
-    .panelBase { width: 360px; display: block; margin-left: 15px; }
+    .panelBase { width: 345px; display: block; margin-left: 15px; }
     .windowBtn { width: 12px; height: 12px; --image-source: /images/ui/miniwindow_buttons; --image-size: 14 14; margin-top: 7px; }
 
     /* ==============================================================================================
        MAIN WINDOW & STRUCTURE
        ============================================================================================== */
     .modal-message { width: 400px; height: 400px; display: block; --image-source: /images/ui/window_new; --image-border: 6; --image-border-top: 27; }
-    .leftPanel { width: 395px; height: 400px; float: left; }
-    .rightPanel { width: 195px; height: 368px; margin-top: 27px; margin-left: 10px; float: left; }
+    .leftPanel {width: 395px; height: 400px; float: left;}
+    .rightPanel { width: 195px; height: 368px; margin-top: 27px; margin-left: 10px; float: left;}
     .verticalSep { height: 340px; margin-top: 25px; float: left;  margin-left: -10px;}
     .closeButton { --image-clip: 28 0 14 14; margin-right: 10px; }
     .closeButton:hover { --image-clip: 28 14 14 14; }
@@ -55,12 +55,12 @@
     .creature-display { width: 64px; height: 64px; margin-left: 10px; margin-top: 10px; }
 
     /* Chat & Console */
-    .panelConsole { height: 288px; --border: 1 red; margin-top: -35px; }
-    .inputConsole { display: inline-block; width: 288px; margin-left: 15px; margin-top: 5px; }
+    .panelConsole { margin-top: 30px; --image-border: 4; padding: 1; padding-right: 12; padding-left: 4; padding-top: 4; padding-bottom: 4; height: 288px; --image-source: /images/ui/3pixel_frame_borderimage; }
+    .inputConsole { margin-bottom: 10px; display: inline-block; width: 288px; margin-left: 15px; margin-top: 5px; }
     .bottonChat { display: inline; margin-left: 2px; font: cipsoftFont; }
     
     /* Buttons Panel */
-    .panelBotons { height: 35px;  margin-top: 8px; --focusable: false;}
+    .panelBotons {height: 35px;  margin-bottom: 39px; --focusable: false;}
     .npc-button { width: 19px; height: 19px; --icon-source: /game_npctrader_html/static/images/icons-npcdialog; margin-right: 2px; }
 
     /* ==============================================================================================
@@ -120,23 +120,26 @@
 
 <html>
 <uiwindow id="windowTrader" placement="center" *width="self.widthConsole" class="modal-message"
-    src="images/ui/miniwindow" onescape="self:unloadHtml()">
+    src="images/ui/miniwindow" onescape="self:onCloseNpcTrade()" onkeydown="self:onConsoleKeyPress(event)">
 
     <!-- Panel izquierda -->
-    <div class="leftPanel">
-        <img class="img" src="static/images/blue-golden-flag-banner" />
+    <div class="leftPanel" >
+        <div id="consoleBuffer" class="panelConsole panelBase" style="overflow: scroll; padding: 4px;" layout="type: verticalBox; align-bottom: true" placement="top-left">
+        </div>
+
+        <img class="img" src="static/images/blue-golden-flag-banner" placement="top-left" />
         <label class="title" placement="top-left">{{self.creatureName}}</label>
         <img class="podium" src="static/images/backdrop-npcdialog-podestal" placement="top-left" />
         <uicreature *outfit="self.outfit" class="creature-display" placement="top-left"></uicreature>
-        <UIWidget class="panelConsole panelBase"></UIWidget>
 
-        <div id="panelBotons" class="panelBotons panelBase flex">
+
+        <div id="panelBotons" placement="bottom-left" class="panelBotons panelBase flex">
             <button *for="local buttonData in self.buttons" class="npc-button" *tooltip="buttonData.text"
-                *icon-clip="self:getIconClip(buttonData.id)" onclick="g_game.talkChannel(11, 0, buttonData.text)">
+                *icon-clip="self:getIconClip(buttonData.id)" onclick="self:onConsoleTextClicked(buttonData.text)">
 
             </button>
         </div>
-        <input class="inputConsole" />
+        <input class="inputConsole" placement="bottom-left"/>
         <button class="bottonChat">Chat On</button>
     </div>
 
@@ -152,8 +155,8 @@
             </div>
             <UIItem class="tradeCurrencyIcon iconBox sunkenBorder" item-id="3031" item-count="100" always-show-count="false" />
             <div class="tradeTabs">
-                <button id="tabBuy" class="tradeTab fontTitle" text="Buy" onclick="self:setTradeMode(1)"></button>
-                <button id="tabSell" class="tradeTab fontTitle" style="display:block;margin-top: 5px;" text="Sell" onclick="self:setTradeMode(2)"></button>
+                <button id="tabBuy" class="tradeTab fontTitle" text="Buy" onclick="self:setTradeMode(self.BUY)"></button>
+                <button id="tabSell" class="tradeTab fontTitle" style="display:block;margin-top: 5px;" text="Sell" onclick="self:setTradeMode(self.SELL)"></button>
             </div>
         </div>
 
@@ -189,7 +192,7 @@
             <UIItem class="tradePreviewBox item borderGrey iconBox sunkenBorder" *item="self.selectedItem and self.selectedItem.ptr or nil" />
 
             <!-- buy (derecha abajo) -->
-            <button class="tradeBuyButton fontTitle" text="Buy" onclick="self:executeTrade()"></button>
+            <button id="toggleButton" class="tradeBuyButton fontTitle" text="Buy" onclick="self:executeTrade()"></button>
 
             <!-- filas (izquierda) -->
             <div class="tradeRows">
@@ -214,7 +217,7 @@
     </div>
 
     <UIButton class="bottonOptions windowBtn" placement="top-right" *visible="self.isTradeOpen" onclick="self:onOptionsClick()"></UIButton>
-    <UIButton class="closeButton windowBtn" placement="top-right" onclick="self:unloadHtml()"></UIButton>
+    <UIButton class="closeButton windowBtn" placement="top-right" onclick="self:onCloseNpcTrade()"></UIButton>
 
 </uiwindow>
 
