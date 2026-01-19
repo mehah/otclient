@@ -27,6 +27,7 @@
         margin-left: 90px;
         margin-top: 8px;
         display: block;
+        width: 20%;
     }
 
     .podium {
@@ -285,12 +286,11 @@
         color: #c0c0c0;
         font: verdana-11px-antialised;
         width: 120px;
-        text-offset: 0 2;
+        --text-offset: 0 2;
     }
 
     .tradeItemInfo {
         color: #c0c0c0;
-        font: verdana-9px-antialised;
         width: 120px;
     }
 
@@ -314,7 +314,6 @@
         height: 40px;
         border: 1 #444444;
         background: #1a1a1a;
-        border: 1 red;
         position: absolute;
         right: 4px;
         top: 4px;
@@ -370,7 +369,6 @@
 </style>
 
 <script type="text">
-    self.creatureName = "";
     self.isTradeOpen = false;
     self.tradeItems = {};
     self.selectedItem = nil;
@@ -420,16 +418,17 @@
 
 
         <!-- List Container -->
-        <div class="tradeListScroll">
+        <div id="tradeListScroll" class="tradeListScroll">
             <div *for="local item in self.tradeItems" class="tradeListItem"
-                *class-tradeListItemSelected="self.selectedItem == item" onclick="self:selectTradeItem(item)"
+                *class-tradeListItemSelected="self.selectedItem == item" onclick="self:selectTradeItem(item, this)"
                 style="display: flex;">
-                <UIItem class="tradeItemIcon" *item="item.ptr" />
+                <UIItem class="tradeItemIcon item" *item="item.ptr" />
                 <div style="display: block; margin-left: 5px;">
                     <label class="tradeItemName" *text="item.name"></label>
                     <label class="tradeItemInfo" *text="'Price ' .. item.price .. ', ' .. item.weight .. ' oz'"></label>
                 </div>
             </div>
+            <label *if="#self.tradeItems > 0" *oninit="self:onTradeListRendered()" />
         </div>
 
         <!-- Search -->
@@ -444,7 +443,7 @@
             <!-- scrollbar (arriba izquierda) -->
             <div class="tradeTopRow">
                 <HorizontalScrollBar id="amountScrollBar" minimum="1" maximum="100" step="1" *value="self.amount"
-                    onchange="self:onQuantityValueChange(event.value)" />
+                    onchange="self:onQuantityValueChange(event.value)" disabled/>
             </div>
 
             <!-- preview (derecha) -->
@@ -462,7 +461,7 @@
 
                 <div class="tradeRow">
                     <div class="tradeFooterLabel">Price:</div>
-                    <label class="tradeFooterValue" *text="self.totalPrice"></label>
+                    <label class="tradeFooterValue" >{{self.totalPrice}}</label>
                 </div>
 
                 <div class="tradeRow">
