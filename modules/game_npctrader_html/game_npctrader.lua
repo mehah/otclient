@@ -5,39 +5,21 @@ controllerNpcTrader.creatureName = ""
 controllerNpcTrader.outfit = nil
 controllerNpcTrader.buttons = {}
 controllerNpcTrader.isTradeOpen = false
-
-local testMode = true
--- LuaFormatter off
-local KeywordButtonIcon = {
-  KEYWORDBUTTONICON_GENERALTRADE   = 0,
-  KEYWORDBUTTONICON_POTIONTRADE    = 1,
-  KEYWORDBUTTONICON_EQUIPMENTTRADE = 2,
-  KEYWORDBUTTONICON_SAIL           = 3,
-  KEYWORDBUTTONICON_DEPOSITALL     = 4,
-  KEYWORDBUTTONICON_WITHDRAW       = 5,
-  KEYWORDBUTTONICON_BALANCE        = 6,
-  KEYWORDBUTTONICON_YES            = 7,
-  KEYWORDBUTTONICON_NO             = 8,
-  KEYWORDBUTTONICON_BYE            = 9,
-}
-
-local IconSpriteIndex = {
-  [KeywordButtonIcon.KEYWORDBUTTONICON_GENERALTRADE]   = 1,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_POTIONTRADE]    = 2,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_EQUIPMENTTRADE] = 3,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_SAIL]           = 0,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_DEPOSITALL]     = 5,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_WITHDRAW]       = 6,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_BALANCE]        = 4,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_YES]            = 7,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_NO]             = 8,
-  [KeywordButtonIcon.KEYWORDBUTTONICON_BYE]            = 9,
-}
--- LuaFormatter on
-function controllerNpcTrader:getIconClip(id)
-    local index = IconSpriteIndex[id] or 0
-    local x = index * 32
-    return x .. " 0 32 32"
+--@ DELETEME
+local testMode = false
+local function test_reactive_loop(numItems)
+    -- Test reactive loop helper
+    modules.game_npctrader_html.test_reactive_loop(500)
+    local mockTradeItems = {}
+    for i = 1, numItems do
+        local itemId = math.random(1000, 9999)
+        local itemName = "Item #" .. itemId
+        local itemPrice = math.random(100, 5000)
+        local itemAmount = math.random(1, 100)
+        local itemWeight = math.random(1, 10)
+        table.insert(mockTradeItems, {Item.create(itemId), itemName, itemPrice, itemAmount, itemWeight})
+    end
+    onOpenNpcTrade(mockTradeItems)
 end
 
 function controllerNpcTrader:onInit()
@@ -47,18 +29,22 @@ function controllerNpcTrader:onInit()
 end
 
 function controllerNpcTrader:onGameStart()
-    controllerNpcTrader:registerEvents(g_game, {
+    self:registerEvents(g_game, {
         onNpcChatWindow = onNpcChatWindow,
-        onOpenNpcTrade = onOpenNpcTrade
+        onOpenNpcTrade = onOpenNpcTrade,
+        onPlayerGoods = onPlayerGoods,
+        onCloseNpcTrade = onCloseNpcTrade
     })
+
     if testMode then
--- LuaFormatter off
+        -- LuaFormatter off
         local mockTradeItems = {
-            { Item.create(3031), "Gold Coin", 10, 1, 100 },
+            { Item.create(3031), "LOOOOOOOOOOONG TEXT", 10, 1000000000, 100 },
             { Item.create(3357), "Plate Armor", 120000, 400, 100 },
             { Item.create(3351), "Steel Helmet", 46000, 190, 100 },
             { Item.create(190), "Health Potion", 500, 45, 100 }
         }
+        
         onNpcChatWindow({ 
             ["buttons"] = { 
                 [1] = { ["id"] = KeywordButtonIcon.KEYWORDBUTTONICON_YES, ["text"] = "yes" },
@@ -68,111 +54,26 @@ function controllerNpcTrader:onGameStart()
             },
             ["npcIds"] = { [1] = 2147484212 }
         })
--- LuaFormatter on
-        controllerNpcTrader:scheduleEvent(function()
+        -- LuaFormatter on
+
+        self:scheduleEvent(function()
             onOpenNpcTrade(mockTradeItems)
         end, 1500, "controllertest")
+--@ 
     end
 end
 
 function controllerNpcTrader:onTerminate()
-    local ui = controllerNpcTrader.ui
+    local ui = self.ui
     if ui and ui:isVisible() then
-        controllerNpcTrader:unloadHtml()
+        self:unloadHtml()
     end
 end
 
 function controllerNpcTrader:onGameEnd()
-    local ui = controllerNpcTrader.ui
+    local ui = self.ui
     if ui and ui:isVisible() then
-        controllerNpcTrader:unloadHtml()
+        self:unloadHtml()
     end
 end
 
-function onNpcChatWindow(data)
-    local creature = g_map.getCreatureById(data.npcIds[1])
-    if not creature then
-        return
-    end
-
-    controllerNpcTrader.widthConsole = 395
-    controllerNpcTrader.isTradeOpen = false
-    controllerNpcTrader.creatureName = creature:getName() or "NPC"
-    controllerNpcTrader.outfit = creature:getOutfit()
-    controllerNpcTrader.buttons = data.buttons or {}
-    controllerNpcTrader:loadHtml('game_npctrader.html')
-end
-
-function onOpenNpcTrade(items)
-    local ui = controllerNpcTrader.ui
-    if not ui or not ui:isVisible() then
-        controllerNpcTrader:loadHtml('game_npctrader.html')
-    end
-    controllerNpcTrader.isTradeOpen = true
-    controllerNpcTrader.widthConsole = 600
-    local formattedItems = {}
-    if items and #items > 0 then
-        for i, itemData in ipairs(items) do
-            table.insert(formattedItems, {
-                ptr = itemData[1],
-                name = itemData[2],
-                weight = itemData[3] / 100,
-                price = itemData[4],
-                count = itemData[5]
-            })
-        end
-    end
-    controllerNpcTrader.tradeItems = formattedItems
-    if #formattedItems > 0 then
-        controllerNpcTrader:findWidget("#amountScrollBar"):enable()
-        controllerNpcTrader:selectTradeItem(formattedItems[1])
-    else
-        controllerNpcTrader:findWidget("#amountScrollBar"):disable()
-    end
-
-end
-function controllerNpcTrader:onTradeListRendered()
-    print("onTradeListRendered")
-    local list = self:findWidget("#tradeListScroll")
-    if list then
-        local firstChild = list:getChildByIndex(1)
-        if firstChild then
-            firstChild:focus()
-        end
-    end
-end
-
-function controllerNpcTrader:selectTradeItem(item, widget)
-    self.selectedItem = item
-    if widget then
-        widget:focus()
-    end
-    self.amount = 1
-    if self.ui and self.ui.tradeScrollBar then
-        self.ui.tradeScrollBar:setValue(1)
-    end
-    self:onQuantityValueChange(1)
-end
-
-function controllerNpcTrader:onQuantityValueChange(quantity)
-    self.amount = quantity
-    if self.selectedItem then
-        self.totalPrice = self.selectedItem.price * quantity
-        self.totalWeight = string.format("%.2f", self.selectedItem.weight * quantity)
-    else
-        self.totalPrice = 0
-        self.totalWeight = "0.00"
-    end
-end
-
-function test_reactive_loop()
--- LuaFormatter off
-        local mockTradeItems = {
-            { Item.create(4444), "Gold Coin", 10, 1, 100 },
-            { Item.create(444), "Plate Armor", 120000, 400, 100 },
-            { Item.create(4444), "Steel Helmet", 46000, 190, 100 },
-            { Item.create(5555), "Health Potion", 500, 45, 100 }
-        }
--- LuaFormatter on
-        onOpenNpcTrade(mockTradeItems)
-end

@@ -4,6 +4,6 @@ Module
   author: game_npctrader_html
   website: https://github.com/mehah/otclient
   sandboxed: true
-  scripts: [ game_npctrader ]
+  scripts: [ game_npctrader, constants/trader_const, controllers/npc_dialog, controllers/npc_trader, controllers/npc_options ]
   @onLoad: controllerNpcTrader:init()
   @onUnload: controllerNpcTrader:terminate()

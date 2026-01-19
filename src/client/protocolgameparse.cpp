@@ -760,6 +760,9 @@ void ProtocolGame::parseBugReport(const InputMessagePtr& msg)
 void ProtocolGame::parseNpcChatWindow(const InputMessagePtr& msg)
 {
     const uint8_t status = msg->getU8();
+    if (status != 0) {
+        return;
+    }
     NpcChatWindowData data;
 
     const uint8_t npcCount = msg->getU8();
