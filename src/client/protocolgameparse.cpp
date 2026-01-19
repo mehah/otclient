@@ -5712,14 +5712,16 @@ void ProtocolGame::parsePreyRerollPrice(const InputMessagePtr& msg)
     uint8_t directly = 0; // prey selection list price
 
     if (g_game.getProtocolVersion() >= 1230) {
-        wildcard = msg->getU8();
         directly = msg->getU8();
-        if (g_game.getClientVersion() < 1521) {
-            msg->getU32(); // task hunting reroll price
-            msg->getU32(); // task hunting reroll price
-            msg->getU8(); // task hunting selection list price
-            msg->getU8(); // task hunting bonus reroll price
+        if (g_game.getProtocolVersion() >= 1521) {
+            //note improve this if
+            msg->getU8();
+            return;
         }
+        msg->getU32(); // task hunting reroll price
+        msg->getU32(); // task hunting reroll price
+        msg->getU8(); // task hunting selection list price
+        msg->getU8(); // task hunting bonus reroll price
     }
 
     g_lua.callGlobalField("g_game", "onPreyRerollPrice", price, wildcard, directly);
@@ -6268,7 +6270,6 @@ void ProtocolGame::parseClientEvent(const InputMessagePtr& msg)
             break;
         }
         default:
-            g_logger.traceError("ProtocolGame::parseClientEvent: unknown event type {}", type);
             break;
     }
 }

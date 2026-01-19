@@ -896,7 +896,7 @@ namespace Otc
         CLIENT_EVENT_TYPE_QUEST = 8,
         CLIENT_EVENT_TYPE_COSMETIC = 9,
         CLIENT_EVENT_TYPE_PROFICIENCY = 10,
-        CLIENT_EVENT_LAST
+        CLIENT_EVENT_TYPE_LAST
     };
 
     enum ClientEvent_t : uint8_t
