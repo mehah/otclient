@@ -234,6 +234,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseBosstiaryInfo(msg);
                     break;
                 case Proto::GameServerTakeScreenshot:
+                    // todo improve this if
                     if (g_game.getClientVersion() >= 1521) {
                         parseClientEvent(msg);
                     } else {
@@ -6226,7 +6227,11 @@ void ProtocolGame::parseClientEvent(const InputMessagePtr& msg)
     switch (type) {
         case Otc::CLIENT_EVENT_TYPE_SIMPLE: {
             const auto eventType = static_cast<Otc::ClientEvent_t>(msg->getU8());
-            g_lua.callGlobalField("g_game", "onClientEvent", type, eventType);
+            if (eventType < Otc::CLIENT_EVENT_ATTACKSTOPPED) {
+                m_localPlayer->takeScreenshot(eventType); // TODO unTest
+            } else {
+                g_lua.callGlobalField("g_game", "onClientEvent", type, eventType);
+            }
             break;
         }
         case Otc::CLIENT_EVENT_TYPE_ACHIEVEMENT:

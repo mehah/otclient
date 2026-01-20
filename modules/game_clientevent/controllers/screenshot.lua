@@ -51,13 +51,7 @@ local autoScreenshotDir = g_resources.getWriteDir() .. "/" .. autoScreenshotDirN
 
 -- @
 
-screenshotController = Controller:new()
-
-function screenshotController:onInit()
-
-end
-
-function screenshotController:onTerminate()
+function screenshot_onTerminate()
     destroyOptionsModule()
 
     ScreenshotType = {}
@@ -66,11 +60,11 @@ function screenshotController:onTerminate()
     AutoScreenshotEvents = {}
 end
 
-function screenshotController:onGameStart()
+function screenshot_onGameStart()
     if g_game.getClientVersion() < 1180 then
         return
     end
-    optionPanel = g_ui.loadUI('game_screenshot',modules.client_options:getPanel())
+    optionPanel = g_ui.loadUI('/game_clientevent/templates/screenshot', modules.client_options:getPanel())
 
     for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
         local label = g_ui.createWidget("ScreenshotType", optionPanel.allCheckBox)
@@ -89,7 +83,7 @@ function screenshotController:onGameStart()
         g_resources.makeDir(autoScreenshotDirName)
     end
 
-    screenshotController:registerEvents(LocalPlayer, {
+    clientEventController:registerEvents(LocalPlayer, {
         onTakeScreenshot = onScreenShot
     })
     optionPanel:recursiveGetChildById("keepBlacklog"):disable() -- no compatibility 11/07/24
@@ -97,7 +91,7 @@ function screenshotController:onGameStart()
     modules.client_options.addButton("Misc.", "Screenshot", optionPanel)
 end
 
-function screenshotController:onGameEnd()
+function screenshot_onGameEnd()
     if g_game.getClientVersion() >= 1180 and optionPanel then
         g_settings.set("onlyCaptureGameWindow", optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked())
         g_settings.set("enableScreenshots", optionPanel:recursiveGetChildById("enableScreenshots"):isChecked())
@@ -176,7 +170,7 @@ function takeScreenshot(name)
         return
     end
 
-    screenshotController:scheduleEvent(function()
+    clientEventController:scheduleEvent(function()
         if  optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked() then
             g_app.doMapScreenshot(name)
         else
@@ -189,4 +183,3 @@ function OpenFolder()
     local directory = g_resources.getWriteDir():gsub("[/\\]+", "\\") .. autoScreenshotDirName
     g_platform.openDir(directory)
 end
-

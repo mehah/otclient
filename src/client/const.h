@@ -901,6 +901,7 @@ namespace Otc
 
     enum ClientEvent_t : uint8_t
     {
+        // screenshot
         CLIENT_EVENT_NONE = 0,
         CLIENT_EVENT_BOSSDEFEATED = 1,
         CLIENT_EVENT_DEATHPVE = 2,
@@ -910,7 +911,7 @@ namespace Otc
         CLIENT_EVENT_PLAYERATTACKING = 6,
         CLIENT_EVENT_TREASUREFOUND = 7,
         CLIENT_EVENT_GIFTOFLIFE = 8,
-
+        // pop up
         CLIENT_EVENT_ATTACKSTOPPED = 9,
         CLIENT_EVENT_CAPACITYLIMIT = 10,
         CLIENT_EVENT_OUTOFAMMO = 11,

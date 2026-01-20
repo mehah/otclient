@@ -1,0 +1,9 @@
+Module
+  name: game_clientevent
+  description:game_clientevent
+  author: game_clientevent
+  website: https://github.com/mehah/otclient
+  sandboxed: true
+  scripts: [ game_clientevent, controllers/infobanner, controllers/screenshot ]
+  @onLoad: clientEventController:init()
+  @onUnload: clientEventController:terminate()
