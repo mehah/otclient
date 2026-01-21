@@ -1,6 +1,6 @@
 Module
   name: game_clientevent
-  description:game_clientevent
+  description:game_clientevent TODO NEED IMPROVE NAME
   author: game_clientevent
   website: https://github.com/mehah/otclient
   sandboxed: true

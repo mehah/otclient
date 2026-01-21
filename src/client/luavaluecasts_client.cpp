@@ -1317,16 +1317,34 @@ int push_luavalue(const DailyRewardData& data) {
 
 int push_luavalue(const CyclopediaCharacterOffenceStats& data)
 {
-    g_lua.createTable(0, 30);
+    g_lua.createTable(0, 40);
 
     g_lua.pushNumber(data.critChanceTotal);
-    g_lua.setField("critChance");
+    g_lua.setField("critChanceTotal");
+
+    g_lua.pushNumber(data.critChanceEquipament);
+    g_lua.setField("critChanceEquipament");
+
+    g_lua.pushNumber(data.critChanceFlat);
+    g_lua.setField("critChanceFlat");
+
+    g_lua.pushNumber(data.critChanceImbuement);
+    g_lua.setField("critChanceImbuement");
+
+    g_lua.pushNumber(data.critChanceWheel);
+    g_lua.setField("critChanceWheel");
+
+    g_lua.pushNumber(data.critChanceConcoction);
+    g_lua.setField("critChanceConcoction");
 
     g_lua.pushNumber(data.critDamageTotal);
-    g_lua.setField("critDamage");
+    g_lua.setField("critDamageTotal");
 
     g_lua.pushNumber(data.critDamageEquipament);
-    g_lua.setField("critDamageBase");
+    g_lua.setField("critDamageEquipament");
+
+    g_lua.pushNumber(data.critDamageFlat);
+    g_lua.setField("critDamageFlat");
 
     g_lua.pushNumber(data.critDamageImbuement);
     g_lua.setField("critDamageImbuement");
@@ -1334,11 +1352,14 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     g_lua.pushNumber(data.critDamageWheel);
     g_lua.setField("critDamageWheel");
 
+    g_lua.pushNumber(data.critDamageConcoction);
+    g_lua.setField("critDamageConcoction");
+
     g_lua.pushNumber(data.lifeLeechTotal);
-    g_lua.setField("lifeLeech");
+    g_lua.setField("lifeLeechTotal");
 
     g_lua.pushNumber(data.lifeLeechEquipament);
-    g_lua.setField("lifeLeechBase");
+    g_lua.setField("lifeLeechEquipament");
 
     g_lua.pushNumber(data.lifeLeechImbuement);
     g_lua.setField("lifeLeechImbuement");
@@ -1346,17 +1367,23 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     g_lua.pushNumber(data.lifeLeechWheel);
     g_lua.setField("lifeLeechWheel");
 
+    g_lua.pushNumber(data.lifeLeechEventBonus);
+    g_lua.setField("lifeLeechEventBonus");
+
     g_lua.pushNumber(data.manaLeechTotal);
-    g_lua.setField("manaLeech");
+    g_lua.setField("manaLeechTotal");
 
     g_lua.pushNumber(data.manaLeechEquipament);
-    g_lua.setField("manaLeechBase");
+    g_lua.setField("manaLeechEquipament");
 
     g_lua.pushNumber(data.manaLeechImbuement);
     g_lua.setField("manaLeechImbuement");
 
     g_lua.pushNumber(data.manaLeechWheel);
     g_lua.setField("manaLeechWheel");
+
+    g_lua.pushNumber(data.manaLeechEventBonus);
+    g_lua.setField("manaLeechEventBonus");
 
     g_lua.pushNumber(data.onslaught);
     g_lua.setField("onslaught");
