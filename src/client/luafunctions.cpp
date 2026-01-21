@@ -424,6 +424,10 @@ void Client::registerLuaFunctions()
 
     g_lua.registerSingletonClass("g_client");
     g_lua.bindSingletonFunction("g_client", "setEffectAlpha", &Client::setEffectAlpha, &g_client);
+    g_lua.bindSingletonFunction("g_client", "setOwnSpellEffectAlpha", &Client::setOwnSpellEffectAlpha, &g_client);
+    g_lua.bindSingletonFunction("g_client", "setOtherPlayerSpellEffectAlpha", &Client::setOtherPlayerSpellEffectAlpha, &g_client);
+    g_lua.bindSingletonFunction("g_client", "setCreatureSpellEffectAlpha", &Client::setCreatureSpellEffectAlpha, &g_client);
+    g_lua.bindSingletonFunction("g_client", "setBossAreaCreatureEffectAlpha", &Client::setBossAreaCreatureEffectAlpha, &g_client);
     g_lua.bindSingletonFunction("g_client", "setMissileAlpha", &Client::setMissileAlpha, &g_client);
 
     g_lua.registerSingletonClass("g_attachedEffects");
