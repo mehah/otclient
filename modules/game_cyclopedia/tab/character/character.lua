@@ -1318,6 +1318,7 @@ local  function getWeaponSkillName(skillType)
         return skillNames[skillType] or "Fighting Skill"
     end
     function Cyclopedia.onCyclopediaCharacterOffenceStats(data)
+        -- TODO UI/UX , verticalScroll, add new stats
         UI.OffenceStats.rightPanel:destroyChildren()
         UI.OffenceStats.leftPanel:destroyChildren()
     

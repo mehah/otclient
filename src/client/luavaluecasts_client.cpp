@@ -1367,6 +1367,9 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     g_lua.pushNumber(data.onslaughtBonus);
     g_lua.setField("onslaughtBonus");
 
+    g_lua.pushNumber(data.onslaughtEventBonus);
+    g_lua.setField("onslaughtEventBonus");
+
     g_lua.pushNumber(data.cleavePercent);
     g_lua.setField("cleavePercent");
 
@@ -1382,6 +1385,9 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
 
     g_lua.pushInteger(data.flatDamageBase);
     g_lua.setField("flatDamageBase");
+
+    g_lua.pushInteger(data.flatDamageWheel);
+    g_lua.setField("flatDamageWheel");
 
     g_lua.pushInteger(data.weaponAttack);
     g_lua.setField("weaponAttack");
@@ -1412,10 +1418,133 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
 
     g_lua.createTable(data.weaponAccuracy.size(), 0);
     for (size_t i = 0; i < data.weaponAccuracy.size(); ++i) {
-        g_lua.pushNumber(data.weaponAccuracy[i]);
+        g_lua.createTable(0, 2);
+        g_lua.pushInteger(data.weaponAccuracy[i].range);
+        g_lua.setField("range");
+        g_lua.pushNumber(data.weaponAccuracy[i].chance);
+        g_lua.setField("chance");
         g_lua.rawSeti(i + 1);
     }
     g_lua.setField("weaponAccuracy");
+
+    g_lua.pushNumber(data.damagePowerfulFoes);
+    g_lua.setField("damagePowerfulFoes");
+
+    g_lua.createTable(data.damageSpecificTargets.size(), 0);
+    for (size_t i = 0; i < data.damageSpecificTargets.size(); ++i) {
+        g_lua.createTable(0, 2);
+        g_lua.pushString(data.damageSpecificTargets[i].name);
+        g_lua.setField("name");
+        g_lua.pushNumber(data.damageSpecificTargets[i].value);
+        g_lua.setField("value");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("damageSpecificTargets");
+
+    g_lua.createTable(data.damageElements.size(), 0);
+    for (size_t i = 0; i < data.damageElements.size(); ++i) {
+        g_lua.createTable(0, 2);
+        g_lua.pushInteger(data.damageElements[i].element);
+        g_lua.setField("element");
+        g_lua.pushNumber(data.damageElements[i].value);
+        g_lua.setField("value");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("damageElements");
+
+    g_lua.pushNumber(data.offensiveRuneDamage);
+    g_lua.setField("offensiveRuneDamage");
+
+    g_lua.pushNumber(data.autoAttackDamage);
+    g_lua.setField("autoAttackDamage");
+
+    g_lua.createTable(data.critDamageElements.size(), 0);
+    for (size_t i = 0; i < data.critDamageElements.size(); ++i) {
+        g_lua.createTable(0, 2);
+        g_lua.pushInteger(data.critDamageElements[i].element);
+        g_lua.setField("element");
+        g_lua.pushNumber(data.critDamageElements[i].value);
+        g_lua.setField("value");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("critDamageElements");
+
+    g_lua.pushNumber(data.critDamageOffensiveRunes);
+    g_lua.setField("critDamageOffensiveRunes");
+
+    g_lua.pushNumber(data.critDamageAutoAttack);
+    g_lua.setField("critDamageAutoAttack");
+
+    g_lua.pushInteger(data.lifeGainHit);
+    g_lua.setField("lifeGainHit");
+
+    g_lua.pushInteger(data.manaGainHit);
+    g_lua.setField("manaGainHit");
+
+    g_lua.pushInteger(data.lifeGainKill);
+    g_lua.setField("lifeGainKill");
+
+    g_lua.pushInteger(data.manaGainKill);
+    g_lua.setField("manaGainKill");
+
+    g_lua.createTable(data.extraDamageSkills.size(), 0);
+    for (size_t i = 0; i < data.extraDamageSkills.size(); ++i) {
+        g_lua.createTable(0, 3);
+        g_lua.pushInteger(data.extraDamageSkills[i].skillId);
+        g_lua.setField("skillId");
+        g_lua.pushNumber(data.extraDamageSkills[i].valueA);
+        g_lua.setField("valueA");
+        g_lua.pushNumber(data.extraDamageSkills[i].valueB);
+        g_lua.setField("valueB");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("extraDamageSkills");
+
+    g_lua.createTable(data.extraDamageSpells.size(), 0);
+    for (size_t i = 0; i < data.extraDamageSpells.size(); ++i) {
+        g_lua.createTable(0, 3);
+        g_lua.pushInteger(data.extraDamageSpells[i].skillId);
+        g_lua.setField("skillId");
+        g_lua.pushNumber(data.extraDamageSpells[i].valueA);
+        g_lua.setField("valueA");
+        g_lua.pushNumber(data.extraDamageSpells[i].valueB);
+        g_lua.setField("valueB");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("extraDamageSpells");
+
+    g_lua.createTable(data.extraHealingSpells.size(), 0);
+    for (size_t i = 0; i < data.extraHealingSpells.size(); ++i) {
+        g_lua.createTable(0, 3);
+        g_lua.pushInteger(data.extraHealingSpells[i].skillId);
+        g_lua.setField("skillId");
+        g_lua.pushNumber(data.extraHealingSpells[i].valueA);
+        g_lua.setField("valueA");
+        g_lua.pushNumber(data.extraHealingSpells[i].valueB);
+        g_lua.setField("valueB");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("extraHealingSpells");
+
+    g_lua.pushNumber(data.damageHighHp);
+    g_lua.setField("damageHighHp");
+
+    g_lua.pushNumber(data.damageLowHp);
+    g_lua.setField("damageLowHp");
+
+    g_lua.pushNumber(data.armorPenetration);
+    g_lua.setField("armorPenetration");
+
+    g_lua.createTable(data.elementalPierce.size(), 0);
+    for (size_t i = 0; i < data.elementalPierce.size(); ++i) {
+        g_lua.createTable(0, 2);
+        g_lua.pushInteger(data.elementalPierce[i].element);
+        g_lua.setField("element");
+        g_lua.pushNumber(data.elementalPierce[i].value);
+        g_lua.setField("value");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("elementalPierce");
 
     return 1;
 }

@@ -5266,7 +5266,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             data.onslaught = msg->getDouble();
             data.onslaughtBase = msg->getDouble();
             data.onslaughtBonus = msg->getDouble();
-            msg->getDouble(); // unused event bonus?
+            data.onslaughtEventBonus = msg->getDouble();
 
             data.cleavePercent = msg->getDouble();
 
@@ -5278,7 +5278,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             data.flatDamage = msg->getU16();
             data.flatDamageBase = msg->getU16();
-            msg->getU16(); // unused wheel?
+            data.flatDamageWheel = msg->getU16();
 
             data.weaponAttack = msg->getU16();
             data.weaponFlatModifier = msg->getU16();
@@ -5287,69 +5287,86 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             data.weaponSkillLevel = msg->getU16();
             data.weaponSkillModifier = msg->getU16();
             data.weaponElement = msg->getU8();
-            data.weaponElementDamage = msg->getDouble();
-            data.weaponElementType = msg->getU8();
+            // damage conversion
+            data.weaponElementDamage = msg->getDouble(); // % amount
+            data.weaponElementType = msg->getU8(); // new element
 
-            const uint8_t accuracyCount = msg->getU8();
+            const uint8_t accuracyCount = msg->getU8();// distance fighting accuracy
             for (int i = 0; i < accuracyCount; i++) {
-                msg->getU8(); // range
-                data.weaponAccuracy.push_back(msg->getDouble());
+                CyclopediaCharacterOffenceStats::AccuracyData acc;
+                acc.range = msg->getU8(); // range
+                acc.chance = msg->getDouble(); // change to hit (placeholder)
+                data.weaponAccuracy.push_back(acc);
             }
 
             if (g_game.getClientVersion() >= 1510) {
-                msg->getDouble(); // damage against powerful foes
+                data.damagePowerfulFoes = msg->getDouble(); // damage against powerful foes
                 const uint16_t targetCount = msg->getU16(); // damage against specific targets FOR
                 for (int i = 0; i < targetCount; i++) {
-                    msg->getString(); // placeholder
-                    msg->getDouble(); // 1.25
+                    CyclopediaCharacterOffenceStats::TargetBonus bonus;
+                    bonus.name = msg->getString(); // placeholder
+                    bonus.value = msg->getDouble(); // 1.25
+                    data.damageSpecificTargets.push_back(bonus);
                 }
-                const uint8_t elementCount = msg->getU8();
+                const uint8_t elementCount = msg->getU8();// critical chance by type
                 for (int i = 0; i < elementCount; i++) {
-                    msg->getU8(); // element id
-                    msg->getDouble(); // modifier
+                    CyclopediaCharacterOffenceStats::ElementModifier mod;
+                    mod.element = msg->getU8(); // element id
+                    mod.value = msg->getDouble(); // modifier
+                    data.damageElements.push_back(mod);
                 }
-                msg->getDouble(); // +x% for offensive runes
-                msg->getDouble(); // +x% for auto-attack
-                const uint8_t critDmgElemCount = msg->getU8();
+                data.offensiveRuneDamage = msg->getDouble(); // +x% for offensive runes
+                data.autoAttackDamage = msg->getDouble(); // +x% for auto-attack
+                const uint8_t critDmgElemCount = msg->getU8(); // critical damage by type
                 for (int i = 0; i < critDmgElemCount; i++) {
-                    msg->getU8(); // element id
-                    msg->getDouble(); // modifier
+                    CyclopediaCharacterOffenceStats::ElementModifier mod;
+                    mod.element = msg->getU8(); // element id
+                    mod.value = msg->getDouble(); // modifier
+                    data.critDamageElements.push_back(mod);
                 }
-                msg->getDouble(); // crit dmg: +x% for offensive runes
-                msg->getDouble(); // crit dmg: +x% for auto-attack
+                data.critDamageOffensiveRunes = msg->getDouble(); // crit dmg: +x% for offensive runes
+                data.critDamageAutoAttack = msg->getDouble(); // crit dmg: +x% for auto-attack
 
-                msg->getU16(); // life gain on hit
-                msg->getU16(); // mana gain on hit
-                msg->getU16(); // life gain on kill
-                msg->getU16(); // mana gain on kill
+                data.lifeGainHit = msg->getU16(); // life gain on hit
+                data.manaGainHit = msg->getU16(); // mana gain on hit
+                data.lifeGainKill = msg->getU16(); // life gain on kill
+                data.manaGainKill = msg->getU16(); // mana gain on kill
 
                 const uint8_t adExtraDmgCount = msg->getU8();
                 for (int i = 0; i < adExtraDmgCount; i++) {
-                    msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
-                    msg->getDouble(); // value a
-                    msg->getDouble(); // value b
+                    CyclopediaCharacterOffenceStats::SkillBonus bonus;
+                    bonus.skillId = msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
+                    bonus.valueA = msg->getDouble(); // value a
+                    bonus.valueB = msg->getDouble(); // value b
+                    data.extraDamageSkills.push_back(bonus);
                 }
                 const uint8_t spellExtraCount = msg->getU8();
                 for (int i = 0; i < spellExtraCount; i++) {
-                    msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
-                    msg->getDouble(); // value a
-                    msg->getDouble(); // value b
+                    CyclopediaCharacterOffenceStats::SkillBonus bonus;
+                    bonus.skillId = msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
+                    bonus.valueA = msg->getDouble(); // value a
+                    bonus.valueB = msg->getDouble(); // value b
+                    data.extraDamageSpells.push_back(bonus);
                 }
                 const uint8_t spellExtraHealingCount = msg->getU8();
                 for (int i = 0; i < spellExtraHealingCount; i++) {
-                    msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
-                    msg->getDouble(); // value a
-                    msg->getDouble(); // value b
+                    CyclopediaCharacterOffenceStats::SkillBonus bonus;
+                    bonus.skillId = msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
+                    bonus.valueA = msg->getDouble(); // value a
+                    bonus.valueB = msg->getDouble(); // value b
+                    data.extraHealingSpells.push_back(bonus);
                 }
             }
             if (g_game.getClientVersion() >= 1521) {
-                msg->getDouble(); // damage to targets above 95% hp
-                msg->getDouble(); // damage to targets below 30% hp
-                msg->getDouble(); // armor penetration multiplier
-                const uint8_t elemPierceBonuses = msg->getU8();
+                data.damageHighHp = msg->getDouble(); // damage to targets above 95% hp
+                data.damageLowHp = msg->getDouble(); // damage to targets below 30% hp
+                data.armorPenetration = msg->getDouble(); // armor penetration multiplier
+                const uint8_t elemPierceBonuses = msg->getU8(); // elemental pierce
                 for (int i = 0; i < elemPierceBonuses; i++) {
-                    msg->getU8(); // element id
-                    msg->getDouble(); // modifier
+                    CyclopediaCharacterOffenceStats::ElementModifier mod;
+                    mod.element = msg->getU8(); // element id
+                    mod.value = msg->getDouble(); // modifier
+                    data.elementalPierce.push_back(mod);
                 }
             }
 

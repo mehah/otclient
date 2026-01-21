@@ -684,6 +684,7 @@ struct CyclopediaCharacterOffenceStats
     double onslaught;
     double onslaughtBase;
     double onslaughtBonus;
+    double onslaughtEventBonus;
 
     double cleavePercent;
 
@@ -691,6 +692,7 @@ struct CyclopediaCharacterOffenceStats
 
     uint16_t flatDamage;
     uint16_t flatDamageBase;
+    uint16_t flatDamageWheel;
 
     uint16_t weaponAttack;
     uint16_t weaponFlatModifier;
@@ -701,7 +703,38 @@ struct CyclopediaCharacterOffenceStats
     uint8_t weaponElement;
     double weaponElementDamage;
     uint8_t weaponElementType;
-    std::vector<double> weaponAccuracy;
+    
+    struct AccuracyData { uint8_t range; double chance; };
+    std::vector<AccuracyData> weaponAccuracy;
+
+    double damagePowerfulFoes;
+    struct TargetBonus { std::string name; double value; };
+    std::vector<TargetBonus> damageSpecificTargets;
+
+    struct ElementModifier { uint8_t element; double value; };
+    std::vector<ElementModifier> damageElements;
+
+    double offensiveRuneDamage;
+    double autoAttackDamage;
+
+    std::vector<ElementModifier> critDamageElements;
+    double critDamageOffensiveRunes;
+    double critDamageAutoAttack;
+
+    uint16_t lifeGainHit;
+    uint16_t manaGainHit;
+    uint16_t lifeGainKill;
+    uint16_t manaGainKill;
+
+    struct SkillBonus { uint8_t skillId; double valueA; double valueB; };
+    std::vector<SkillBonus> extraDamageSkills;
+    std::vector<SkillBonus> extraDamageSpells;
+    std::vector<SkillBonus> extraHealingSpells;
+
+    double damageHighHp;
+    double damageLowHp;
+    double armorPenetration;
+    std::vector<ElementModifier> elementalPierce;
 };
 
 struct CyclopediaCharacterDefenceStats
