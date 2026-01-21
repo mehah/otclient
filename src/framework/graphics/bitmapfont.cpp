@@ -502,8 +502,8 @@ std::string BitmapFont::wrapText(std::string_view text, int maxWidth, const Wrap
         if (len == 1 && _isAscii((uint8_t)*cur)) {
             unsigned char ch = (unsigned char)*cur;
             if (_isSpace(ch)) {
-                int w = _gw(m_glyphsSize, ' ', sx);
-                if (lineW + w > maxW) { commitBreak(false); ++cur; markBreak(false, 0); continue; }
+                const int w = _gw(m_glyphsSize, ' ', sx);
+                if (lineW + w > maxW) { commitBreak(false); pushChar(' '); lineW = w; ++cur; continue; }
                 pushChar(' '); lineW += w; markBreak(false, 0); ++cur; continue;
             }
             if (_isHyphen(ch)) {
