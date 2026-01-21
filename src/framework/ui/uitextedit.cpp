@@ -144,17 +144,16 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
                 const auto& src = m_glyphsCoords[i].second;
                 if (dest.isValid()) m_glyphsSelectRectCache.emplace_back(dest, src);
 
-                // Determine rect for background selection
                 if (i >= static_cast<int>(m_glyphsPositionsCache.size())) continue;
-
                 uint8_t glyph = static_cast<uint8_t>(m_displayedText[i]);
-                // Add glyph offset for proper TTF font alignment (same as text rendering)
-                Point pos = textScreenOffset + m_glyphsPositionsCache[i] + glyphsOffset[glyph];
+                Point baselinePos = textScreenOffset + m_glyphsPositionsCache[i];
+                Point pos(baselinePos.x + glyphsOffset[glyph].x, baselinePos.y);
                 int width = 0;
 
                 if (i + 1 < static_cast<int>(m_glyphsPositionsCache.size()) && i + 1 < static_cast<int>(m_displayedText.length())) {
                     uint8_t nextGlyph = static_cast<uint8_t>(m_displayedText[i + 1]);
-                    Point nextPos = textScreenOffset + m_glyphsPositionsCache[i + 1] + glyphsOffset[nextGlyph];
+                    Point nextBaselinePos = textScreenOffset + m_glyphsPositionsCache[i + 1];
+                    Point nextPos(nextBaselinePos.x + glyphsOffset[nextGlyph].x, nextBaselinePos.y);
                     if (nextPos.y == pos.y) {
                         width = nextPos.x - pos.x;
                     }
