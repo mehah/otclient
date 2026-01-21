@@ -384,7 +384,7 @@ struct CyclopediaCharacterGeneralStats
 {
     uint64_t experience;
     uint16_t level;
-    uint8_t levelPercent;
+    uint16_t levelPercent;
     uint16_t baseExpGain;
     uint16_t lowLevelExpBonus;
     uint16_t XpBoostPercent;

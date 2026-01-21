@@ -4818,7 +4818,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             CyclopediaCharacterGeneralStats stats;
             stats.experience = msg->getU64();
             stats.level = msg->getU16();
-            stats.levelPercent = msg->getU8();
+            stats.levelPercent = g_game.getFeature(Otc::GameLevelPercentU16) ? msg->getU16() : msg->getU8();
             stats.baseExpGain = msg->getU16();
             if (g_game.getFeature(Otc::GameTournamentPackets)) {
                 msg->getU32(); // tournament exp(deprecated)
@@ -5229,22 +5229,21 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
         {
             CyclopediaCharacterOffenceStats data;
 
-            // Critical hit chance
             data.critChanceTotal = msg->getDouble();
+            data.critChanceEquipament = msg->getDouble();
             if (g_game.getClientVersion() >= 1510) {
                 data.critChanceFlat = msg->getDouble();
             }
-            data.critChanceEquipament = msg->getDouble();
             data.critChanceImbuement = msg->getDouble();
             data.critChanceWheel = msg->getDouble();
             data.critChanceConcoction = msg->getDouble();
 
             // Critical hit damage
             data.critDamageTotal = msg->getDouble();
+            data.critDamageEquipament = msg->getDouble();
             if (g_game.getClientVersion() >= 1510) {
                 data.critDamageFlat = msg->getDouble();
             }
-            data.critDamageEquipament = msg->getDouble();
             data.critDamageImbuement = msg->getDouble();
             data.critDamageWheel = msg->getDouble();
             data.critDamageConcoction = msg->getDouble();
@@ -5267,7 +5266,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             data.onslaught = msg->getDouble();
             data.onslaughtBase = msg->getDouble();
             data.onslaughtBonus = msg->getDouble();
-            msg->getDouble(); // unused
+            msg->getDouble(); // unused event bonus?
 
             data.cleavePercent = msg->getDouble();
 
@@ -5279,7 +5278,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             data.flatDamage = msg->getU16();
             data.flatDamageBase = msg->getU16();
-            msg->getU16(); // unused
+            msg->getU16(); // unused wheel?
 
             data.weaponAttack = msg->getU16();
             data.weaponFlatModifier = msg->getU16();
@@ -5298,21 +5297,60 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             }
 
             if (g_game.getClientVersion() >= 1510) {
-                msg->getDouble(); // unused
-                msg->getU16(); // unused
-                msg->getU8(); // unused
-                msg->getDouble(); // unused
-                msg->getDouble(); // unused
-                msg->getU8(); // unused
-                msg->getDouble(); // unused
-                msg->getDouble(); // unused
-                msg->getU16(); // unused
-                msg->getU16(); // unused
-                msg->getU16(); // unused
-                msg->getU16(); // unused
-                msg->getU8(); // unused
-                msg->getU8(); // unused
-                msg->getU8(); // unused
+                msg->getDouble(); // damage against powerful foes
+                const uint16_t targetCount = msg->getU16(); // damage against specific targets FOR
+                for (int i = 0; i < targetCount; i++) {
+                    msg->getString(); // placeholder
+                    msg->getDouble(); // 1.25
+                }
+                const uint8_t elementCount = msg->getU8();
+                for (int i = 0; i < elementCount; i++) {
+                    msg->getU8(); // element id
+                    msg->getDouble(); // modifier
+                }
+                msg->getDouble(); // +x% for offensive runes
+                msg->getDouble(); // +x% for auto-attack
+                const uint8_t critDmgElemCount = msg->getU8();
+                for (int i = 0; i < critDmgElemCount; i++) {
+                    msg->getU8(); // element id
+                    msg->getDouble(); // modifier
+                }
+                msg->getDouble(); // crit dmg: +x% for offensive runes
+                msg->getDouble(); // crit dmg: +x% for auto-attack
+
+                msg->getU16(); // life gain on hit
+                msg->getU16(); // mana gain on hit
+                msg->getU16(); // life gain on kill
+                msg->getU16(); // mana gain on kill
+
+                const uint8_t adExtraDmgCount = msg->getU8();
+                for (int i = 0; i < adExtraDmgCount; i++) {
+                    msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
+                    msg->getDouble(); // value a
+                    msg->getDouble(); // value b
+                }
+                const uint8_t spellExtraCount = msg->getU8();
+                for (int i = 0; i < spellExtraCount; i++) {
+                    msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
+                    msg->getDouble(); // value a
+                    msg->getDouble(); // value b
+                }
+                const uint8_t spellExtraHealingCount = msg->getU8();
+                for (int i = 0; i < spellExtraHealingCount; i++) {
+                    msg->getU8(); // skill id, uses same enums as in HardcodedSkillIds
+                    msg->getDouble(); // value a
+                    msg->getDouble(); // value b
+                }
+            }
+            if (g_game.getClientVersion() >= 1521) {
+                msg->getDouble(); // damage to targets above 95% hp
+                msg->getDouble(); // damage to targets below 30% hp
+                msg->getDouble(); // armor penetration multiplier
+                const uint8_t elemPierceBonuses = msg->getU8();
+                for (int i = 0; i < elemPierceBonuses; i++) {
+                    msg->getU8(); // element id
+                    msg->getDouble(); // modifier
+                }
             }
 
             g_game.processCyclopediaCharacterOffenceStats(data);
