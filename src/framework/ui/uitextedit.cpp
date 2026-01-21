@@ -1182,7 +1182,7 @@ int UITextEdit::getTextPos(const Point& pos)
 void UITextEdit::updateDisplayedText()
 {
     std::string src = getProp(PropTextHidden) ? std::string(m_text.length(), '*') : m_text;
-    m_drawTextColors = m_textColors;
+    const auto& srcColors = m_textColors;
 
     std::string vis = src;
     if (isTextWrap() && m_rect.isValid()) {
@@ -1215,6 +1215,23 @@ void UITextEdit::updateDisplayedText()
 
     m_srcToVis[src.size()] = static_cast<int>(j);
     m_visToSrc[vis.size()] = static_cast<int>(i);
+
+    m_drawTextColors.clear();
+    m_drawTextColors.reserve(srcColors.size());
+
+    const int visSize = static_cast<int>(vis.size());
+    const int srcSize = static_cast<int>(src.size());
+
+    for (const auto& [srcPosRaw, color] : srcColors) {
+        const int srcPos = std::clamp(srcPosRaw, 0, srcSize);
+        const int visPos = m_srcToVis.empty() ? srcPos : std::clamp(m_srcToVis[srcPos], 0, visSize);
+
+        if (!m_drawTextColors.empty() && m_drawTextColors.back().first == visPos) {
+            m_drawTextColors.back().second = color;
+        } else {
+            m_drawTextColors.emplace_back(visPos, color);
+        }
+    }
 }
 
 std::string UITextEdit::getSelection()
@@ -1229,7 +1246,6 @@ void UITextEdit::updateText()
     if (m_cursorPos > static_cast<int>(m_text.length()))
         m_cursorPos = m_text.length();
 
-    // any text changes reset the selection
     if (getProp(PropSelectable)) {
         m_selectionEnd = 0;
         m_selectionStart = 0;

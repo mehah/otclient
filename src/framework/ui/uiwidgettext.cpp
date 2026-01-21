@@ -109,6 +109,51 @@ namespace {
             s.assign(out, l, r - l + 1);
         }
     }
+
+    static std::vector<size_t> buildSrcPosToDrawPosMap(std::string_view src, std::string_view draw) {
+        std::vector<size_t> map;
+        map.assign(src.size() + 1, 0);
+
+        size_t i = 0;
+        size_t j = 0;
+        while (i < src.size() || j < draw.size()) {
+            if (i <= src.size())
+                map[i] = j;
+
+            if (i < src.size() && j < draw.size() && src[i] == draw[j]) {
+                ++i;
+                ++j;
+                continue;
+            }
+
+            if (j < draw.size() && (draw[j] == '\n' || draw[j] == '-') && (i >= src.size() || src[i] != draw[j])) {
+                ++j;
+                continue;
+            }
+
+            if (i < src.size() && src[i] == ' ' && (j >= draw.size() || draw[j] != ' ')) {
+                ++i;
+                continue;
+            }
+
+            if (i < src.size() && j < draw.size()) {
+                ++i;
+                ++j;
+                continue;
+            }
+            if (i < src.size()) {
+                ++i;
+                continue;
+            }
+            if (j < draw.size()) {
+                ++j;
+                continue;
+            }
+        }
+
+        map[src.size()] = j;
+        return map;
+    }
 }
 
 void UIWidget::initText()
@@ -666,7 +711,34 @@ void UIWidget::updateRectToWord(const std::vector<Rect>& glypsCoords)
 
     const size_t glyphCount = glypsCoords.size();
 
-    for (const auto& textEvent : m_textEvents) {
+    std::vector<TextEvent> drawEvents;
+    drawEvents.reserve(m_textEvents.size());
+    if (isTextWrap() && m_rect.isValid() && m_drawText != m_text) {
+        const auto srcPosToDrawPos = buildSrcPosToDrawPosMap(m_text, m_drawText);
+
+        for (const auto& ev : m_textEvents) {
+            TextEvent mapped = ev;
+            const size_t srcLen = m_text.size();
+            const size_t start = std::min(mapped.startPos, srcLen);
+            const size_t end = std::min(mapped.endPos, srcLen);
+            if (start >= end) {
+                mapped.startPos = 0;
+                mapped.endPos = 0;
+                drawEvents.push_back(std::move(mapped));
+                continue;
+            }
+
+            const size_t dStart = srcPosToDrawPos[start];
+            const size_t dEnd = srcPosToDrawPos[end];
+            mapped.startPos = std::min(dStart, m_drawText.size());
+            mapped.endPos = std::min(dEnd, m_drawText.size());
+            drawEvents.push_back(std::move(mapped));
+        }
+    } else {
+        drawEvents = m_textEvents;
+    }
+
+    for (const auto& textEvent : drawEvents) {
         const size_t start = std::min<int>(textEvent.startPos, glyphCount);
         const size_t end = std::min<int>(textEvent.endPos, glyphCount);
         if (start >= end)
