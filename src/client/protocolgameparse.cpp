@@ -817,6 +817,7 @@ void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
             break;
     }
     m_localPlayer->setResourceBalance(type, value);
+    g_lua.callGlobalField("g_game", "onResourceBalance", type, value);
 }
 
 void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
