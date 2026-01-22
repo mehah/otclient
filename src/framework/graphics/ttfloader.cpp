@@ -245,15 +245,21 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
         // Get outline glyph
         FT_Glyph glyph;
         if (FT_Get_Glyph(slot, &glyph) == 0) {
-          // Apply stroke
-          FT_Glyph_StrokeBorder(&glyph, stroker, 0, 1);
-
-          // Rasterize stroked glyph
-          if (glyph->format == FT_GLYPH_FORMAT_OUTLINE) {
-            FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
+          if (FT_Glyph_StrokeBorder(&glyph, stroker, 0, 1) != 0) {
+            FT_Done_Glyph(glyph);
+            continue;
           }
-
-          FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
+          if (glyph->format == FT_GLYPH_FORMAT_OUTLINE) {
+            if (FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, 1) != 0) {
+              FT_Done_Glyph(glyph);
+              continue;
+            }
+          }
+          if (glyph->format != FT_GLYPH_FORMAT_BITMAP) {
+            FT_Done_Glyph(glyph);
+            continue;
+          }
+          FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
           width = (int)bitmapGlyph->bitmap.width;
           height = (int)bitmapGlyph->bitmap.rows;
           bearingX = bitmapGlyph->left;
