@@ -25,7 +25,7 @@
 #include "framework/core/configmanager.h"
 #include <sstream>
 #include <string>
-#include <string_view>
+#include <vector>
 
 #include "framework/core/resourcemanager.h"
 #include "framework/graphics/fontmanager.h"

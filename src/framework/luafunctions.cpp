@@ -477,7 +477,10 @@ void Application::registerLuaFunctions()
     // FontManager
     g_lua.registerSingletonClass("g_fonts");
     g_lua.bindSingletonFunction("g_fonts", "clearFonts", &FontManager::clearFonts, &g_fonts);
-    g_lua.bindSingletonFunction("g_fonts", "importFont", &FontManager::importFont, &g_fonts);
+    g_lua.bindSingletonFunction("g_fonts", "importFont",
+        static_cast<bool (FontManager::*)(const std::string&)>(&FontManager::importFont), &g_fonts);
+    g_lua.bindSingletonFunction("g_fonts", "importFontWithSize",
+        static_cast<bool (FontManager::*)(const std::string&, int)>(&FontManager::importFont), &g_fonts);
     g_lua.bindSingletonFunction("g_fonts", "fontExists", &FontManager::fontExists, &g_fonts);
 
     // ParticleManager
