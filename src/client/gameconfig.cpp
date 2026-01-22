@@ -24,6 +24,8 @@
 
 #include "framework/core/configmanager.h"
 #include <sstream>
+#include <string>
+#include <string_view>
 
 #include "framework/core/resourcemanager.h"
 #include "framework/graphics/fontmanager.h"
@@ -85,11 +87,11 @@ void GameConfig::loadFonts() {
             try {
                 size = std::stoi(parts[1]);
             } catch (...) {
-                g_logger.warn("Invalid TTF size in font descriptor: {}", fontName);
+                g_logger.debug("Invalid TTF size in font descriptor: {}", fontName);
                 return;
             }
             if (size <= 0) {
-                g_logger.warn("TTF size must be > 0 in font descriptor: {}", fontName);
+                g_logger.debug("TTF size must be > 0 in font descriptor: {}", fontName);
                 return;
             }
             int strokeWidth = 0;
