@@ -330,20 +330,27 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
               std::min((int)strokeBitmap.rows, glyphsSize[i].height());
 
           // Draw stroke
-          for (int y = 0; y < copyHeight; ++y) {
-            for (int x = 0; x < copyWidth; ++x) {
-              const int srcIdx = y * strokeBitmap.pitch + x;
-              const int dstX = atlasX + x;
-              const int dstY = atlasY + y;
-              const int dstIdx = (dstY * atlasWidth + dstX) * 4;
+          if (strokeBitmap.buffer && strokeBitmap.pitch != 0) {
+            const int pitch = (int)strokeBitmap.pitch;
+            const int bmpRows = (int)strokeBitmap.rows;
 
-              const uint8_t alpha = strokeBitmap.buffer[srcIdx];
+            for (int y = 0; y < copyHeight; ++y) {
+              const int rowOffset = (pitch > 0) ? (y * pitch)
+                                               : ((bmpRows - 1 - y) * -pitch);
+              for (int x = 0; x < copyWidth; ++x) {
+                const int srcIdx = rowOffset + x;
+                const int dstX = atlasX + x;
+                const int dstY = atlasY + y;
+                const int dstIdx = (dstY * atlasWidth + dstX) * 4;
 
-              if (alpha > 0) {
-                atlasPixels[dstIdx + 0] = strokeColor.r();
-                atlasPixels[dstIdx + 1] = strokeColor.g();
-                atlasPixels[dstIdx + 2] = strokeColor.b();
-                atlasPixels[dstIdx + 3] = alpha;
+                const uint8_t alpha = strokeBitmap.buffer[srcIdx];
+
+                if (alpha > 0) {
+                  atlasPixels[dstIdx + 0] = strokeColor.r();
+                  atlasPixels[dstIdx + 1] = strokeColor.g();
+                  atlasPixels[dstIdx + 2] = strokeColor.b();
+                  atlasPixels[dstIdx + 3] = alpha;
+                }
               }
             }
           }
@@ -430,19 +437,26 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
           const int copyHeight =
               std::min((int)bitmap.rows, glyphsSize[i].height());
 
-          for (int y = 0; y < copyHeight; ++y) {
-            for (int x = 0; x < copyWidth; ++x) {
-              const int srcIdx = y * bitmap.pitch + x;
-              const int dstX = atlasX + x;
-              const int dstY = atlasY + y;
-              const int dstIdx = (dstY * atlasWidth + dstX) * 4;
+          if (bitmap.buffer && bitmap.pitch != 0) {
+            const int pitch = (int)bitmap.pitch;
+            const int bmpRows = (int)bitmap.rows;
 
-              const uint8_t alpha = bitmap.buffer[srcIdx];
+            for (int y = 0; y < copyHeight; ++y) {
+              const int rowOffset = (pitch > 0) ? (y * pitch)
+                                               : ((bmpRows - 1 - y) * -pitch);
+              for (int x = 0; x < copyWidth; ++x) {
+                const int srcIdx = rowOffset + x;
+                const int dstX = atlasX + x;
+                const int dstY = atlasY + y;
+                const int dstIdx = (dstY * atlasWidth + dstX) * 4;
 
-              atlasPixels[dstIdx + 0] = 255;
-              atlasPixels[dstIdx + 1] = 255;
-              atlasPixels[dstIdx + 2] = 255;
-              atlasPixels[dstIdx + 3] = alpha;
+                const uint8_t alpha = bitmap.buffer[srcIdx];
+
+                atlasPixels[dstIdx + 0] = 255;
+                atlasPixels[dstIdx + 1] = 255;
+                atlasPixels[dstIdx + 2] = 255;
+                atlasPixels[dstIdx + 3] = alpha;
+              }
             }
           }
         }
