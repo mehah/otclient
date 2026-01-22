@@ -290,6 +290,9 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
     std::vector<uint8_t> atlasPixels(atlasWidth * atlasHeight * 4, 0);
 
     Rect glyphsCoords[256];
+    for (int i = 0; i < 256; ++i) {
+      glyphsCoords[i] = Rect(0, 0, 0, 0);
+    }
 
     for (int i = firstGlyph; i <= lastGlyph; ++i) {
       if (glyphsSize[i].width() == 0 || glyphsSize[i].height() == 0) {
