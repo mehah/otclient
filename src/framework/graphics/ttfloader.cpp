@@ -498,8 +498,7 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
     int yShift = (minYOffset < 0) ? -minYOffset : 0;
 
     font->m_texture = texture;
-    font->m_glyphHeight =
-        std::max(lineHeight, maxYOffset - minYOffset + yShift);
+    font->m_glyphHeight = std::max(lineHeight, maxYOffset - minYOffset);
     font->m_firstGlyph = 32;
     font->m_yOffset = yShift;
     font->m_glyphSpacing = Size(0, 0);
