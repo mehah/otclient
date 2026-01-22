@@ -527,14 +527,7 @@ void UIWidget::setFont(const std::string_view fontName)
 
 void UIWidget::setTTFFont(const std::string_view fontName, int fontSize, int strokeWidth, const Color& strokeColor)
 {
-
-    m_strokeWidth = strokeWidth;
-    m_strokeColor = strokeColor;
-
-    // Keep the original font path so subsequent stroke updates can re-import
-    // using the full path (important for fonts in subdirectories).
-    m_ttfFontPath = std::string(fontName);
-
+    const std::string fontPath(fontName);
     std::string baseName = std::string(fontName);
     
     size_t lastDot = baseName.find_last_of('.');
@@ -547,10 +540,6 @@ void UIWidget::setTTFFont(const std::string_view fontName, int fontSize, int str
     if (lastSlash != std::string::npos) {
         baseName = baseName.substr(lastSlash + 1);
     }
-
-    m_ttfBaseName = baseName;
-    m_ttfFontSize = fontSize;
-    
 
     std::string uniqueFontName = baseName + "_" + std::to_string(fontSize);
 	
@@ -566,13 +555,18 @@ void UIWidget::setTTFFont(const std::string_view fontName, int fontSize, int str
     }	
     
     if (!g_fonts.fontExists(uniqueFontName)) {
-		
-        if (g_fonts.importTTF(std::string(fontName), fontSize, strokeWidth, strokeColor).empty()) {
+        if (g_fonts.importTTF(fontPath, fontSize, strokeWidth, strokeColor).empty()) {
             g_logger.error("Failed to load TTF font: {}", fontName);
             return;
         }
     }
     
+    m_strokeWidth = strokeWidth;
+    m_strokeColor = strokeColor;
+    m_ttfFontPath = fontPath;
+    m_ttfBaseName = baseName;
+    m_ttfFontSize = fontSize;
+
     m_font = g_fonts.getFont(uniqueFontName);
     computeHtmlTextIntrinsicSize();
     updateText();
