@@ -29,7 +29,9 @@
 #include <framework/core/logger.h>
 #include <framework/core/resourcemanager.h>
 #include <iomanip>
+#include <memory>
 #include <sstream>
+#include <type_traits>
 
 #ifdef max
 #undef max
@@ -69,6 +71,27 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
     return nullptr;
   }
 
+  struct FTFaceDeleter {
+    void operator()(FT_Face face) const noexcept {
+      if (face) {
+        FT_Done_Face(face);
+      }
+    }
+  };
+
+  struct FTStrokerDeleter {
+    void operator()(FT_Stroker stroker) const noexcept {
+      if (stroker) {
+        FT_Stroker_Done(stroker);
+      }
+    }
+  };
+
+  using FacePtr =
+      std::unique_ptr<std::remove_pointer_t<FT_Face>, FTFaceDeleter>;
+  using StrokerPtr =
+      std::unique_ptr<std::remove_pointer_t<FT_Stroker>, FTStrokerDeleter>;
+
   try {
 
     std::string resolvedPath;
@@ -79,14 +102,14 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
       fileName += ".ttf";
     }
 
-    // Lista de diretórios para procurar a fonte
+    // Search paths for the font file
     std::vector<std::string> searchPaths = {
-        fileName,                      // Caminho original
-        "/data/fonts/ttf/" + fileName, // Diretório padrão de fontes TTF
-        "data/fonts/ttf/" + fileName   // Sem barra inicial
+      fileName,                      // Original path
+      "/data/fonts/ttf/" + fileName, // Default TTF directory
+      "data/fonts/ttf/" + fileName   // Without leading slash
     };
 
-    // Se fileName já começa com /, não duplicar
+    // If already absolute in resources, don't prepend search paths
     if (fileName.starts_with("/")) {
       searchPaths = {fileName};
     }
@@ -112,7 +135,7 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
       return nullptr;
     }
 
-    FT_Face face;
+    FT_Face face = nullptr;
     if (FT_New_Memory_Face(s_library,
                            reinterpret_cast<const FT_Byte *>(fontBuffer.data()),
                            fontBuffer.size(), 0, &face)) {
@@ -120,9 +143,10 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
       return nullptr;
     }
 
+    FacePtr faceGuard(face);
+
     if (FT_Set_Pixel_Sizes(face, 0, fontSize)) {
       g_logger.error("Failed to set font size: " + file);
-      FT_Done_Face(face);
       return nullptr;
     }
 
@@ -140,7 +164,7 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
 
     fontName = fontName + "_" + std::to_string(fontSize);
 
-    // Adicionar stroke ao nome se houver
+    // Include stroke settings in the font cache key
     if (strokeWidth > 0) {
       std::ostringstream colorStream;
       colorStream << std::hex << std::setfill('0') << std::setw(2)
@@ -153,19 +177,19 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
 
     auto font = std::make_shared<BitmapFont>(fontName);
 
-    // Renderizar glyphs
+    // Rasterize glyphs and collect metrics
     const int firstGlyph = 32;
     const int lastGlyph = 255;
     const int padding = 2;
 
     int maxGlyphWidth = 0;
     int maxGlyphHeight = 0;
-    Size glyphsSize[256];    // Tamanho visual do glyph (bitmap)
-    int glyphsAdvance[256];  // Advance horizontal (para posicionamento)
-    int glyphsBearingX[256]; // Offset X do bearing
-    int glyphsBearingY[256]; // Offset Y do bearing (para baseline)
+    Size glyphsSize[256];    // Bitmap size
+    int glyphsAdvance[256];  // Horizontal advance
+    int glyphsBearingX[256]; // Bearing X
+    int glyphsBearingY[256]; // Bearing Y (baseline)
 
-    // Inicializar
+    // Initialize metrics arrays
     for (int i = 0; i < 256; ++i) {
       glyphsSize[i] = Size(0, 0);
       glyphsAdvance[i] = 0;
@@ -173,15 +197,16 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
       glyphsBearingY[i] = 0;
     }
 
-    // Criar stroker se necessário
+    // Create stroker (optional outline)
     FT_Stroker stroker = nullptr;
+    StrokerPtr strokerGuard;
     if (strokeWidth > 0) {
       if (FT_Stroker_New(s_library, &stroker)) {
         g_logger.error("Failed to create FreeType stroker");
-        strokeWidth = 0; // Desabilitar stroke em caso de erro
+        strokeWidth = 0; // Disable stroke on error
       } else {
-        // Configurar stroker (strokeWidth em pixels * 64 para unidades
-        // FreeType)
+        strokerGuard.reset(stroker);
+        // strokeWidth is in pixels; FreeType uses 26.6 fixed-point units
         FT_Stroker_Set(stroker, strokeWidth * 64, FT_STROKER_LINECAP_ROUND,
                        FT_STROKER_LINEJOIN_ROUND, 0);
       }
@@ -204,13 +229,13 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
       int bearingY = 0;
 
       if (strokeWidth > 0 && stroker) {
-        // Obter o glyph como outline
+        // Get outline glyph
         FT_Glyph glyph;
         if (FT_Get_Glyph(slot, &glyph) == 0) {
-          // Aplicar stroke
+          // Apply stroke
           FT_Glyph_StrokeBorder(&glyph, stroker, 0, 1);
 
-          // Renderizar o glyph com stroke
+          // Rasterize stroked glyph
           if (glyph->format == FT_GLYPH_FORMAT_OUTLINE) {
             FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
           }
@@ -224,7 +249,7 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
           FT_Done_Glyph(glyph);
         }
       } else {
-        // Renderizar normalmente sem stroke
+        // Rasterize without stroke
         if (FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL) == 0) {
           width = (int)slot->bitmap.width;
           height = (int)slot->bitmap.rows;
@@ -242,13 +267,13 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
       maxGlyphHeight = std::max(maxGlyphHeight, height);
     }
 
-    // Calcular dimensões do atlas
+    // Compute atlas dimensions
     const int glyphsPerRow = 16;
     const int rows = (256 + glyphsPerRow - 1) / glyphsPerRow;
     const int atlasWidth = glyphsPerRow * (maxGlyphWidth + padding);
     const int atlasHeight = rows * (maxGlyphHeight + padding);
 
-    // Criar atlas RGBA
+    // Create RGBA atlas
     std::vector<uint8_t> atlasPixels(atlasWidth * atlasHeight * 4, 0);
 
     Rect glyphsCoords[256];
@@ -274,7 +299,7 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
           Rect(atlasX, atlasY, glyphsSize[i].width(), glyphsSize[i].height());
 
       if (strokeWidth > 0 && stroker) {
-        // Renderizar stroke primeiro (fundo)
+        // Draw stroke first (background)
         FT_Glyph strokeGlyph;
         if (FT_Get_Glyph(slot, &strokeGlyph) == 0) {
           FT_Glyph_StrokeBorder(&strokeGlyph, stroker, 0, 1);
@@ -291,7 +316,7 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
           const int copyHeight =
               std::min((int)strokeBitmap.rows, glyphsSize[i].height());
 
-          // Desenhar stroke
+          // Draw stroke
           for (int y = 0; y < copyHeight; ++y) {
             for (int x = 0; x < copyWidth; ++x) {
               const int srcIdx = y * strokeBitmap.pitch + x;
@@ -302,10 +327,10 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
               const uint8_t alpha = strokeBitmap.buffer[srcIdx];
 
               if (alpha > 0) {
-                atlasPixels[dstIdx + 0] = strokeColor.r(); // R
-                atlasPixels[dstIdx + 1] = strokeColor.g(); // G
-                atlasPixels[dstIdx + 2] = strokeColor.b(); // B
-                atlasPixels[dstIdx + 3] = alpha;           // A
+                atlasPixels[dstIdx + 0] = strokeColor.r();
+                atlasPixels[dstIdx + 1] = strokeColor.g();
+                atlasPixels[dstIdx + 2] = strokeColor.b();
+                atlasPixels[dstIdx + 3] = alpha;
               }
             }
           }
@@ -313,39 +338,77 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
           FT_Done_Glyph(strokeGlyph);
         }
 
-        // Renderizar glyph original por cima
+        // Draw original glyph on top
         if (FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL) == 0) {
           const FT_Bitmap &bitmap = slot->bitmap;
 
-          // Calcular offset para centralizar o glyph original sobre o stroke
+          // Center the original glyph over the stroked bounds
           int offsetX = (glyphsSize[i].width() - (int)bitmap.width) / 2;
           int offsetY = (glyphsSize[i].height() - (int)bitmap.rows) / 2;
 
-          const int copyWidth =
-              std::min((int)bitmap.width, glyphsSize[i].width() - offsetX);
-          const int copyHeight =
-              std::min((int)bitmap.rows, glyphsSize[i].height() - offsetY);
+          const int glyphW = glyphsSize[i].width();
+          const int glyphH = glyphsSize[i].height();
+          const int bitmapW = (int)bitmap.width;
+          const int bitmapH = (int)bitmap.rows;
 
-          for (int y = 0; y < copyHeight; ++y) {
-            for (int x = 0; x < copyWidth; ++x) {
-              const int srcIdx = y * bitmap.pitch + x;
-              const int dstX = atlasX + x + offsetX;
-              const int dstY = atlasY + y + offsetY;
-              const int dstIdx = (dstY * atlasWidth + dstX) * 4;
+          if (bitmap.buffer && glyphW > 0 && glyphH > 0 && bitmapW > 0 &&
+              bitmapH > 0 && bitmap.pitch != 0) {
+            // If offsets are negative, skip pixels from the source and clamp
+            // the destination to the glyph cell.
+            const int srcX0 = std::max(0, -offsetX);
+            const int srcY0 = std::max(0, -offsetY);
+            const int dstX0 = atlasX + std::max(0, offsetX);
+            const int dstY0 = atlasY + std::max(0, offsetY);
 
-              const uint8_t alpha = bitmap.buffer[srcIdx];
+            int copyWidth = bitmapW - srcX0;
+            int copyHeight = bitmapH - srcY0;
 
-              if (alpha > 0) {
-                atlasPixels[dstIdx + 0] = 255;   // R
-                atlasPixels[dstIdx + 1] = 255;   // G
-                atlasPixels[dstIdx + 2] = 255;   // B
-                atlasPixels[dstIdx + 3] = alpha; // A
+            copyWidth = std::min(copyWidth, glyphW - std::max(0, offsetX));
+            copyHeight = std::min(copyHeight, glyphH - std::max(0, offsetY));
+
+            copyWidth = std::min(copyWidth, atlasWidth - dstX0);
+            copyHeight = std::min(copyHeight, atlasHeight - dstY0);
+
+            if (copyWidth > 0 && copyHeight > 0) {
+              const int absPitch = std::abs((int)bitmap.pitch);
+              const auto getRowPtr = [&](int row) -> const uint8_t * {
+                if (bitmap.pitch > 0) {
+                  return bitmap.buffer + row * bitmap.pitch;
+                }
+                // Negative pitch means rows are stored bottom-up.
+                return bitmap.buffer + (bitmapH - 1 - row) * absPitch;
+              };
+
+              for (int y = 0; y < copyHeight; ++y) {
+                const int srcRow = srcY0 + y;
+                const int dstY = dstY0 + y;
+                if (dstY < 0 || dstY >= atlasHeight) {
+                  continue;
+                }
+
+                const uint8_t *srcRowPtr = getRowPtr(srcRow);
+                for (int x = 0; x < copyWidth; ++x) {
+                  const int srcCol = srcX0 + x;
+                  const int dstX = dstX0 + x;
+                  if (dstX < 0 || dstX >= atlasWidth) {
+                    continue;
+                  }
+
+                  const uint8_t alpha = srcRowPtr[srcCol];
+                  if (alpha > 0) {
+                    const int dstIdx = (dstY * atlasWidth + dstX) * 4;
+                    atlasPixels[dstIdx + 0] = 255;
+                    atlasPixels[dstIdx + 1] = 255;
+                    atlasPixels[dstIdx + 2] = 255;
+                    atlasPixels[dstIdx + 3] = alpha;
+                  }
+                }
               }
             }
           }
         }
       } else {
-        // Renderizar normalmente sem stroke
+        // Draw without stroke
         if (FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL) == 0) {
           const FT_Bitmap &bitmap = slot->bitmap;
 
@@ -363,19 +426,14 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
 
               const uint8_t alpha = bitmap.buffer[srcIdx];
 
-              atlasPixels[dstIdx + 0] = 255;   // R
-              atlasPixels[dstIdx + 1] = 255;   // G
-              atlasPixels[dstIdx + 2] = 255;   // B
-              atlasPixels[dstIdx + 3] = alpha; // A
+              atlasPixels[dstIdx + 0] = 255;
+              atlasPixels[dstIdx + 1] = 255;
+              atlasPixels[dstIdx + 2] = 255;
+              atlasPixels[dstIdx + 3] = alpha;
             }
           }
         }
       }
-    }
-
-    // Limpar stroker se foi criado
-    if (stroker) {
-      FT_Stroker_Done(stroker);
     }
 
     ImagePtr image = std::make_shared<Image>(Size(atlasWidth, atlasHeight), 4,
@@ -383,12 +441,12 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
     TexturePtr texture = TexturePtr(new Texture(image));
     texture->setSmooth(true);
 
-    // Obter métricas da fonte para calcular a baseline
+    // Font metrics for baseline/alignment
     int ascender = (int)(face->size->metrics.ascender >> 6);
     int descender = (int)(face->size->metrics.descender >> 6);
     int lineHeight = (int)(face->size->metrics.height >> 6);
 
-    // Calcular o offset Y mínimo e máximo para normalizar
+    // Compute vertical extents for baseline normalization
     int minYOffset = 0;
     int maxYOffset = 0;
 
@@ -438,16 +496,14 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
     if (font->m_glyphsAdvance[32] <= 0) {
       font->m_glyphsAdvance[32] = fontSize / 3;
     }
-    font->m_glyphsSize[32] = Size(0, 0);    // Espaço não tem bitmap
-    font->m_glyphsOffset[32] = Point(0, 0); // Espaço não tem offset
+    font->m_glyphsSize[32] = Size(0, 0);    // Space has no bitmap
+    font->m_glyphsOffset[32] = Point(0, 0); // Space has no offset
 
-    // Caracteres especiais
+    // Special characters
     font->m_glyphsSize[127].setWidth(1);
     font->m_glyphsAdvance[127] = 1;
     font->m_glyphsSize[static_cast<int>('\n')] = Size(1, font->m_glyphHeight);
     font->m_glyphsAdvance[static_cast<int>('\n')] = 0;
-
-    FT_Done_Face(face);
 
     return font;
 
