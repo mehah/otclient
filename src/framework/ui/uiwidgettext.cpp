@@ -159,6 +159,7 @@ namespace {
 void UIWidget::initText()
 {
     m_font = g_fonts.getDefaultWidgetFont();
+    m_ttfFontPath.clear();
     m_ttfBaseName.clear();
     m_ttfFontSize = 0;
     m_textAlign = Fw::AlignCenter;
@@ -514,6 +515,7 @@ std::string UIWidget::getFont() { return m_font->getName(); }
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
+    m_ttfFontPath.clear();
     m_ttfBaseName.clear();
     m_ttfFontSize = 0;
     computeHtmlTextIntrinsicSize();
@@ -528,6 +530,10 @@ void UIWidget::setTTFFont(const std::string_view fontName, int fontSize, int str
 
     m_strokeWidth = strokeWidth;
     m_strokeColor = strokeColor;
+
+    // Keep the original font path so subsequent stroke updates can re-import
+    // using the full path (important for fonts in subdirectories).
+    m_ttfFontPath = std::string(fontName);
 
     std::string baseName = std::string(fontName);
     
@@ -579,9 +585,9 @@ void UIWidget::setStroke(int strokeWidth, const Color& strokeColor)
 {
 
     if (m_font) {
-        // Prefer the originally requested TTF base name/size.
-        if (!m_ttfBaseName.empty() && m_ttfFontSize > 0) {
-            setTTFFont(m_ttfBaseName, m_ttfFontSize, strokeWidth, strokeColor);
+        // Prefer the originally requested TTF path/size.
+        if (!m_ttfFontPath.empty() && m_ttfFontSize > 0) {
+            setTTFFont(m_ttfFontPath, m_ttfFontSize, strokeWidth, strokeColor);
             return;
         }
 
