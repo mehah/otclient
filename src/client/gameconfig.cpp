@@ -100,8 +100,13 @@ void GameConfig::loadFonts() {
                 try { strokeWidth = std::stoi(parts[2]); } catch (...) { strokeWidth = 0; }
                 if (strokeWidth < 0) strokeWidth = 0;
             }
-            if (parts.size() > 3) strokeColor = Color(parts[3]);
-
+            if (parts.size() > 3) {
+                try {
+                    strokeColor = Color(parts[3]);
+                } catch (...) {
+                    g_logger.debug("Invalid stroke color in font descriptor: {}", fontName);
+                }
+            }
             std::string actualName = g_fonts.importTTF(file, size, strokeWidth, strokeColor);
             if (!actualName.empty()) {
                 fontName = actualName;
