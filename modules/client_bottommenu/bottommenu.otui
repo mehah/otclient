@@ -13,7 +13,7 @@ ShowOffWidget < UIWidget
 
   UITextEdit
     id: description
-    size: 472 0
+    size: 465 0
     ttf-font: verdana-bold
     ttf-font-size: 10
     anchors.left: image.right
@@ -21,9 +21,16 @@ ShowOffWidget < UIWidget
     anchors.bottom: parent.bottom
     margin-left: 2
     color: #c0c0c0ff
+    multiline: true
     text-wrap: true
     text-auto-resize: true
+    editable: false
     selectable: true
+    focusable: false
+    cursor-visible: false
+    change-cursor-image: false
+    selection-color: #f4f4f4ff
+    selection-background-color: #808080ff
 
 Panel
   id: bottomMenu

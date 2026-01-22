@@ -425,7 +425,6 @@ namespace {
     bool _isAscii(uint8_t c) { return c < 0x80; }
     bool _isSpace(uint8_t c) { return c == ' ' || c == '\t'; }
     bool _isHyphen(uint8_t c) { return c == '-'; }
-    int _gw(const Size s[256], uint8_t ch, int sx) { return s[ch].width() + sx; }
     bool _utf8(const char* s, const char* e, uint32_t& cp, int& len) {
         if (s >= e)return false; unsigned char c0 = (unsigned char)s[0];
         if (c0 < 0x80) { cp = c0; len = 1; return true; }
@@ -466,8 +465,12 @@ std::string BitmapFont::wrapText(std::string_view text, int maxWidth, const Wrap
         if (colors) updateColors(colors, (int)out.size() - 1, 1);
         lineW = 0; lastBreakOut = -1; lastBreakLineW = 0; lastBreakHy = false; lastBreakHyCount = 0;
     };
+    auto glyphWidth = [&](uint8_t ch)->int {
+        const int adv = m_glyphsAdvance[ch];
+        return (adv > 0 ? adv : m_glyphsSize[ch].width()) + sx;
+    };
     auto measure = [&](const char* s, int len, uint32_t cp)->int {
-        if (len == 1 && cp < 256) return _gw(m_glyphsSize, (uint8_t)cp, sx);
+        if (len == 1 && cp < 256) return glyphWidth((uint8_t)cp);
         return calculateTextRectSize(std::string_view(s, len)).width();
     };
     auto markBreak = [&](bool hy, int hyc) {
@@ -521,16 +524,16 @@ std::string BitmapFont::wrapText(std::string_view text, int maxWidth, const Wrap
         if (len == 1 && _isAscii((uint8_t)*cur)) {
             unsigned char ch = (unsigned char)*cur;
             if (_isSpace(ch)) {
-                const int w = _gw(m_glyphsSize, ' ', sx);
+                const int w = glyphWidth(' ');
                 if (lineW + w > maxW) { commitBreak(false); pushChar(' '); lineW = w; ++cur; continue; }
                 pushChar(' '); lineW += w; markBreak(false, 0); ++cur; continue;
             }
             if (_isHyphen(ch)) {
-                int w = _gw(m_glyphsSize, ch, sx);
+                int w = glyphWidth((uint8_t)ch);
                 if (lineW + w > maxW) commitBreak(false);
                 pushChar((char)ch); lineW += w; markBreak(false, 0); ++cur; continue;
             }
-            int w = _gw(m_glyphsSize, ch, sx);
+            int w = glyphWidth((uint8_t)ch);
             if (lineW + w > maxW) {
                 bool anywhere = (options.overflowWrapMode == OverflowWrapMode::Anywhere) || (options.wordBreakMode == WordBreakMode::BreakAll);
                 if (lastBreakOut >= 0) commitBreak(false);
