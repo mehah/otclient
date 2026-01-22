@@ -24,6 +24,8 @@
 #include "bitmapfont.h"
 #include "image.h"
 #include "texturemanager.h"
+#include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <framework/core/filestream.h>
 #include <framework/core/logger.h>
@@ -97,8 +99,19 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
     std::string resolvedPath;
     std::string fileName = file;
 
-    if (fileName.find(".ttf") == std::string::npos &&
-        fileName.find(".otf") == std::string::npos) {
+    std::string lowerFileName = fileName;
+    std::transform(lowerFileName.begin(), lowerFileName.end(),
+                   lowerFileName.begin(),
+                   [](unsigned char c) { return (char)std::tolower(c); });
+
+    const bool hasTtfSuffix =
+      lowerFileName.size() >= 4 &&
+      lowerFileName.compare(lowerFileName.size() - 4, 4, ".ttf") == 0;
+    const bool hasOtfSuffix =
+      lowerFileName.size() >= 4 &&
+      lowerFileName.compare(lowerFileName.size() - 4, 4, ".otf") == 0;
+
+    if (!hasTtfSuffix && !hasOtfSuffix) {
       fileName += ".ttf";
     }
 
