@@ -73,15 +73,15 @@ public:
 
     std::string wrapText(std::string_view text, int maxWidth, const WrapOptions& options = WrapOptions{}, std::vector<std::pair<int, Color>>* colors = nullptr);
 
-    const std::string& getName() { return m_name; }
-    int getGlyphHeight() const { return m_glyphHeight; }
-    const Rect* getGlyphsTextureCoords() { return m_glyphsTextureCoords; }
-    const Size* getGlyphsSize() { return m_glyphsSize; }
-    const Point* getGlyphsOffset() { return m_glyphsOffset; }
-    const int* getGlyphsAdvance() { return m_glyphsAdvance; }
-    const TexturePtr& getTexture() { return m_texture; }
-    int getYOffset() const { return m_yOffset; }
-    Size getGlyphSpacing() { return m_glyphSpacing; }
+    const std::string& getName() const noexcept { return m_name; }
+    int getGlyphHeight() const noexcept { return m_glyphHeight; }
+    const Rect* getGlyphsTextureCoords() const noexcept { return m_glyphsTextureCoords; }
+    const Size* getGlyphsSize() const noexcept { return m_glyphsSize; }
+    const Point* getGlyphsOffset() const noexcept { return m_glyphsOffset; }
+    const int* getGlyphsAdvance() const noexcept { return m_glyphsAdvance; }
+    const TexturePtr& getTexture() const noexcept { return m_texture; }
+    int getYOffset() const noexcept { return m_yOffset; }
+    Size getGlyphSpacing() const noexcept { return m_glyphSpacing; }
     const AtlasRegion* getAtlasRegion() const noexcept;
 
 private:
