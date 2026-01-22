@@ -1006,6 +1006,11 @@ protected:
     int m_strokeWidth{ 0 };
     Color m_strokeColor{ Color::black };	
 
+    // Tracks the originally requested TTF font (base name) and size so we
+    // don't need to parse m_font->getName() when updating stroke.
+    std::string m_ttfBaseName;
+    int m_ttfFontSize{ 0 };
+
     const AtlasRegion* m_atlasRegion = nullptr;
 
 public:

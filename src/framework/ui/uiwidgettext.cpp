@@ -159,6 +159,8 @@ namespace {
 void UIWidget::initText()
 {
     m_font = g_fonts.getDefaultWidgetFont();
+    m_ttfBaseName.clear();
+    m_ttfFontSize = 0;
     m_textAlign = Fw::AlignCenter;
     m_coordsBuffer = std::make_shared<CoordsBuffer>();
     m_textOverflowLength = 0;
@@ -512,6 +514,8 @@ std::string UIWidget::getFont() { return m_font->getName(); }
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
+    m_ttfBaseName.clear();
+    m_ttfFontSize = 0;
     computeHtmlTextIntrinsicSize();
     updateText();
     onFontChange(fontName);
@@ -537,6 +541,9 @@ void UIWidget::setTTFFont(const std::string_view fontName, int fontSize, int str
     if (lastSlash != std::string::npos) {
         baseName = baseName.substr(lastSlash + 1);
     }
+
+    m_ttfBaseName = baseName;
+    m_ttfFontSize = fontSize;
     
 
     std::string uniqueFontName = baseName + "_" + std::to_string(fontSize);
@@ -572,33 +579,41 @@ void UIWidget::setStroke(int strokeWidth, const Color& strokeColor)
 {
 
     if (m_font) {
-        std::string fontName = m_font->getName();
-        
-
-        size_t underscorePos = fontName.find('_');
-        if (underscorePos != std::string::npos) {
-            fontName = fontName.substr(0, underscorePos);
+        // Prefer the originally requested TTF base name/size.
+        if (!m_ttfBaseName.empty() && m_ttfFontSize > 0) {
+            setTTFFont(m_ttfBaseName, m_ttfFontSize, strokeWidth, strokeColor);
+            return;
         }
-        
 
-        int fontSize = 12;
+        // Fallback: best-effort parse from the current font name.
+        // NOTE: this remains potentially ambiguous which is why we prefer
+        // m_ttfBaseName/m_ttfFontSize when available.
         std::string currentName = m_font->getName();
-        size_t sizePos = currentName.find('_');
-        if (sizePos != std::string::npos) {
-            std::string sizeStr = currentName.substr(sizePos + 1);
-            size_t nextUnderscore = sizeStr.find('_');
-            if (nextUnderscore != std::string::npos) {
-                sizeStr = sizeStr.substr(0, nextUnderscore);
-            }
+        int fontSize = 12;
+        std::string baseName;
+
+        // Strip optional stroke suffix: <base>_<size>_s<width>_<rgba>
+        const size_t strokePos = currentName.find("_s");
+        const std::string baseAndSize = (strokePos == std::string::npos) ? currentName : currentName.substr(0, strokePos);
+
+        const size_t sizeSep = baseAndSize.find_last_of('_');
+        if (sizeSep != std::string::npos && sizeSep + 1 < baseAndSize.size()) {
+            const std::string sizeStr = baseAndSize.substr(sizeSep + 1);
             try {
                 fontSize = std::stoi(sizeStr);
+                baseName = baseAndSize.substr(0, sizeSep);
             } catch (...) {
-                fontSize = 12;
+                // keep defaults
             }
         }
-        
 
-        setTTFFont(fontName, fontSize, strokeWidth, strokeColor);
+        if (baseName.empty()) {
+            m_strokeWidth = strokeWidth;
+            m_strokeColor = strokeColor;
+            return;
+        }
+
+        setTTFFont(baseName, fontSize, strokeWidth, strokeColor);
     } else {
 
         m_strokeWidth = strokeWidth;
