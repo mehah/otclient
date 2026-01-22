@@ -81,10 +81,23 @@ void GameConfig::loadFonts() {
 
         if (parts.size() >= 2) {
             std::string file = parts[0];
-            int size = std::atoi(parts[1].c_str());
+            int size = 0;
+            try {
+                size = std::stoi(parts[1]);
+            } catch (...) {
+                g_logger.warn("Invalid TTF size in font descriptor: {}", fontName);
+                return;
+            }
+            if (size <= 0) {
+                g_logger.warn("TTF size must be > 0 in font descriptor: {}", fontName);
+                return;
+            }
             int strokeWidth = 0;
             Color strokeColor = Color::black;
-            if (parts.size() > 2) strokeWidth = std::atoi(parts[2].c_str());
+            if (parts.size() > 2) {
+                try { strokeWidth = std::stoi(parts[2]); } catch (...) { strokeWidth = 0; }
+                if (strokeWidth < 0) strokeWidth = 0;
+            }
             if (parts.size() > 3) strokeColor = Color(parts[3]);
 
             std::string actualName = g_fonts.importTTF(file, size, strokeWidth, strokeColor);
