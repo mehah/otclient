@@ -8,7 +8,7 @@ function onOpenNpcTrade(items, currencyId, currencyName)
     local isNewSession = not controllerNpcTrader.isTradeOpen
 
     if isNewSession then
-        print(1)
+        -- delete this?
         controllerNpcTrader.isTradeOpen = true
         controllerNpcTrader.widthConsole = controllerNpcTrader.TRADE_CONSOLE_WIDTH
         controllerNpcTrader.buyItems = {}
