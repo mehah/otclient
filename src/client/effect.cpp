@@ -81,6 +81,13 @@ void Effect::draw(const Point& dest, const bool drawThings, LightView* lightView
             yPattern += getNumPatternY();
     }
 
+    // Check if the effect can actually be drawn before setting opacity/shader
+    // This prevents stale state from affecting subsequent draws when this effect
+    // returns early due to missing texture or invalid state
+    auto* thingType = getThingType();
+    if (!thingType || thingType->isNull() || thingType->getAnimationPhases() == 0)
+        return;
+
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
         if (drawThings && g_client.getEffectAlpha() < 1.f)
             g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
@@ -89,7 +96,7 @@ void Effect::draw(const Point& dest, const bool drawThings, LightView* lightView
     if (hasShader())
         g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
 
-    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView);
+    thingType->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView);
 }
 
 void Effect::onAppear()
