@@ -359,13 +359,22 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
         // Draw stroke first (background)
         FT_Glyph strokeGlyph;
         if (FT_Get_Glyph(slot, &strokeGlyph) == 0) {
-          FT_Glyph_StrokeBorder(&strokeGlyph, stroker, 0, 1);
-
+          if (FT_Glyph_StrokeBorder(&strokeGlyph, stroker, 0, 1) != 0) {
+            FT_Done_Glyph(strokeGlyph);
+            continue;
+          }
           if (strokeGlyph->format == FT_GLYPH_FORMAT_OUTLINE) {
-            FT_Glyph_To_Bitmap(&strokeGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1);
+            if (FT_Glyph_To_Bitmap(&strokeGlyph, FT_RENDER_MODE_NORMAL, nullptr, 1) != 0) {
+              FT_Done_Glyph(strokeGlyph);
+              continue;
+            }
+          }
+          if (strokeGlyph->format != FT_GLYPH_FORMAT_BITMAP) {
+            FT_Done_Glyph(strokeGlyph);
+            continue;
           }
 
-          FT_BitmapGlyph strokeBitmapGlyph = (FT_BitmapGlyph)strokeGlyph;
+          FT_BitmapGlyph strokeBitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(strokeGlyph);
           const FT_Bitmap &strokeBitmap = strokeBitmapGlyph->bitmap;
           const int strokeLeft = strokeBitmapGlyph->left;
           const int strokeTop = strokeBitmapGlyph->top;
