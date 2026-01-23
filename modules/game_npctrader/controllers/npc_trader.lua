@@ -3,6 +3,18 @@ function onOpenNpcTrade(items, currencyId, currencyName)
     if not ui or not ui:isVisible() then
         controllerNpcTrader:loadHtml('templates/game_npctrader.html')
         controllerNpcTrader:cloneConsoleMessages()
+        controllerNpcTrader.widthConsole = controllerNpcTrader.DEFAULT_CONSOLE_WIDTH
+        controllerNpcTrader.isTradeOpen = false
+        controllerNpcTrader.creatureName =  "Unknown"
+        controllerNpcTrader.outfit =  "/game_npctrader/static/images/icon-npcdialog-multiplenpcs"
+        controllerNpcTrader.buttons = controllerNpcTrader.buttonsDefault
+        local creatureOutfit = controllerNpcTrader:findWidget("#creatureOutfit")
+        if type(controllerNpcTrader.outfit) == "string" then
+            creatureOutfit:setImageSource(controllerNpcTrader.outfit)
+        else
+            creatureOutfit:setOutfit(controllerNpcTrader.outfit)
+        end
+        controllerNpcTrader:updateChatButton()
     end
 
     local isNewSession = not controllerNpcTrader.isTradeOpen

@@ -6,7 +6,7 @@ controller:registerEvents(g_game, {
         -- g_game.enableFeature(GameWingsAurasEffectsShader)
         -- g_game.enableFeature(GameCreaturePaperdoll)
         -- g_game.enableFeature(GameAllowCustomBotScripts)
-
+ g_game.enableFeature(GameNpcWindowRedesign)
         g_game.enableFeature(GameFormatCreatureName)
 
         -- For Walk
@@ -268,6 +268,9 @@ controller:registerEvents(g_game, {
         end
         if version >= 1500 then
             g_game.enableFeature(GameVocationMonk)
+        end
+        if version >= 1513 then
+            g_game.enableFeature(GameNpcWindowRedesign)
         end
         if version >= 1514 then
             g_game.enableFeature(GameEffectSource)

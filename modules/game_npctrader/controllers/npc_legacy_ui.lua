@@ -90,8 +90,10 @@ end
 
 function controllerNpcTrader:legacy_terminate()
     initialized = false
-    npcWindow:destroy()
-
+    if npcWindow then
+        npcWindow:destroy()
+    end
+    npcWindow = nil
     disconnect(LocalPlayer, {
         onFreeCapacityChange = onFreeCapacityChange,
         onInventoryChange = onInventoryChange
