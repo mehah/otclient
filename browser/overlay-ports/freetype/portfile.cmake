@@ -1,5 +1,4 @@
-vcpkg_from_gitlab(
-    GITLAB_URL https://gitlab.freedesktop.org
+vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO freetype/freetype
     REF "VER-${VERSION}"
@@ -16,13 +15,20 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         zlib    FT_REQUIRE_ZLIB
 )
 
+# Add pthread flags for Emscripten builds
+if(VCPKG_TARGET_IS_EMSCRIPTEN OR VCPKG_TARGET_TRIPLET MATCHES "wasm")
+    set(PTHREAD_FLAGS "-pthread")
+else()
+    set(PTHREAD_FLAGS "")
+endif()
+
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
         ${FEATURE_OPTIONS}
         -DFT_DISABLE_HARFBUZZ=ON
-        -DCMAKE_C_FLAGS="-pthread"
-        -DCMAKE_CXX_FLAGS="-pthread"
+        "-DCMAKE_C_FLAGS=${PTHREAD_FLAGS}"
+        "-DCMAKE_CXX_FLAGS=${PTHREAD_FLAGS}"
 )
 
 vcpkg_cmake_install()
