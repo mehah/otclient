@@ -101,6 +101,7 @@ function onNpcChatWindow(data)
     controllerNpcTrader.creatureName = creature and creature:getName() or "Unknown"
     controllerNpcTrader.outfit = creature and creature:getOutfit() or "/game_npctrader_html/static/images/icon-npcdialog-multiplenpcs"
     controllerNpcTrader.buttons = data.buttons or controllerNpcTrader.buttonsDefault
+    controllerNpcTrader:updateChatButton()
     local ui = controllerNpcTrader.ui
     if not ui or not ui:isVisible() then
         controllerNpcTrader:loadHtml('templates/game_npctrader.html')
@@ -166,4 +167,18 @@ function onNpcTalk(name, level, mode, text, channelId, creaturePos)
             end
         end
     end
+end
+
+function controllerNpcTrader:updateChatButton()
+    local isChatEnabled = modules.game_console.isChatEnabled()
+    self.chatMode = isChatEnabled and tr('Chat On') or tr('Chat Off')
+    local inputConsole = self:findWidget(".inputConsole")
+    if inputConsole then
+        inputConsole:setEnabled(isChatEnabled)
+    end
+end
+
+function controllerNpcTrader:toggleChatMode()
+    modules.game_console.toggleChat()
+    self:updateChatButton()
 end

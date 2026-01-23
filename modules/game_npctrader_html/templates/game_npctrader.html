@@ -139,7 +139,7 @@
             </button>
         </div>
         <input class="inputConsole" placement="bottom-left"/>
-        <button class="bottonChat">Chat On</button>
+        <button id="chatModeButton" class="bottonChat" onclick="self:toggleChatMode()">{{self.chatMode}}</button>
     </div>
 
     <div class="verticalSep VerticalSeparator" *visible="self.isTradeOpen"></div>

@@ -812,4 +812,5 @@ return {
            g_client.setBossAreaCreatureEffectAlpha(value / 100)
         end
     },   
+    showInfoBanner                     = true,
 }

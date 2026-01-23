@@ -212,6 +212,10 @@ clientEventController.queue = {}
 clientEventController.widgets = {}
 
 function clientEventController:onClientEvent(eventCat, ...)
+    if not modules.client_options.getOption("showInfoBanner") then
+         g_logger.debug("The server has sent infobaner, but the checkbox in client_options is disabled..")
+        return
+    end
     local args = { ... }
     local popupTemplate = nil
     if eventCat == eventCategory.CLIENT_EVENT_TYPE_SIMPLE then

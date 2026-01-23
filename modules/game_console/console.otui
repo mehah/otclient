@@ -359,12 +359,4 @@ Panel
     font: cipsoftFont
     !text: tr('Chat Off')
     &isChecked: false
-    @onClick: |
-      if self.isChecked then
-        self.isChecked = false
-        self:setText(tr('Chat On'))
-      else
-        self.isChecked = true
-        self:setText(tr('Chat Off'))
-      end
-      updateChatMode()
+    @onClick: toggleChat()
