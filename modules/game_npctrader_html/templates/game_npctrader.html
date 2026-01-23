@@ -56,7 +56,7 @@
 
     /* Chat & Console */
     .panelConsole { margin-top: 30px; --image-border: 4; padding: 1; padding-right: 12; padding-left: 4; padding-top: 4; padding-bottom: 4; height: 288px; --image-source: /images/ui/3pixel_frame_borderimage; }
-    .inputConsole { margin-bottom: 10px; display: inline-block; width: 288px; margin-left: 15px; margin-top: 5px; }
+    .inputConsole { margin-bottom: 10px; display: inline-block; width: 288px; margin-left: 15px; margin-top: 5px; --placeholder: "Type here to chat"; --placeholder-color: #6E706F}
     .bottonChat { display: inline; margin-left: 2px; font: cipsoftFont; }
     
     /* Buttons Panel */
@@ -92,7 +92,7 @@
 
     /* Search Bar */
     .tradeSearchRow { height: 21px; margin: 2px 5px; }
-    .tradeSearchInput {  margin-left: -5px; --placeholder: Type to search; --placeholder-color: #6E706F; width: 100%;display: block; float: left;}
+    .tradeSearchInput {  margin-left: -5px; --placeholder: "Type to search"; --placeholder-color: #6E706F; width: 100%;display: block; float: left;}
     .tradeSearchClear { --image-source: /game_cyclopedia/images/button_clear_search; float: right; margin-right: 5px; }
 
     /* Trade Footer & Controls */
@@ -130,7 +130,7 @@
         <img class="img" src="static/images/blue-golden-flag-banner" placement="top-left" />
         <label class="title" placement="top-left">{{self.creatureName}}</label>
         <img class="podium" src="static/images/backdrop-npcdialog-podestal" placement="top-left" />
-        <uicreature *outfit="self.outfit" class="creature-display" placement="top-left"></uicreature>
+        <uicreature id="creatureOutfit" class="creature-display" placement="top-left"></uicreature>
 
 
         <div id="panelBotons" placement="bottom-left" class="panelBotons panelBase flex">
@@ -176,7 +176,7 @@
         <!-- Search -->
 
         <div class="tradeSearchRow borderGrey bgDark">
-            <input class="tradeSearchInput fontText colorLightGrey" onchange="self:filterQuestListShowHidden(event)"/>
+            <input class="tradeSearchInput fontText colorLightGrey" onchange="self:filterTradeList(event.value)"/>
             <uibutton class="tradeSearchClear" onclick="self:clearSearch()"></uibutton>
         </div>
         <!-- Footer -->

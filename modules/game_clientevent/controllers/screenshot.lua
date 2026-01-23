@@ -169,7 +169,9 @@ function takeScreenshot(name)
     if not g_game.isOnline() then
         return
     end
-
+    if not name:lower():match("%.png$") then
+        name = name .. ".png"
+    end
     clientEventController:scheduleEvent(function()
         if  optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked() then
             g_app.doMapScreenshot(name)
@@ -177,6 +179,11 @@ function takeScreenshot(name)
             g_app.doScreenshot(name)
         end
     end, 50, 'screenshotScheduleEvent')
+    local directory = g_resources.getWriteDir():gsub("[/\\]+", "\\") .. autoScreenshotDirName
+    local message = string.format("Screenshot has been saved to '%s'.",directory)
+    local console = modules.game_console
+    console.addText(message, console.SpeakTypesSettings, tr("Server Log"))
+    modules.game_textmessage.displayStatusMessage(message)
 end
 
 function OpenFolder()

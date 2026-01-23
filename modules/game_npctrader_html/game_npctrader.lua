@@ -1,6 +1,5 @@
 controllerNpcTrader = Controller:new()
 controllerNpcTrader.widthConsole = controllerNpcTrader.DEFAULT_CONSOLE_WIDTH
-controllerNpcTrader.lookType = 23
 controllerNpcTrader.creatureName = ""
 controllerNpcTrader.outfit = nil
 controllerNpcTrader.buttons = {}
@@ -11,7 +10,9 @@ function controllerNpcTrader:onInit()
         onNpcChatWindow = onNpcChatWindow,
         onOpenNpcTrade = onOpenNpcTrade,
         onPlayerGoods = onPlayerGoods,
-        onCloseNpcTrade = self.onCloseNpcTrade,
+        onCloseNpcTrade = function()
+            self:onCloseNpcTrade() --not work?
+        end,
         onTalk = onNpcTalk
     })
 end

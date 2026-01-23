@@ -64,15 +64,33 @@ local eventType = {
     CLIENT_EVENT_LAST = 15
 }
 
+local skinType = {
+    outfit = 0,
+    addon1 = 1,
+    addon2 = 2,
+    mount = 3
+}
+
+local SkillId = {
+    Magic = 1,
+    Sword = 2,
+    Club = 3,
+    Axe = 4,
+    Fist = 5,
+    Distance = 6,
+    Shielding = 7,
+    Fishing = 8
+}
+
 local skillNames = {
-    [1] = "Magic",
-    [2] = "Sword",
-    [3] = "Club",
-    [4] = "Axe",
-    [5] = "Fist",
-    [6] = "Distance",
-    [7] = "Shielding",
-    [8] = "Fishing"
+    [SkillId.Magic]     = { name = "Magic Level",        icon = "magic" },
+    [SkillId.Sword]     = { name = "Sword Fighting",     icon = "sword" },
+    [SkillId.Club]      = { name = "Club Fighting",      icon = "club" },
+    [SkillId.Axe]       = { name = "Axe Fighting",       icon = "axe" },
+    [SkillId.Fist]      = { name = "Fist Fighting",      icon = "fist" },
+    [SkillId.Distance]  = { name = "Distance Fighting",  icon = "distance" },
+    [SkillId.Shielding] = { name = "Shielding",          icon = "shielding" },
+    [SkillId.Fishing]   = { name = "Fishing",            icon = "fishing" }
 }
 
 local infoPopUp = {
@@ -80,7 +98,7 @@ local infoPopUp = {
         --type(int), lookType(int), skinName(string), skinType(int)
         {
             title = "Outfit Unlocked",
-            description = "You have unlocked'%s", --skinName
+            description = "You have unlocked '%s'", --skinName
             creatureId = '%d', --lookType
             img = "/game_clientevent/static/images/nodo/icon-infobanner-unlock"
         }
@@ -89,7 +107,7 @@ local infoPopUp = {
         --type(int), raceId(int), progressLevel(int)
         {
             title = "Bosstiary Progress",
-            description = "You have progressed '%s",--progressLevel
+            description = "You have progressed '%s'",--progressLevel
             raceId = '%d', --RaceId
             img = "/game_clientevent/static/images/nodo/icon-infobanner-unlock"
         }
@@ -98,7 +116,7 @@ local infoPopUp = {
         --type(int), raceId(int), progressLevel(int)
         {
             title = "Bestiary Progress",
-            description = "You have progressed '%s", --progressLevel
+            description = "You have progressed '%s'", --progressLevel
             raceId = '%d', --RaceId
             img = "/game_clientevent/static/images/nodo/icon-infobanner-unlock"
         }
@@ -106,7 +124,7 @@ local infoPopUp = {
     [eventCategory.CLIENT_EVENT_TYPE_ACHIEVEMENT] = {
         -- type(int), name(string)
         {
-            title = "New Archievement",
+            title = "New Achievement",
             description = "You have earned '%s'", --name
             img = "/game_clientevent/static/images/nodo/icon-infobanner-achievements"
         }
@@ -151,7 +169,7 @@ local infoPopUp = {
     [eventCategory.CLIENT_EVENT_TYPE_SKILL] = {
         -- type(int), skillId(int), level(int)
         {
-            title = "%s Fighting",
+            title = "%s",
             description = "your skill has advanced to level %d",
             img = "/game_clientevent/static/images/nodo/icon-infobanner-skill-%s"
         }
@@ -196,9 +214,14 @@ clientEventController.widgets = {}
 function clientEventController:onClientEvent(eventCat, ...)
     local args = { ... }
     local popupTemplate = nil
-
     if eventCat == eventCategory.CLIENT_EVENT_TYPE_SIMPLE then
         local eventType = args[1]
+--[[        
+        --TODO check
+         if eventType <= eventType.CLIENT_EVENT_ATTACKSTOPPED  then
+            onScreenShot(eventType)
+            return
+        end ]]
         popupTemplate = infoPopUp[eventCat] and infoPopUp[eventCat][eventType]
 
     elseif eventCat == eventCategory.CLIENT_EVENT_TYPE_QUEST then
@@ -240,20 +263,26 @@ function clientEventController:onClientEvent(eventCat, ...)
     elseif eventCat == eventCategory.CLIENT_EVENT_TYPE_SKILL then
         local skillId = args[1]
         local level = args[2]
-        local skillName = skillNames[skillId] or "Skill"
-        title = type(title) == 'string' and title:format(skillName) or title
+        local data = skillNames[skillId] or { name = "Skill", icon = "fist" }
+        title = type(title) == 'string' and title:format(data.name) or title
         description = type(description) == 'string' and description:format(level) or description
-        img = type(img) == 'string' and img:format(skillName:lower()) or img
+        img = type(img) == 'string' and img:format(data.icon) or img
 
     elseif eventCat == eventCategory.CLIENT_EVENT_TYPE_COSMETIC then
         local lookType = args[1]
         local skinName = args[2]
-        --  TODO args[3] is skinType (0=outfit, 1/2=addon, 3=mount)
+        local skinType = tonumber(args[3])
+        if skinType == 1 then
+            skinName = skinName .. " (Addon 1)"
+        elseif skinType == 2 then
+            skinName = skinName .. " (Addon 2)"
+        end
         description = type(description) == 'string' and description:format(skinName) or description
+        print(description)
         if popupTemplate.creatureId then
             extraData.creatureId = lookType
+            extraData.skinType = skinType
         end
-
     elseif eventCat == eventCategory.CLIENT_EVENT_TYPE_BESTIARY or eventCat == eventCategory.CLIENT_EVENT_TYPE_BOSSTIARY then
         local raceId = args[1]
         local progressLevel = args[2]
@@ -276,7 +305,9 @@ end
 
 function infoBanner_onTerminate()
     clientEventController:hideImmediate()
-    clientEventController:unloadHtml()
+    if clientEventController.ui then
+        clientEventController:unloadHtml()
+    end
 end
 
 function clientEventController:ensure()
@@ -386,10 +417,11 @@ end
 function clientEventController:processNext()
     self:cancelEvent()
     if #self.queue == 0 then
-        debugPrint("Queue empty.")
+        debugPrint("Queue empty. Unloading UI.")
         self.state = "idle"
         if self.ui then
-            self.ui:hide()
+            self:unloadHtml()
+            self.widgets = {}
         end
         return
     end
@@ -413,30 +445,37 @@ function clientEventController:processNext()
         if data.extraData.itemId then
             local itemId = data.extraData.itemId
             local html = string.format([[
-            <uiitem item-id="%s" style="width: 64px; height: 64px;"></uiitem>
+            <uiitem item-id="%d" style="width: 64px; height: 64px"></uiitem>
             ]], itemId)
-            self:createWidgetFromHTML(html, appendW)
+            appendW:append(html)
         elseif data.extraData.raceId then
             local raceId = data.extraData.raceId
             local raceData = g_things.getRaceData(raceId)
-            if raceData and raceData.raceId == 0 and raceData.outfit.type == 0 then
-                local msg = string.format("Creature with race id %s was not found.", data.creatureraceid)
-                g_logger.warning(msg)
+            if not raceData or (raceData.raceId == 0 and raceData.outfit.type == 0) then
+                g_logger.warning(string.format("Creature with race id %s was not found.", raceId))
             else
                 local html = string.format([[
-                <uicreature style="width: 64px; height: 64px;border: 1 blue; "></uicreature>
+                <uicreature style="width: 64px; height: 64px"/>
                 ]])
-                local outfit = self:createWidgetFromHTML(html, appendW)
+                local outfit = appendW:append(html)
                 outfit:setOutfit(raceData.outfit)
             end
         elseif data.extraData.creatureId then
             local html = string.format([[
-            <uicreature outfit-id="%d" style="width: 64px; height: 64px;border: 1 blue; " />
+            <uicreature outfit-id="%d" style="width: 64px; height: 64px"/>
             ]], data.extraData.creatureId)
-            print("looktype", data.extraData.creatureId)
-            local a = self:createWidgetFromHTML(html, appendW)
+            if data.extraData.skinType == skinType.outfit then
+                local outfit = appendW:append(html)
+                outfit:setOutfit({type = data.extraData.creatureId})
+            elseif data.extraData.skinType == skinType.addon1 or data.extraData.skinType == skinType.addon2 then
+                local outfit = appendW:append(html)
+                outfit:setOutfit({type = data.extraData.creatureId, addons = data.extraData.skinType})
+            elseif data.extraData.skinType == skinType.mount then
+                local outfit = appendW:append(html)
+                outfit:setOutfit({type = data.extraData.creatureId})
+            end
         end
-    end
+    end 
 
     self.state = "opening"
     debugPrint("Starting Banner ->", data.title)
@@ -579,14 +618,11 @@ end
 
 function clientEventController:hideImmediate()
     self:cancelEvent()
-    if self.ui and not self.ui:isDestroyed() then
-        self.ui:hide()
-        self.ui:setMarginLeft(0)
-        self.ui:setOpacity(1.0)
-        self:setContentOpacity(0)
-        self:setLeftIconsOpacity(0)
+    if self.ui then
+        self:unloadHtml()
+        self.widgets = {}
     end
     self.queue = {}
     self.state = "idle"
-    debugPrint("Reset Immediate.")
+    debugPrint("Reset Immediate and Unloaded.")
 end

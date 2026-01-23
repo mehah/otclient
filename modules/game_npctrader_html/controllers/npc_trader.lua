@@ -302,13 +302,7 @@ function controllerNpcTrader:getPlayerMoney()
     if not player then
         return 0
     end
-    local money = player:getResourceBalance(ResourceBank) + player:getResourceBalance(ResourceInventary)
-    local currencyId = self.currencyId or controllerNpcTrader.DEFAULT_CURRENCY_ID
-    if currencyId ~= controllerNpcTrader.DEFAULT_CURRENCY_ID and currencyId > 0 then
-        money = player:getResourceBalance(ResourceNpcTrade)
-    elseif currencyId == 0 then
-        money = player:getResourceBalance(ResourceNpcStorageTrade)
-    end
+    local money = player:getTotalMoney()
     return money
 end
 
@@ -372,10 +366,6 @@ function controllerNpcTrader:clearSearch()
         input:setText("")
         self:filterTradeList("")
     end
-end
-
-function controllerNpcTrader:filterQuestListShowHidden(event)
-    self:filterTradeList(event.value)
 end
 
 function controllerNpcTrader:filterTradeList(searchText)

@@ -92,18 +92,20 @@ end
 
 function onNpcChatWindow(data)
     local creature = g_map.getCreatureById(data.npcIds[1])
-    if not creature then
-        return
-    end
     controllerNpcTrader.widthConsole = controllerNpcTrader.DEFAULT_CONSOLE_WIDTH
     controllerNpcTrader.isTradeOpen = false
-    controllerNpcTrader.creatureName = creature:getName() or "NPC"
-    controllerNpcTrader.outfit = creature:getOutfit()
+    controllerNpcTrader.creatureName = creature and creature:getName() or "Unknown"
+    controllerNpcTrader.outfit = creature and creature:getOutfit() or "/game_npctrader_html/static/images/icon-npcdialog-multiplenpcs"
     controllerNpcTrader.buttons = data.buttons or {}
-
     local ui = controllerNpcTrader.ui
     if not ui or not ui:isVisible() then
         controllerNpcTrader:loadHtml('templates/game_npctrader.html')
+        local creatureOutfit = controllerNpcTrader:findWidget("#creatureOutfit")
+        if type(controllerNpcTrader.outfit) == "string" then
+            creatureOutfit:setImageSource(controllerNpcTrader.outfit)
+        else
+            creatureOutfit:setOutfit(controllerNpcTrader.outfit)
+        end
     end
     controllerNpcTrader:cloneConsoleMessages()
 end

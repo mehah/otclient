@@ -5774,10 +5774,9 @@ void ProtocolGame::parsePreyRerollPrice(const InputMessagePtr& msg)
     uint8_t directly = 0; // prey selection list price
 
     if (g_game.getProtocolVersion() >= 1230) {
+        wildcard = msg->getU8();
         directly = msg->getU8();
-        if (g_game.getProtocolVersion() >= 1521) {
-            //note improve this if
-            msg->getU8();
+        if (g_game.getProtocolVersion() <= 1521) {
             return;
         }
         msg->getU32(); // task hunting reroll price
