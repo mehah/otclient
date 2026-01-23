@@ -3,7 +3,7 @@ vcpkg_from_gitlab(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO freetype/freetype
     REF "VER-${VERSION}"
-    SHA512 62dc2f9da8b5e5c8a20e0de0c1c84b23e63c5f7d36c74ace0452d01d19bb5db1c5e45b3fa38b5b5a9dbf2da3fc7b4f6d1eb8edb0c5f8ae4a0b4f5e3c2e6d3e7f9
+    SHA512 be4411f0e1cd55ccabf0ffe20c7197d24f366e389ad3de440d2a79de5e50e0f9a1b4f46f28e5ebf0d76f3c71fe50c80d43d0b68d0f5ae9ba11b039b73cccfd9e
     HEAD_REF master
 )
 
