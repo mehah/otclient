@@ -1852,7 +1852,7 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 
                     const auto& effect = std::make_shared<Effect>();
                     effect->setId(effectId);
-                    effect->setSource(static_cast<Otc::MagicEffectSources>(3));
+                    effect->setSource(static_cast<Otc::MagicEffectSources>(effectSource));
                     g_map.addThing(effect, pos);
                     break;
                 }
