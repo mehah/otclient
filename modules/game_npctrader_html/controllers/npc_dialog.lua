@@ -95,6 +95,11 @@ function controllerNpcTrader:cloneConsoleMessages()
 end
 
 function onNpcChatWindow(data)
+    if g_game.getClientVersion() < 1510 then
+        controllerNpcTrader:legacy_show()
+        return
+    end
+
     local creature = g_map.getCreatureById(data.npcIds[1])
     controllerNpcTrader.widthConsole = controllerNpcTrader.DEFAULT_CONSOLE_WIDTH
     controllerNpcTrader.isTradeOpen = false

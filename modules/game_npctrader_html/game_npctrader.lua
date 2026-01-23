@@ -6,26 +6,53 @@ controllerNpcTrader.buttons = {}
 controllerNpcTrader.isTradeOpen = false
 
 function controllerNpcTrader:onInit()
+
+end
+
+function controllerNpcTrader:onGameStart()
+    if g_game.getClientVersion() < 1510 then
+        self:legacy_init()
+    end
+
     self:registerEvents(g_game, {
         onNpcChatWindow = onNpcChatWindow,
-        onOpenNpcTrade = onOpenNpcTrade,
-        onPlayerGoods = onPlayerGoods,
+        onOpenNpcTrade = function(...)
+            if g_game.getClientVersion() < 1510 then
+                self:onOpenNpcTradeLegacy(...)
+            else
+                onOpenNpcTrade(...)
+            end
+        end,
+        onPlayerGoods = function(...)
+            if g_game.getClientVersion() < 1510 then
+                self:onPlayerGoodsLegacy(...)
+            else
+                onPlayerGoods(...)
+            end
+        end,
         onCloseNpcTrade = function()
-            self:onCloseNpcTrade() --not work?
+            if g_game.getClientVersion() < 1510 then
+                self:onCloseNpcTradeLegacy()
+            else
+                onCloseNpcTrade()
+            end
         end,
         onTalk = onNpcTalk
     })
 end
 
-function controllerNpcTrader:onGameStart()
-end
-
 function controllerNpcTrader:onTerminate()
     self:onCloseNpcTrade()
+    if g_game.getClientVersion() < 1510 then
+        self:legacy_terminate()
+    end
 end
 
 function controllerNpcTrader:onGameEnd()
     self:onCloseNpcTrade()
+    if g_game.getClientVersion() < 1510 then
+        self:legacy_hide()
+    end
 end
 
 function controllerNpcTrader:onCloseNpcTrade()
@@ -38,6 +65,11 @@ function controllerNpcTrader:onCloseNpcTrade()
     controllerNpcTrader.tradeItems = {}
     controllerNpcTrader.currentList = {}
     controllerNpcTrader.allTradeItems = {}
+    
+    if g_game.getClientVersion() < 1510 then
+        self:legacy_hide()
+    end
+
     if controllerNpcTrader.ui and controllerNpcTrader.ui:isVisible() then
         controllerNpcTrader:unloadHtml()
     end
