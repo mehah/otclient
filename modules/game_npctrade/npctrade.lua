@@ -83,7 +83,7 @@ function init()
         onGameEnd = hide,
         onOpenNpcTrade = onOpenNpcTrade,
         onCloseNpcTrade = onCloseNpcTrade,
-        onPlayerGoods = onPlayerGoods,
+        onPlayerGoods = onPlayerGoods
     })
 
     connect(LocalPlayer, {
@@ -102,7 +102,7 @@ function terminate()
         onGameEnd = hide,
         onOpenNpcTrade = onOpenNpcTrade,
         onCloseNpcTrade = onCloseNpcTrade,
-        onPlayerGoods = onPlayerGoods,
+        onPlayerGoods = onPlayerGoods
     })
 
     disconnect(LocalPlayer, {

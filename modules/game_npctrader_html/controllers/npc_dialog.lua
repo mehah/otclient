@@ -44,6 +44,7 @@ function controllerNpcTrader:onConsoleTextClicked(widget, text)
     local npcTab = modules.game_console.consoleTabBar:getTab("NPCs")
     if npcTab then
         modules.game_console.sendMessage(text, npcTab)
+        onNpcTalk(g_game.getCharacterName(), 0, MessageModes.NpcTo, text)
     end
     if text == "bye" then
         controllerNpcTrader:onCloseNpcTrade()
