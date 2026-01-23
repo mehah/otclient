@@ -1,5 +1,5 @@
-clientEventController = Controller:new()
-function clientEventController:onInit()
+notificationsController = Controller:new()
+function notificationsController:onInit()
     self.bannerQueue = {}
     self.bannerState = "idle"
     self:registerEvents(g_game, {
@@ -8,15 +8,15 @@ function clientEventController:onInit()
         end,
     })
 end
-function clientEventController:onTerminate()
+function notificationsController:onTerminate()
     screenshot_onTerminate()
     infoBanner_onTerminate()
 end
 
-function clientEventController:onGameStart()
+function notificationsController:onGameStart()
     screenshot_onGameStart()
 end
 
-function clientEventController:onGameEnd()
+function notificationsController:onGameEnd()
     screenshot_onGameEnd()
 end

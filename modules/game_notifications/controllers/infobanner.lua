@@ -8,14 +8,14 @@ local function debugPrint(...)
 end
 
 local OPEN_FRAMES = {
-    "/game_clientevent/static/images/infobanner/backdrop-infobanner-anim0",
-    "/game_clientevent/static/images/infobanner/backdrop-infobanner-anim1",
-    "/game_clientevent/static/images/infobanner/backdrop-infobanner-anim2", 
-    "/game_clientevent/static/images/infobanner/backdrop-infobanner-anim3",
-    "/game_clientevent/static/images/infobanner/backdrop-infobanner-anim4",
-    "/game_clientevent/static/images/infobanner/backdrop-infobanner-anim5",
-    "/game_clientevent/static/images/infobanner/backdrop-infobanner-anim6", 
-    "/game_clientevent/static/images/infobanner/backdrop-infobanner-anim7"
+    "/game_notifications/static/images/infobanner/backdrop-infobanner-anim0",
+    "/game_notifications/static/images/infobanner/backdrop-infobanner-anim1",
+    "/game_notifications/static/images/infobanner/backdrop-infobanner-anim2", 
+    "/game_notifications/static/images/infobanner/backdrop-infobanner-anim3",
+    "/game_notifications/static/images/infobanner/backdrop-infobanner-anim4",
+    "/game_notifications/static/images/infobanner/backdrop-infobanner-anim5",
+    "/game_notifications/static/images/infobanner/backdrop-infobanner-anim6", 
+    "/game_notifications/static/images/infobanner/backdrop-infobanner-anim7"
 }
 
 local MAX_WIDTH = 289
@@ -100,7 +100,7 @@ local infoPopUp = {
             title = "Outfit Unlocked",
             description = "You have unlocked '%s'", --skinName
             creatureId = '%d', --lookType
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-unlock"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-unlock"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_BOSSTIARY] = {
@@ -109,7 +109,7 @@ local infoPopUp = {
             title = "Bosstiary Progress",
             description = "You have progressed '%s'",--progressLevel
             raceId = '%d', --RaceId
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-unlock"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-unlock"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_BESTIARY] = {
@@ -118,7 +118,7 @@ local infoPopUp = {
             title = "Bestiary Progress",
             description = "You have progressed '%s'", --progressLevel
             raceId = '%d', --RaceId
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-unlock"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-unlock"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_ACHIEVEMENT] = {
@@ -126,7 +126,7 @@ local infoPopUp = {
         {
             title = "New Achievement",
             description = "You have earned '%s'", --name
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-achievements"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-achievements"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_TITLE] = {
@@ -134,7 +134,7 @@ local infoPopUp = {
         {
             title = "Title Gained",
             description = "You have earned '%s'", --name
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-title"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-title"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_PROFICIENCY] = {
@@ -143,7 +143,7 @@ local infoPopUp = {
             title = "Weapon Proficiency",
             description = "you have improved '%s'", -- message
             itemId = '%d', -- itemId
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-unlock"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-unlock"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_QUEST] = {
@@ -151,19 +151,19 @@ local infoPopUp = {
         [true] = { -- isCompleted(bool)
             title = "Quest started",
             description = "you have begun '%s'",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-quests"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-quests"
         },
         [false] = { -- isCompleted(bool)
             title = "Quest completed",
             description = "you have finished '%s'",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-quests"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-quests"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_LEVEL] = {
         {
             title = "Level %d!",
             description = "You gained hit points, mana, and capacity.",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-levelup"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-levelup"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_SKILL] = {
@@ -171,7 +171,7 @@ local infoPopUp = {
         {
             title = "%s",
             description = "your skill has advanced to level %d",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-skill-%s"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-skill-%s"
         }
     },
     [eventCategory.CLIENT_EVENT_TYPE_SIMPLE] = {
@@ -179,39 +179,39 @@ local infoPopUp = {
         [eventType.CLIENT_EVENT_CAPACITYLIMIT] = {
             title = "Capacity Limit",
             description = "Remove items before adding new ones.",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-quests"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-quests"
         },
         [eventType.CLIENT_EVENT_OUTOFAMMO] = {
             title = "Out of Ammunition",
             description = "You have no arrow or bolt equipped.",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-hint"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-hint"
         },
         [eventType.CLIENT_EVENT_TARGETTOOCLOSE] = {
             title = "Target Too Close",
             description = "You are using a ranged auto-attack at melee distance.",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-hint"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-hint"
         },
         [eventType.CLIENT_EVENT_OUTOFSOULPOINTS] = {
             title = "Out of Soul Points",
             description = "You don't have enough soul points to cast this spell.",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-hint"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-hint"
         },
         [eventType.CLIENT_EVENT_TUTORIALCOMPLETE] = {
             title = "Off to New Shores",
             description = "Leave the village and set sail to start your real adventure.",
-            img = "/game_clientevent/static/images/nodo/icon-infobanner-offtonewshores"
+            img = "/game_notifications/static/images/nodo/icon-infobanner-offtonewshores"
         }
     }
 }
 
 -- LuaFormatter on
 
-clientEventController.event = nil
-clientEventController.state = "idle"
-clientEventController.queue = {}
-clientEventController.widgets = {}
+notificationsController.event = nil
+notificationsController.state = "idle"
+notificationsController.queue = {}
+notificationsController.widgets = {}
 
-function clientEventController:onClientEvent(eventCat, ...)
+function notificationsController:onClientEvent(eventCat, ...)
     if not modules.client_options.getOption("showInfoBanner") then
          g_logger.debug("The server has sent infobaner, but the checkbox in client_options is disabled..")
         return
@@ -307,13 +307,13 @@ function clientEventController:onClientEvent(eventCat, ...)
 end
 
 function infoBanner_onTerminate()
-    clientEventController:hideImmediate()
-    if clientEventController.ui then
-        clientEventController:unloadHtml()
+    notificationsController:hideImmediate()
+    if notificationsController.ui then
+        notificationsController:unloadHtml()
     end
 end
 
-function clientEventController:ensure()
+function notificationsController:ensure()
     if self.ui and not self.ui:isDestroyed() then
         return
     end
@@ -335,7 +335,7 @@ function clientEventController:ensure()
     debugPrint("HTML Widget Initialized/Ensured")
 end
 
-function clientEventController:updateBannerPosition()
+function notificationsController:updateBannerPosition()
     if not self.ui or self.ui:isDestroyed() then
         return
     end
@@ -346,14 +346,14 @@ function clientEventController:updateBannerPosition()
     debugPrint("Banner margin-top set to:", marginTop)
 end
 
-function clientEventController:cancelEvent()
+function notificationsController:cancelEvent()
     if self.event then
         removeEvent(self.event)
         self.event = nil
     end
 end
 
-function clientEventController:show(title, desc, img, holdMs, extraData)
+function notificationsController:show(title, desc, img, holdMs, extraData)
     self:ensure()
     debugPrint("Adding to queue ->", tostring(title))
 
@@ -369,25 +369,25 @@ function clientEventController:show(title, desc, img, holdMs, extraData)
     end
 end
 
-function clientEventController:setWidgetsOpacity(widgets, opacity)
+function notificationsController:setWidgetsOpacity(widgets, opacity)
     for _, widget in ipairs(widgets) do
         widget:setOpacity(opacity)
     end
 end
 
-function clientEventController:setContentOpacity(opacity)
+function notificationsController:setContentOpacity(opacity)
     if self.widgets.fadeTexts then
         self:setWidgetsOpacity(self.widgets.fadeTexts, opacity)
     end
 end
 
-function clientEventController:setLeftIconsOpacity(opacity)
+function notificationsController:setLeftIconsOpacity(opacity)
     if self.widgets.fadeIcons then
         self:setWidgetsOpacity(self.widgets.fadeIcons, opacity)
     end
 end
 
-function clientEventController:setPaperSize(width)
+function notificationsController:setPaperSize(width)
     local paper = self.widgets.paper
     paper:setWidth(width)
     paper:setImageRect({
@@ -398,7 +398,7 @@ function clientEventController:setPaperSize(width)
     })
 end
 
-function clientEventController:resetBanner()
+function notificationsController:resetBanner()
     local w = self.ui
     w:setOpacity(1.0)
     w:setMarginLeft(0)
@@ -417,7 +417,7 @@ function clientEventController:resetBanner()
     anim:setImageSource(OPEN_FRAMES[1])
 end
 
-function clientEventController:processNext()
+function notificationsController:processNext()
     self:cancelEvent()
     if #self.queue == 0 then
         debugPrint("Queue empty. Unloading UI.")
@@ -485,7 +485,7 @@ function clientEventController:processNext()
     self:animateOpen(data.holdMs)
 end
 
-function clientEventController:animateOpen(holdMs)
+function notificationsController:animateOpen(holdMs)
     local frame = 1
     local iconsShown = false
     local anim = self.widgets.anim
@@ -512,7 +512,7 @@ function clientEventController:animateOpen(holdMs)
     self.event = scheduleEvent(animate, FRAME_MS)
 end
 
-function clientEventController:finishOpening(holdMs)
+function notificationsController:finishOpening(holdMs)
     debugPrint("Opening finished. Holding.")
     self:setPaperSize(MAX_WIDTH)
     self.widgets.anim:hide()
@@ -521,7 +521,7 @@ function clientEventController:finishOpening(holdMs)
     self:fadeIn(holdMs)
 end
 
-function clientEventController:fadeIn(holdMs)
+function notificationsController:fadeIn(holdMs)
     local startTime = g_clock.millis()
     local function fadeInText()
         if not self.ui or self.ui:isDestroyed() then
@@ -543,7 +543,7 @@ function clientEventController:fadeIn(holdMs)
     self.event = scheduleEvent(fadeInText, FADE_INTERVAL_MS)
 end
 
-function clientEventController:close()
+function notificationsController:close()
     if not self.ui or self.ui:isDestroyed() then
         return
     end
@@ -553,7 +553,7 @@ function clientEventController:close()
     self:fadeOut()
 end
 
-function clientEventController:fadeOut()
+function notificationsController:fadeOut()
     local startTime = g_clock.millis()
     local function fadeOutText()
         if not self.ui or self.ui:isDestroyed() then
@@ -573,7 +573,7 @@ function clientEventController:fadeOut()
     self.event = scheduleEvent(fadeOutText, FADE_INTERVAL_MS)
 end
 
-function clientEventController:animateClose()
+function notificationsController:animateClose()
     local frame = TOTAL_FRAMES
     local iconsHidden = false
     local anim = self.widgets.anim
@@ -607,7 +607,7 @@ function clientEventController:animateClose()
     self.event = scheduleEvent(retract, FRAME_MS)
 end
 
-function clientEventController:exit()
+function notificationsController:exit()
     if not self.ui or self.ui:isDestroyed() then
         return
     end
@@ -619,7 +619,7 @@ function clientEventController:exit()
     self:processNext()
 end
 
-function clientEventController:hideImmediate()
+function notificationsController:hideImmediate()
     self:cancelEvent()
     if self.ui then
         self:unloadHtml()

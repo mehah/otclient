@@ -64,7 +64,7 @@ function screenshot_onGameStart()
     if g_game.getClientVersion() < 1180 then
         return
     end
-    optionPanel = g_ui.loadUI('/game_clientevent/templates/screenshot', modules.client_options:getPanel())
+    optionPanel = g_ui.loadUI('/game_notifications/templates/screenshot', modules.client_options:getPanel())
 
     for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
         local label = g_ui.createWidget("ScreenshotType", optionPanel.allCheckBox)
@@ -83,7 +83,7 @@ function screenshot_onGameStart()
         g_resources.makeDir(autoScreenshotDirName)
     end
 
-    clientEventController:registerEvents(LocalPlayer, {
+    notificationsController:registerEvents(LocalPlayer, {
         onTakeScreenshot = onScreenShot
     })
     optionPanel:recursiveGetChildById("keepBlacklog"):disable() -- no compatibility 11/07/24
@@ -172,7 +172,7 @@ function takeScreenshot(name)
     if not name:lower():match("%.png$") then
         name = name .. ".png"
     end
-    clientEventController:scheduleEvent(function()
+    notificationsController:scheduleEvent(function()
         if  optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked() then
             g_app.doMapScreenshot(name)
         else
