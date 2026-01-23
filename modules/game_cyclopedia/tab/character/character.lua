@@ -1367,13 +1367,13 @@ local function getElementName(id)
             {name = "From Character Level",  value = data.flatDamageBase or 0, align = "center", percent = false, icon = false},
             {name = "From Wheel of destiny",  value = data.flatDamageWheel or 0, align = "center", percent = false, icon = false},
 
-            {name = "Attack Value", value = data.weaponAttack, icon = true, weaponElement = data.weaponAttack},
+            {name = "Attack Value", value = data.weaponAttack, icon = true, weaponElement = data.weaponElementType},
             {name = "From Flat Bonus", value = data.weaponFlatModifier or 0, align = "center", icon = false},
             {name = "From Magic Level", value = data.weaponDamage or 0, align = "center", icon = false},
             {name = "From Equipment", value = data.weaponSkillLevel or 0, align = "center", icon = false},
             {name = "From Combat Tactics", value = data.weaponSkillModifier or 0, align = "center", icon = false},
     
-            {name = "Converted Damage", value = data.weaponElementDamage, icon = true, weaponElement = data.weaponAttack, percent = true},
+            {name = "Converted Damage", value = data.weaponElementDamage, icon = true, weaponElement = data.weaponElementType, percent = true},
 
             {name = "Life Leech", value = data.lifeLeechTotal or data.lifeLeech or 0, icon = false, percent = true},
             {name = "From Equipment", value = data.lifeLeechBase or data.lifeLeechEquipament or 0, align = "center", percent = true, icon = false},
@@ -1533,12 +1533,9 @@ local function getElementName(id)
                 elseif type(valueText) == "number" then
                      valueText = tostring(valueText)
                 end
-                
                 widget:setText("   " .. valueText .. " " .. stat.name)
-                widget:setMarginLeft(80)
-                widget:setPaddingLeft(70)
+                widget:setTextOffset("29 0")
                 widget:setHeight(16)
-                
                 return widget
             else
                 local widget = g_ui.createWidget("CharacterSkillBase", parent)
@@ -1586,7 +1583,7 @@ local function getElementName(id)
             end
         end 
 
-        -- Resize Container for scrolling
+        -- temp fix
         controllerCyclopedia:scheduleEvent(function()
             local height = math.max(leftPanel:getHeight() + leftPanel:getMarginTop(), rightPanel:getHeight() + rightPanel:getMarginTop())
             container:setHeight(height + 10)

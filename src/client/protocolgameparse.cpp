@@ -6279,7 +6279,6 @@ void ProtocolGame::parseBosstiaryEntryChanged(const InputMessagePtr& msg)
 
 void ProtocolGame::parseClientEvent(const InputMessagePtr& msg)
 {
-    // todo improve this
     const auto type = static_cast<Otc::ClientEventType_t>(msg->getU8());
     switch (type) {
         case Otc::CLIENT_EVENT_TYPE_SIMPLE: {
