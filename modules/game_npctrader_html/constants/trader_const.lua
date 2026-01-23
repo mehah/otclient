@@ -75,6 +75,13 @@ IconSpriteIndex = {
   [KeywordButtonIcon.KEYWORDBUTTONICON_NO]             = 8,
   [KeywordButtonIcon.KEYWORDBUTTONICON_BYE]            = 9,
 }
+
+controllerNpcTrader.buttonsDefault = {
+    [1] = { id = KeywordButtonIcon.KEYWORDBUTTONICON_YES, text = "yes" },
+    [2] = { id = KeywordButtonIcon.KEYWORDBUTTONICON_NO, text = "no" },
+    [3] = { id = KeywordButtonIcon.KEYWORDBUTTONICON_BYE, text = "bye" },
+    [4] = { id = KeywordButtonIcon.KEYWORDBUTTONICON_GENERALTRADE, text = "trade" }
+}
 -- LuaFormatter on
 
 function controllerNpcTrader:getIconClip(id)

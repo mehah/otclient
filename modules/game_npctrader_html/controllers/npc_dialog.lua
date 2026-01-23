@@ -45,6 +45,9 @@ function controllerNpcTrader:onConsoleTextClicked(widget, text)
     if npcTab then
         modules.game_console.sendMessage(text, npcTab)
     end
+    if text == "bye" then
+        controllerNpcTrader:onCloseNpcTrade()
+    end
 end
 
 function controllerNpcTrader:cloneConsoleMessages()
@@ -96,7 +99,7 @@ function onNpcChatWindow(data)
     controllerNpcTrader.isTradeOpen = false
     controllerNpcTrader.creatureName = creature and creature:getName() or "Unknown"
     controllerNpcTrader.outfit = creature and creature:getOutfit() or "/game_npctrader_html/static/images/icon-npcdialog-multiplenpcs"
-    controllerNpcTrader.buttons = data.buttons or {}
+    controllerNpcTrader.buttons = data.buttons or controllerNpcTrader.buttonsDefault
     local ui = controllerNpcTrader.ui
     if not ui or not ui:isVisible() then
         controllerNpcTrader:loadHtml('templates/game_npctrader.html')

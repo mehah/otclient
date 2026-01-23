@@ -278,7 +278,6 @@ function clientEventController:onClientEvent(eventCat, ...)
             skinName = skinName .. " (Addon 2)"
         end
         description = type(description) == 'string' and description:format(skinName) or description
-        print(description)
         if popupTemplate.creatureId then
             extraData.creatureId = lookType
             extraData.skinType = skinType

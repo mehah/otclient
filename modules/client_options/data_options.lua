@@ -783,7 +783,7 @@ return {
         setOwnSpellEffectAlphaScroll                       = {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsEffectsPanel:recursiveGetChildById('setOwnSpellEffectAlphaScroll'):setText(string.format('Own Spells Effect: %s ms',
+            panels.graphicsEffectsPanel:recursiveGetChildById('setOwnSpellEffectAlphaScroll'):setText(string.format('Own Spells Effect: %s %%',
                 value))
             g_client.setOwnSpellEffectAlpha(value / 100)
         end
@@ -791,7 +791,7 @@ return {
     setOtherPlayerSpellEffectAlphaScroll                       = {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsEffectsPanel:recursiveGetChildById('setOtherPlayerSpellEffectAlphaScroll'):setText(string.format('Other Player Spells Effect: %s ms',
+            panels.graphicsEffectsPanel:recursiveGetChildById('setOtherPlayerSpellEffectAlphaScroll'):setText(string.format('Other Player Spells Effect: %s %%',
                 value))
            g_client.setOtherPlayerSpellEffectAlpha(value / 100)
         end
@@ -799,7 +799,7 @@ return {
         setCreatureSpellEffectAlphaScroll                       = {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsEffectsPanel:recursiveGetChildById('setCreatureSpellEffectAlphaScroll'):setText(string.format('Creature Spells Effect: %s ms',
+            panels.graphicsEffectsPanel:recursiveGetChildById('setCreatureSpellEffectAlphaScroll'):setText(string.format('Creature Spells Effect: %s %%',
                 value))
             g_client.setCreatureSpellEffectAlpha(value / 100)
         end
@@ -807,7 +807,7 @@ return {
         setBossAreaCreatureEffectAlphaScroll                       = {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsEffectsPanel:recursiveGetChildById('setBossAreaCreatureEffectAlphaScroll'):setText(string.format('Boss Area Creature Effect: %s ms',
+            panels.graphicsEffectsPanel:recursiveGetChildById('setBossAreaCreatureEffectAlphaScroll'):setText(string.format('Boss Area Creature Effect: %s %%',
                 value))
            g_client.setBossAreaCreatureEffectAlpha(value / 100)
         end

@@ -1853,7 +1853,7 @@ UIWidget
       anchors.bottom: parent.bottom
       anchors.right: parent.right
       step: 48
-      pixels-scroll: true
+      pixel-scroll: true
 
 
   BorderBox
