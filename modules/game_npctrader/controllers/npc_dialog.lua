@@ -104,7 +104,7 @@ function onNpcChatWindow(data)
     controllerNpcTrader.widthConsole = controllerNpcTrader.DEFAULT_CONSOLE_WIDTH
     controllerNpcTrader.isTradeOpen = false
     controllerNpcTrader.creatureName = creature and creature:getName() or "Unknown"
-    controllerNpcTrader.outfit = creature and creature:getOutfit() or "/game_npctrader_html/static/images/icon-npcdialog-multiplenpcs"
+    controllerNpcTrader.outfit = creature and creature:getOutfit() or "/game_npctrader/static/images/icon-npcdialog-multiplenpcs"
     controllerNpcTrader.buttons = data.buttons or controllerNpcTrader.buttonsDefault
     controllerNpcTrader:updateChatButton()
     local ui = controllerNpcTrader.ui

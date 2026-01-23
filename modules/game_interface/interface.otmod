@@ -52,6 +52,6 @@ Module
     - game_creatureinformation
     - game_rewardwall
     - game_forge
-    - game_npctrader_html
+    - game_npctrader
   @onLoad: init()
   @onUnload: terminate()

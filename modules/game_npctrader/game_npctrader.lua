@@ -27,14 +27,14 @@ function controllerNpcTrader:onGameStart()
             if g_game.getClientVersion() < 1510 then
                 self:onPlayerGoodsLegacy(...)
             else
-                onPlayerGoods(...)
+                --onPlayerGoods(...)
             end
         end,
         onCloseNpcTrade = function()
             if g_game.getClientVersion() < 1510 then
                 self:onCloseNpcTradeLegacy()
             else
-                onCloseNpcTrade()
+                --onCloseNpcTrade()
             end
         end,
         onTalk = onNpcTalk

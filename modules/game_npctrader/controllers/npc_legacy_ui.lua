@@ -41,7 +41,7 @@ local selectedItem = nil
 local cancelNextRelease = nil
 
 function controllerNpcTrader:legacy_init()
-    npcWindow = g_ui.displayUI('/game_npctrader_html/templates/npctrade_legacy')
+    npcWindow = g_ui.displayUI('/game_npctrader/templates/npctrade_legacy')
     npcWindow:setVisible(false)
 
     itemsPanel = npcWindow:recursiveGetChildById('itemsPanel')

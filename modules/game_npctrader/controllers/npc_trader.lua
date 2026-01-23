@@ -8,6 +8,7 @@ function onOpenNpcTrade(items, currencyId, currencyName)
     local isNewSession = not controllerNpcTrader.isTradeOpen
 
     if isNewSession then
+        print(1)
         controllerNpcTrader.isTradeOpen = true
         controllerNpcTrader.widthConsole = controllerNpcTrader.TRADE_CONSOLE_WIDTH
         controllerNpcTrader.buyItems = {}
@@ -24,6 +25,9 @@ function onOpenNpcTrade(items, currencyId, currencyName)
     end
 
     if items and type(items) == "table" then
+        controllerNpcTrader.buyItems = {}
+        controllerNpcTrader.sellItems = {}
+        controllerNpcTrader.selectedItem = nil
         for _, itemData in ipairs(items) do
             local ptr = itemData[1]
             local name = itemData[2]
