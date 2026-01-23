@@ -310,7 +310,6 @@ function init()
     onDisappear = onCreatureDisappear,
   })
 
-  g_ui.importStyle('styles/helper.otui')
   g_ui.importStyle('styles/shooterPreset.otui')
   g_ui.importStyle('styles/spell.otui')
 
@@ -331,7 +330,7 @@ function init()
 
   player = g_game.getLocalPlayer()
   hide()
-  healingPanel = helper.contentPanel:getChildById('healingPanel')
+  healingPanel = helper.contentPanel:getChildById('healingPanelInside')
   toolsPanel = helper.contentPanel:getChildById('toolsPanel')
   potionButton2 = healingPanel:recursiveGetChildById("potionButton2")
   rmvPotionPercentButton2 = healingPanel:recursiveGetChildById("rmvPotionPercentButton2")
@@ -344,7 +343,7 @@ function init()
   rmvPercentButton2 = healingPanel:recursiveGetChildById("rmvPercentButton2")
   spellPercentBg2 = healingPanel:recursiveGetChildById("spellPercentBg2")
   addPercentButton2 = healingPanel:recursiveGetChildById("addPercentButton2")
-  healPanel = healingPanel:getChildById('healingPanelInside')
+  healPanel = helper.contentPanel.healingPanelInside
   priorityButton1 = healingPanel:recursiveGetChildById("priority0")
   priorityButton2 = healingPanel:recursiveGetChildById("priority1")
   priorityButton3 = healingPanel:recursiveGetChildById("priority2")
@@ -358,7 +357,7 @@ function init()
   presetsPanel = shooterPanel:recursiveGetChildById('presetsPanel')
   friendListWidget = healingPanel:recursiveGetChildById('friendList')
   granListWidget = healingPanel:recursiveGetChildById('friendList2')
-  helperTabs = helper.contentPanel:getChildById('optionsTabBar')
+  helperTabs = helper.contentPanel.optionsTabBar
 
   botStatus()
 

@@ -250,6 +250,13 @@ end
 function onGameStart()
     show()
 
+    local player = g_game.getLocalPlayer()
+    if player then
+        LoadedPlayer:setId(player:getId())
+        LoadedPlayer:setName(player:getName())
+        LoadedPlayer:setVocation(player:getVocation())
+    end
+
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
     if g_platform.isMobile() then
         leftDecreaseSidePanels:setEnabled(false)

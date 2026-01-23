@@ -2490,7 +2490,7 @@ ShooterPanel < Panel
       image-source: /images/skin/show-gui-help-grey
       !tooltip: tr('Choose a hotkey to toggle RTCaster and Target on/off.')
       
-NewHeadlessWindow < UIWindow
+MainWindow
   id: helperWindow
   anchors.horizontalCenter: parent.horizontalCenter
   size: 295 365

@@ -1,3 +1,31 @@
+if not LoadedPlayer then
+  LoadedPlayer = {
+    playerId = 0,
+    playerName = "",
+    playerVocation = 0,
+  }
+  LoadedPlayer.__index = LoadedPlayer
+end
+
+function LoadedPlayer:getId() return self.playerId end
+function LoadedPlayer:getName() return self.playerName end
+function LoadedPlayer:getVocation() return self.playerVocation end
+function LoadedPlayer:isLoaded()
+  return self.playerId > 0
+end
+
+function LoadedPlayer:setId(playerId)
+  self.playerId = playerId
+end
+
+function LoadedPlayer:setName(playerName)
+  self.playerName = playerName
+end
+
+function LoadedPlayer:setVocation(vocationId)
+  self.playerVocation = vocationId
+end
+
 -- @docclass Player
 -- local index = math.log(bit) / math.log(2)
 PlayerStates = {
