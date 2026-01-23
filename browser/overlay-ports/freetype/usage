@@ -1,0 +1,9 @@
+freetype provides CMake targets:
+
+    find_package(Freetype REQUIRED)
+    target_link_libraries(main PRIVATE Freetype::Freetype)
+
+freetype provides pkg-config modules:
+
+    # FreeType 2
+    freetype2
