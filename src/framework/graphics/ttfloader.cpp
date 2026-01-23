@@ -321,6 +321,41 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
           Rect(atlasX, atlasY, glyphsSize[i].width(), glyphsSize[i].height());
 
       if (strokeWidth > 0 && stroker) {
+        const auto blendPixelRGBA = [&](int dstIdx, uint8_t srcR, uint8_t srcG,
+                                        uint8_t srcB, uint8_t srcA) {
+          if (srcA == 0)
+            return;
+
+          const float srcAf = srcA / 255.f;
+          const float dstAf = atlasPixels[dstIdx + 3] / 255.f;
+          const float outAf = srcAf + dstAf * (1.f - srcAf);
+
+          if (outAf <= 0.f) {
+            atlasPixels[dstIdx + 0] = 0;
+            atlasPixels[dstIdx + 1] = 0;
+            atlasPixels[dstIdx + 2] = 0;
+            atlasPixels[dstIdx + 3] = 0;
+            return;
+          }
+
+          const float dstRf = atlasPixels[dstIdx + 0] / 255.f;
+          const float dstGf = atlasPixels[dstIdx + 1] / 255.f;
+          const float dstBf = atlasPixels[dstIdx + 2] / 255.f;
+
+          const float srcRf = srcR / 255.f;
+          const float srcGf = srcG / 255.f;
+          const float srcBf = srcB / 255.f;
+
+          const float outRf = (srcRf * srcAf + dstRf * dstAf * (1.f - srcAf)) / outAf;
+          const float outGf = (srcGf * srcAf + dstGf * dstAf * (1.f - srcAf)) / outAf;
+          const float outBf = (srcBf * srcAf + dstBf * dstAf * (1.f - srcAf)) / outAf;
+
+          atlasPixels[dstIdx + 0] = (uint8_t)std::clamp(outRf * 255.f, 0.f, 255.f);
+          atlasPixels[dstIdx + 1] = (uint8_t)std::clamp(outGf * 255.f, 0.f, 255.f);
+          atlasPixels[dstIdx + 2] = (uint8_t)std::clamp(outBf * 255.f, 0.f, 255.f);
+          atlasPixels[dstIdx + 3] = (uint8_t)std::clamp(outAf * 255.f, 0.f, 255.f);
+        };
+
         // Draw stroke first (background)
         FT_Glyph strokeGlyph;
         if (FT_Get_Glyph(slot, &strokeGlyph) == 0) {
@@ -332,6 +367,8 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
 
           FT_BitmapGlyph strokeBitmapGlyph = (FT_BitmapGlyph)strokeGlyph;
           const FT_Bitmap &strokeBitmap = strokeBitmapGlyph->bitmap;
+          const int strokeLeft = strokeBitmapGlyph->left;
+          const int strokeTop = strokeBitmapGlyph->top;
 
           const int copyWidth =
               std::min((int)strokeBitmap.width, glyphsSize[i].width());
@@ -353,88 +390,88 @@ BitmapFontPtr TTFLoader::load(const std::string &file, int fontSize,
                 const int dstIdx = (dstY * atlasWidth + dstX) * 4;
 
                 const uint8_t alpha = strokeBitmap.buffer[srcIdx];
+                const uint8_t outAlpha = (uint8_t)((alpha * (int)strokeColor.a() + 127) / 255);
 
-                if (alpha > 0) {
-                  atlasPixels[dstIdx + 0] = strokeColor.r();
-                  atlasPixels[dstIdx + 1] = strokeColor.g();
-                  atlasPixels[dstIdx + 2] = strokeColor.b();
-                  atlasPixels[dstIdx + 3] = alpha;
+                if (outAlpha > 0)
+                  blendPixelRGBA(dstIdx, strokeColor.r(), strokeColor.g(),
+                                 strokeColor.b(), outAlpha);
+              }
+            }
+          }
+
+          // Draw original glyph on top, aligned using bearings (baseline origin)
+          if (FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL) == 0) {
+            const FT_Bitmap &bitmap = slot->bitmap;
+
+            // Align fill bitmap to the stroked glyph using FreeType bearings.
+            // (Avoid centering, which causes uneven/"textured" outlines at small sizes.)
+            const int fillLeft = (int)slot->bitmap_left;
+            const int fillTop = (int)slot->bitmap_top;
+            const int offsetX = fillLeft - strokeLeft;
+            const int offsetY = strokeTop - fillTop;
+
+            const int glyphW = glyphsSize[i].width();
+            const int glyphH = glyphsSize[i].height();
+            const int bitmapW = (int)bitmap.width;
+            const int bitmapH = (int)bitmap.rows;
+
+            if (bitmap.buffer && glyphW > 0 && glyphH > 0 && bitmapW > 0 &&
+                bitmapH > 0 && bitmap.pitch != 0) {
+              // If offsets are negative, skip pixels from the source and clamp
+              // the destination to the glyph cell.
+              const int srcX0 = std::max(0, -offsetX);
+              const int srcY0 = std::max(0, -offsetY);
+              const int dstX0 = atlasX + std::max(0, offsetX);
+              const int dstY0 = atlasY + std::max(0, offsetY);
+
+              int copyWidth = bitmapW - srcX0;
+              int copyHeight = bitmapH - srcY0;
+
+              copyWidth = std::min(copyWidth, glyphW - std::max(0, offsetX));
+              copyHeight = std::min(copyHeight, glyphH - std::max(0, offsetY));
+
+              copyWidth = std::min(copyWidth, atlasWidth - dstX0);
+              copyHeight = std::min(copyHeight, atlasHeight - dstY0);
+
+              if (copyWidth > 0 && copyHeight > 0) {
+                const int absPitch = std::abs((int)bitmap.pitch);
+                const auto getRowPtr = [&](int row) -> const uint8_t * {
+                  if (bitmap.pitch > 0) {
+                    return bitmap.buffer + row * bitmap.pitch;
+                  }
+                  // Negative pitch means rows are stored bottom-up.
+                  return bitmap.buffer + (bitmapH - 1 - row) * absPitch;
+                };
+
+                for (int y = 0; y < copyHeight; ++y) {
+                  const int srcRow = srcY0 + y;
+                  const int dstY = dstY0 + y;
+                  if (dstY < 0 || dstY >= atlasHeight) {
+                    continue;
+                  }
+
+                  const uint8_t *srcRowPtr = getRowPtr(srcRow);
+                  for (int x = 0; x < copyWidth; ++x) {
+                    const int srcCol = srcX0 + x;
+                    const int dstX = dstX0 + x;
+                    if (dstX < 0 || dstX >= atlasWidth) {
+                      continue;
+                    }
+
+                    const uint8_t alpha = srcRowPtr[srcCol];
+                    if (alpha > 0) {
+                      const int dstIdx = (dstY * atlasWidth + dstX) * 4;
+                      // Composite fill over stroke so the outline stays continuous
+                      // through anti-aliased edges (important for small font sizes).
+                      blendPixelRGBA(dstIdx, 255, 255, 255, alpha);
+                    }
+                  }
                 }
               }
             }
           }
 
           FT_Done_Glyph(strokeGlyph);
-        }
-
-        // Draw original glyph on top
-        if (FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL) == 0) {
-          const FT_Bitmap &bitmap = slot->bitmap;
-
-          // Center the original glyph over the stroked bounds
-          int offsetX = (glyphsSize[i].width() - (int)bitmap.width) / 2;
-          int offsetY = (glyphsSize[i].height() - (int)bitmap.rows) / 2;
-
-          const int glyphW = glyphsSize[i].width();
-          const int glyphH = glyphsSize[i].height();
-          const int bitmapW = (int)bitmap.width;
-          const int bitmapH = (int)bitmap.rows;
-
-          if (bitmap.buffer && glyphW > 0 && glyphH > 0 && bitmapW > 0 &&
-              bitmapH > 0 && bitmap.pitch != 0) {
-            // If offsets are negative, skip pixels from the source and clamp
-            // the destination to the glyph cell.
-            const int srcX0 = std::max(0, -offsetX);
-            const int srcY0 = std::max(0, -offsetY);
-            const int dstX0 = atlasX + std::max(0, offsetX);
-            const int dstY0 = atlasY + std::max(0, offsetY);
-
-            int copyWidth = bitmapW - srcX0;
-            int copyHeight = bitmapH - srcY0;
-
-            copyWidth = std::min(copyWidth, glyphW - std::max(0, offsetX));
-            copyHeight = std::min(copyHeight, glyphH - std::max(0, offsetY));
-
-            copyWidth = std::min(copyWidth, atlasWidth - dstX0);
-            copyHeight = std::min(copyHeight, atlasHeight - dstY0);
-
-            if (copyWidth > 0 && copyHeight > 0) {
-              const int absPitch = std::abs((int)bitmap.pitch);
-              const auto getRowPtr = [&](int row) -> const uint8_t * {
-                if (bitmap.pitch > 0) {
-                  return bitmap.buffer + row * bitmap.pitch;
-                }
-                // Negative pitch means rows are stored bottom-up.
-                return bitmap.buffer + (bitmapH - 1 - row) * absPitch;
-              };
-
-              for (int y = 0; y < copyHeight; ++y) {
-                const int srcRow = srcY0 + y;
-                const int dstY = dstY0 + y;
-                if (dstY < 0 || dstY >= atlasHeight) {
-                  continue;
-                }
-
-                const uint8_t *srcRowPtr = getRowPtr(srcRow);
-                for (int x = 0; x < copyWidth; ++x) {
-                  const int srcCol = srcX0 + x;
-                  const int dstX = dstX0 + x;
-                  if (dstX < 0 || dstX >= atlasWidth) {
-                    continue;
-                  }
-
-                  const uint8_t alpha = srcRowPtr[srcCol];
-                  if (alpha > 0) {
-                    const int dstIdx = (dstY * atlasWidth + dstX) * 4;
-                    atlasPixels[dstIdx + 0] = 255;
-                    atlasPixels[dstIdx + 1] = 255;
-                    atlasPixels[dstIdx + 2] = 255;
-                    atlasPixels[dstIdx + 3] = alpha;
-                  }
-                }
-              }
-            }
-          }
         }
       } else {
         // Draw without stroke
