@@ -1219,6 +1219,7 @@ ToolsPanel < Panel
         margin-top: 2
         margin-left: 5
         color: #c0c0c0
+        @onOptionChange: updateTrainingPercent('spellTrainingButton0', self:getCurrentOption().text:match("%d+"))
         @onSetup: |
           for i = 10, 100, 10 do
             self:addOption(i .. "%")
