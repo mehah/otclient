@@ -28,7 +28,7 @@ function controllerNpcTrader:onGameStart()
             if not g_game.getFeature(GameNpcWindowRedesign) then
                 self:onPlayerGoodsLegacy(...)
             else
-                --onPlayerGoods(...)
+                -- onPlayerGoods(...)
             end
         end,
         onCloseNpcTrade = function()
@@ -62,7 +62,7 @@ function controllerNpcTrader:onCloseNpcTrade()
     controllerNpcTrader.tradeItems = {}
     controllerNpcTrader.currentList = {}
     controllerNpcTrader.allTradeItems = {}
-    
+
     if not g_game.getFeature(GameNpcWindowRedesign) then
         self:legacy_hide()
     end

@@ -94,32 +94,42 @@ function controllerNpcTrader:cloneConsoleMessages()
     end
 end
 
+function controllerNpcTrader:initNpcWindow(creature, buttons)
+    if not g_game.getFeature(GameNpcWindowRedesign) then
+        return
+    end
+    self.widthConsole = self.DEFAULT_CONSOLE_WIDTH
+    self.isTradeOpen = false
+    if creature then
+        self.creatureName = creature:getName() or "Unknown"
+        self.outfit = creature:getOutfit()
+    else
+        self.creatureName = "Unknown"
+        self.outfit = "/game_npctrader/static/images/icon-npcdialog-multiplenpcs"
+    end
+    self.buttons = buttons or self.buttons or self.buttonsDefault
+    self:updateChatButton()
+    if not self.ui or not self.ui:isVisible() then
+        self:loadHtml('templates/game_npctrader.html')
+    end
+    local creatureOutfit = self:findWidget("#creatureOutfit")
+    if creatureOutfit then
+        if type(self.outfit) == "string" then
+            creatureOutfit:setImageSource(self.outfit)
+        else
+            creatureOutfit:setOutfit(self.outfit)
+        end
+    end
+    self:cloneConsoleMessages()
+end
+
 function onNpcChatWindow(data)
     if not g_game.getFeature(GameNpcWindowRedesign) then
-    print(1111)
-
         controllerNpcTrader:legacy_show()
         return
     end
-    print(222222)
     local creature = g_map.getCreatureById(data.npcIds[1])
-    controllerNpcTrader.widthConsole = controllerNpcTrader.DEFAULT_CONSOLE_WIDTH
-    controllerNpcTrader.isTradeOpen = false
-    controllerNpcTrader.creatureName = creature and creature:getName() or "Unknown"
-    controllerNpcTrader.outfit = creature and creature:getOutfit() or "/game_npctrader/static/images/icon-npcdialog-multiplenpcs"
-    controllerNpcTrader.buttons = data.buttons or controllerNpcTrader.buttonsDefault
-    controllerNpcTrader:updateChatButton()
-    local ui = controllerNpcTrader.ui
-    if not ui or not ui:isVisible() then
-        controllerNpcTrader:loadHtml('templates/game_npctrader.html')
-        local creatureOutfit = controllerNpcTrader:findWidget("#creatureOutfit")
-        if type(controllerNpcTrader.outfit) == "string" then
-            creatureOutfit:setImageSource(controllerNpcTrader.outfit)
-        else
-            creatureOutfit:setOutfit(controllerNpcTrader.outfit)
-        end
-    end
-    controllerNpcTrader:cloneConsoleMessages()
+    controllerNpcTrader:initNpcWindow(creature, data.buttons)
 end
 
 function controllerNpcTrader:onConsoleKeyPress(event)
