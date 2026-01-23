@@ -49,7 +49,8 @@ RUN source /opt/emsdk/emsdk_env.sh \
     -DWASM=ON \
     -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \
     -DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake \
-    -DVCPKG_TARGET_TRIPLET=wasm32-emscripten \
+    -DVCPKG_TARGET_TRIPLET=wasm32-emscripten-pthread \
+    -DVCPKG_OVERLAY_TRIPLETS=/workspace/browser/triplets \
     -DVCPKG_OVERLAY_PORTS=/workspace/browser/overlay-ports \
     -DVCPKG_BUILD_TYPE=${BUILD_TYPE} \
     -DWASM_USE_WASM_EXCEPTIONS=OFF \
