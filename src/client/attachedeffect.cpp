@@ -102,17 +102,22 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, LightView* ligh
         if (!m_texture && thingType && (thingType->isNull() || thingType->getAnimationPhases() == 0))
             return;
 
-        if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
-        if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
 
         const auto scaleFactor = g_drawPool.getScaleFactor();
 
-        if (m_pulse.height > 0 && m_pulse.speed > 0) {
-            g_drawPool.setScaleFactor(scaleFactor + getBounce(m_pulse) / 100.f);
-        }
+        // Only set shader, opacity, pulse and fade when actually drawing things
+        // to prevent stale state from affecting subsequent draws
+        if (drawThing) {
+            if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
+            if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
 
-        if (m_fade.height > 0 && m_fade.speed > 0) {
-            g_drawPool.setOpacity(std::clamp<float>(getBounce(m_fade) / 100.f, 0, 1.f));
+            if (m_pulse.height > 0 && m_pulse.speed > 0) {
+                g_drawPool.setScaleFactor(scaleFactor + getBounce(m_pulse) / 100.f);
+            }
+
+            if (m_fade.height > 0 && m_fade.speed > 0) {
+                g_drawPool.setOpacity(std::clamp<float>(getBounce(m_fade) / 100.f, 0, 1.f));
+            }
         }
 
         auto point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
@@ -146,12 +151,14 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, LightView* ligh
 
         g_drawPool.setDrawOrder(lastDrawOrder);
 
-        if (m_pulse.height > 0 && m_pulse.speed > 0) {
-            g_drawPool.setScaleFactor(scaleFactor);
-        }
+        if (drawThing) {
+            if (m_pulse.height > 0 && m_pulse.speed > 0) {
+                g_drawPool.setScaleFactor(scaleFactor);
+            }
 
-        if (m_fade.height > 0 && m_fade.speed > 0) {
-            g_drawPool.resetOpacity();
+            if (m_fade.height > 0 && m_fade.speed > 0) {
+                g_drawPool.resetOpacity();
+            }
         }
     }
 

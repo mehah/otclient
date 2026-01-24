@@ -51,7 +51,7 @@ void Missile::draw(const Point& dest, const bool drawThings, LightView* lightVie
             g_drawPool.setOpacity(g_client.getMissileAlpha(), true);
     }
 
-    if (hasShader())
+    if (drawThings && hasShader())
         g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
 
     thingType->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, Color::white, drawThings, lightView);

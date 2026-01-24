@@ -93,7 +93,7 @@ void Effect::draw(const Point& dest, const bool drawThings, LightView* lightView
             g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
 
-    if (hasShader())
+    if (drawThings && hasShader())
         g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
 
     thingType->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView);

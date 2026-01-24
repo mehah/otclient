@@ -694,6 +694,10 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
             drawWithFrameBuffer(texture, screenRect, textureRect, newColor);
         else
             g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor);
+    } else {
+        // Reset any pending onlyOnce state when not drawing things
+        // to prevent stale opacity/shader from affecting subsequent draws
+        g_drawPool.resetOnlyOnceParameters();
     }
 
     if (lightView && hasLight()) {
