@@ -5,6 +5,7 @@ set(VCPKG_LIBRARY_LINKAGE static)
 set(VCPKG_CMAKE_SYSTEM_NAME Emscripten)
 set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "$ENV{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
 
-# Force pthread support for all packages
-set(VCPKG_C_FLAGS "-pthread")
-set(VCPKG_CXX_FLAGS "-pthread")
+# Force pthread support with atomics and bulk-memory for all packages
+# These flags are required for shared memory support in WebAssembly
+set(VCPKG_C_FLAGS "-pthread -matomics -mbulk-memory")
+set(VCPKG_CXX_FLAGS "-pthread -matomics -mbulk-memory")

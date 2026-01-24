@@ -72,8 +72,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten"
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     # Add threading and atomics support for WebAssembly builds
     # This fixes linker issues with --shared-memory flag when using pthreads
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread -matomics -mbulk-memory")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -matomics -mbulk-memory")
+    # Using add_compile_options ensures flags are applied to all targets including dependencies
+    add_compile_options(-pthread -matomics -mbulk-memory)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 endif()
 
