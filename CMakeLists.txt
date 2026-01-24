@@ -74,7 +74,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten"
     # This fixes linker issues with --shared-memory flag when using pthreads
     # Using add_compile_options ensures flags are applied to all targets including dependencies
     add_compile_options(-pthread -matomics -mbulk-memory)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+    add_link_options(-pthread -matomics -mbulk-memory)
 endif()
 
 # *****************************************************************************

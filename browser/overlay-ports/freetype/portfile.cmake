@@ -19,8 +19,9 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
 set(EXTRA_C_FLAGS "")
 set(EXTRA_CXX_FLAGS "")
 if(VCPKG_TARGET_TRIPLET MATCHES "emscripten" OR VCPKG_TARGET_TRIPLET MATCHES "wasm")
-    set(EXTRA_C_FLAGS "-pthread")
-    set(EXTRA_CXX_FLAGS "-pthread")
+    # Add atomics and bulk-memory support for shared memory/threading
+    set(EXTRA_C_FLAGS "-pthread -matomics -mbulk-memory")
+    set(EXTRA_CXX_FLAGS "-pthread -matomics -mbulk-memory")
 endif()
 
 vcpkg_cmake_configure(

@@ -9,3 +9,4 @@ set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "$ENV{EMSDK}/upstream/emscripten/cmake/Module
 # These flags are required for shared memory support in WebAssembly
 set(VCPKG_C_FLAGS "-pthread -matomics -mbulk-memory")
 set(VCPKG_CXX_FLAGS "-pthread -matomics -mbulk-memory")
+set(VCPKG_LINKER_FLAGS "-pthread -matomics -mbulk-memory")
