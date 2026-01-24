@@ -34,7 +34,7 @@ ENV VCPKG_ROOT=/opt/vcpkg
 COPY vcpkg.json /tmp/vcpkg.json
 RUN git clone --filter=blob:none https://github.com/microsoft/vcpkg.git ${VCPKG_ROOT} \
  && cd ${VCPKG_ROOT} \
- && git checkout "$(grep '.builtin-baseline' /tmp/vcpkg.json | awk -F: '{print $2}' | tr -d ',\" ')" \
+ && git checkout "$(grep 'builtin-baseline' /tmp/vcpkg.json | cut -d'"' -f4)" \
  && ./bootstrap-vcpkg.sh
 
 WORKDIR /workspace
