@@ -294,11 +294,15 @@ ClearImbue < Panel
       anchors.centerIn: parent
       image-source: /images/game/imbuing/imbui-timer-bg
       
-      UIProgressBar
+      ProgressBarSD
         id: timeRemaining
+        size: 277 18
         anchors.fill: parent
         image-source: /images/game/imbuing/imbui-progress
-        background-color: alpha
+        margin: 1
+        phantom: true
+        percent: 1
+
         Label
           id: text
           anchors.centerIn: parent
@@ -306,6 +310,8 @@ ClearImbue < Panel
           text-auto-resize: true
           color: white
           font: verdana-11px-rounded
+          margin-top: 1
+          phantom: true
 
   UIButton
     id: clear

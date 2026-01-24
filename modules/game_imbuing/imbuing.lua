@@ -197,20 +197,24 @@ function selectSlot(widget, slotId, activeSlot)
         clearImbue.imbuement:addOption(activeSlot[1]['name'])
         clearImbue.description:setText(activeSlot[1]['description'])
 
-        hours = string.format('%02.f', math.floor(activeSlot[2] / 3600))
-        mins = string.format('%02.f', math.floor(activeSlot[2] / 60 - (hours * 60)))
-        local totalTime = 72000 -- 20 hours in seconds
-        local percent = math.max(0, math.min(100, (activeSlot[2] / totalTime) * 100))
+        local hours = string.format('%02.f', math.floor(activeSlot[2] / 3600))
+        local mins = string.format('%02.f', math.floor(activeSlot[2] / 60 - (hours * 60)))
+        
+        local totalTime = activeSlot[1].duration or 72000
+        local timeRemaining = clearImbue.time.timerContainer.timeRemaining
+        
+        if timeRemaining then
+            timeRemaining:setMinimum(0)
+            timeRemaining:setMaximum(totalTime)
+            timeRemaining:setValue(activeSlot[2], 0, totalTime)
+        end
 
-        clearImbue.time.timerContainer.timeRemaining:setPercent(percent)
         clearImbue.time.timerContainer.timeRemaining.text:setText(hours .. ':' .. mins .. 'h')
-
         clearImbue.cost:setText(comma_value(activeSlot[3]))
         if (bankGold + inventoryGold) < activeSlot[3] then
-            emptyImbue.clear:setEnabled(false)
-            emptyImbue.clear:setImageSource('/images/game/imbuing/imbue_empty')
-            emptyImbue.cost:setColor('red')
-
+            clearImbue.clear:setEnabled(false)
+            clearImbue.clear:setImageSource('/images/game/imbuing/imbue_empty')
+            clearImbue.cost:setColor('red')
         end
 
         local yesCallback = function()
