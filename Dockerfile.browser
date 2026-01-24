@@ -44,9 +44,10 @@ COPY . /workspace
 ARG BUILD_TYPE=Release
 ENV BUILD_DIR=/workspace/build-emscripten
 RUN mkdir -p ${BUILD_DIR}
-# Force vcpkg to rebuild packages by cleaning the buildtrees and packages cache
+# Force complete rebuild by clearing all vcpkg and emscripten caches
 RUN source /opt/emsdk/emsdk_env.sh \
- && rm -rf ${VCPKG_ROOT}/buildtrees ${VCPKG_ROOT}/packages \
+ && rm -rf ${VCPKG_ROOT}/buildtrees ${VCPKG_ROOT}/packages ${BUILD_DIR}/vcpkg_installed \
+ && rm -rf /opt/emsdk/upstream/emscripten/cache \
  && cmake -G Ninja -S /workspace -B ${BUILD_DIR} \
     -DWASM=ON \
     -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake \

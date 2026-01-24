@@ -20,8 +20,9 @@ set(EXTRA_C_FLAGS "")
 set(EXTRA_CXX_FLAGS "")
 if(VCPKG_TARGET_TRIPLET MATCHES "emscripten" OR VCPKG_TARGET_TRIPLET MATCHES "wasm")
     # Add atomics and bulk-memory support for shared memory/threading
-    set(EXTRA_C_FLAGS "-pthread -matomics -mbulk-memory")
-    set(EXTRA_CXX_FLAGS "-pthread -matomics -mbulk-memory")
+    # Append to existing VCPKG flags to preserve triplet settings
+    set(EXTRA_C_FLAGS "${VCPKG_C_FLAGS} -pthread -matomics -mbulk-memory")
+    set(EXTRA_CXX_FLAGS "${VCPKG_CXX_FLAGS} -pthread -matomics -mbulk-memory")
 endif()
 
 vcpkg_cmake_configure(
@@ -29,8 +30,12 @@ vcpkg_cmake_configure(
     OPTIONS
         ${FEATURE_OPTIONS}
         -DFT_DISABLE_HARFBUZZ=ON
-        "-DCMAKE_C_FLAGS=${EXTRA_C_FLAGS}"
-        "-DCMAKE_CXX_FLAGS=${EXTRA_CXX_FLAGS}"
+OPTIONS_DEBUG
+        "-DCMAKE_C_FLAGS_DEBUG=${EXTRA_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}"
+        "-DCMAKE_CXX_FLAGS_DEBUG=${EXTRA_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG}"
+OPTIONS_RELEASE
+        "-DCMAKE_C_FLAGS_RELEASE=${EXTRA_C_FLAGS} ${CMAKE_C_FLAGS_RELEASE}"
+        "-DCMAKE_CXX_FLAGS_RELEASE=${EXTRA_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}"
 )
 
 vcpkg_cmake_install()
