@@ -64,7 +64,12 @@ function screenshot_onGameStart()
     if g_game.getClientVersion() < 1180 then
         return
     end
-    optionPanel = g_ui.loadUI('/game_notifications/templates/screenshot', modules.client_options:getPanel())
+    optionPanel = g_ui.loadUI('/modules/game_notifications/templates/screenshot', modules.client_options:getPanel())
+
+    if not optionPanel then
+        g_logger.info("Failed to load screenshot options panel")
+        return
+    end
 
     for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
         local label = g_ui.createWidget("ScreenshotType", optionPanel.allCheckBox)
@@ -123,6 +128,9 @@ function resetValues()
         local labelScreenshotEvent = screenshotEvent.label:gsub("%s+", "")
         g_settings.set(labelScreenshotEvent, screenshotEvent.currentBoolean)
     end
+    if not optionPanel then
+        return
+    end
     for _, selectedCheckBox in pairs(optionPanel.allCheckBox:getChildren()) do
         for _, selectedCheckBoxChildren in pairs(selectedCheckBox:getChildren()) do
             if selectedCheckBoxChildren:getStyle().__class == 'UICheckBox' then
@@ -150,7 +158,7 @@ function destroyOptionsModule()
 end
 
 function onScreenShot(type)
-    if not optionPanel.Opciones3.enableScreenshots:isChecked() then
+    if not optionPanel or not optionPanel.Opciones3.enableScreenshots:isChecked() then
         return
     end
     local name = g_game.getLocalPlayer():getName() or "player"
@@ -173,7 +181,7 @@ function takeScreenshot(name)
         name = name .. ".png"
     end
     notificationsController:scheduleEvent(function()
-        if  optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked() then
+        if optionPanel and optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked() then
             g_app.doMapScreenshot(name)
         else
             g_app.doScreenshot(name)
