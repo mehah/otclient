@@ -12,6 +12,9 @@ ImbuementScroll.__index = ImbuementScroll
 
 local self = ImbuementScroll
 function ImbuementScroll.setup(availableImbuements, needItems)
+    print("DEBUG: ImbuementScroll.setup chamado")
+    print("DEBUG: availableImbuements count:", availableImbuements and #availableImbuements or 0)
+    
     self.availableImbuements = availableImbuements or {}
     self.needItems = needItems or {}
 
@@ -56,6 +59,9 @@ function ImbuementScroll.selectBaseType(selectedButtonId)
         end
     end
 
+    print("DEBUG: selectBaseType chamado com baseImbuement =", baseImbuement)
+    print("DEBUG: total availableImbuements =", #self.availableImbuements)
+
     local imbuementsList = self.window:recursiveGetChildById("imbuementsList")
     imbuementsList:destroyChildren()
 
@@ -63,9 +69,21 @@ function ImbuementScroll.selectBaseType(selectedButtonId)
     imbuementsDetails:setVisible(false)
 
     local selected = false
+    local matchedCount = 0
 
     for id, imbuement in ipairs(self.availableImbuements) do
-        if imbuement.type == baseImbuement then
+        local imbuementType = imbuement.type
+        if imbuementType == nil and imbuement.group then
+            if imbuement.group == 'Basic' then imbuementType = 0
+            elseif imbuement.group == 'Intricate' then imbuementType = 1
+            elseif imbuement.group == 'Powerful' then imbuementType = 2
+            end
+        end
+        
+        print("DEBUG: imbuement", id, "type =", imbuement.type, "group =", imbuement.group, "imbuementType =", imbuementType, "baseImbuement =", baseImbuement)
+        
+        if imbuementType == baseImbuement then
+            matchedCount = matchedCount + 1
             local widget = g_ui.createWidget("SlotImbuing", imbuementsList)
             widget:setId(tostring(id))
             widget.resource:setImageSource("/images/game/imbuing/icons/" .. imbuement.imageId)
@@ -81,6 +99,8 @@ function ImbuementScroll.selectBaseType(selectedButtonId)
 
         end
     end
+    
+    print("DEBUG: matchedCount =", matchedCount)
 end
 
 function ImbuementScroll.selectImbuementWidget(widget, imbuement)
