@@ -68,25 +68,31 @@ function init()
             if imbuement['group'] == selectedGroup then
                 if #imbuement['sources'] == widget.currentIndex then
                     selectedImbue = imbuement
+                    local hasAllItems = true
+                    
                     for i, source in ipairs(imbuement['sources']) do
+                        local itemFound = false
                         for _, item in ipairs(imbueItems) do
                             if item:getId() == source['item']:getId() then
+                                itemFound = true
                                 if item:getCount() >= source['item']:getCount() then
-                                    emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_green')
-                                    emptyImbue.imbue:setEnabled(true)
                                     emptyImbue.requiredItems:getChildByIndex(i).count:setColor('white')
-                                end
-                                if item:getCount() < source['item']:getCount() then
-                                    emptyImbue.imbue:setEnabled(false)
-                                    emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_empty')
+                                else
+                                    hasAllItems = false
                                     emptyImbue.requiredItems:getChildByIndex(i).count:setColor('red')
                                 end
                                 emptyImbue.requiredItems:getChildByIndex(i).count:setText(item:getCount() .. '/' .. source['item']:getCount())
                             end
                         end
+                        if not itemFound then
+                            hasAllItems = false
+                            emptyImbue.requiredItems:getChildByIndex(i).count:setText('0/' .. source['item']:getCount())
+                            emptyImbue.requiredItems:getChildByIndex(i).count:setColor('red')
+                        end
                         emptyImbue.requiredItems:getChildByIndex(i).item:setItemId(source['item']:getId())
                         emptyImbue.requiredItems:getChildByIndex(i).item:setTooltip('The imbuement requires ' .. source['description'] .. '.')
                     end
+                    
                     for i = 3, widget.currentIndex + 1, -1 do
                         emptyImbue.requiredItems:getChildByIndex(i).count:setText('')
                         emptyImbue.requiredItems:getChildByIndex(i).item:setItemId(0)
@@ -94,21 +100,43 @@ function init()
                     end
                     emptyImbue.protectionCost:setText((comma_value(imbuement['protectionCost'])))
                     emptyImbue.cost:setText(comma_value(imbuement['cost']))
-                    if not protection and (bankGold + inventoryGold) < imbuement['cost'] then
+                    
+                    -- Verificar se tem todos os itens e gold suficiente
+                    local hasEnoughGold = false
+                    if not protection then
+                        hasEnoughGold = (bankGold + inventoryGold) >= imbuement['cost']
+                        if not hasEnoughGold then
+                            emptyImbue.cost:setColor('red')
+                        else
+                            emptyImbue.cost:setColor('white')
+                        end
+                    else
+                        hasEnoughGold = (bankGold + inventoryGold) >= (imbuement['cost'] + imbuement['protectionCost'])
+                        if not hasEnoughGold then
+                            emptyImbue.cost:setColor('red')
+                        else
+                            emptyImbue.cost:setColor('white')
+                        end
+                    end
+                    
+                    -- Habilitar/desabilitar botão de imbue baseado em itens E gold
+                    if hasAllItems and hasEnoughGold then
+                        emptyImbue.imbue:setEnabled(true)
+                        emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_green')
+                    else
                         emptyImbue.imbue:setEnabled(false)
                         emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_empty')
-                        emptyImbue.cost:setColor('red')
                     end
-                    if not protection and (bankGold + inventoryGold) >= imbuement['cost'] then
-                        emptyImbue.cost:setColor('white')
-                    end
-                    if protection and (bankGold + inventoryGold) < (imbuement['cost'] + imbuement['protectionCost']) then
-                        emptyImbue.imbue:setEnabled(false)
-                        emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_empty')
-                        emptyImbue.cost:setColor('red')
-                    end
-                    if protection and (bankGold + inventoryGold) >= (imbuement['cost'] + imbuement['protectionCost']) then
-                        emptyImbue.cost:setColor('white')
+                    
+                    -- Verificar se o botão de proteção deve ser desabilitado
+                    if (bankGold + inventoryGold) < imbuement['protectionCost'] then
+                        protectionBtn:setEnabled(false)
+                        emptyImbue.protection:setImageSource('/images/game/imbuing/useprotection-disabled')
+                        emptyImbue.protectionCost:setColor('red')
+                    else
+                        protectionBtn:setEnabled(true)
+                        emptyImbue.protection:setImageSource('/images/game/imbuing/100percent')
+                        emptyImbue.protectionCost:setColor('white')
                     end
                     emptyImbue.successRate:setText(imbuement['successRate'] .. '%')
                     if selectedImbue['successRate'] > 50 then
@@ -137,6 +165,13 @@ function setProtection(value)
         emptyImbue.successRate:setText('100%')
         emptyImbue.successRate:setColor('green')
         protectionBtn:setImageClip(torect('66 0 66 66'))
+        
+        -- Verificar se há gold suficiente para o custo total com proteção
+        if (bankGold + inventoryGold) < (selectedImbue['cost'] + selectedImbue['protectionCost']) then
+            emptyImbue.cost:setColor('red')
+        else
+            emptyImbue.cost:setColor('white')
+        end
     else
         if selectedImbue then
             emptyImbue.cost:setText(comma_value(selectedImbue['cost']))
@@ -146,8 +181,52 @@ function setProtection(value)
             else
                 emptyImbue.successRate:setColor('red')
             end
+            
+            -- Verificar se há gold suficiente para o custo sem proteção
+            if (bankGold + inventoryGold) < selectedImbue['cost'] then
+                emptyImbue.cost:setColor('red')
+            else
+                emptyImbue.cost:setColor('white')
+            end
         end
         protectionBtn:setImageClip(torect('0 0 66 66'))
+    end
+    
+    -- Re-verificar o estado do botão de imbue quando a proteção mudar
+    if selectedImbue then
+        local hasAllItems = true
+        for i, source in ipairs(selectedImbue['sources']) do
+            local itemFound = false
+            for _, item in ipairs(imbueItems) do
+                if item:getId() == source['item']:getId() then
+                    itemFound = true
+                    if item:getCount() < source['item']:getCount() then
+                        hasAllItems = false
+                        break
+                    end
+                end
+            end
+            if not itemFound then
+                hasAllItems = false
+                break
+            end
+        end
+        
+        local hasEnoughGold = false
+        if protection then
+            hasEnoughGold = (bankGold + inventoryGold) >= (selectedImbue['cost'] + selectedImbue['protectionCost'])
+        else
+            hasEnoughGold = (bankGold + inventoryGold) >= selectedImbue['cost']
+        end
+        
+        -- Habilitar/desabilitar botão de imbue baseado em itens E gold
+        if hasAllItems and hasEnoughGold then
+            emptyImbue.imbue:setEnabled(true)
+            emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_green')
+        else
+            emptyImbue.imbue:setEnabled(false)
+            emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_empty')
+        end
     end
 end
 
@@ -370,6 +449,66 @@ function Imbuing.onResourcesBalanceChange(balance, oldBalance, type)
     if player then
         if type == ResourceTypes.BANK_BALANCE or type == ResourceTypes.GOLD_EQUIPPED then
             imbuingWindow.balance:setText(tr(comma_value (player:getTotalMoney())))
+            
+            -- Re-verificar o estado dos botões quando o saldo mudar
+            if selectedImbue and emptyImbue:isVisible() then
+                -- Verificar botão de proteção
+                if (bankGold + inventoryGold) < selectedImbue['protectionCost'] then
+                    protectionBtn:setEnabled(false)
+                    emptyImbue.protection:setImageSource('/images/game/imbuing/useprotection-disabled')
+                    emptyImbue.protectionCost:setColor('red')
+                else
+                    protectionBtn:setEnabled(true)
+                    emptyImbue.protection:setImageSource('/images/game/imbuing/100percent')
+                    emptyImbue.protectionCost:setColor('white')
+                end
+                
+                -- Verificar se tem todos os itens
+                local hasAllItems = true
+                for i, source in ipairs(selectedImbue['sources']) do
+                    local itemFound = false
+                    for _, item in ipairs(imbueItems) do
+                        if item:getId() == source['item']:getId() then
+                            itemFound = true
+                            if item:getCount() < source['item']:getCount() then
+                                hasAllItems = false
+                                break
+                            end
+                        end
+                    end
+                    if not itemFound then
+                        hasAllItems = false
+                        break
+                    end
+                end
+                
+                -- Verificar gold suficiente
+                local hasEnoughGold = false
+                if protection then
+                    hasEnoughGold = (bankGold + inventoryGold) >= (selectedImbue['cost'] + selectedImbue['protectionCost'])
+                    if not hasEnoughGold then
+                        emptyImbue.cost:setColor('red')
+                    else
+                        emptyImbue.cost:setColor('white')
+                    end
+                else
+                    hasEnoughGold = (bankGold + inventoryGold) >= selectedImbue['cost']
+                    if not hasEnoughGold then
+                        emptyImbue.cost:setColor('red')
+                    else
+                        emptyImbue.cost:setColor('white')
+                    end
+                end
+                
+                -- Habilitar/desabilitar botão de imbue baseado em itens E gold
+                if hasAllItems and hasEnoughGold then
+                    emptyImbue.imbue:setEnabled(true)
+                    emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_green')
+                else
+                    emptyImbue.imbue:setEnabled(false)
+                    emptyImbue.imbue:setImageSource('/images/game/imbuing/imbue_empty')
+                end
+            end
         end
     end
 end
