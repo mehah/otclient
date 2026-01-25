@@ -781,6 +781,7 @@ function EnterGame.doLogin()
         protocolLogin.onUpdateNeeded = onUpdateNeeded
 
         loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
+        loadBox:setWidth(300)
         connect(loadBox, {
             onCancel = function(msgbox)
                 loadBox = nil
@@ -924,6 +925,12 @@ function EnterGame.showAuthenticatorInput()
     tokenWindow.content:setText(tr('Please enter a new, valid token:'))
     tokenWindow.content:setColor('#c0c0c0')
     tokenWindow.content:resizeToText()
+    -- Align content to the left instead of center
+    tokenWindow.content:breakAnchors()
+    tokenWindow.content:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+    tokenWindow.content:addAnchor(AnchorTop, 'parent', AnchorTop)
+    tokenWindow.content:setMarginLeft(15)
+    tokenWindow.content:setMarginTop(32)
     
     -- Add text edit field for token input
     local tokenEdit = g_ui.createWidget('TextEdit', tokenWindow)
@@ -932,7 +939,7 @@ function EnterGame.showAuthenticatorInput()
     tokenEdit:addAnchor(AnchorTop, 'content', AnchorBottom)
     tokenEdit:setMarginTop(10)
     tokenEdit:setMaxLength(8)
-    tokenEdit:setWidth(330)
+    tokenEdit:setWidth(320)
     tokenEdit:setHeight(16)
     tokenEdit:setMarginLeft(15)
     tokenEdit:setMarginRight(15)
@@ -1009,6 +1016,7 @@ function EnterGame.showAuthenticatorInput()
     cancelButton:breakAnchors()
     cancelButton:addAnchor(AnchorTop, 'parent', AnchorTop)
     cancelButton:addAnchor(AnchorRight, 'parent', AnchorRight)
+    cancelButton:setWidth(45)
 
     -- Add OK button (right side, added first)
     local okButton = tokenWindow:addButton(tr('Ok'), okCallback)
@@ -1016,6 +1024,7 @@ function EnterGame.showAuthenticatorInput()
     okButton:addAnchor(AnchorTop, 'prev', AnchorTop)
     okButton:addAnchor(AnchorRight, 'prev', AnchorLeft)
     okButton:setMarginRight(10)
+    okButton:setWidth(40)
     
     -- Calculate window size based on content
     local windowWidth = 350
