@@ -1,4 +1,7 @@
 Cursors
+  default:
+    image: default
+    hot-spot: 0 0
   target:
     image: targetcursor
     hot-spot: 9 9

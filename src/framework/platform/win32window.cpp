@@ -866,22 +866,38 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
 {
     const int width = image->getWidth();
     const int height = image->getHeight();
-    const int numbits = width * height;
-    const int numbytes = (width * height) / 8;
+    const int n = width * height;
 
-    std::vector<uint8_t> andMask(numbytes, 0);
-    std::vector<uint8_t> xorMask(numbytes, 0);
-
-    for (int i = 0; i < numbits; ++i) {
-        const uint32_t rgba = stdext::readULE32(image->getPixelData() + i * 4);
-        if (rgba == 0xffffffff) { //white
-            HSB_BIT_SET(xorMask, i);
-        } else if (rgba == 0x00000000) { //alpha
-            HSB_BIT_SET(andMask, i);
-        } // otherwise 0xff000000 => black
+    std::vector<uint32_t> iconData(n);
+    for (int i = 0; i < n; ++i) {
+        auto* const pixel = (uint8_t*)&iconData[i];
+        pixel[2] = *(image->getPixelData() + (i * 4) + 0); // R
+        pixel[1] = *(image->getPixelData() + (i * 4) + 1); // G
+        pixel[0] = *(image->getPixelData() + (i * 4) + 2); // B
+        pixel[3] = *(image->getPixelData() + (i * 4) + 3); // A
     }
 
-    const HCURSOR cursor = CreateCursor(m_instance, hotSpot.x, hotSpot.y, width, height, &andMask[0], &xorMask[0]);
+    const HBITMAP hbmColor = CreateBitmap(width, height, 1, 32, &iconData[0]);
+
+    const HBITMAP hbmMask = CreateCompatibleBitmap(GetDC(nullptr), width, height);
+
+    ICONINFO ii;
+    ii.fIcon = FALSE;
+    ii.xHotspot = hotSpot.x;
+    ii.yHotspot = hotSpot.y;
+    ii.hbmMask = hbmMask;
+    ii.hbmColor = hbmColor;
+
+    const HCURSOR cursor = static_cast<HCURSOR>(CreateIconIndirect(&ii));
+
+    DeleteObject(hbmMask);
+    DeleteObject(hbmColor);
+
+    if (!cursor) {
+        g_logger.error("Failed to create colored cursor");
+        return -1;
+    }
+
     m_cursors.push_back(cursor);
     return m_cursors.size() - 1;
 }

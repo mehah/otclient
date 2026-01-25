@@ -24,6 +24,7 @@
 
 #include "framework/core/clock.h"
 #include "framework/graphics/image.h"
+#include <framework/core/resourcemanager.h>
 
 #ifdef WIN32
 #include "win32window.h"
@@ -52,11 +53,6 @@ int PlatformWindow::loadMouseCursor(const std::string& file, const Point& hotSpo
 
     if (image->getBpp() != 4) {
         g_logger.error("the cursor image must have 4 channels");
-        return -1;
-    }
-
-    if (image->getWidth() != 32 || image->getHeight() != 32) {
-        g_logger.error("the cursor image must have 32x32 dimension");
         return -1;
     }
 
