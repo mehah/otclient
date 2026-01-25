@@ -85,6 +85,7 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
     if (g_game.getFeature(Otc::GameSessionKey)) {
         msg->addString(m_sessionKey);
         msg->addString(m_characterName);
+
     } else {
         if (g_game.getFeature(Otc::GameAccountNames))
             msg->addString(m_accountName);
