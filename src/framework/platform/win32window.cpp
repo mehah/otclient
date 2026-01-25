@@ -879,7 +879,9 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
 
     const HBITMAP hbmColor = CreateBitmap(width, height, 1, 32, &iconData[0]);
 
-    const HBITMAP hbmMask = CreateCompatibleBitmap(GetDC(nullptr), width, height);
+    const HDC screenDC = GetDC(nullptr);
+    const HBITMAP hbmMask = CreateCompatibleBitmap(screenDC, width, height);
+    ReleaseDC(nullptr, screenDC);
 
     ICONINFO ii;
     ii.fIcon = FALSE;
@@ -1011,7 +1013,9 @@ void WIN32Window::setIcon(const std::string& file)
         }
 
         const HBITMAP hbmColor = CreateBitmap(image->getWidth(), image->getHeight(), 1, 32, &iconData[0]);
-        const HBITMAP hbmMask = CreateCompatibleBitmap(GetDC(nullptr), image->getWidth(), image->getHeight());
+        const HDC screenDC = GetDC(nullptr);
+        const HBITMAP hbmMask = CreateCompatibleBitmap(screenDC, image->getWidth(), image->getHeight());
+        ReleaseDC(nullptr, screenDC);
 
         ICONINFO ii;
         ii.fIcon = TRUE;
