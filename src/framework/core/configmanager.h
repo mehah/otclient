@@ -53,6 +53,8 @@ public:
     bool unload(const std::string& file);
     void remove(const ConfigPtr& config);
 
+    void saveSettings();
+
     const PublicConfig& getPublicConfig() const { return m_publicConfig; }
     void loadPublicConfig(const std::string& file);
 
