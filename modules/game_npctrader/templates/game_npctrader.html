@@ -59,7 +59,7 @@
     .bottonChat { display: inline; margin-left: 2px; font: cipsoftFont; }
     
     /* Buttons Panel */
-    .panelBotons {height: 35px;  margin-bottom: 39px; --focusable: false;}
+    .panelBotons {height: 35px;  margin-bottom: 39px; --focusable: false; width: 100%; margin-left: 15px;}
     .npc-button { width: 19px; height: 19px; --icon-source: /game_npctrader/static/images/icons-npcdialog; margin-right: 2px; }
 
     /* ==============================================================================================
@@ -132,7 +132,7 @@
         <uicreature id="creatureOutfit" class="creature-display" placement="top-left"></uicreature>
 
 
-        <div id="panelBotons" placement="bottom-left" class="panelBotons panelBase flex">
+        <div id="panelBotons" placement="bottom-left" class="panelBotons">
             <button *for="local buttonData in self.buttons" class="npc-button" *tooltip="buttonData.text"
                 *icon-clip="self:getIconClip(buttonData.id)" onclick="self:onConsoleTextClicked(buttonData.text)">
 
