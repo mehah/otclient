@@ -1,4 +1,4 @@
-NewMainWindow < NewWindow
+NewMainWindow < MainWindow
   id: window
   anchors.horizontalCenter: parent.horizontalCenter
   !text: tr('Add shooter preset')

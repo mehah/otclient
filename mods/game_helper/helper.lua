@@ -97,11 +97,6 @@ local function positionCompare(position1, position2)
   return position1.x == position2.x and position1.y == position2.y and position1.z == position2.z
 end
 
-local function playerHasSpell(player, spellId)
-  local spells = player:getSpells()
-  return table.contains(spells, spellId)
-end
-
 local function numberToOrdinal(n)
   local lastDigit = n % 10
   local lastTwoDigits = n % 100
@@ -311,9 +306,6 @@ function init()
     onAppear = onCreatureAppear,
     onDisappear = onCreatureDisappear,
   })
-
-  g_ui.importStyle('styles/shooterPreset.otui')
-  g_ui.importStyle('styles/spell.otui')
 
   helperButton = modules.game_mainpanel.addToggleButton('helperButton', tr('helper'), '/images/options/bot', toggle, false, 99999)
   helperButton:setOn(false)
@@ -687,66 +679,65 @@ end
 --[[ Events ]]--
 function assignTrainingSpell(button, isHaste)
   local radio = UIRadioGroup.create()
-  window = g_ui.loadUI('styles/spell', g_ui.getRootWidget())
-  if not window then
-    return true
-  end
+  local window = g_ui.loadUI('styles/spell.otui', g_ui.getRootWidget())
 
   window:show(true)
   window:raise()
   window:focus()
-  g_client.setInputLockWidget(window)
   helper:hide()
 
-  local windowHeader = isHaste and "Assign Haste Spell" or "Assign Training Spell"
-  window:setText(windowHeader)
+  window:setText(isHaste and "Assign Haste Spell" or "Assign Training Spell")
 
   local playerVocation = translateVocation(player:getVocation())
+  local playerLevel = player:getLevel()
   local spells = modules.gamelib.SpellInfo['Default']
+  local iconsSource = SpelllistSettings['Default'].iconFile
 
   for spellName, spellData in pairs(spells) do
     if isHaste and not table.contains(hasteWhiteList[playerVocation], spellData.id) then
       goto continue
     end
 
-    if not isHaste and not (table.contains(Spells.getGroupIds(spellData), 3) or table.contains(Spells.getGroupIds(spellData), 2)) then
-      goto continue
+    if not isHaste then
+      local groups = Spells.getGroupIds(spellData)
+      if not (table.contains(groups, 2) or table.contains(groups, 3)) then
+        goto continue
+      end
+      if table.contains(hasteWhiteList[playerVocation], spellData.id) then
+        goto continue
+      end
     end
 
-    if not isHaste and table.contains(hasteWhiteList[playerVocation], spellData.id) then
-      goto continue
-    end
+    if table.contains(spellData.vocations, playerVocation)
+      and not ignoredTrainingSpells[spellData.id] then
 
-    if table.contains(spellData.vocations, playerVocation) and not ignoredTrainingSpells[spellData.id] then
       local widget = g_ui.createWidget('SpellPreview', window.contentPanel.spellList)
-      local spellId = SpellIcons[spellData.icon][1]
+      local spellId = spellData.clientId
+      if not spellId then goto continue end
+
+      local clip = Spells.getImageClip(spellId)
 
       radio:addWidget(widget)
       widget:setId(spellData.id)
-      widget:setText(spellName.."\n"..spellData.words)
+      widget:setText(spellName .. "\n" .. spellData.words)
       widget.voc = spellData.vocations
-      widget.source = SpelllistSettings['Default'].iconsFolder
-      widget.clip = Spells.getImageClipNormal(spellId, 'Default')
+      widget.param = spellData.parameter
+      widget.source = iconsSource
+      widget.clip = clip
+
       widget.image:setImageSource(widget.source)
       widget.image:setImageClip(widget.clip)
 
       if spellData.level then
         widget.levelLabel:setVisible(true)
         widget.levelLabel:setText(string.format("Level: %d", spellData.level))
-        if player:getLevel() < spellData.level then
-          widget.image.gray:setVisible(true)
-        end
+        widget.image.gray:setVisible(playerLevel < spellData.level)
       end
 
       local primaryGroup = Spells.getPrimaryGroup(spellData)
       if primaryGroup ~= -1 then
-        local offSet = 1
-        if primaryGroup == 2 then
-          offSet = (23 * (primaryGroup - 1))
-        elseif primaryGroup == 3 then
-          offSet = (23 * (primaryGroup - 1)) - 1
-        end
-        widget.imageGroup:setImageClip(offSet .. " 25 20 20")
+        local offSet = (primaryGroup == 2 and 20) or (primaryGroup == 3 and 40) or 0
+        widget.imageGroup:setImageClip(offSet .. " 0 20 20")
         widget.imageGroup:setVisible(true)
       end
     end
@@ -754,15 +745,13 @@ function assignTrainingSpell(button, isHaste)
     ::continue::
   end
 
-  -- Order the spell list
   local widgets = window.contentPanel.spellList:getChildren()
   table.sort(widgets, function(a, b) return a:getText() < b:getText() end)
   for i, widget in ipairs(widgets) do
     window.contentPanel.spellList:moveChildToIndex(widget, i)
   end
 
-  -- Callback of radio
-  radio.onSelectionChange = function(widget, selected)
+  radio.onSelectionChange = function(_, selected)
     if selected then
       window.contentPanel.preview:setText(selected:getText())
       window.contentPanel.preview.image:setImageSource(selected.source)
@@ -770,39 +759,33 @@ function assignTrainingSpell(button, isHaste)
       window.contentPanel.paramLabel:setOn(selected.param)
       window.contentPanel.paramText:setEnabled(selected.param)
       window.contentPanel.paramText:clearText()
-      window.contentPanel.spellList:ensureChildVisible(widget)
+      window.contentPanel.spellList:ensureChildVisible(selected)
     end
   end
 
-  if window.contentPanel.spellList:getChildren() then
-    radio:selectWidget(window.contentPanel.spellList:getChildren()[1])
+  if #widgets > 0 then
+    radio:selectWidget(widgets[1])
   end
 
   local okFunc = function(destroy)
     local selected = radio:getSelectedWidget()
     if not selected then return end
 
-    local spellIcon = selected.source
-    local spellClip = selected.clip
-    local spellId = selected:getId()
     local spellName = selected:getText():match("^(.-)\n")
     local spellWords = selected:getText():match("\n(.+)")
+    local spellId = tonumber(selected:getId())
 
-    local slotID = tonumber(button:getId():match("%d+"))
     if isHaste then
-      helperConfig.haste[1].id = tonumber(spellId)
+      helperConfig.haste[1].id = spellId
     else
-      helperConfig.training[1].id = tonumber(spellId)
+      helperConfig.training[1].id = spellId
       if helperConfig.training[1].percent == 0 then
         helperConfig.training[1].percent = 100
-        -- TODO: AJUSTAR
-        -- updateTrainingPercent('spellTrainingButton0', helperConfig.training[1].percent)
       end
     end
 
-    g_client.setInputLockWidget(nil)
-    button:setImageSource(spellIcon)
-    button:setImageClip(spellClip)
+    button:setImageSource(selected.source)
+    button:setImageClip(selected.clip)
     button:setBorderColorTop("#1b1b1b")
     button:setBorderColorLeft("#1b1b1b")
     button:setBorderColorRight("#757575")
@@ -818,7 +801,6 @@ function assignTrainingSpell(button, isHaste)
 
   local cancelFunc = function()
     helper:show(true)
-    g_client.setInputLockWidget(nil)
     window:destroy()
   end
 
@@ -828,6 +810,7 @@ function assignTrainingSpell(button, isHaste)
   window.contentPanel.onEnter = function() okFunc(true) end
   window.onEscape = cancelFunc
 end
+
 
 local function invalidPresetName(name)
   if helperConfig.shooterProfiles[name] then
@@ -864,7 +847,7 @@ function sendRenameOrAddWindow(isRename)
   window:raise()
   window:focus()
   window.contentPanel.target:focus()
-  g_client.setInputLockWidget(window)
+  -- g_client.setInputLockWidget(window)
   helper:hide()
 
   local onWrite = function()
@@ -931,7 +914,7 @@ function sendRenameOrAddWindow(isRename)
 
   local cancel = function()
     helper:show()
-    g_client.setInputLockWidget(nil)
+    -- g_client.setInputLockWidget(nil)
 		window:destroy()
 	end
 
@@ -948,120 +931,110 @@ function sendRenameOrAddWindow(isRename)
 end
 
 function assignSpell(button, groupName, groups, tableToAssign)
-	local radio = UIRadioGroup.create()
-	window = g_ui.loadUI('styles/spell', g_ui.getRootWidget())
-  if not window then
-    return true
-  end
+  local radio = UIRadioGroup.create()
+  local window = g_ui.loadUI('styles/spell.otui', g_ui.getRootWidget())
+  if not window then return true end
 
-	window:show(true)
-	window:raise()
-	window:focus()
-  g_client.setInputLockWidget(window)
+  window:show(true)
+  window:raise()
+  window:focus()
   helper:hide()
 
-	window:setText("Assign " .. groupName .. " Spell")
+  window:setText("Assign " .. groupName .. " Spell")
 
   local profile = getShooterProfile()
-	local playerVocation = translateVocation(player:getVocation())
+  local playerVocation = translateVocation(player:getVocation())
+  local playerLevel = player:getLevel()
   local spells = modules.gamelib.SpellInfo['Default']
+  local iconsSource = SpelllistSettings['Default'].iconFile
 
-  for spellName, spellData in pairs(spells) do
-      local groupIds = Spells.getGroupIds(spellData)
-      local function containsAnyGroup(groups, targetGroups)
-          for _, group in ipairs(targetGroups) do
-              if table.contains(groups, group) then
-                  return true
-              end
-          end
-          return false
+  local function containsAnyGroup(groups, targetGroups)
+    for _, group in ipairs(targetGroups) do
+      if table.contains(groups, group) then
+        return true
       end
-      if containsAnyGroup(groupIds, groups) and table.contains(spellData.vocations, playerVocation) and not ignoredSpellsIds[spellData.id] then
-          if player:getLevel() < spellData.level or not playerHasSpell(player, spellData.id) then
-              goto continue
-          end
-          local widget = g_ui.createWidget('SpellPreview', window.contentPanel.spellList)
-          local spellId = SpellIcons[spellData.icon][1]
-          radio:addWidget(widget)
-          widget:setId(spellData.id)
-          widget:setText(spellName.."\n"..spellData.words)
-          widget.voc = spellData.vocations
-          widget.source = SpelllistSettings['Default'].iconsFolder
-          widget.clip = Spells.getImageClipNormal(spellId, 'Default')
-          widget.image:setImageSource(widget.source)
-          widget.image:setImageClip(widget.clip)
-
-          if spellData.level then
-            widget.levelLabel:setVisible(true)
-            widget.levelLabel:setText(string.format("Level: %d", spellData.level))
-            if player:getLevel() < spellData.level then
-              widget.image.gray:setVisible(true)
-            end
-          end
-
-          local primaryGroup = Spells.getPrimaryGroup(spellData)
-          if primaryGroup ~= -1 then
-            local offSet = 1
-            if primaryGroup == 2 then
-              offSet = (23 * (primaryGroup - 1))
-            elseif primaryGroup == 3 then
-              offSet = (23 * (primaryGroup - 1)) - 1
-            end
-            widget.imageGroup:setImageClip(offSet .. " 25 20 20")
-            widget.imageGroup:setVisible(true)
-          end
-      end
-      ::continue::
+    end
+    return false
   end
 
-	-- sort alphabetically
-	local widgets = window.contentPanel.spellList:getChildren()
-	table.sort(widgets, function(a, b) return a:getText() < b:getText() end)
-	for i, widget in ipairs(widgets) do
-		window.contentPanel.spellList:moveChildToIndex(widget, i)
-	end
+  for spellName, spellData in pairs(spells) do
+    local groupIds = Spells.getGroupIds(spellData)
+    local clientId = spellData.clientId
+    local serverId = spellData.id
 
-	-- callback
-	radio.onSelectionChange = function(widget, selected)
-		if selected then
-			window.contentPanel.preview:setText(selected:getText())
-			window.contentPanel.preview.image:setImageSource(selected.source)
-			window.contentPanel.preview.image:setImageClip(selected.clip)
-			window.contentPanel.paramLabel:setOn(selected.param)
-			window.contentPanel.paramText:setEnabled(selected.param)
-			window.contentPanel.paramText:clearText()
-			window.contentPanel.spellList:ensureChildVisible(widget)
-		end
-	end
+    if containsAnyGroup(groupIds, groups)
+      and table.contains(spellData.vocations, playerVocation)
+      and not ignoredSpellsIds[serverId]
+      and spellData.level
+      and playerLevel >= spellData.level then
 
-	if window.contentPanel.spellList:getChildren() then
-		radio:selectWidget(window.contentPanel.spellList:getChildren()[1])
-	end
+      local widget = g_ui.createWidget('SpellPreview', window.contentPanel.spellList)
+      local clip = Spells.getImageClip(clientId)
+
+      radio:addWidget(widget)
+      widget:setId(serverId)
+      widget:setText(spellName .. "\n" .. spellData.words)
+      widget.voc = spellData.vocations
+      widget.source = iconsSource
+      widget.clip = clip
+
+      widget.image:setImageSource(widget.source)
+      widget.image:setImageClip(widget.clip)
+
+      widget.levelLabel:setVisible(true)
+      widget.levelLabel:setText(string.format("Level: %d", spellData.level))
+
+      local primaryGroup = Spells.getPrimaryGroup(spellData)
+      if primaryGroup ~= -1 then
+        local offSet = (primaryGroup == 2 and 20) or (primaryGroup == 3 and 40) or 0
+        widget.imageGroup:setImageClip(offSet .. " 0 20 20")
+        widget.imageGroup:setVisible(true)
+      end
+    end
+  end
+
+  -- ordenar
+  local widgets = window.contentPanel.spellList:getChildren()
+  table.sort(widgets, function(a, b) return a:getText() < b:getText() end)
+  for i, widget in ipairs(widgets) do
+    window.contentPanel.spellList:moveChildToIndex(widget, i)
+  end
+
+  radio.onSelectionChange = function(_, selected)
+    if selected then
+      window.contentPanel.preview:setText(selected:getText())
+      window.contentPanel.preview.image:setImageSource(selected.source)
+      window.contentPanel.preview.image:setImageClip(selected.clip)
+      window.contentPanel.spellList:ensureChildVisible(selected)
+    end
+  end
+
+  if #widgets > 0 then
+    radio:selectWidget(widgets[1])
+  end
 
   window:recursiveGetChildById('tick'):setChecked(true)
   window:recursiveGetChildById('tick'):setEnabled(false)
 
-  local okFunc = function(destroy, profile)
+  local okFunc = function(destroy)
     local selected = radio:getSelectedWidget()
     if not selected then return end
 
-    local profile = getShooterProfile()
-    local spellIcon = selected.source
-    local spellClip = selected.clip
-    local spellId = selected:getId()
+    local spellId = tonumber(selected:getId())
     local spellName = selected:getText():match("^(.-)\n")
     local spellWords = selected:getText():match("\n(.+)")
 
     local slotID = tonumber(button:getId():match("%d+"))
+    
+    -- ✅ CORRIGIDO: Usa spellId em vez de serverId
     if button:getId():find("attackSpellButton") then
-      profile.spells[slotID + 1].id = tonumber(spellId)
+      profile.spells[slotID + 1].id = spellId
     else
-      tableToAssign[slotID + 1].id = tonumber(spellId)
+      tableToAssign[slotID + 1].id = spellId
     end
 
-    g_client.setInputLockWidget(nil)
-    button:setImageSource(spellIcon)
-    button:setImageClip(spellClip)
+    button:setImageSource(selected.source)
+    button:setImageClip(selected.clip)
     button:setBorderColorTop("#1b1b1b")
     button:setBorderColorLeft("#1b1b1b")
     button:setBorderColorRight("#757575")
@@ -1069,68 +1042,73 @@ function assignSpell(button, groupName, groups, tableToAssign)
     button:setBorderWidth(1)
     button:setTooltip("Spell: " .. spellName .. "\nWords: " .. spellWords)
 
+    -- ✅ CORRIGIDO: Busca o spell novamente para ter os dados completos
     if button:getId():find("attackSpellButton") then
-      local creaturesMin = shooterPanel:recursiveGetChildById("countMinCreature" .. slotID)
-      local forceCast = shooterPanel:recursiveGetChildById("conditionSetting" .. slotID)
-      local selfCast = shooterPanel:recursiveGetChildById("selfCast" .. slotID)
       local spell = Spells.getSpellByClientId(tonumber(spellId))
+      print("Assigned spell ID:", spellId)
+      
       if spell then
-          if table.contains(bothCastTypeSpells, spell.id) then -- divine grenade self cast
-            if not selfCast then
-              selfCast = g_ui.createWidget('CheckBox', creaturesMin:getParent())
-              local style = {
-                ["width"] = 12,
-                ["anchors.top"] = "countMinCreature" .. slotID .. ".top",
-                ["anchors.left"] = "countMinCreature" .. slotID .. ".right",
-                ["margin-top"] = 6,
-                ["margin-left"] = 5
-              }
-              selfCast:mergeStyle(style)
-              selfCast:setId('selfCast' .. slotID)
-              selfCast:setTooltip('Cast on yourself')
-              selfCast:setVisible(true)
-              selfCast.onCheckChange = function() toggleSelfCast(selfCast:getId():match("%d+"), selfCast:isChecked()) end
-            end
+        local creaturesMin = shooterPanel:recursiveGetChildById("countMinCreature" .. slotID)
+        local forceCast = shooterPanel:recursiveGetChildById("conditionSetting" .. slotID)
+        local selfCast = shooterPanel:recursiveGetChildById("selfCast" .. slotID)
+
+        if table.contains(bothCastTypeSpells, spell.id) and not selfCast then
+          selfCast = g_ui.createWidget('CheckBox', creaturesMin:getParent())
+          selfCast:mergeStyle({
+            ["width"] = 12,
+            ["anchors.top"] = "countMinCreature" .. slotID .. ".top",
+            ["anchors.left"] = "countMinCreature" .. slotID .. ".right",
+            ["margin-top"] = 6,
+            ["margin-left"] = 5
+          })
+          selfCast:setId('selfCast' .. slotID)
+          selfCast:setTooltip('Cast on yourself')
+          selfCast:setVisible(true)
+          selfCast.onCheckChange = function()
+            toggleSelfCast(slotID, selfCast:isChecked())
           end
-          if selfCast and not table.contains(bothCastTypeSpells, spell.id) then
-            profile.spells[slotID + 1].selfCast = false
-            selfCast:destroy()
+        end
+
+        if selfCast and not table.contains(bothCastTypeSpells, spell.id) then
+          profile.spells[slotID + 1].selfCast = false
+          selfCast:destroy()
+        end
+
+        if (spell.range > 0 or not spell.area)
+          and not table.contains(bothCastTypeSpells, spell.id) then
+
+          profile.spells[slotID + 1].creatures = 1
+          creaturesMin:setCurrentOption("1+")
+          creaturesMin:disable()
+          if forceCast then
+            forceCast:setVisible(true)
           end
-          if (spell.range > 0 or not spell.area) and not table.contains(bothCastTypeSpells, spell.id) then
-            profile.spells[slotID + 1].creatures = 1
-            creaturesMin:setCurrentOption("1+")
-            creaturesMin:disable()
-            if forceCast then
-              forceCast:setChecked(profile.spells[slotID + 1].forceCast)
-              forceCast:setVisible(true)
-            end
-          else
-            creaturesMin:enable()
-            if forceCast then
-              forceCast:setChecked(false)
-              forceCast:setVisible(false)
-              profile.spells[slotID + 1].forceCast = false
-            end
+        else
+          creaturesMin:enable()
+          if forceCast then
+            forceCast:setVisible(false)
+            profile.spells[slotID + 1].forceCast = false
           end
         end
       end
+    end
+
     if destroy then
-      helper:show()
+      helper:show(true)
       window:destroy()
     end
   end
 
-	local cancelFunc = function()
-    helper:show()
-    g_client.setInputLockWidget(nil)
-		window:destroy()
-	end
+  local cancelFunc = function()
+    helper:show(true)
+    window:destroy()
+  end
 
-	window.contentPanel.buttonOk.onClick = function() okFunc(true) end
-	window.contentPanel.buttonApply.onClick = function() okFunc(false) end
-	window.contentPanel.buttonClose.onClick = cancelFunc
-	window.contentPanel.onEnter = function() okFunc(true) end
-	window.onEscape = cancelFunc
+  window.contentPanel.buttonOk.onClick = function() okFunc(true) end
+  window.contentPanel.buttonApply.onClick = function() okFunc(false) end
+  window.contentPanel.buttonClose.onClick = cancelFunc
+  window.contentPanel.onEnter = function() okFunc(true) end
+  window.onEscape = cancelFunc
 end
 
 function assignRune(button, groupName, groups, tableToAssign)
@@ -1271,9 +1249,7 @@ function usePotion(potionId)
 
   local potionCount = player:getInventoryCount(potionId)
   if potionCount > 0 then
-    g_game.doThing(false)
     g_game.useInventoryItemWith(potionId, player, 0, true)
-    g_game.doThing(true)
     spellsCooldown[potionConfig.id] = g_clock.millis() + potionConfig.exhaustion
   end
 
@@ -1755,9 +1731,7 @@ function castHealingSpell(spellId)
     end
   end
 
-  g_game.doThing(false)
   g_game.talk(spell.words, true)
-  g_game.doThing(true)
   return true
 end
 
@@ -1766,7 +1740,7 @@ function checkHealthHealing()
     return false
   end
 
-  local health, maxHealth = player:getHealth(), player:getMaxHealth()
+  local health, maxHealth = g_game.getLocalPlayer():getHealth(), g_game.getLocalPlayer():getMaxHealth()
   local healthPercent = (health / maxHealth) * 100
 
   local prioritizedPotions = {}
@@ -1873,9 +1847,7 @@ function useAutoSio(target)
     return false
   end
 
-  g_game.doThing(false)
   g_game.talk(string.format("%s \"%s\"", spell.words, target:getName()), true)
-  g_game.doThing(true)
 end
 
 function useAutoGranSio(target)
@@ -1893,9 +1865,7 @@ function useAutoGranSio(target)
     return false
   end
 
-  g_game.doThing(false)
   g_game.talk(string.format("%s \"%s\"", spell.words, target:getName()), true)
-  g_game.doThing(true)
 end
 
 function useAutoTioSio(target)
@@ -1913,9 +1883,7 @@ function useAutoTioSio(target)
     return false
   end
 
-  g_game.doThing(false)
   g_game.talk(string.format("%s \"%s\"", spell.words, target:getName()), true)
-  g_game.doThing(true)
 end
 
 function useAutoUH(target)
@@ -1932,9 +1900,7 @@ function useAutoUH(target)
   helperConfig.magicShooterOnHold = true
 
   if hasItemInBackpack(runeId) then
-    g_game.doThing(false)
     g_game.useInventoryItemWith(runeId, target, 0, true)
-    g_game.doThing(true)
   end
 
   helperConfig.magicShooterOnHold = false
@@ -1996,9 +1962,7 @@ function autoEatFood()
 
   for _, id in pairs(infiniteFoodIds) do
     if player:getInventoryCount(id) > 0 then
-      g_game.doThing(false)
       g_game.useInventoryItem(id)
-      g_game.doThing(true)
       spellsCooldown[foodConfig.id] = g_clock.millis() + foodConfig.exhaustion
       return
     end
@@ -2006,9 +1970,7 @@ function autoEatFood()
 
   for _, id in pairs(foodIds) do
     if player:getInventoryCount(id) > 0 then
-      g_game.doThing(false)
       g_game.useInventoryItem(id)
-      g_game.doThing(true)
       spellsCooldown[foodConfig.id] = g_clock.millis() + foodConfig.exhaustion
       break
     end
@@ -2401,16 +2363,17 @@ function checkMagicShooter()
     end
   end
 
-  local timer = g_ui.getActionTimer()
-  if timer > afkTime then
-    local widget = enableButtons:recursiveGetChildById("enableMagicShooter")
-    if widget then
-      widget:setChecked(false)
-      toggleMagicShooter(widget, "RTCaster disabled! \nDue to no changes in your actions so far.")
-      return
-    end
-    return
-  end
+  -- TODO: If needed implement afktime
+  -- local timer = g_ui.getActionTimer()
+  -- if timer > afkTime then
+  --   local widget = enableButtons:recursiveGetChildById("enableMagicShooter")
+  --   if widget then
+  --     widget:setChecked(false)
+  --     toggleMagicShooter(widget, "RTCaster disabled! \nDue to no changes in your actions so far.")
+  --     return
+  --   end
+  --   return
+  -- end
 
   local following = g_game.getFollowingCreature()
   if following then
@@ -2472,8 +2435,6 @@ function checkMagicShooter()
         goto continue
       elseif not table.contains(spell.vocations, translateVocation(myCharacter:getVocation())) then
         goto continue
-      elseif not playerHasSpell(myCharacter, spell.id) then
-        goto continue
       elseif spell.spender and harmonyCount < 5 then
         goto continue
       end
@@ -2513,9 +2474,7 @@ function checkMagicShooter()
             goto continue
           end
 
-          g_game.doThing(false) 
           g_game.talk(spell.words, true, castOnFoot)
-          g_game.doThing(true)
 
           -- --- precooldown
           onSpellCooldown(spell.id, 500)
@@ -2550,9 +2509,7 @@ function checkMagicShooter()
             goto continue
           end
 
-          g_game.doThing(false)
           g_game.useInventoryItemWith(config.id, bestTarget, 0, true)
-          g_game.doThing(true)
           -- precooldown
           onSpellGroupCooldown(runeSpell.group, 500)
         end
@@ -2581,16 +2538,17 @@ function checkAutoTarget()
     end
   end
 
-  local timer = g_ui.getActionTimer()
-  if timer > afkTime then
-    local widget = enableButtons:recursiveGetChildById("enableAutoTarget")
-    if widget then
-      widget:setChecked(false)
-      toggleAutoTarget(widget)
-      return
-    end
-    return
-  end
+  -- TODO: Implement afktime if needed
+  -- local timer = g_ui.getActionTimer()
+  -- if timer > afkTime then
+  --   local widget = enableButtons:recursiveGetChildById("enableAutoTarget")
+  --   if widget then
+  --     widget:setChecked(false)
+  --     toggleAutoTarget(widget)
+  --     return
+  --   end
+  --   return
+  -- end
 
   local position = myCharacter:getPosition()
 
@@ -2693,9 +2651,7 @@ function checkAutoTarget()
   end
 
   if target and not (currentTarget and currentTarget:getId() == target:getId()) then
-    g_game.doThing(false)
     g_game.attack(target)
-    g_game.doThing(true)
   end
 end
 
@@ -2726,7 +2682,7 @@ function checkAutoHaste()
     return true
   end
 
-  if not helperConfig.haste[1].safecast and player:isInPz() then
+  if not helperConfig.haste[1].safecast and player:isInProtectionZone() then
     return true
   end
 
@@ -3038,7 +2994,7 @@ function loadShooterProfileByName(profileName)
       if spell then
         local spellId = SpellIcons[spell.icon][1]
         local source = SpelllistSettings['Default'].iconsFolder
-        local clip = Spells.getImageClipNormal(spellId, 'Default')
+        local clip = Spells.getImageClip(spellId, 'Default')
         button:setImageSource(source)
         button:setImageClip(clip)
         button:setBorderColorTop("#1b1b1b")
@@ -3131,7 +3087,7 @@ function onLoadHelperData()
       if spell then
         local spellId = SpellIcons[spell.icon][1]
         local source = SpelllistSettings['Default'].iconsFolder
-        local clip = Spells.getImageClipNormal(spellId, 'Default')
+        local clip = Spells.getImageClip(spellId, 'Default')
         button:setImageSource(source)
         button:setImageClip(clip)
         button:setBorderColorTop("#1b1b1b")
@@ -3179,7 +3135,7 @@ function onLoadHelperData()
       if spell then
         local spellId = SpellIcons[spell.icon][1]
         local source = SpelllistSettings['Default'].iconsFolder
-        local clip = Spells.getImageClipNormal(spellId, 'Default')
+        local clip = Spells.getImageClip(spellId, 'Default')
         button:setImageSource(source)
         button:setImageClip(clip)
         button:setBorderColorTop("#1b1b1b")
@@ -3202,7 +3158,7 @@ function onLoadHelperData()
       if spell then
         local spellId = SpellIcons[spell.icon][1]
         local source = SpelllistSettings['Default'].iconsFolder
-        local clip = Spells.getImageClipNormal(spellId, 'Default')
+        local clip = Spells.getImageClip(spellId, 'Default')
 
         button:setImageSource(source)
         button:setImageClip(clip)
@@ -3430,9 +3386,7 @@ function checkExerciseEvent()
     return
   end
 
-  -- g_game.doThing(false)
   g_game.useInventoryItemWith(itemId, dummy)
-  -- g_game.doThing(true)
 end
 
 function getExerciseDummy()
@@ -3659,7 +3613,7 @@ function manageHotkeys(typo)
   assignWindow.display:setText(currentHotkey)
   assignWindow.desc:setText("Assign or edit a hotkey to manage Target/Shooter state.")
   assignWindow:setHeight(190)
-  g_client.setInputLockWidget(assignWindow)
+  -- g_client.setInputLockWidget(assignWindow)
 
   assignWindow.onKeyDown = function(assignWindow, keyCode, keyboardModifiers, keyText)
     local keyCombo = determineKeyComboDesc(keyCode, keyboardModifiers, keyText)
@@ -3694,7 +3648,7 @@ function manageHotkeys(typo)
         Options.removeActionHotkey(chatMode and "chatOn" or "chatOff", currentBind.jsonName, false)
         KeyBinds:setupAndReset(Options.currentHotkeySetName, chatMode and "chatOn" or "chatOff")
       end
-      g_client.setInputLockWidget(nil)
+      -- g_client.setInputLockWidget(nil)
       assignWindow:destroy()
       return true
     end
@@ -3727,7 +3681,7 @@ function manageHotkeys(typo)
     end
 
     assignWindow:destroy()
-    g_client.setInputLockWidget(nil)
+    -- g_client.setInputLockWidget(nil)
   end
 
   assignWindow.buttonClear.onClick = function()
@@ -3737,7 +3691,7 @@ function manageHotkeys(typo)
     end
 
     assignWindow:destroy()
-    g_client.setInputLockWidget(nil)
+    -- g_client.setInputLockWidget(nil)
   end
 
   assignWindow.onDestroy = function(widget) helper:show(true) end
@@ -3781,7 +3735,7 @@ function onSetupDropSpell(button, spellData, groups, tableToAssign)
 
   if containsAnyGroup(groupIds, groups) and table.contains(spellData.vocations, playerVocation) and not ignoredSpellsIds[spellId] then
     local source = SpelllistSettings['Default'].iconsFolder
-    local clip = Spells.getImageClipNormal(spellId, 'Default')
+    local clip = Spells.getImageClip(spellId, 'Default')
     local spell = Spells.getSpellByClientId(tonumber(spellId))
 
     button:setImageSource(source)
@@ -3864,7 +3818,7 @@ function onSetupDropSupport(widget, spellData, hasteSpell)
   local spellId = SpellIcons[spellData.icon][1]
   if table.contains(spellData.vocations, playerVocation) and not ignoredTrainingSpells[spellData.id] then
     local source = SpelllistSettings['Default'].iconsFolder
-    local clip = Spells.getImageClipNormal(spellId, 'Default')
+    local clip = Spells.getImageClip(spellId, 'Default')
 
     widget:setImageSource(source)
     widget:setImageClip(clip)
