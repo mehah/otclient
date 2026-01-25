@@ -203,6 +203,8 @@ local exercises = {
   62107, 63492
 }
 
+local moneyIds = { 3031, 3035 } -- gold coin, platinium coin
+
 -- spells that can be cast on both targets and self
 local bothCastTypeSpells = {
   258
@@ -318,10 +320,6 @@ function init()
   helperButton:show()
 
   helper = g_ui.displayUI('styles/helper')
-  if not helper then
-    perror("Could not load helper UI from styles/helper.otui")
-    return
-  end
   helperTracker = g_ui.createWidget('HelperTracker')
   helperRules =  g_ui.createWidget('HelperRules', rootWidget)
   helperRules:hide()
@@ -330,8 +328,9 @@ function init()
 
   player = g_game.getLocalPlayer()
   hide()
-  healingPanel = helper.contentPanel:getChildById('healingPanelInside')
+  healingPanel = helper.contentPanel:getChildById('healingPanel')
   toolsPanel = helper.contentPanel:getChildById('toolsPanel')
+  healingPanel = helper.contentPanel:getChildById('healingPanel')
   potionButton2 = healingPanel:recursiveGetChildById("potionButton2")
   rmvPotionPercentButton2 = healingPanel:recursiveGetChildById("rmvPotionPercentButton2")
   potionPercentBg2 = healingPanel:recursiveGetChildById("potionPercentBg2")
@@ -343,7 +342,7 @@ function init()
   rmvPercentButton2 = healingPanel:recursiveGetChildById("rmvPercentButton2")
   spellPercentBg2 = healingPanel:recursiveGetChildById("spellPercentBg2")
   addPercentButton2 = healingPanel:recursiveGetChildById("addPercentButton2")
-  healPanel = helper.contentPanel.healingPanelInside
+  healPanel = helper.contentPanel.healingPanel.healingPanel
   priorityButton1 = healingPanel:recursiveGetChildById("priority0")
   priorityButton2 = healingPanel:recursiveGetChildById("priority1")
   priorityButton3 = healingPanel:recursiveGetChildById("priority2")
@@ -454,7 +453,7 @@ function online()
   helperEvents.helperCycleEvent = cycleEvent(helperCycleEvent, helperEvents.helperCycleTimer)
 
   resetPartyPanel()
-  consoleln("Helper loaded in " .. (g_clock.millis() - benchmark) / 1000 .. " seconds.")
+  print("Helper loaded in " .. (g_clock.millis() - benchmark) / 1000 .. " seconds.")
 end
 
 function offline()
@@ -2021,9 +2020,24 @@ function autoChangeGold()
     return
   end
 
-  g_game.doThing(false)
-  Helper.changeGold()
-  g_game.doThing(true)
+  doChangeGold(moneyIds)
+end
+
+function doChangeGold(moneyIds)
+  local containers = g_game.getContainers()
+  for index, container in pairs(containers) do
+    if not container.lootContainer then -- ignore monster containers
+      for i, item in ipairs(container:getItems()) do
+        if item:getCount() == 100 then
+          for m, moneyId in ipairs(moneyIds) do
+            if item:getId() == moneyId then
+              return g_game.use(item)
+            end
+          end
+        end
+      end
+    end
+  end
 end
 
 function checkMana()
@@ -2733,9 +2747,7 @@ function checkAutoHaste()
     return
   end
 
-  g_game.doThing(false)
   g_game.talk(spell.words, true)
-  g_game.doThing(true)
 
   lastHaste = currentMillis
 end
@@ -3418,9 +3430,9 @@ function checkExerciseEvent()
     return
   end
 
-  g_game.doThing(false)
+  -- g_game.doThing(false)
   g_game.useInventoryItemWith(itemId, dummy)
-  g_game.doThing(true)
+  -- g_game.doThing(true)
 end
 
 function getExerciseDummy()

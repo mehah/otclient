@@ -2578,7 +2578,7 @@ MainWindow
         @onClick: loadMenu('shooterMenu')
 
     HealingPanel
-      id: healingPanelInside
+      id: healingPanel
       anchors.top: optionsTabBar.bottom
       anchors.left: parent.left
       anchors.right: parent.right
