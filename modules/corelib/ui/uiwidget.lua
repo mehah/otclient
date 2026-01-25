@@ -714,8 +714,6 @@ function UIWidget:__childFor(moduleName, expr, html, index, onFinished)
             self.watchList.list = list
         end
 
-
-
         self.watchList:scan()
         if finishedFnc and hasChanges then
             execFnc(finishedFnc, { controller }, self.widget, controller, html)
