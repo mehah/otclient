@@ -922,38 +922,20 @@ function EnterGame.showAuthenticatorInput()
     
     tokenWindow.content = tokenWindow:getChildById('content')
     tokenWindow.content:setText(tr('Please enter a new, valid token:'))
-    tokenWindow.content:setTextAlign(AlignLeft)
-    tokenWindow.content:breakAnchors()
-    tokenWindow.content:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-    tokenWindow.content:addAnchor(AnchorTop, 'title', AnchorBottom)
-    tokenWindow.content:setMarginLeft(10)
-    tokenWindow.content:setMarginTop(10)
+    tokenWindow.content:setColor('#c0c0c0')
     tokenWindow.content:resizeToText()
-    
-    -- Hide the default separator that's part of MessageBoxWindow template
-    local defaultSeparator = tokenWindow:getChildById('separator')
-    if not defaultSeparator then
-        -- Find it by child iteration if id doesn't work
-        for _, child in ipairs(tokenWindow:getChildren()) do
-            if child:getStyle().__class == 'UIWidget' and child:getHeight() == 2 then
-                defaultSeparator = child
-                break
-            end
-        end
-    end
-    if defaultSeparator then
-        defaultSeparator:hide()
-    end
     
     -- Add text edit field for token input
     local tokenEdit = g_ui.createWidget('TextEdit', tokenWindow)
     tokenEdit:setId('tokenEdit')
     tokenEdit:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
     tokenEdit:addAnchor(AnchorTop, 'content', AnchorBottom)
-    tokenEdit:setMarginTop(5)
+    tokenEdit:setMarginTop(10)
     tokenEdit:setMaxLength(8)
     tokenEdit:setWidth(330)
     tokenEdit:setHeight(16)
+    tokenEdit:setMarginLeft(15)
+    tokenEdit:setMarginRight(15)
     tokenEdit:focus()
     
     -- Add horizontal separator
@@ -1022,23 +1004,25 @@ function EnterGame.showAuthenticatorInput()
         EnterGame.show()
     end
         
-    -- Add Cancel button
+    -- Add Cancel button (to the left of OK button)
     local cancelButton = tokenWindow:addButton(tr('Cancel'), cancelCallback)
+    cancelButton:breakAnchors()
     cancelButton:addAnchor(AnchorTop, 'parent', AnchorTop)
     cancelButton:addAnchor(AnchorRight, 'parent', AnchorRight)
-    cancelButton:setWidth(45)
 
-    -- Add OK button
+    -- Add OK button (right side, added first)
     local okButton = tokenWindow:addButton(tr('Ok'), okCallback)
-    okButton:addAnchor(AnchorTop, 'parent', AnchorTop)
+    okButton:breakAnchors()
+    okButton:addAnchor(AnchorTop, 'prev', AnchorTop)
     okButton:addAnchor(AnchorRight, 'prev', AnchorLeft)
     okButton:setMarginRight(10)
-    okButton:setWidth(40)
     
-    -- Set window size
-    local windowHeight = 12 + tokenWindow.content:getHeight() + 10 + 22 + 10 + 20 + 22 + 12
+    -- Calculate window size based on content
+    local windowWidth = 350
+    local windowHeight = 28 + tokenWindow.content:getHeight() + 10 + tokenEdit:getHeight() + 10 + 2 + 12 + okButton:getHeight() + 12
+    
+    tokenWindow:setWidth(windowWidth)
     tokenWindow:setHeight(windowHeight)
-    tokenWindow:setWidth(350)
     
     -- Connect Enter and Escape keys
     connect(tokenWindow, {
