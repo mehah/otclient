@@ -190,8 +190,8 @@ function EnterGame.init()
     local servers = g_settings.getNode("ServerList") or {}
     local serverData = servers[host] or {}
     if serverData and serverData.account then
-        EnterGame.setAccountName(safeDecrypt(serverData.account))
-        EnterGame.setPassword(safeDecrypt(serverData.password))
+        EnterGame.setAccountName(serverData.account)
+        EnterGame.setPassword(serverData.password)
         enterGame:getChildById('rememberEmailBox'):setChecked(true)
     else
         EnterGame.setAccountName('')
@@ -319,8 +319,8 @@ function EnterGame.firstShow()
     local host = g_settings.get('host')
     local servers = g_settings.getNode('ServerList') or {}
     local serverData = servers[host] or {}
-    local account = safeDecrypt(serverData.account)
-    local password = safeDecrypt(serverData.password)
+    local account = safeDecrypt(serverData.account) or ''
+    local password = safeDecrypt(serverData.password) or ''
     local autologin = serverData.autologin == true
     if #host > 0 and #password > 0 and #account > 0 and autologin then
         addEvent(function()

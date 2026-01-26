@@ -54,8 +54,8 @@ function ServerList.select()
         local server = servers[selected:getId()]
         if server then
             EnterGame.setDefaultServer(selected:getId(), server.port, server.protocol)
-            EnterGame.setAccountName(safeDecrypt(server.account))
-            EnterGame.setPassword(safeDecrypt(server.password))
+            EnterGame.setAccountName(server.account)
+            EnterGame.setPassword(server.password)
             EnterGame.setHttpLogin(server.httpLogin)
             ServerList.hide()
         end
