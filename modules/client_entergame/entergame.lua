@@ -635,6 +635,16 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
         return
     end
 
+    -- Show connecting message immediately
+    loadBox = displayCancelBox(tr('Connecting'), tr('Your character list is being loaded. Please wait.'))
+    connect(loadBox, {
+        onCancel = function(msgbox)
+            loadBox = nil
+            G.requestId = 0
+            EnterGame.show()
+        end
+    })
+
     local host, path = G.host, "/"
     if G.host:find("https?://") then
         local url = G.host:gsub("https?://", "")
@@ -679,6 +689,10 @@ function EnterGame.loginSuccess(requestId, jsonSession, jsonWorlds, jsonCharacte
         return
     end
 
+    -- Update the existing loadBox message or create new one if it doesn't exist
+    if loadBox then
+        loadBox:destroy()
+    end
     loadBox = displayCancelBox(tr('Connecting'), tr('Your character list is being loaded. Please wait.'))
 
     connect(loadBox, {
@@ -784,7 +798,7 @@ function EnterGame.doLogin()
         protocolLogin.onUpdateNeeded = onUpdateNeeded
 
         loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
-        loadBox:setWidth(300)
+        loadBox:setWidth(200)
         connect(loadBox, {
             onCancel = function(msgbox)
                 loadBox = nil
