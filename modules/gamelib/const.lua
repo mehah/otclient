@@ -222,7 +222,8 @@ GameMapCache = 125
 GameForgeSkillStats = 126
 GameCharacterSkillStats = 127
 GameCreaturePaperdoll = 128
-GameVocationMonk = 130 -- GameMultiSpr is 129
+GameMultiSpr = 129
+GameVocationMonk = 130
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
@@ -491,3 +492,9 @@ PARTYANALYZERACTION_PRICETYPE = 1
 PARTYANALYZERACTION_PRICEVALUE = 2
 
 -- @}
+
+FlipDirection = {
+    None = 0,
+    Horizontal = 1,
+    Vertical = 2,
+}
