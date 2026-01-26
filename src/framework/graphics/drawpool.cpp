@@ -489,7 +489,6 @@ void DrawPool::releaseFrameBuffer(const Rect& dest, uint8_t flipDirection)
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->release();
         drawState.execute(this);
-        frame->draw(dest);
         frame->draw(dest, flipDirection);
     });
 

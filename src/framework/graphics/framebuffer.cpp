@@ -148,11 +148,11 @@ void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorC
     m_coordsBuffer.clear();
     // 0 = none, 1 = horizontal, 2 = vertical
     if (flipDirection == 1) {
-        m_coordsBuffer.addHorizontallyFlippedQuad(m_dest, m_src);
+        m_coordsBuffer.addHorizontallyFlippedQuad(_dest, _src);
     } else if (flipDirection == 2) {
-        m_coordsBuffer.addVerticallyFlippedQuad(m_dest, m_src);
+        m_coordsBuffer.addVerticallyFlippedQuad(_dest, _src);
     } else {
-        m_coordsBuffer.addQuad(m_dest, m_src);
+        m_coordsBuffer.addQuad(_dest, _src);
     }
 }
 
