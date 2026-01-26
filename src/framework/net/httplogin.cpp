@@ -188,10 +188,6 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
 
         if (!token.empty()) {
             body["token"] = token;
-        }
-
-        if (!token.empty()) {
-            body["token"] = token;
             body["authenticatorToken"] = token;
         }
 
@@ -336,7 +332,7 @@ httplib::Result LoginHttp::loginHttpJson(const std::string& host,
             << std::endl;
     }
     if (response && response->status == Success && !parseJsonResponse(response->body)) {
-        return response;;
+        return response;
     }
 
     return response;

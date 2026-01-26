@@ -128,13 +128,21 @@ void OTMLParser::parseNode(const std::string_view data)
         line.pop_back();
 
     const bool isUrlWithColon = (line.starts_with("http://") || line.starts_with("https://")) && line.back() == ':';
+    const bool isUrlKey = line.starts_with("http://") || line.starts_with("https://");
+
     if (isUrlWithColon) {
         // URL ending in ':' → treat as a key without ':' and no value on the same line
         tag = line.substr(0, line.size() - 1);
         // Value remains empty
     } else {
         // Normal processing (list item, key-value, or just key)
-        dotsPos = line.find(':');
+        if (isUrlKey) {
+            // For URLs, find colon after the "://" pattern
+            const size_t schemeEnd = line.find("://");
+            dotsPos = (schemeEnd != std::string::npos) ? line.find(':', schemeEnd + 3) : line.find(':');
+        } else {
+            dotsPos = line.find(':');
+        }
 
         if (!line.empty() && line.front() == '-') {
             // "- item"
