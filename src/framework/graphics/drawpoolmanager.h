@@ -76,6 +76,7 @@ public:
     void resetShaderProgram() const { getCurrentPool()->resetShaderProgram(); }
     void resetCompositionMode() const { getCurrentPool()->resetCompositionMode(); }
     void resetDrawOrder() const { getCurrentPool()->resetDrawOrder(); }
+    void resetOnlyOnceParameters() const { getCurrentPool()->resetOnlyOnceParameters(); }
 
     void pushTransformMatrix() const { getCurrentPool()->pushTransformMatrix(); }
     void popTransformMatrix() const { getCurrentPool()->popTransformMatrix(); }
