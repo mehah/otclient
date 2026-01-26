@@ -31,6 +31,7 @@
 #include "map.h"
 #include "missile.h"
 #include "tile.h"
+#include <framework/input/mouse.h>
 #include "framework/core/asyncdispatcher.h"
 #include "framework/core/eventdispatcher.h"
 #include <framework/core/graphicalapplication.h>
@@ -566,6 +567,35 @@ void MapView::onMouseMove(const Position& mousePos, const bool /*isVirtualMove*/
     { // Highlight Target System
         destroyHighlightTile();
         updateHighlightTile(mousePos);
+    }
+
+    if (!g_mouse.isCursorChanged()) {
+        bool cursorSet = false;
+        if (const auto& tile = getTopTile(mousePos)) {
+            if (const auto& creature = tile->getTopCreature()) {
+                if (creature->isMonster()) {
+                    int id = g_mouse.getCursorId("attack");
+                    if (id != -1) {
+                        g_window.setMouseCursor(id);
+                        cursorSet = true;
+                    }
+                } else if (creature->isNpc()) {
+                    int id = g_mouse.getCursorId("talk");
+                    if (id != -1) {
+                        g_window.setMouseCursor(id);
+                        cursorSet = true;
+                    }
+                }
+            }
+        }
+
+        if (!cursorSet) {
+            int id = g_mouse.getCursorId("default");
+            if (id != -1)
+                g_window.setMouseCursor(id);
+            else
+                g_window.restoreMouseCursor();
+        }
     }
 }
 

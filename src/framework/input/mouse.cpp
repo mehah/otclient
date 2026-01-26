@@ -124,6 +124,13 @@ bool Mouse::isPressed(const Fw::MouseButton mouseButton)
     return g_window.isMouseButtonPressed(mouseButton);
 }
 
+int Mouse::getCursorId(const std::string& name)
+{
+    if (m_cursors.contains(name))
+        return m_cursors[name];
+    return -1;
+}
+
 void Mouse::checkStackSize()
 {
     if (m_cursorStack.size() > 5) {

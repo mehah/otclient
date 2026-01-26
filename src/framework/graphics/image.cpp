@@ -54,7 +54,7 @@ ImagePtr Image::loadPNG(const char* data, const size_t size)
         image = std::make_shared<Image>(Size(apng.width, apng.height), apng.bpp, apng.pdata);
         if (apng.num_frames > 1 && apng.frames_delay) {
             const int frameSize = apng.width * apng.height * apng.bpp;
-            const uint32_t frames = std::min(apng.num_frames, apng.last_frame);
+            const uint32_t frames = apng.num_frames;
             for (uint32_t i = 0; i < frames; ++i) {
                 // Create a new Image for every frame to avoid circular reference (image -> m_animation -> image)
                 ImagePtr frameImage = std::make_shared<Image>(Size(apng.width, apng.height), apng.bpp, apng.pdata + (i * frameSize));
