@@ -12,12 +12,8 @@ ImbuementScroll.__index = ImbuementScroll
 
 local self = ImbuementScroll
 function ImbuementScroll.setup(availableImbuements, needItems)
-    print("DEBUG: ImbuementScroll.setup chamado")
-    print("DEBUG: availableImbuements count:", availableImbuements and #availableImbuements or 0)
-    
     self.availableImbuements = availableImbuements or {}
     self.needItems = needItems or {}
-
     self.window = Imbuement.scrollImbue
 
     local itemWidget = self.window:recursiveGetChildById("itemScroll")
@@ -59,9 +55,6 @@ function ImbuementScroll.selectBaseType(selectedButtonId)
         end
     end
 
-    print("DEBUG: selectBaseType chamado com baseImbuement =", baseImbuement)
-    print("DEBUG: total availableImbuements =", #self.availableImbuements)
-
     local imbuementsList = self.window:recursiveGetChildById("imbuementsList")
     imbuementsList:destroyChildren()
 
@@ -79,9 +72,7 @@ function ImbuementScroll.selectBaseType(selectedButtonId)
             elseif imbuement.group == 'Powerful' then imbuementType = 2
             end
         end
-        
-        print("DEBUG: imbuement", id, "type =", imbuement.type, "group =", imbuement.group, "imbuementType =", imbuementType, "baseImbuement =", baseImbuement)
-        
+                
         if imbuementType == baseImbuement then
             matchedCount = matchedCount + 1
             local widget = g_ui.createWidget("SlotImbuing", imbuementsList)
@@ -100,7 +91,6 @@ function ImbuementScroll.selectBaseType(selectedButtonId)
         end
     end
     
-    print("DEBUG: matchedCount =", matchedCount)
 end
 
 function ImbuementScroll.selectImbuementWidget(widget, imbuement)

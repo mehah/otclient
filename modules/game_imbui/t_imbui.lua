@@ -182,8 +182,6 @@ function Imbuement.close()
   self.window:hide()
 end
 
--- testOpen removed (temporary debug button deleted)
-
 function Imbuement:toggleMenu(menu)
   for key, value in pairs(self) do
     if type(value) ~= 'userdata' or key == 'window' then

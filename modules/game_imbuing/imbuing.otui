@@ -70,6 +70,7 @@ ItemInformation < Panel
 
     Slot
       id: slot0
+      !text: tr("Slot 1")
       text-align: center
       anchors.left: parent.left
       image-source: /images/game/imbuing/slot_inactive
@@ -82,6 +83,7 @@ ItemInformation < Panel
 
     Slot
       id: slot1
+      !text: tr("Slot 2")
       anchors.left: prev.right
       margin-left: 10
       image-source: /images/game/imbuing/slot_inactive
@@ -94,6 +96,7 @@ ItemInformation < Panel
 
     Slot
       id: slot2
+      !text: tr("Slot 3")
       text-align: center
       margin-left: 10
       anchors.left: prev.right
