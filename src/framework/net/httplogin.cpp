@@ -353,7 +353,7 @@ bool LoginHttp::parseJsonResponse(const std::string& body) {
 
     if (responseJson.contains("errorCode") && responseJson["errorCode"].get<int>() != 0) {
         this->errorMessage = responseJson.value("errorMessage", "Authenticator token required.");
-        g_logger.error("Error code: {}, message: {}", responseJson["errorCode"].get<int>(), this->errorMessage);
+        g_logger.debug("Error code: {}, message: {}", responseJson["errorCode"].get<int>(), this->errorMessage);
         return false;
     }
 
