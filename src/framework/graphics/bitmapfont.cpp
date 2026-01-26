@@ -524,7 +524,7 @@ std::string BitmapFont::wrapText(std::string_view text, int maxWidth, const Wrap
         if (len == 1 && _isAscii((uint8_t)*cur)) {
             unsigned char ch = (unsigned char)*cur;
             if (_isSpace(ch)) {
-                const int w = _gw(m_glyphsSize, ' ', sx);
+                const int w = glyphWidth(' ');
                 if (lineW + w > maxW) { commitBreak(false); pushChar(' '); lineW = w; ++cur; continue; }
                 pushChar(' '); lineW += w; markBreak(false, 0); ++cur; continue;
             }
