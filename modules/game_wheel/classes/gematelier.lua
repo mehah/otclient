@@ -659,21 +659,28 @@ function GemAtelier.onSelectGem(selected, clicked)
 
 	-- checa se já há gema equipada do mesmo domínio
 	local alreadyEquipped = false
+	local isTheSameGem = false
 	for _, id in pairs(WheelOfDestiny.equipedGems or {}) do
-	local dom = GemAtelier.getGemDomainById(id)
-	if dom == gemData.gemDomain then
-		alreadyEquipped = true
-		break
-	end
+		local dom = GemAtelier.getGemDomainById(id)
+		if dom == gemData.gemDomain then
+			alreadyEquipped = true
+			if id == gemData.gemID then
+				isTheSameGem = true
+			end
+			break
+		end
 	end
 
 	-- decide visibilidade dos botões
-	if alreadyEquipped then
-	panel.clickedContent.placeVessel:setVisible(false)
-	panel.clickedContent.removeVessel:setVisible(true)
+	-- Se a gema selecionada é a mesma que está equipada, mostra "Remove from Vessel"
+	-- Se é uma gema diferente mas da mesma cor, mostra "Place in Vessel" (vai substituir)
+	-- Se não há gema equipada, mostra "Place in Vessel"
+	if alreadyEquipped and isTheSameGem then
+		panel.clickedContent.placeVessel:setVisible(false)
+		panel.clickedContent.removeVessel:setVisible(true)
 	else
-	panel.clickedContent.placeVessel:setVisible(true)
-	panel.clickedContent.removeVessel:setVisible(false)
+		panel.clickedContent.placeVessel:setVisible(true)
+		panel.clickedContent.removeVessel:setVisible(false)
 	end
 
 
