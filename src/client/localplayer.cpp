@@ -260,13 +260,8 @@ void LocalPlayer::setStates(const uint64_t states)
     const uint64_t oldStates = m_states;
     m_states = states;
 
-    const bool wasParalyzed = (oldStates & Otc::IconParalyze) == Otc::IconParalyze;
-    const bool nowParalyzed = (states & Otc::IconParalyze) == Otc::IconParalyze;
-
-    if (!wasParalyzed && nowParalyzed) {
-        m_walkTimer.restart();
+    if (isParalyzed() && isWalking())
         updateWalk();
-    }
 
     callLuaField("onStatesChange", states, oldStates);
 }
