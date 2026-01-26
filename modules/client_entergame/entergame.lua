@@ -246,8 +246,8 @@ function EnterGame.init()
             local password = enterGame:getChildById('accountPasswordTextEdit'):getText()
 
             if checked and #account > 0 then
-                ServerList.setServerAccount(host, account)
-                ServerList.setServerPassword(host, password)
+                ServerList.setServerAccount(host, g_crypt.encrypt(account))
+                ServerList.setServerPassword(host, g_crypt.encrypt(password))
                 ServerList.setServerAutologin(host, enterGame:getChildById('autoLoginBox'):isChecked() or false)
                 g_settings.set('host', host)
             else
@@ -1007,6 +1007,7 @@ function EnterGame.showAuthenticatorInput()
     
     local cancelCallback = function()
         hasAttemptedAuthenticator = false
+        G.authenticatorToken = nil
         if tokenWindow then
             tokenWindow:destroy()
             tokenWindow = nil
@@ -1066,6 +1067,7 @@ function EnterGame.destroyToken()
       end
       tokenWindow = nil
       hasAttemptedAuthenticator = false
+      G.authenticatorToken = nil
     end
 end
 
