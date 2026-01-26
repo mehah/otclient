@@ -337,8 +337,8 @@ SelectImbue < UIWidget
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         !text: tr('')
-      font: verdana-11px-rounded
-      color: white
+        font: verdana-11px-rounded
+        color: white
         text-auto-resize: true
         visible: true
 
@@ -454,8 +454,8 @@ ClearImbue < UIWidget
         anchors.top: prev.top
         anchors.right: prev.left
         !text: tr('Item Information')
-      font: verdana-11px-rounded
-      color: white
+        font: verdana-11px-rounded
+        color: white
         text-auto-resize: true
         margin-top: 24
         margin-right: 22
@@ -502,8 +502,8 @@ ClearImbue < UIWidget
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         !text: tr('Raises your walking speed by 30. Lasts for 20h 0min while equipped.')
-      font: verdana-11px-rounded
-      color: white
+        font: verdana-11px-rounded
+        color: white
         text-auto-resize: true
 
   Panel
@@ -560,8 +560,8 @@ ClearImbue < UIWidget
         id: cleanImbuementsDetails
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-      font: verdana-11px-rounded
-      color: white
+        font: verdana-11px-rounded
+        color: white
         text-auto-resize: true
 
       UIButton
@@ -625,7 +625,6 @@ ScrollImbue < UIWidget
       PickItemButton
       ScrollItemButton
         
-
       UIItem
         id: itemScroll
         size: 64 64
@@ -643,8 +642,8 @@ ScrollImbue < UIWidget
         anchors.top: prev.top
         anchors.right: prev.left
         !text: tr('Blank Imbuement Scroll')
-      font: verdana-11px-rounded
-      color: white
+        font: verdana-11px-rounded
+        color: white
         text-auto-resize: true
         margin-top: 24
         margin-right: 22
@@ -792,8 +791,8 @@ ScrollImbue < UIWidget
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         !text: tr('')
-      font: verdana-11px-rounded
-      color: white
+        font: verdana-11px-rounded
+        color: white
         text-auto-resize: true
         visible: true
 

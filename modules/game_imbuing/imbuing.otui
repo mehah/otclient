@@ -70,23 +70,40 @@ ItemInformation < Panel
 
     Slot
       id: slot0
-      !text: tr("Slot 1")
       text-align: center
       anchors.left: parent.left
+      image-source: /images/game/imbuing/slot_inactive
+      image-clip: 0 0 66 66
+      $hover !pressed:
+        image-clip: 0 0 66 66
+      $pressed:
+        image-source: /images/game/imbuing/slot
+        image-clip: 0 0 66 66
 
     Slot
       id: slot1
-      !text: tr("Slot 2")
-      text-align: center
-      margin-left: 10
       anchors.left: prev.right
+      margin-left: 10
+      image-source: /images/game/imbuing/slot_inactive
+      image-clip: 0 0 66 66
+      $hover !pressed:
+        image-clip: 0 0 66 66
+      $pressed:
+        image-source: /images/game/imbuing/slot
+        image-clip: 0 0 66 66
 
     Slot
       id: slot2
-      !text: tr("Slot 3")
       text-align: center
       margin-left: 10
       anchors.left: prev.right
+      image-source: /images/game/imbuing/slot_inactive
+      image-clip: 0 0 66 66
+      $hover !pressed:
+        image-clip: 0 0 66 66
+      $pressed:
+        image-source: /images/game/imbuing/slot
+        image-clip: 0 0 66 66
 
   Label
     id: selectSlot

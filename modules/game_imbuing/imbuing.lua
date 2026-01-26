@@ -250,7 +250,7 @@ function resetSlots()
     end
     for i = 1, 3 do
         local slot = imbuingWindow.itemInfo.slots:getChildByIndex(i)
-        slot:setText('Slot ' .. i)
+        -- slot:setText('Slot ' .. i)
         slot:getChildById('icon'):setVisible(false)
         slot:setEnabled(false)
         slot:setTooltip(
