@@ -99,6 +99,7 @@ public:
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
+    void onHoverChange(bool hovered) override;
     bool onMouseMove(const Point& mousePos, const Point& mouseMoved) override;
     bool onMousePress(const Point& mousePos, Fw::MouseButton button) override;
     bool onMouseRelease(const Point& mousePos, Fw::MouseButton button) override;

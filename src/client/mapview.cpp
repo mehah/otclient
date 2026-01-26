@@ -588,6 +588,14 @@ void MapView::onMouseMove(const Position& mousePos, const bool /*isVirtualMove*/
                         }
                     }
                 }
+                
+                if (!cursorSet && tile->isWalkable()) {
+                    int id = g_mouse.getCursorId("walk");
+                    if (id != -1) {
+                        g_window.setMouseCursor(id);
+                        cursorSet = true;
+                    }
+                }
             }
         }
 
