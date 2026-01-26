@@ -351,10 +351,17 @@ bool LoginHttp::parseJsonResponse(const std::string& body) {
         return false;
     }
 
-    if (responseJson.contains("errorCode") && responseJson["errorCode"].get<int>() != 0) {
-        this->errorMessage = responseJson.value("errorMessage", "Authenticator token required.");
-        g_logger.error("Error code: {}, message: {}", responseJson["errorCode"].get<int>(), this->errorMessage);
-        return false;
+    if (responseJson.contains("errorCode")) {
+        if (!responseJson["errorCode"].is_number_integer()) {
+            this->errorMessage = "Invalid errorCode type in response.";
+            return false;
+        }
+        const int code = responseJson["errorCode"].get<int>();
+        if (code != 0) {
+            this->errorMessage = responseJson.value("errorMessage", "Authenticator token required.");
+            g_logger.error("Error code: {}, message: {}", code, this->errorMessage);
+            return false;
+        }
     }
 
     if (!responseJson.contains("session") || !responseJson.contains("playdata")) {

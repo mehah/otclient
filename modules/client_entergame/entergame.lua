@@ -192,7 +192,9 @@ function EnterGame.init()
 
     local servers = g_settings.getNode("ServerList") or {}
     local serverData = servers[host] or {}
-    if serverData and serverData.account then
+    local decryptedAccount = safeDecrypt(serverData.account or '')
+    local hasCreds = #decryptedAccount > 0
+    if hasCreds then
         EnterGame.setAccountName(serverData.account)
         EnterGame.setPassword(serverData.password)
         enterGame:getChildById('rememberEmailBox'):setChecked(true)
@@ -201,8 +203,8 @@ function EnterGame.init()
         EnterGame.setPassword('')
         enterGame:getChildById('rememberEmailBox'):setChecked(false)
     end
-    
-    enterGame:getChildById('autoLoginBox'):setChecked(serverData.autologin == true)
+
+    enterGame:getChildById('autoLoginBox'):setChecked(hasCreds and serverData.autologin == true)
     enterGame:getChildById('serverHostTextEdit'):setText(host)
     enterGame:getChildById('serverPortTextEdit'):setText(port)
     enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
