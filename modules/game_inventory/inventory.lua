@@ -37,7 +37,7 @@ local function isPlayerMonk()
 end
 
 local function updateMonkMirrorItem(leftItem)
-    if not g_game.getFeature(GameMonkVocation) then
+    if not g_game.getFeature(GameVocationMonk) then
         return
     end
     if inventoryShrink then

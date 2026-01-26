@@ -268,7 +268,7 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1500 then
-            g_game.enableFeature(GameMonkVocation)
+            g_game.enableFeature(GameVocationMonk)
         end
     end
 })
