@@ -18,7 +18,6 @@ function controllerNpcTrader:onGameStart()
         onNpcChatWindow = onNpcChatWindow,
         onOpenNpcTrade = function(...)
             if not g_game.getFeature(GameNpcWindowRedesign) then
-                print("aaaaaaaa")
                 self:onOpenNpcTradeLegacy(...)
             else
                 onOpenNpcTrade(...)
@@ -40,7 +39,7 @@ end
 
 function controllerNpcTrader:onTerminate()
     self:onCloseNpcTrade()
-    if g_game.getFeature(GameNpcWindowRedesign) then
+    if  not g_game.getFeature(GameNpcWindowRedesign) then
         self:legacy_terminate()
     end
 end
