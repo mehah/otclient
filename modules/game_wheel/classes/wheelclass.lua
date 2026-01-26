@@ -241,7 +241,6 @@ end
 
 function WheelOfDestiny.onWheelClick(position)
   local index = WheelOfDestiny.getSliceIndex(position)
-  g_logger.info("WheelOfDestiny: Clicked index: " .. index)
   if index == 0 then
     return
   end
