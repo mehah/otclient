@@ -9,6 +9,15 @@ Workshop.__index = Workshop
 fragmentList = {}
 currentWorkshopPage = 1
 
+-- Helper function to match text (case-insensitive search)
+local function matchText(text, search)
+	if not text or not search then
+		return false
+	end
+	
+	return text:lower():find(search:lower(), 1, true) ~= nil
+end
+
 function Workshop.getFragmentList()
 	return fragmentList
 end
@@ -613,7 +622,8 @@ function Workshop.getSortList(sortOption, equippedBasic, equippedSupreme, text)
 	local gradesText = { ["Grade II"] = 1, ["Grade III"] = 2, ["Grade IV"] = 3 }
 
     for _, data in pairs(fragmentList) do
-		if text and not matchText(text, data.tooltip) then
+		-- Only apply text filter if text is not empty
+		if text and not string.empty(text) and not matchText(text, data.tooltip) then
 			goto continue
 		end
 

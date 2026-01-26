@@ -830,7 +830,10 @@ function WheelOfDestiny.onCreate(vocationId)
   end
 	
   if fragmentWindow:isVisible() then
-    Workshop.showFragmentList(true, false, true)
+    -- Preserve current search text and filter when refreshing after enhance
+    local searchWidget = fragmentWindow:recursiveGetChildById('searchText')
+    local currentSearch = searchWidget and searchWidget:getText() or ""
+    Workshop.showFragmentList(false, false, true, currentSearch)
   end
 end
 
