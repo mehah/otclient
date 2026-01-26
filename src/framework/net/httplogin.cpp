@@ -269,6 +269,7 @@ httplib::Result LoginHttp::loginHttpsJson(const std::string& host,
 
     if (!token.empty()) {
         body["token"] = token;
+        body["authenticatorToken"] = token;
     }
 
     const httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };

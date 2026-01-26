@@ -137,9 +137,17 @@ void OTMLParser::parseNode(const std::string_view data)
     } else {
         // Normal processing (list item, key-value, or just key)
         if (isUrlKey) {
-            // For URLs, find colon after the "://" pattern
+            // For URLs, prefer a separator colon followed by whitespace (avoids port/path colons)
             const size_t schemeEnd = line.find("://");
-            dotsPos = (schemeEnd != std::string::npos) ? line.find(':', schemeEnd + 3) : line.find(':');
+            const size_t searchFrom = (schemeEnd != std::string::npos) ? schemeEnd + 3 : 0;
+            const size_t sepPosSpace = line.find(": ", searchFrom);
+            const size_t sepPosTab = line.find(":\t", searchFrom);
+            if (sepPosSpace != std::string::npos)
+                dotsPos = sepPosSpace;
+            else if (sepPosTab != std::string::npos)
+                dotsPos = sepPosTab;
+            else
+                dotsPos = std::string::npos;
         } else {
             dotsPos = line.find(':');
         }
