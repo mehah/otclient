@@ -1,8 +1,11 @@
 EnterGame = {}
 
 function safeDecrypt(text)
+    if not text or text == '' then
+        return ''
+    end
     local success, result = pcall(g_crypt.decrypt, text)
-    return success and result or text
+    return success and result or ''
 end
 
 -- private variables
@@ -198,10 +201,10 @@ function EnterGame.init()
         EnterGame.setPassword('')
         enterGame:getChildById('rememberEmailBox'):setChecked(false)
     end
-
+    
+    enterGame:getChildById('autoLoginBox'):setChecked(serverData.autologin == true)
     enterGame:getChildById('serverHostTextEdit'):setText(host)
     enterGame:getChildById('serverPortTextEdit'):setText(port)
-    enterGame:getChildById('autoLoginBox'):setChecked(autologin)
     enterGame:getChildById('stayLoggedBox'):setChecked(stayLogged)
     enterGame:getChildById('httpLoginBox'):setChecked(httpLogin)
 
