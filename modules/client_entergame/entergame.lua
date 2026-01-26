@@ -82,8 +82,8 @@ local function onCharacterList(protocol, characters, account, otui)
         g_settings.set('account', account)
         g_settings.set('password', password)
 
-        ServerList.setServerAccount(G.host, account)
-        ServerList.setServerPassword(G.host, password)
+        ServerList.setServerAccount(G.host, G.account)
+        ServerList.setServerPassword(G.host, G.password)
         ServerList.setServerAutologin(G.host, enterGame:getChildById('autoLoginBox'):isChecked())
 
         g_settings.set('autologin', enterGame:getChildById('autoLoginBox'):isChecked())
@@ -193,8 +193,8 @@ function EnterGame.init()
     local servers = g_settings.getNode("ServerList") or {}
     local serverData = servers[host] or {}
     if serverData and serverData.account then
-        EnterGame.setAccountName(safeDecrypt(serverData.account))
-        EnterGame.setPassword(safeDecrypt(serverData.password))
+        EnterGame.setAccountName(serverData.account)
+        EnterGame.setPassword(serverData.password)
         enterGame:getChildById('rememberEmailBox'):setChecked(true)
     else
         EnterGame.setAccountName('')
@@ -246,8 +246,8 @@ function EnterGame.init()
             local password = enterGame:getChildById('accountPasswordTextEdit'):getText()
 
             if checked and #account > 0 then
-                ServerList.setServerAccount(host, g_crypt.encrypt(account))
-                ServerList.setServerPassword(host, g_crypt.encrypt(password))
+                ServerList.setServerAccount(host, account)
+                ServerList.setServerPassword(host, password)
                 ServerList.setServerAutologin(host, enterGame:getChildById('autoLoginBox'):isChecked() or false)
                 g_settings.set('host', host)
             else
