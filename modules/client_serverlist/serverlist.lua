@@ -1,8 +1,11 @@
 ServerList = {}
 
 function safeDecrypt(text)
+    if not text or text == '' then
+        return ''
+    end
     local success, result = pcall(g_crypt.decrypt, text)
-    return success and result or text
+    return success and result or ''
 end
 
 -- private variables
