@@ -3665,8 +3665,8 @@ function manageHotkeys(typo)
       local usedButton = modules.game_actionbar.getUsedHotkeyButton(text)
       if usedButton then
         Options.removeHotkey(usedButton:getId())
-        g_keyboard.unbindKeyPress(text, nil, m_interface.getRootPanel())
-        g_keyboard.unbindKeyDown(text, nil, m_interface.getRootPanel())
+        g_keyboard.unbindKeyPress(text, nil, modules.game_interface.getRootPanel())
+        g_keyboard.unbindKeyDown(text, nil, modules.game_interface.getRootPanel())
         usedButton.cache.hotkey = nil
         modules.game_actionbar.updateButton(usedButton)
       end
@@ -3866,7 +3866,7 @@ function toggleHelperTracker()
 		helperTracker:setParent(nil)
 	else
 		helperTracker:open()
-		if m_interface.addToPanels(helperTracker) then
+		if modules.game_interface.addToPanels(helperTracker) then
 			helperTracker:getParent():moveChildToIndex(helperTracker, #helperTracker:getParent():getChildren())
 		end
 	end
