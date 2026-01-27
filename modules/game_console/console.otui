@@ -67,6 +67,7 @@ ConsoleTabBarButton < UIButton
   anchors.top: parent.top
   anchors.left: parent.left
   padding: 5
+  tab-spacing: 0
   padding-left: 20
   padding-right: 20
   &tabWidth: 95
