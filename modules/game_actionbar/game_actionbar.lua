@@ -126,20 +126,58 @@ function setupActionBar(n)
     for i = 1, 50 do
         local layout = n < 4 and 'ActionButton' or 'SideActionButton'
         local widget = actionbar.tabBar:getChildById(n .. "." .. i)
-        if not widget then
-            widget = g_ui.createWidget(layout, actionbar.tabBar)
-            widget:setId(n .. "." .. i)
+        
+           if not widget then
+               local hasMapping = ApiJson.getMapping(n, i)
+           
+           if hasMapping then
+               widget = g_ui.createWidget(layout, actionbar.tabBar)
+               widget:setId(n .. "." .. i)
+               if g_game.isOnline() then
+                   updateButton(widget)
+               end
+           else
+               widget = g_ui.createWidget('UIWidget', actionbar.tabBar)
+               widget:setId(n .. "." .. i)
+               widget:setSize({width = 34, height = 34})
+               widget:setMarginLeft(2)
+               widget:setImageSource('/images/game/actionbar/actionbarslot')
+               widget:setDraggable(false)
+               
+               widget.onDrop = function(self, draggedWidget, mousePos)
+                    if draggedWidget and draggedWidget.currentDragThing then
+                        if tryAssignActionButtonFromDrop(mousePos, draggedWidget, draggedWidget.currentDragThing) then
+                            return true
+                        end
+                    end
+               end
+               
+               widget.onMouseRelease = function(self, mousePos, mouseButton)
+                    if mouseButton == MouseRightButton then
+                        local parent = self:getParent()
+                        local id = self:getId()
+                        updateButton(self)
+                        local newButton = parent:getChildById(id)
+                        if newButton and newButton.onMouseRelease then
+                            newButton.onMouseRelease(newButton, mousePos, mouseButton)
+                        end
+                        return true
+                    end
+               end
+           end
         end
-        resetButtonCache(widget)
-        if g_game.isOnline() then
-            updateButton(widget)
+        
+        -- Only update if it's a real button
+        if widget:getChildById('item') and g_game.isOnline() then
+             updateButton(widget)
         end
-        if widget.cooldown then
-            widget.cooldown:stop()
-        end
-        if widget.item and widget.item:getItemId() > 100 then
-            table.insert(items, widget.item:getItem())
-        end
+         
+         if widget.cooldown then
+             widget.cooldown:stop()
+         end
+         if widget.item and widget.item:getItemId() > 100 then
+             table.insert(items, widget.item:getItem())
+         end
     end
 end
 
@@ -200,6 +238,7 @@ end
 -- /*=============================================
 -- =            Event             =
 -- =============================================*/
+
 
 local function connecting()
     if areEventsConnected then
@@ -299,6 +338,9 @@ end
 
 function ActionBarController:onGameStart()
     onCreateActionBars()
+    
+    -- Ensure fresh cache
+    if clearHotkeyCache then clearHotkeyCache() end
     updateActionBarEventSubscriptions()
     dragItem = nil
     dragButton = nil
@@ -335,6 +377,7 @@ end
 -- =            Events Call            =
 -- =============================================*/
 
+
 function onSpellCooldown(spellId, delay)
     local showProgress = modules.client_options.getOption("graphicalCooldown")
     local showTime = modules.client_options.getOption("cooldownSecond")
@@ -349,7 +392,7 @@ function onSpellCooldown(spellId, delay)
     for _, actionbar in pairs(activeActionBars) do
         for _, button in pairs(actionbar.tabBar:getChildren()) do
             local cache = getButtonCache(button)
-            if cache.isSpell or cache.isRuneSpell then
+            if cache and (cache.isSpell or cache.isRuneSpell) then
                 local shouldUpdate = true
                 if cache.isRuneSpell and not isRune then
                     shouldUpdate = false
@@ -382,7 +425,7 @@ function onSpellGroupCooldown(groupId, delay)
     for _, actionbar in pairs(activeActionBars) do
         for _, button in pairs(actionbar.tabBar:getChildren()) do
             local cache = getButtonCache(button)
-            if not cache.isRuneSpell and cache.spellData then
+            if cache and (not cache.isRuneSpell and cache.spellData) then
                 if Spells.getCooldownByGroup(cache.spellData, groupId) then
                     local resttime = button.cooldown:getDuration() - button.cooldown:getTimeElapsed()
                     if resttime < delay then
@@ -468,7 +511,7 @@ function onMultiUseCooldown(multiUseCooldown)
     for _, actionbar in pairs(activeActionBars) do
         for _, button in pairs(actionbar.tabBar:getChildren()) do
             updateButtonState(button)
-            if multiUseCooldown and button.item and button.cache.itemId then
+            if multiUseCooldown and button.item and button.cache and button.cache.itemId then
                 local item = button.item:getItem()
                 if item and item:isMultiUse() then
                     local marketArray = {MarketCategory.Potions, MarketCategory.Runes, MarketCategory.Tools}
@@ -489,9 +532,90 @@ function updateInventoryItems(_)
     end
 end
 
--- Export function for external modules to call when panel visibility changes
 function updateVisibleWidgetsExternal()
-    -- Call the updateVisibleWidgets function from ActionBarLayout.lua
-    -- The function should be available globally since all logic files are loaded
     updateVisibleWidgets()
+end
+
+function toggleCooldownOption()
+    for _, actionbar in pairs(activeActionBars) do
+        for _, button in pairs(actionbar.tabBar:getChildren()) do
+            if button.cooldown and button.cooldown:getPercent() < 100 then
+                 local remaining = button.cooldown:getDuration() - button.cooldown:getTimeElapsed()
+                 if remaining > 0 then
+                     updateCooldown(button, remaining) 
+                 end
+            end
+        end
+    end
+
+end
+
+function configureActionBar(key, value)
+    local map = {
+        actionBarShowBottom1 = 1,
+        actionBarShowBottom2 = 2,
+        actionBarShowBottom3 = 3,
+        actionBarShowLeft1 = 4,
+        actionBarShowLeft2 = 5,
+        actionBarShowLeft3 = 6,
+        actionBarShowRight1 = 7,
+        actionBarShowRight2 = 8,
+        actionBarShowRight3 = 9
+    }
+    local n = map[key]
+    if not n then return end
+    
+    local actionbar = actionBars[n]
+    if actionbar then
+        actionbar:setVisible(value)
+        actionbar:setOn(value)
+        if value then
+            addActiveActionBar(actionbar)
+            setupActionBar(n)
+        else
+            removeActiveActionBar(actionbar)
+        end
+        if resizeLockButtons then
+            resizeLockButtons()
+        end
+        if ActionBarController then
+            ActionBarController:scheduleEvent(onUpdateActionBarStatus)
+        end
+    end
+end
+
+function updateVisibleOptions(type, value)
+    for _, actionbar in pairs(activeActionBars) do
+        for _, button in pairs(actionbar.tabBar:getChildren()) do
+            if type == 'hotkey' and button.hotkeyLabel then
+                button.hotkeyLabel:setVisible(value)
+            elseif type == 'parameter' and button.parameterText then
+                button.parameterText:setVisible(value)
+            elseif type == 'tooltip' then
+                setupButtonTooltip(button, false)
+            elseif type == 'amount' then
+                updateButtonState(button)
+            end
+        end
+    end
+end
+
+function resetAction(barId)
+    local actionbar = actionBars[barId]
+    if not actionbar then return end
+    
+    for i = 1, 50 do
+        ApiJson.removeAction(barId, i)
+        
+        local button = actionbar.tabBar:getChildById(barId .. "." .. i)
+        if button then
+            updateButton(button)
+        end
+    end
+end
+
+function resetActionBars()
+    for i = 1, 9 do
+        resetAction(i)
+    end
 end

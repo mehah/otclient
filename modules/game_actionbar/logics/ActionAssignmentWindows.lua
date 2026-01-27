@@ -276,11 +276,13 @@ function assignItem(button, itemId, itemTier, dragEvent)
     if not isLoaded then
         return true
     end
-    local item = button.item:getItem()
     if not button.item then
+        local parent = button:getParent()
+        local id = button:getId()
         updateButton(button)
-        return
+        button = parent:getChildById(id)
     end
+    local item = button.item:getItem()
     local actionbar = button:getParent():getParent()
     if dragEvent and actionbar.locked or actionbar.locked then
         updateButton(button)

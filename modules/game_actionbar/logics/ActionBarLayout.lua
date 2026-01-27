@@ -176,7 +176,7 @@ function updateVisibleWidgets()
                         firstIndex = newFirstIndex
                     end
                 end
-                
+
                 -- Final bounds check
                 firstIndex = math.max(1, math.min(firstIndex, totalChildren - visibleCount + 1))
             end
@@ -304,7 +304,7 @@ function unbindActionBarEvent(actionbar)
         if button.cache and button.cache.hotkey then
             unbindHotkey(button.cache.hotkey)
         end
-        if button.cache.cooldownEvent then
+        if button.cache and button.cache.cooldownEvent then
             removeEvent(button.cache.cooldownEvent)
         end
         resetButtonCache(button)
