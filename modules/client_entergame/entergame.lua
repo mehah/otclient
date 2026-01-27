@@ -798,7 +798,7 @@ function EnterGame.doLogin()
         protocolLogin.onUpdateNeeded = onUpdateNeeded
 
         loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
-        loadBox:setWidth(200)
+
         connect(loadBox, {
             onCancel = function(msgbox)
                 loadBox = nil
