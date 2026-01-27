@@ -46,7 +46,7 @@ EnterGameWindow
     margin-top: 10
     opacity: 0.8
 
-  TextEdit
+  HiddenTextQtToggleEdit
     id: accountNameTextEdit
     anchors.right: accountPasswordTextEdit.right
     anchors.verticalCenter: emailLabel.verticalCenter
