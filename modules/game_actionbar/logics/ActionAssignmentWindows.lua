@@ -281,6 +281,9 @@ function assignItem(button, itemId, itemTier, dragEvent)
         local id = button:getId()
         updateButton(button)
         button = parent:getChildById(id)
+        if not button or not button.item then
+            return
+        end
     end
     local item = button.item:getItem()
     local actionbar = button:getParent():getParent()

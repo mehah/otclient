@@ -47,10 +47,12 @@ lastHighlightWidget = nil
 isLoaded = false
 local areEventsConnected = false
 
+--- checks if action bar is visible
 local function isActionBarVisible(actionBar)
     return actionBar and actionBar:isVisible()
 end
 
+--- Adds an action bar to the active list
 function addActiveActionBar(actionBar)
     if not actionBar then
         return false
@@ -65,6 +67,7 @@ function addActiveActionBar(actionBar)
     table.insert(activeActionBars, actionBar)
     return true
 end
+--- Rebuilds the list of active action bars
 local function rebuildActiveActionBars()
     local previousCount = #activeActionBars
     local visibleCount = 0
@@ -82,6 +85,7 @@ local function rebuildActiveActionBars()
 
     return visibleCount > 0
 end
+--- Removes an action bar from the active list
 function removeActiveActionBar(actionBar)
     if not actionBar then
         return false
@@ -101,6 +105,7 @@ function removeActiveActionBar(actionBar)
     return removed
 end
 
+--- Checks if there are any active action bars
 function hasAnyActiveActionBar()
     if not g_game.isOnline() then
         return false
@@ -113,6 +118,7 @@ function hasAnyActiveActionBar()
     return false
 end
 
+--- Sets up an action bar by index
 function setupActionBar(n)
     local actionbar = actionBars[n]
     local barState = ApiJson.getActionBar(n) or {}
@@ -133,9 +139,6 @@ function setupActionBar(n)
            if hasMapping then
                widget = g_ui.createWidget(layout, actionbar.tabBar)
                widget:setId(n .. "." .. i)
-               if g_game.isOnline() then
-                   updateButton(widget)
-               end
            else
                widget = g_ui.createWidget('UIWidget', actionbar.tabBar)
                widget:setId(n .. "." .. i)
@@ -181,6 +184,7 @@ function setupActionBar(n)
     end
 end
 
+--- Gets the count of active bottom action bars
 function getActiveBottomBars()
     if #actionBars == 0 then
         return 0
@@ -195,6 +199,7 @@ function getActiveBottomBars()
     return count
 end
 
+--- Gets the count of active right action bars
 function getActiveRightBars()
     if #actionBars == 0 then
         return 0
@@ -240,6 +245,7 @@ end
 -- =============================================*/
 
 
+--- Connects player events
 local function connecting()
     if areEventsConnected then
         return
@@ -263,6 +269,7 @@ local function connecting()
     areEventsConnected = true
 end
 
+--- Disconnects player events
 local function disconnecting()
     if not areEventsConnected then
         return
@@ -286,6 +293,7 @@ local function disconnecting()
     areEventsConnected = false
 end
 
+--- Updates event subscriptions based on active bars
 function updateActionBarEventSubscriptions()
     if hasAnyActiveActionBar() then
         connecting()
@@ -299,6 +307,7 @@ end
 -- =            Controller             =
 -- =============================================*/
 ActionBarController = Controller:new()
+--- Initializes the action bar controller
 function ActionBarController:onInit()
     g_ui.importStyle("otui/style.otui")
     gameRootPanel = modules.game_interface.getRootPanel()
@@ -308,6 +317,7 @@ function ActionBarController:onInit()
     mouseGrabberWidget.onMouseRelease = onDropActionButton
 end
 
+--- Handles termination event
 function ActionBarController:onTerminate()
     ApiJson.saveData()
     for _, actionbar in pairs(actionBars) do
@@ -336,6 +346,7 @@ function ActionBarController:onTerminate()
     disconnecting()
 end
 
+--- Handles game start event
 function ActionBarController:onGameStart()
     onCreateActionBars()
     
@@ -378,6 +389,7 @@ end
 -- =============================================*/
 
 
+--- Handles spell cooldown events
 function onSpellCooldown(spellId, delay)
     local showProgress = modules.client_options.getOption("graphicalCooldown")
     local showTime = modules.client_options.getOption("cooldownSecond")
@@ -470,6 +482,7 @@ function onSpellGroupCooldown(groupId, delay)
     end
 end
 
+--- Handles passive ability data updates
 function onPassiveData(currentCooldown, maxCooldown, canDecay)
     passiveData = {
         cooldown = currentCooldown,
@@ -478,6 +491,7 @@ function onPassiveData(currentCooldown, maxCooldown, canDecay)
     updateActionPassive()
 end
 
+--- Handles spell list changes
 function onSpellsChange(player, list)
     spellListData = {}
     for _, spellId in pairs(list) do
@@ -501,12 +515,14 @@ function onHotkeyItems(itemList)
     end
 end
 
+--- Handles level updates
 function onUpdateLevel(localPlayer, level, levelPercent, oldLevel, oldLevelPercent)
     if level ~= oldLevel then
         onUpdateActionBarStatus()
     end
 end
 
+--- Handles multi-use cooldown updates
 function onMultiUseCooldown(multiUseCooldown)
     for _, actionbar in pairs(activeActionBars) do
         for _, button in pairs(actionbar.tabBar:getChildren()) do
@@ -532,10 +548,12 @@ function updateInventoryItems(_)
     end
 end
 
+--- Updates visible widgets externally
 function updateVisibleWidgetsExternal()
     updateVisibleWidgets()
 end
 
+--- Toggles cooldown display options
 function toggleCooldownOption()
     for _, actionbar in pairs(activeActionBars) do
         for _, button in pairs(actionbar.tabBar:getChildren()) do
@@ -584,6 +602,7 @@ function configureActionBar(key, value)
     end
 end
 
+--- Updates visible options
 function updateVisibleOptions(type, value)
     for _, actionbar in pairs(activeActionBars) do
         for _, button in pairs(actionbar.tabBar:getChildren()) do
@@ -600,6 +619,7 @@ function updateVisibleOptions(type, value)
     end
 end
 
+--- Resets a specific action bar
 function resetAction(barId)
     local actionbar = actionBars[barId]
     if not actionbar then return end
@@ -614,6 +634,7 @@ function resetAction(barId)
     end
 end
 
+--- Resets all action bars
 function resetActionBars()
     for i = 1, 9 do
         resetAction(i)

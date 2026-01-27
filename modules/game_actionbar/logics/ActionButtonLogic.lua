@@ -1,10 +1,12 @@
 -- /*=============================================
 -- =            util             =
 -- =============================================*/
+--- checks if string is empty
 local function string_empty(str)
     return #str == 0
 end
 
+--- Truncates text with ellipsis
 local function short_text(text, chars_limit)
     if #text > chars_limit then
         local newstring = ''
@@ -20,6 +22,7 @@ local function short_text(text, chars_limit)
     end
 end
 
+--- Inserts line breaks into text
 local function lineBreaks(input, lineLength, spaceCount)
     spaceCount = spaceCount or 0
     local result = {}
@@ -35,6 +38,7 @@ local function lineBreaks(input, lineLength, spaceCount)
     return table.concat(result)
 end
 
+--- Gets a button widget by ID
 local function getButtonById(id)
     if not id then
         return nil
@@ -49,10 +53,12 @@ local function getButtonById(id)
     return nil
 end
 
+--- Checks if a button is empty
 local function buttonIsEmpty(button)
     return button.item:getItemId() == 0 and string_empty(button.item.text:getText()) and
                string_empty(button.item.text:getImageSource())
 end
+--- Gets the name of an action type
 local function getActionName(actionType)
     for k, v in pairs(UseTypes) do
         if v == actionType then
@@ -60,6 +66,7 @@ local function getActionName(actionType)
         end
     end
 end
+--- Gets item name by ID
 local function getItemNameById(itemId)
     for _, k in pairs(hotkeyItemList) do
         local item = k[1]
@@ -70,6 +77,7 @@ local function getItemNameById(itemId)
     return "this object"
 end
 
+--- Checks if player can use a spell
 local function playerCanUseSpell(spellData)
     if not g_game.isOnline() then
         return
@@ -140,14 +148,18 @@ end
 
 local hotkeyCache = {}
 local hotkeyCacheValid = false
+local cachedChatMode = nil
 
+--- Updates the hotkey cache
 local function updateHotkeyCache()
     hotkeyCache = {}
+    local currentChatMode = modules.game_console.isChatEnabled() and 'chatOn' or 'chatOff'
+    cachedChatMode = currentChatMode
     hotkeyCacheValid = true
+    
     if not ApiJson.hasCurrentHotkeySet() then return end
     
-    local chatMode = modules.game_console.isChatEnabled() and 'chatOn' or 'chatOff'
-    local entries = ApiJson.getHotkeyEntries(chatMode)
+    local entries = ApiJson.getHotkeyEntries(currentChatMode)
     if not entries then return end
 
     for _, data in pairs(entries) do
@@ -161,19 +173,24 @@ local function updateHotkeyCache()
     end
 end
 
+--- Clears the hotkey cache
 function clearHotkeyCache()
     hotkeyCache = {}
     hotkeyCacheValid = false
+    cachedChatMode = nil
 end
 
+--- Sets up hotkey for a button
 local function setupHotkeyButton(button)
     if not ApiJson.hasCurrentHotkeySet() then
         return
     end
 
+    local currentChatMode = modules.game_console.isChatEnabled() and 'chatOn' or 'chatOff'
+
     -- Invalidate/rebuild cache if needed (you might want a better invalidation strategy later)
     -- For now, we rebuild if it's empty, or we could expose a function to clear it
-    if not hotkeyCacheValid then 
+    if not hotkeyCacheValid or cachedChatMode ~= currentChatMode then 
         updateHotkeyCache()
     end
     
@@ -189,6 +206,7 @@ end
 -- /*=============================================
 -- =            button behavior             =
 -- =============================================*/
+--- Executes the action assigned to a button
 function onExecuteAction(button, isPress)
     local cache = getButtonCache(button)
     if cache.lastClick > g_clock.millis() then
@@ -270,6 +288,7 @@ function onExecuteAction(button, isPress)
     end
 end
 
+--- Translates hotkey text for display
 local function translateDisplayHotkey(text)
     if HotkeyShortcuts[text] then
         text = HotkeyShortcuts[text]
@@ -301,6 +320,7 @@ function clearButton(button, removeAction)
     end
 end
 
+--- Updates the state of a button
 function updateButtonState(button)
     if not button then
         return
@@ -347,6 +367,7 @@ function updateButtonState(button)
     end
 end
 
+--- Gets or creates the cache for a button
 function getButtonCache(button)
     if not button then
         return {
@@ -397,6 +418,7 @@ function getButtonCache(button)
     return button.cache
 end
 
+--- Resets the cache of a button
 function resetButtonCache(button)
     -- Optimize: Check if we really need to clear the item widget cache
     if button.cache and button.cache.itemId > 0 then
@@ -477,6 +499,7 @@ end
 -- /*=============================================
 -- =       Tooltip    =
 -- =============================================*/
+--- Sets up the tooltip for a button
 function setupButtonTooltip(button, isEmpty)
     if not g_game.isOnline() then
         return true
@@ -695,6 +718,7 @@ end
 -- /*=============================================
 -- =       click left in the action bar slot    =
 -- =============================================*/
+--- Updates the button's visual representation
 function updateButton(button)
     local startUpdate = g_clock.millis()
     if not player then
@@ -916,6 +940,7 @@ end
 -- =            Mouse Drag Event             =
 -- =============================================*/
 -- item in UIMap or UIWidget(UIItem) drop in slot actionbar
+--- Gets button from widget
 local function getButtonFromWidget(widget)
     if not widget then
         return nil
@@ -929,6 +954,7 @@ local function getButtonFromWidget(widget)
     return getButtonFromWidget(widget:getParent())
 end
 
+--- Resolves dropped item data
 local function resolveDroppedItemData(draggedWidget, item)
     if type(item) == 'number' then
         local itemTier = 0
@@ -950,6 +976,7 @@ local function resolveDroppedItemData(draggedWidget, item)
     return nil, 0
 end
 
+--- Tries to assign action from a drop event
 function tryAssignActionButtonFromDrop(mousePos, draggedWidget, item)
     if not hasAnyActiveActionBar() or not item then
         return false
@@ -1005,6 +1032,7 @@ function tryAssignActionButtonFromDrop(mousePos, draggedWidget, item)
 end
 
 -- move button to other slot bar 
+--- Resets a dragging widget
 function resetDragWidget(self, button)
     button.cache = getButtonCache(button)
     local cachedItem = cachedItemWidget[button.cache.itemId]
@@ -1032,6 +1060,7 @@ function resetDragWidget(self, button)
     updateButton(widget)
 end
 
+--- Handles drag item leave event
 function onDragItemLeave(self, mousePos, button)
     if lastHighlightWidget then
         lastHighlightWidget:setBorderWidth(0)
