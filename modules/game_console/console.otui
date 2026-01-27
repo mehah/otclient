@@ -62,11 +62,11 @@ ConsoleTabBarButton < UIButton
   image-source: /images/ui/console_button
   image-clip: 0 18 96 18
   color: #7f7f7fff
+  text-offset: 0 -1
   font: verdana-11px-rounded
   anchors.top: parent.top
   anchors.left: parent.left
   padding: 5
-  tab-spacing: 0
   padding-left: 20
   padding-right: 20
   &tabWidth: 95
