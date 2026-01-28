@@ -1153,7 +1153,7 @@ function resetWheel(ignoreprotocol)
   end
 
   WheelOfDestiny.equipedGemBonuses = {}
-  WheelOfDestiny.equipedGems = {}
+  WheelOfDestiny.equipedGems = {0, 0, 0, 0}
   WheelOfDestiny.configureDedicationPerk()
   WheelOfDestiny.configureConvictionPerk()
   WheelOfDestiny.configureVessels()
@@ -2716,8 +2716,6 @@ function WheelOfDestiny.onDeletePreset()
     deletePresetWindow = nil
     WheelOfDestiny.configurePresets()
     WheelOfDestiny.saveWheelPresets()
-    wheelWindow:grabMouse()
-    wheelWindow:grabKeyboard()
   end
 
   local message = string.format("Do you really  want to delete the preset '%s'?", WheelOfDestiny.currentPreset.presetName)
@@ -2856,8 +2854,6 @@ function WheelOfDestiny.onPreparePresetClick(list, selection, oldSelection)
     end
 
     wheelWindow:show(true)
-    wheelWindow:grabMouse()
-    wheelWindow:grabKeyboard()
 
     onWheelOfDestinyApply(false, false)
     WheelOfDestiny.updateCurrentPreset()
