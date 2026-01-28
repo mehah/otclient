@@ -1,6 +1,5 @@
 WheelOfDestiny = {}
 WheelOfDestiny.__index = WheelOfDestiny
-
 WheelOfDestiny.pointInvested = {}
 WheelOfDestiny.clickIndex = {}
 
@@ -1882,7 +1881,7 @@ function WheelOfDestiny.create(playerId, canView, changeState, vocationId, point
   local function incrementBonusCount(bonus, bonusType)
     -- Ignora valores inválidos ou nulos (0 e -1 significam "sem bônus")
     if type(bonus) ~= "number" or bonus <= 0 then
-      -- g_logger.debug(string.format("[WheelCount] Ignored bonus=%s (no modifier for this tier)", tostring(bonus)))
+
       return
     end
   
@@ -1894,17 +1893,11 @@ function WheelOfDestiny.create(playerId, canView, changeState, vocationId, point
   WheelOfDestiny.supremeModCount = {}
   for _, info in pairs(WheelOfDestiny.atelierGems) do
     local function dumpCounts(title, t)
-      g_logger.debug(string.format("[WheelCount] %s (total %d)", title, table.size(t or {})))
-      for k, v in pairs(t or {}) do
-        g_logger.debug(string.format("  %s[%s] = %d", title, k, v))
-      end
+
     end
     dumpCounts("basicModCount", WheelOfDestiny.basicModCount)
     dumpCounts("supremeModCount", WheelOfDestiny.supremeModCount)
-    g_logger.debug(string.format(
-      "[WheelCount] GemID=%d | lesser=%d | regular=%d | supreme=%d",
-      info.gemID or -1, info.lesserBonus or -1, info.regularBonus or -1, info.supremeBonus or -1
-    ))
+
     incrementBonusCount(info.lesserBonus, WheelOfDestiny.basicModCount)
     incrementBonusCount(info.regularBonus, WheelOfDestiny.basicModCount)
     incrementBonusCount(info.supremeBonus, WheelOfDestiny.supremeModCount)
@@ -1983,7 +1976,7 @@ end
 
 function onWheelOfDestinyApply(close, ignoreprotocol)
   local struct = getGemStruct()
-  g_logger.debug("[WheelApply] Executado onWheelOfDestinyApply")
+
 
   if not ignoreprotocol then
     local g = struct[GemDomains.GREEN].gemID or 0
@@ -2536,8 +2529,7 @@ end
 
 function WheelOfDestiny.onCancelConfig()
   wheelWindow:show(true)
-  wheelWindow:grabMouse()
-  wheelWindow:grabKeyboard()
+
   newPresetWindow:hide()
 end
 
@@ -2659,8 +2651,7 @@ function WheelOfDestiny.onConfirmCreatePreset()
   WheelOfDestiny.createPreset(presetName, dataCopy)
   WheelOfDestiny.configurePresets()
   WheelOfDestiny.saveWheelPresets()
-  wheelWindow:grabMouse()
-  wheelWindow:grabKeyboard()
+
 end
 
 function WheelOfDestiny.createPreset(presetName, dataCopy)
@@ -2696,8 +2687,7 @@ function WheelOfDestiny.onConfirmRenamePreset(cancel)
   if cancel then
     renamePresetWindow:hide()
     wheelWindow:show(true)
-    wheelWindow:grabMouse()
-    wheelWindow:grabKeyboard()
+
     return
   end
 
@@ -2725,8 +2715,7 @@ function WheelOfDestiny.onDeletePreset()
     deletePresetWindow:destroy()
     deletePresetWindow = nil
     wheelWindow:show(true)
-    wheelWindow:grabMouse()
-    wheelWindow:grabKeyboard()
+
   end
 
   local yesOption = function()
@@ -3109,7 +3098,7 @@ function WheelOfDestiny.generateInternalPreset()
   end
   
   local playerVocation = translateWheelVocation(player:getVocation())
-  g_logger.debug("[WheelPresets] Generating internal presets for vocation: " .. playerVocation)
+
   
 	for k, v in pairs(WheelOfDestiny.externalPreset.presets) do
 		local codeString = v["exportString"]
