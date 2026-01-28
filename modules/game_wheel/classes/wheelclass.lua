@@ -2745,9 +2745,6 @@ function WheelOfDestiny.onDeletePreset()
     { text="Yes", callback=yesOption },
     { text="No", callback=noOption }
   })
-
-  wheelWindow:grabMouse()
-  wheelWindow:grabKeyboard()
 end
 
 function WheelOfDestiny.deletePreset()
@@ -2912,9 +2909,6 @@ function WheelOfDestiny.onPreparePresetClick(list, selection, oldSelection)
     { text="Yes", callback=yesOption },
     { text="No", callback=noOption }
   })
-
-  wheelWindow:grabMouse()
-  wheelWindow:grabKeyboard()
 end
 
 function WheelOfDestiny.onPresetClick(list, selection, oldSelection)
