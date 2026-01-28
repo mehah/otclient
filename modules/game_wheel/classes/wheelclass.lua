@@ -2282,8 +2282,6 @@ end
 function WheelOfDestiny.showNewPreset(createPreset)
   wheelWindow:hide()
   newPresetWindow:show()
-  newPresetWindow:grabMouse()
-  newPresetWindow:grabKeyboard()
 
   if not createPreset then
     selectedNewPresetRadio:selectWidget(newPresetWindow.contentPanel.import)
@@ -2932,31 +2930,33 @@ function WheelOfDestiny.onPresetClick(list, selection, oldSelection)
 	selection.name:setColor("#f4f4f4")
 	selection.points:setColor("#f4f4f4")
 
-	WheelOfDestiny.currentPreset = presetData
+  WheelOfDestiny.currentPreset = presetData
 
-	local presetLabel = wheelWindow:recursiveGetChildById("presetLabel")
-	presetLabel:setText(string.format("Current Preset: %s", presetData.presetName))
+  local presetLabel = wheelWindow:recursiveGetChildById("presetLabel")
+  presetLabel:setText(string.format("Current Preset: %s", presetData.presetName))
 
-	local presetHotCopy = wheelWindow:recursiveGetChildById("hotCopy")
-	presetHotCopy.onClick = function() 
-		WheelOfDestiny.onExportConfig()
-	end
+  local presetHotCopy = wheelWindow:recursiveGetChildById("hotCopy")
+  presetHotCopy.onClick = function() 
+    WheelOfDestiny.onExportConfig()
+  end
 
-	local managePanel = wheelWindow:recursiveGetChildById("manage")
-	managePanel.applyPresetChanges:setEnabled(false)
-	managePanel.renamePreset:setEnabled(true)
+  local managePanel = wheelWindow:recursiveGetChildById("manage")
+  managePanel.applyPresetChanges:setEnabled(false)
+  managePanel.renamePreset:setEnabled(true)
 
   local deletePreset = wheelWindow:recursiveGetChildById("deletePreset")
   deletePreset:setEnabled(#WheelOfDestiny.internalPreset > 1)
 
-	local oldValue = table.copy(WheelOfDestiny.currentPreset.pointInvested)
+  local oldPoints = table.copy(WheelOfDestiny.currentPreset.pointInvested)
+  local oldGems = table.copy(WheelOfDestiny.currentPreset.equipedGems)
 
-	resetWheel(true)
+  resetWheel(true)
 
-	WheelOfDestiny.currentPreset.pointInvested = oldValue
+  WheelOfDestiny.currentPreset.pointInvested = oldPoints
+  WheelOfDestiny.currentPreset.equipedGems = oldGems
   local pointsInvested = presetData.availablePoints - (WheelOfDestiny.extraGemPoints + WheelOfDestiny.scrollPoints)
 
-	WheelOfDestiny.create(WheelOfDestiny.playerId, WheelOfDestiny.canView, WheelOfDestiny.changeState, WheelOfDestiny.vocationId, pointsInvested, WheelOfDestiny.scrollPoints, presetData.pointInvested, WheelOfDestiny.usedPromotionScrolls, presetData.equipedGems, WheelOfDestiny.atelierGems, WheelOfDestiny.basicModsUpgrade, WheelOfDestiny.supremeModsUpgrade) 
+  WheelOfDestiny.create(WheelOfDestiny.playerId, WheelOfDestiny.canView, WheelOfDestiny.changeState, WheelOfDestiny.vocationId, pointsInvested, WheelOfDestiny.scrollPoints, presetData.pointInvested, WheelOfDestiny.usedPromotionScrolls, presetData.equipedGems, WheelOfDestiny.atelierGems, WheelOfDestiny.basicModsUpgrade, WheelOfDestiny.supremeModsUpgrade) 
 end
 
 function WheelOfDestiny.determinateCurrentPreset()
