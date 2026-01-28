@@ -4,21 +4,16 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <OutDir>$(ProjectDir)../</OutDir>
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <MinimalRebuild>false</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <Optimization>Full</Optimization>
       <ObjectFileName>$(IntDir)\obj_r\%(RelativeDir)</ObjectFileName>
-	  <AdditionalOptions>/bigobj%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OTCLIENT_LIBDEPS_D)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
-
