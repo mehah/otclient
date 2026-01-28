@@ -117,15 +117,15 @@ end
 
 -- servers may have different id's, change if not working properly (only for protocols 910+)
 function getVocationSt(id)
-  if id == 1 then
+  if id == 1 or id == 11 then
     return "K0"
-  elseif id == 2 then
+  elseif id == 2 or id == 12 then
     return "P0"
-  elseif id == 3 then
+  elseif id == 3 or id == 13 then
     return "S0"
-  elseif id == 4 then
+  elseif id == 4 or id == 14 then
     return "D0"
-  elseif id == 5 then
+  elseif id == 5 or id == 15 then
     return "M0"
   end
   return "N"

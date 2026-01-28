@@ -661,6 +661,11 @@ function WheelOfDestiny.onDestinyWheel(playerId, canView, changeState, vocationI
     return
   end
 
+  -- Ensure presets are loaded from wheelOfDestiny.json
+  if table.empty(WheelOfDestiny.internalPreset) then
+    WheelOfDestiny.loadWheelPresets()
+  end
+
   if not wheelWindow:isVisible() then
     wheelWindow:show()
     WheelOfDestiny.resetPassiveFocus()
@@ -1986,13 +1991,22 @@ function onWheelOfDestinyApply(close, ignoreprotocol)
     local a = struct[GemDomains.ACQUA].gemID or 0
     local p = struct[GemDomains.PURPLE].gemID or 0
   
-    WheelOfDestiny.currentPreset.equipedGems = struct
+    if WheelOfDestiny.currentPreset then
+      WheelOfDestiny.currentPreset.equipedGems = struct
+    end
   
     g_logger.debug(string.format(
       "[WheelApply] Enviando gems -> GREEN:%d  RED:%d  ACQUA:%d  PURPLE:%d",
       g, r, a, p))
   
     g_game.sendApplyWheelPoints(WheelOfDestiny.pointInvested, g, r, a, p)
+  end
+
+  -- Update and save current preset (only if local player is available)
+  local player = g_game.getLocalPlayer()
+  if player then
+    WheelOfDestiny.updateCurrentPreset()
+    WheelOfDestiny.saveWheelPresets()
   end
 
   if close then
@@ -2466,7 +2480,32 @@ function WheelOfDestiny.getExportCode(preset)
   end
 
   table.insert(dataParts, packedHeader)
-  for _, value in ipairs(pointInvested) do
+  
+  -- Export map: converts internal position to export position
+  -- This is the INVERSE of importMap used in onImportConfig
+  local exportMap = {
+    -- TL (Green) - (Top -> Bot)
+    15, 14, 9, 13, 8, 3, 7, 2, 1,
+    -- TR (Red) - (Right -> Top)
+    16, 17, 10, 18, 11, 4, 12, 5, 6,
+    -- BR (Purple) - (Right -> Bot)
+    22, 23, 28, 24, 29, 34, 30, 35, 36,
+    -- BL (Blue) - (Left -> Bot)
+    21, 20, 27, 19, 26, 33, 32, 25, 31
+  }
+  
+  -- Convert internal pointInvested array to export order
+  local exportPoints = {}
+  for i = 1, 36 do
+    exportPoints[i] = 0
+  end
+  
+  for exportIndex, internalIndex in ipairs(exportMap) do
+    exportPoints[exportIndex] = pointInvested[internalIndex] or 0
+  end
+  
+  -- Pack the points in export order
+  for _, value in ipairs(exportPoints) do
       local packedValue = string.pack_custom("I1", value)
       if packedValue and packedValue ~= "" then
           table.insert(dataParts, packedValue)
@@ -2487,7 +2526,11 @@ function WheelOfDestiny.getExportCode(preset)
   end
 
   local base64Data = base64.encode(data)
-  local currentVocation = translateWheelVocation(LoadedPlayer:getVocation())
+  local player = g_game.getLocalPlayer()
+  if not player then
+    return ""
+  end
+  local currentVocation = translateWheelVocation(player:getVocation())
   return string.format("%s%s", getVocationSt(currentVocation), base64Data)
 end
 
@@ -2615,6 +2658,7 @@ function WheelOfDestiny.onConfirmCreatePreset()
   newPresetWindow:hide()
   WheelOfDestiny.createPreset(presetName, dataCopy)
   WheelOfDestiny.configurePresets()
+  WheelOfDestiny.saveWheelPresets()
   wheelWindow:grabMouse()
   wheelWindow:grabKeyboard()
 end
@@ -2665,6 +2709,7 @@ function WheelOfDestiny.onConfirmRenamePreset(cancel)
   renamePresetWindow:hide()
   wheelWindow:show(true)
   WheelOfDestiny.configurePresets()
+  WheelOfDestiny.saveWheelPresets()
   wheelWindow:grabMouse()
   wheelWindow:grabKeyboard()
 end
@@ -2690,6 +2735,7 @@ function WheelOfDestiny.onDeletePreset()
     deletePresetWindow:destroy()
     deletePresetWindow = nil
     WheelOfDestiny.configurePresets()
+    WheelOfDestiny.saveWheelPresets()
     wheelWindow:grabMouse()
     wheelWindow:grabKeyboard()
   end
@@ -2716,37 +2762,103 @@ function WheelOfDestiny.deletePreset()
   WheelOfDestiny.currentPreset = WheelOfDestiny.internalPreset[1]
 end
 
+local configuringPresets = false
+
 function WheelOfDestiny.configurePresets()
-	local presetPanel = wheelWindow:recursiveGetChildById("presetList")
-	if not presetPanel or not presetPanel:isVisible() then
+	if configuringPresets then
 		return
 	end
-
-	presetPanel:destroyChildren()
-	presetPanel.onChildFocusChange = function(self, selection, oldSelection) WheelOfDestiny.onPreparePresetClick(self, selection, oldSelection) end
-
-  table.sort(WheelOfDestiny.internalPreset, function(a, b)
-    return a.presetName:lower() < b.presetName:lower()
-  end)
-
-	for i, data in pairs(WheelOfDestiny.internalPreset) do
-		local widget = g_ui.createWidget('PresetLabel', presetPanel)
-		widget.name:setText(data.presetName)
-		widget.points:setText(data.availablePoints - data.usedPoints)
-		widget:setBackgroundColor(i % 2 == 0 and "#484848" or "#414141")
-		widget.presetData = data
-
-		if WheelOfDestiny.currentPreset.presetName == data.presetName then
-			presetPanel:focusChild(widget)
+	
+	configuringPresets = true
+	local status, err = pcall(function()
+		local presetPanel = wheelWindow:recursiveGetChildById("presetList")
+		if not presetPanel then
+			g_logger.error("[WheelPresets] presetPanel not found")
+			configuringPresets = false
+			return
 		end
-	end
+		
+		if not presetPanel:isVisible() then
+			configuringPresets = false
+			return
+		end
 
-  local deletePreset = wheelWindow:recursiveGetChildById("deletePreset")
-  deletePreset:setEnabled(#WheelOfDestiny.internalPreset > 1)
+		-- Load presets if not already loaded
+		if table.empty(WheelOfDestiny.internalPreset) then
+			WheelOfDestiny.loadWheelPresets()
+		end
+
+		presetPanel:destroyChildren()
+		
+		presetPanel.onChildFocusChange = function(self, selection, oldSelection) 
+			WheelOfDestiny.onPreparePresetClick(self, selection, oldSelection) 
+		end
+
+		if table.empty(WheelOfDestiny.internalPreset) then
+			g_logger.warning("[WheelPresets] No presets available to display after loading")
+			configuringPresets = false
+			return
+		end
+
+		table.sort(WheelOfDestiny.internalPreset, function(a, b)
+			if not a or not a.presetName then return false end
+			if not b or not b.presetName then return true end
+			return a.presetName:lower() < b.presetName:lower()
+		end)
+		
+		for i, data in pairs(WheelOfDestiny.internalPreset) do
+			local widgetStatus, widgetErr = pcall(function()
+				local widget = g_ui.createWidget('PresetLabel', presetPanel)
+				if not widget then
+					g_logger.error("[WheelPresets] Failed to create PresetLabel widget")
+					return
+				end
+				
+				local nameLabel = widget:getChildById('name')
+				local pointsLabel = widget:getChildById('points')
+				
+				if nameLabel then
+					nameLabel:setText(data.presetName or "Unknown")
+				end
+				
+				if pointsLabel then
+					local pointsText = tostring((data.availablePoints or 0) - (data.usedPoints or 0))
+					pointsLabel:setText(pointsText)
+				end
+				
+				widget:setBackgroundColor(i % 2 == 0 and "#484848" or "#414141")
+				widget.presetData = data
+
+				if WheelOfDestiny.currentPreset and WheelOfDestiny.currentPreset.presetName == data.presetName then
+					presetPanel:focusChild(widget)
+				end
+			end)
+			
+			if not widgetStatus then
+				g_logger.error("[WheelPresets] Error creating preset widget #" .. i .. ": " .. tostring(widgetErr))
+			end
+		end
+
+		local deletePreset = wheelWindow:recursiveGetChildById("deletePreset")
+		if deletePreset then
+			deletePreset:setEnabled(#WheelOfDestiny.internalPreset > 1)
+		end
+	end)
+	
+	configuringPresets = false
+	
+	if not status then
+		g_logger.error("[WheelPresets] Error in configurePresets: " .. tostring(err))
+	end
 end
 
 function WheelOfDestiny.onPreparePresetClick(list, selection, oldSelection)
-  if not oldSelection then
+  if not selection or not selection.presetData then
+    g_logger.warning("[WheelPresets] Invalid selection or missing presetData")
+    return
+  end
+  
+  if not oldSelection or not oldSelection.presetData then
     WheelOfDestiny.onPresetClick(list, selection, oldSelection)
     return
   end
@@ -2806,6 +2918,19 @@ function WheelOfDestiny.onPreparePresetClick(list, selection, oldSelection)
 end
 
 function WheelOfDestiny.onPresetClick(list, selection, oldSelection)
+	if not selection then
+		g_logger.warning("[WheelPresets] selection is nil")
+		return
+	end
+	
+	if not selection.presetData then
+		g_logger.warning("[WheelPresets] selection.presetData is nil or missing")
+		return
+	end
+	
+	-- Cache presetData locally because configurePresets() will destroy this widget
+	local presetData = selection.presetData
+	
 	if oldSelection then
 		local widgetIndex = list:getChildIndex(oldSelection)
 		oldSelection:setBackgroundColor(widgetIndex % 2 == 0 and "#484848" or "#414141")
@@ -2824,10 +2949,10 @@ function WheelOfDestiny.onPresetClick(list, selection, oldSelection)
 	selection.name:setColor("#f4f4f4")
 	selection.points:setColor("#f4f4f4")
 
-	WheelOfDestiny.currentPreset = selection.presetData
+	WheelOfDestiny.currentPreset = presetData
 
 	local presetLabel = wheelWindow:recursiveGetChildById("presetLabel")
-	presetLabel:setText(string.format("Current Preset: %s", selection.presetData.presetName))
+	presetLabel:setText(string.format("Current Preset: %s", presetData.presetName))
 
 	local presetHotCopy = wheelWindow:recursiveGetChildById("hotCopy")
 	presetHotCopy.onClick = function() 
@@ -2846,9 +2971,9 @@ function WheelOfDestiny.onPresetClick(list, selection, oldSelection)
 	resetWheel(true)
 
 	WheelOfDestiny.currentPreset.pointInvested = oldValue
-  local pointsInvested = selection.presetData.availablePoints - (WheelOfDestiny.extraGemPoints + WheelOfDestiny.scrollPoints)
+  local pointsInvested = presetData.availablePoints - (WheelOfDestiny.extraGemPoints + WheelOfDestiny.scrollPoints)
 
-	WheelOfDestiny.create(WheelOfDestiny.playerId, WheelOfDestiny.canView, WheelOfDestiny.changeState, WheelOfDestiny.vocationId, pointsInvested, WheelOfDestiny.scrollPoints, selection.presetData.pointInvested, WheelOfDestiny.usedPromotionScrolls, selection.presetData.equipedGems, WheelOfDestiny.atelierGems, WheelOfDestiny.basicModsUpgrade, WheelOfDestiny.supremeModsUpgrade) 
+	WheelOfDestiny.create(WheelOfDestiny.playerId, WheelOfDestiny.canView, WheelOfDestiny.changeState, WheelOfDestiny.vocationId, pointsInvested, WheelOfDestiny.scrollPoints, presetData.pointInvested, WheelOfDestiny.usedPromotionScrolls, presetData.equipedGems, WheelOfDestiny.atelierGems, WheelOfDestiny.basicModsUpgrade, WheelOfDestiny.supremeModsUpgrade) 
 end
 
 function WheelOfDestiny.determinateCurrentPreset()
@@ -2871,21 +2996,41 @@ function WheelOfDestiny.determinateCurrentPreset()
 			return
 		end
 	end
+
+	-- If no matching preset found, initialize to first preset
+	if not WheelOfDestiny.currentPreset or table.empty(WheelOfDestiny.currentPreset) then
+		if not table.empty(WheelOfDestiny.internalPreset) then
+			WheelOfDestiny.currentPreset = WheelOfDestiny.internalPreset[1]
+			local presetLabel = wheelWindow:recursiveGetChildById("presetLabel")
+			if presetLabel then
+				presetLabel:setText(string.format("Current Preset: %s", WheelOfDestiny.currentPreset.presetName))
+			end
+		end
+	end
 end
 
 function WheelOfDestiny.updateCurrentPreset()
 	if not WheelOfDestiny.currentPreset then
+		g_logger.warning("[WheelPresets] Cannot update preset: currentPreset is nil")
 		return
 	end
 
-	WheelOfDestiny.currentPreset.pointInvested = WheelOfDestiny.pointInvested
-	WheelOfDestiny.currentPreset.equipedGems = getLocalGemStruct()
-	WheelOfDestiny.currentPreset.usedPoints = WheelOfDestiny.usedPoints
+	local player = g_game.getLocalPlayer()
+	if not player then
+		return
+	end
 
-  local totalPoints = WheelOfDestiny.points + (WheelOfDestiny.extraGemPoints + WheelOfDestiny.scrollPoints)
+	WheelOfDestiny.currentPreset.pointInvested = WheelOfDestiny.pointInvested or {}
+	WheelOfDestiny.currentPreset.equipedGems = getLocalGemStruct()
+	WheelOfDestiny.currentPreset.usedPoints = WheelOfDestiny.usedPoints or 0
+
+  local points = WheelOfDestiny.points or 0
+  local extraGemPoints = WheelOfDestiny.extraGemPoints or 0
+  local scrollPoints = WheelOfDestiny.scrollPoints or 0
+  local totalPoints = points + (extraGemPoints + scrollPoints)
 	WheelOfDestiny.currentPreset.availablePoints = totalPoints
 
-  WheelOfDestiny.currentPreset.extraGemPoints = WheelOfDestiny.extraGemPoints
+  WheelOfDestiny.currentPreset.extraGemPoints = extraGemPoints
   WheelOfDestiny.currentPreset.presetName = WheelOfDestiny.currentPreset.presetName or "Default-Preset"
 
 	for i, data in pairs(WheelOfDestiny.internalPreset) do
@@ -2920,37 +3065,58 @@ function WheelOfDestiny.loadWheelPresets()
 	WheelOfDestiny.externalPreset = {}
 	WheelOfDestiny.internalPreset = {}
 
-	if not LoadedPlayer:isLoaded() then
-		return true
+	local player = g_game.getLocalPlayer()
+	if not player then
+		g_logger.info("[WheelPresets] No local player, skipping preset load")
+		return false
 	end
 
-	local defaultData = { presets = {{ exportString = defaultExportString[translateWheelVocation(LoadedPlayer:getVocation())], name = "Default-Preset" }}} -- default data
+	local playerVocation = translateWheelVocation(player:getVocation())
+	local defaultData = { presets = {{ exportString = defaultExportString[playerVocation], name = "Default-Preset" }}} -- default data
 
-	local file = "/characterdata/" .. LoadedPlayer:getId() .. "/wheelOfDestiny.json"
+	local file = "/characterdata/" .. player:getId() .. "/wheelOfDestiny.json"
+	g_logger.info("[WheelPresets] Loading presets from: " .. file)
+	
 	if g_resources.fileExists(file) then
 		local status, result = pcall(function()
 			return json.decode(g_resources.readFileContents(file))
 		end)
 
 		if not status then
-			return g_logger.error("Error while reading characterdata file. Details: " .. result)
+			g_logger.error("[WheelPresets] Error reading file: " .. result)
+			WheelOfDestiny.externalPreset = defaultData
+			WheelOfDestiny.generateInternalPreset()
+			return false
 		end
 
     if result["presets"] == nil or #result["presets"] == 0 then
+      g_logger.info("[WheelPresets] File has no presets, using default")
       WheelOfDestiny.externalPreset = defaultData
     else
+      g_logger.info(string.format("[WheelPresets] Loaded %d presets from file", #result["presets"]))
 		  WheelOfDestiny.externalPreset = result
     end
 	else
+		g_logger.info("[WheelPresets] File not found, using default preset")
 		WheelOfDestiny.externalPreset = defaultData
 	end
 
 	-- Validate preset structure
 	WheelOfDestiny.generateInternalPreset()
+	g_logger.info(string.format("[WheelPresets] Generated %d internal presets", #WheelOfDestiny.internalPreset))
+	return true
 end
 
 function WheelOfDestiny.generateInternalPreset()
-  local playerVocation = translateWheelVocation(LoadedPlayer:getVocation())
+  local player = g_game.getLocalPlayer()
+  if not player then
+    g_logger.warning("[WheelPresets] No local player for generateInternalPreset")
+    return
+  end
+  
+  local playerVocation = translateWheelVocation(player:getVocation())
+  g_logger.debug("[WheelPresets] Generating internal presets for vocation: " .. playerVocation)
+  
 	for k, v in pairs(WheelOfDestiny.externalPreset.presets) do
 		local codeString = v["exportString"]
 		local vocationString = codeString:sub(1, 2)
@@ -2959,10 +3125,12 @@ function WheelOfDestiny.generateInternalPreset()
 
 		-- Invalid data
 		if table.empty(data) or vocationString ~= getVocationSt(playerVocation) then
+			g_logger.warning(string.format("[WheelPresets] Skipping invalid preset '%s' (vocation mismatch or bad data)", v.name))
 			table.remove(WheelOfDestiny.externalPreset.presets, k)
       goto continue
 		end
 
+		g_logger.debug(string.format("[WheelPresets] Adding preset '%s' with %d points", v.name, data.maxPoints))
 		table.insert(WheelOfDestiny.internalPreset, { presetName = v.name, availablePoints = data.maxPoints, usedPoints = data.usedPoints, pointInvested = data.pointInvested, equipedGems = data.equipedGems })
 	
     :: continue ::
@@ -2970,8 +3138,15 @@ function WheelOfDestiny.generateInternalPreset()
 end
 
 function WheelOfDestiny.saveWheelPresets()
-  if not LoadedPlayer:isLoaded() then
-    return true
+  local player = g_game.getLocalPlayer()
+  if not player then
+    g_logger.info("[WheelPresets] No local player, skipping preset save")
+    return false
+  end
+
+  if table.empty(WheelOfDestiny.internalPreset) then
+    g_logger.warning("[WheelPresets] No presets to save")
+    return false
   end
 
   local savedData = {}
@@ -2980,7 +3155,7 @@ function WheelOfDestiny.saveWheelPresets()
   for _, preset in pairs(WheelOfDestiny.internalPreset) do
     local exportStr = WheelOfDestiny.getExportCode(preset)
     if not string.empty(exportStr) and #exportStr < 10 then
-      exportStr = defaultExportString[translateWheelVocation(LoadedPlayer:getVocation())]
+      exportStr = defaultExportString[translateWheelVocation(player:getVocation())]
     end
 
     if not string.empty(exportStr) then
@@ -2988,17 +3163,33 @@ function WheelOfDestiny.saveWheelPresets()
     end
   end
 
-  local file = "/characterdata/" .. LoadedPlayer:getId() .. "/wheelOfDestiny.json"
+  local directory = "/characterdata/" .. player:getId()
+  local file = directory .. "/wheelOfDestiny.json"
+  
+  g_logger.info(string.format("[WheelPresets] Attempting to save to: %s", file))
+  
+  -- Ensure directory exists
+  if not g_resources.directoryExists(directory) then
+    local success = g_resources.makeDir(directory)
+    g_logger.info(string.format("[WheelPresets] Created directory: %s (success: %s)", directory, tostring(success)))
+  else
+    g_logger.info(string.format("[WheelPresets] Directory already exists: %s", directory))
+  end
+
   local status, result = pcall(function() return json.encode(savedData, 2) end)
   if not status then
-    return g_logger.error("Error while saving wheel of destiny data. Data won't be saved. Details: " .. result)
+    g_logger.error("[WheelPresets] Error encoding JSON: " .. result)
+    return false
   end
 
   if result:len() > 100 * 1024 * 1024 then
-    return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
+    g_logger.error("[WheelPresets] File too large (>100MB), won't be saved")
+    return false
   end
 
   g_resources.writeFileContents(file, result)
+  g_logger.info(string.format("[WheelPresets] Saved %d presets to %s", #savedData.presets, file))
+  return true
 end
 
 function WheelOfDestiny.configureEquippedGems()

@@ -216,7 +216,10 @@ function loadMenu(menuId)
     local summaryButton = wheelWindow.mainPanel.wheelMenu.dedicationPerks:getChildById('summaryButton')
     local summaryOpenedButton = wheelWindow.mainPanel.wheelMenu.summary:getChildById('summaryButton')
     informationButton.onClick = function() toggleTabBarButtons('informationButton') end
-    managePresetsButton.onClick = function() toggleTabBarButtons('managePresetsButton') WheelOfDestiny.configurePresets() end
+    managePresetsButton.onClick = function() 
+      toggleTabBarButtons('managePresetsButton')
+      scheduleEvent(function() WheelOfDestiny.configurePresets() end, 50)
+    end
     summaryButton.onClick = function() toggleSummary() end
     summaryOpenedButton.onClick = function() toggleSummary() end
     toggleTabBarButtons('informationButton')
